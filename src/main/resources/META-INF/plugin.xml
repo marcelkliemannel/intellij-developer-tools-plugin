@@ -1,0 +1,82 @@
+<idea-plugin>
+  <id>dev.turingcomplete.intellijdevelopertoolsplugins</id>
+  <name>Developer Tools</name>
+  <vendor email="dev@marcelkliemannel.com" url="https://marcelkliemannel.com/projects/intellij-developer-tools-plugin">
+    Marcel Kliemannel
+  </vendor>
+
+  <description><![CDATA[
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam finibus massa enim. Maecenas fringilla egestas tristique. Cras sed elementum arcu, eu iaculis neque. Suspendisse mollis, diam tristique bibendum maximus, tortor tortor tincidunt sapien, ac mollis lacus metus scelerisque velit. Curabitur consequat dapibus leo, eu egestas leo eleifend at. Phasellus luctus, lorem eget suscipit vehicula, risus nisl feugiat dui, tempor imperdiet est metus sit amet ipsum. Maecenas aliquam vehicula dolor, at aliquam ante. Etiam semper eget arcu nec ultricies. Aenean at pretium ex. Maecenas efficitur condimentum erat, vitae placerat neque mattis vel. Suspendisse sollicitudin ipsum in turpis laoreet interdum. Duis interdum tincidunt nibh, at accumsan magna ullamcorper vitae. Integer sodales ultrices pulvinar. Donec vitae mattis ligula, condimentum egestas est. Mauris id consectetur massa.</p>
+    ]]></description>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationService
+            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolsService"/>
+  </extensions>
+
+  <actions>
+    <action id="dev.turingcomplete.intellijdevelopertoolsplugins.OpenMainDialogAction"
+            class="dev.turingcomplete.intellijdevelopertoolsplugins.OpenMainDialogAction"
+            text="Developer Tools"
+            description="Provides various developer tools"
+            icon="AllIcons.General.ExternalTools">
+      <add-to-group group-id="MainToolBar" anchor="last"/>
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+  </actions>
+
+  <extensionPoints>
+    <extensionPoint name="encoderDecoder"
+                    interface="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.encoderdecoder.EncoderDecoder"
+                    dynamic="true"/>
+    <extensionPoint name="textEscape"
+                    interface="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.textescape.TextEscape"
+                    dynamic="true"/>
+    <extensionPoint name="hash"
+                    interface="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.HashingTransformer"
+                    dynamic="true"/>
+    <extensionPoint name="uuid"
+                    interface="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidGenerator"
+                    dynamic="true"/>
+    <extensionPoint name="textTransformer"
+                    interface="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextTransformer"
+                    dynamic="true"/>
+  </extensionPoints>
+
+  <extensions defaultExtensionNs="dev.turingcomplete.intellijdevelopertoolsplugins">
+    <encoderDecoder
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.encoderdecoder.Base32EncoderDecoder"/>
+    <encoderDecoder
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.encoderdecoder.Base64EncoderDecoder"/>
+    <encoderDecoder
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.encoderdecoder.UrlBase64EncoderDecoder"/>
+    <encoderDecoder
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.encoderdecoder.UrlEncodingEncoderDecoder"/>
+    <encoderDecoder
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.encoderdecoder.LineBreaksEncoderDecoder"/>
+    <encoderDecoder
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.encoderdecoder.TabsEncoderDecoder"/>
+
+    <textEscape
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.textescape.HtmlEntitiesTextEscape"/>
+    <textEscape
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.textescape.JavaTextEscape"/>
+    <textEscape
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.textescape.JsonTextEscape"/>
+    <textEscape
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.textescape.CsvTextEscape"/>
+    <textEscape
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.textescape.XmlTextEscape"/>
+
+    <textTransformer implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.HashingTransformer"/>
+    <textTransformer implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextCaseTransformer"/>
+
+    <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV1Generator"/>
+    <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV3Generator"/>
+    <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV4Generator"/>
+    <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV5Generator"/>
+    <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV6Generator"/>
+    <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV7Generator"/>
+  </extensions>
+
+</idea-plugin>
