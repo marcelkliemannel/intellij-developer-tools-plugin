@@ -4,12 +4,10 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.dsl.builder.*
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import java.awt.event.ItemEvent
-import javax.swing.JComponent
 
 abstract class TextConverter(
         id: String,
@@ -43,10 +41,7 @@ abstract class TextConverter(
     }
 
     buildConfigurationUi(project, parentDisposable)
-
-    row {
-      cell(createActionsComponent()).horizontalAlign(HorizontalAlign.FILL)
-    }
+    buildActionsUi()
 
     row {
       resizableRow()
@@ -70,7 +65,7 @@ abstract class TextConverter(
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun createActionsComponent(): JComponent = panel {
+  private fun Panel.buildActionsUi() {
     buttonsGroup {
       row {
         radioButton("Live conversion").configure(ConverterMode.LIVE)

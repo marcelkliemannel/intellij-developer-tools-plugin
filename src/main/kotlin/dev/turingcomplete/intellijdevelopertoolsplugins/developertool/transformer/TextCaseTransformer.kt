@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.dsl.builder.*
+import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.GeneralDeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextCaseTransformer.OriginalParsingMode.FIXED_TEXT_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextCaseTransformer.OriginalParsingMode.INDIVIDUAL_DELIMITER
 import dev.turingcomplete.textcaseconverter.StandardTextCases
@@ -21,7 +22,7 @@ class TextCaseTransformer : TextTransformer(
         transformActionTitle = "Transform",
         sourceTitle = "Original",
         resultTitle = "Target"
-) {
+), GeneralDeveloperTool {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var originalParsingMode by createProperty("originalParsingMode", FIXED_TEXT_CASE)
@@ -54,8 +55,7 @@ class TextCaseTransformer : TextTransformer(
     }
 
     row {
-      label("Target:").gap(RightGap.SMALL)
-      comboBox(TextCase.values().toList()).configure(outputTextCase) { outputTextCase = it }
+      comboBox(TextCase.values().toList()).label("Target:").configure(outputTextCase) { outputTextCase = it }
     }
   }
 

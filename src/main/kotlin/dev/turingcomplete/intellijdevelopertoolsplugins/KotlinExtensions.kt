@@ -16,7 +16,7 @@ fun ByteArray.toHexMacAddress() = StringBuilder(18).also {
   }
 }.toString()
 
-fun String.toMessageDigest() = MessageDigest.getInstance(this)
+fun String.toMessageDigest(): MessageDigest = MessageDigest.getInstance(this)
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

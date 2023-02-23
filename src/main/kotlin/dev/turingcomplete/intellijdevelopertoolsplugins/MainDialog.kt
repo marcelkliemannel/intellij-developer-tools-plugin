@@ -13,10 +13,10 @@ import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.DeveloperTool
+import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.GeneralDeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.encoderdecoder.EncoderDecoder
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.textescape.TextEscape
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidGenerator
-import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextTransformer
 import javax.swing.JComponent
 import javax.swing.ScrollPaneConstants
 import javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
@@ -76,38 +76,23 @@ class MainDialog(private val project: Project?) : DialogWrapper(project) {
   }
 
   private fun buildMenuTree(): Tree = Tree().apply {
-    val convertsNode = DefaultMutableTreeNode("Converters")
     val encodersDecodersNodes = collectDeveloperToolNodes("Encoders/Decoders", EncoderDecoder.EP)
-    val textEscapeNodes = collectDeveloperToolNodes("Text Escape", TextEscape.EP)
-
-    val transformersNodes = collectDeveloperToolNodes("Transformers", TextTransformer.EP)
-
-    val generatorsNode = DefaultMutableTreeNode("Generators")
-    val uuidGeneratorsNodesOld = collectDeveloperToolNodes("UUID", UuidGenerator.EP)
-
     val root = DefaultMutableTreeNode().apply {
-      add(convertsNode.apply {
-        add(encodersDecodersNodes)
-        add(textEscapeNodes)
-      })
-
-      add(transformersNodes)
-
-      add(generatorsNode.apply {
-        add(uuidGeneratorsNodesOld)
-      })
+      add(encodersDecodersNodes)
+      add(collectDeveloperToolNodes("Text Escape", TextEscape.EP))
+      add(collectDeveloperToolNodes("UUID", UuidGenerator.EP))
+      GeneralDeveloperTool.EP.forEachExtensionSafe {
+        add(DefaultMutableTreeNode(it))
+      }
     }
-
     model = DefaultTreeModel(root)
-    expandPath(TreePath(convertsNode.path))
+
     expandPath(TreePath(encodersDecodersNodes.path))
-    expandPath(TreePath(transformersNodes.path))
-    expandPath(TreePath(generatorsNode.path))
   }
 
   private fun collectDeveloperToolNodes(title: String, extensionPoint: ExtensionPointName<out DeveloperTool>): DefaultMutableTreeNode {
     return DefaultMutableTreeNode(title).apply {
-      extensionPoint.extensions.forEach { pocketKnifeTool ->
+      extensionPoint.forEachExtensionSafe { pocketKnifeTool ->
         add(DefaultMutableTreeNode(pocketKnifeTool))
       }
     }

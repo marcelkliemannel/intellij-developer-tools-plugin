@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
+import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.GeneralDeveloperTool
 import org.bouncycastle.util.encoders.Hex
 import java.awt.event.ItemEvent
 import java.security.MessageDigest
@@ -16,7 +17,7 @@ class HashingTransformer : TextTransformer(
         transformActionTitle = "Hash",
         sourceTitle = "Plain",
         resultTitle = "Hashed"
-) {
+), GeneralDeveloperTool {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var algorithm: HashAlgorithm by createProperty("algorithm", HashAlgorithm.Sha256Hash)

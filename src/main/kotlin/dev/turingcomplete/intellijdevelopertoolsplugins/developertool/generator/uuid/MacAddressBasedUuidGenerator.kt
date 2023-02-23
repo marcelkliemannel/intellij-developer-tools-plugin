@@ -34,7 +34,7 @@ abstract class MacAddressBasedUuidGenerator(title: String, description: String? 
       }
 
       row {
-        val individualRadioButton = radioButton("Individual:").configure(INDIVIDUAL).gap(com.intellij.ui.dsl.builder.RightGap.SMALL)
+        val individualRadioButton = radioButton("Individual:").configure(INDIVIDUAL).gap(RightGap.SMALL)
         @Suppress("UnstableApiUsage")
         textField().text(individualMacAddress)
                 .validation(validateIndividualMacAddress())
@@ -48,7 +48,7 @@ abstract class MacAddressBasedUuidGenerator(title: String, description: String? 
       row {
         val localMacAddresses = collectLocalMacAddresses()
         visible(localMacAddresses.isNotEmpty())
-        val useLocalInterface = radioButton("Local interface:").configure(LOCAL_INTERFACE).gap(com.intellij.ui.dsl.builder.RightGap.SMALL)
+        val useLocalInterface = radioButton("Local interface:").configure(LOCAL_INTERFACE).gap(RightGap.SMALL)
         comboBox(localMacAddresses).configure().enabledIf(useLocalInterface.selected).component
       }
     }

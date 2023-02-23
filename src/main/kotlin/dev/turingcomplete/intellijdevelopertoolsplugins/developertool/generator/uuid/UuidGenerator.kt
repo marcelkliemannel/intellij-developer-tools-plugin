@@ -1,16 +1,16 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid
 
 import com.intellij.openapi.extensions.ExtensionPointName
-import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.SimpleTextGenerator
+import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.OneLineTextGenerator
 
 abstract class UuidGenerator(
         title: String,
         description: String? = null,
         supportsBulkGeneration: Boolean = true
-) : SimpleTextGenerator(id = title.lowercase(),
-                        title = title,
-                        description = description,
-                        supportsBulkGeneration = supportsBulkGeneration) {
+) : OneLineTextGenerator(id = title.lowercase(),
+                         title = title,
+                         description = description,
+                         supportsBulkGeneration = supportsBulkGeneration) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //

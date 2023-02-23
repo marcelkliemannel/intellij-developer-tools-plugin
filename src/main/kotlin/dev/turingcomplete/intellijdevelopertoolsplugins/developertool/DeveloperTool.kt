@@ -74,7 +74,7 @@ abstract class DeveloperTool(val id: String, val title: String, val description:
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun <T> propertyChanged(key: String, defaultValue: T): (KProperty<*>, T, T) -> Unit = { _, old, new ->
+  private fun <T> propertyChanged(key: String, defaultValue: T): (KProperty<*>, T, T) -> Unit = { property, old, new ->
     if (old != new) {
       if (new != defaultValue) {
         setProperty(key, new as Any)

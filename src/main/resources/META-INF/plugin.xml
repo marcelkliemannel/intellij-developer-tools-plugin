@@ -38,8 +38,8 @@
     <extensionPoint name="uuid"
                     interface="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidGenerator"
                     dynamic="true"/>
-    <extensionPoint name="textTransformer"
-                    interface="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextTransformer"
+    <extensionPoint name="general"
+                    interface="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.GeneralDeveloperTool"
                     dynamic="true"/>
   </extensionPoints>
 
@@ -68,8 +68,9 @@
     <textEscape
             implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.textescape.XmlTextEscape"/>
 
-    <textTransformer implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.HashingTransformer"/>
-    <textTransformer implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextCaseTransformer"/>
+    <general implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.HashingTransformer"/>
+    <general implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextCaseTransformer"/>
+    <general implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.LoremIpsumGenerator"/>
 
     <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV1Generator"/>
     <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV3Generator"/>

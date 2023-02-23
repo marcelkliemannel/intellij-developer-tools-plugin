@@ -1,7 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer
 
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.dsl.builder.*
@@ -10,7 +9,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.DeveloperT
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor.EditorMode.OUTPUT
-import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.textescape.TextEscape
 import java.awt.event.ItemEvent
 
 abstract class TextTransformer(
@@ -100,9 +98,4 @@ abstract class TextTransformer(
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
-
-  companion object {
-
-    val EP: ExtensionPointName<TextEscape> = ExtensionPointName.create("dev.turingcomplete.intellijdevelopertoolsplugins.textTransformer")
-  }
 }

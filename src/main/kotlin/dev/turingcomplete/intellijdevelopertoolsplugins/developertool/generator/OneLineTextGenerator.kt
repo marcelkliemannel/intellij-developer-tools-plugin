@@ -19,7 +19,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.Dev
 import dev.turingcomplete.intellijdevelopertoolsplugins.wrapWithToolBar
 import kotlinx.serialization.json.Json.Default.configuration
 
-abstract class SimpleTextGenerator(
+abstract class OneLineTextGenerator(
         id: String,
         title: String,
         private val supportsBulkGeneration: Boolean = true,
