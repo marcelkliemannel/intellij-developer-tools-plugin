@@ -212,10 +212,11 @@ fun JBCheckBox.onSelected(selectListener: () -> Unit) = this.apply {
   }
 }
 
-fun ComboBox<*>.onChanged(changeListener: () -> Unit) {
+fun <T> ComboBox<T>.onChanged(changeListener: (T) -> Unit) {
   this.addItemListener { event ->
     if (event.stateChange == ItemEvent.SELECTED) {
-      changeListener()
+      @Suppress("UNCHECKED_CAST")
+      changeListener(selectedItem as T)
     }
   }
 }

@@ -41,7 +41,7 @@ class HashingTransformer : TextTransformer(
 
   private fun Cell<ComboBox<HashAlgorithm>>.configure() = this.applyToComponent {
     selectedItem = algorithm
-    onChanged { algorithm = selectedItem as HashAlgorithm }
+    onChanged { algorithm = it }
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

@@ -81,7 +81,7 @@ abstract class NamespaceAndNameBasedUuidGenerator(
 
   private fun Cell<ComboBox<PredefinedNamespace>>.configure() = this.applyToComponent {
     selectedItem = predefinedNamespace
-    onChanged { predefinedNamespace = component.selectedItem as PredefinedNamespace }
+    onChanged { predefinedNamespace = it }
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

@@ -63,7 +63,7 @@ class TextCaseTransformer : TextTransformer(
   private fun Cell<ComboBox<TextCase>>.configure(initialTextCase: TextCase, setTextCase: (TextCase) -> Unit) =
     applyToComponent {
       selectedItem = initialTextCase
-      onChanged { setTextCase(selectedItem as TextCase) }
+      onChanged { setTextCase(it) }
     }
 
   private fun Cell<JBRadioButton>.configure(value: OriginalParsingMode) = this.applyToComponent {

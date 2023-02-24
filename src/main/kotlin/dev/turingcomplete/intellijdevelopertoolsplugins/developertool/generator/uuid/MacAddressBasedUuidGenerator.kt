@@ -78,7 +78,7 @@ abstract class MacAddressBasedUuidGenerator(title: String, description: String? 
     model.asSequence().firstOrNull { it.macAddress.toHexMacAddress() == localInterface }?.let {
       component.selectedItem = it
     }
-    onChanged { localInterface = (component.selectedItem as LocalInterface).macAddress.toHexMacAddress() }
+    onChanged { localInterface = it.macAddress.toHexMacAddress() }
   }
 
   private fun collectLocalMacAddresses(): List<LocalInterface> {
