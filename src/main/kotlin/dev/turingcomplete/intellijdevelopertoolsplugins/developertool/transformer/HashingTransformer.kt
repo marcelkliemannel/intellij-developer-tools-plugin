@@ -7,8 +7,8 @@ import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.GeneralDeveloperTool
+import dev.turingcomplete.intellijdevelopertoolsplugins.onChanged
 import org.bouncycastle.util.encoders.Hex
-import java.awt.event.ItemEvent
 import java.security.MessageDigest
 
 class HashingTransformer : TextTransformer(
@@ -39,14 +39,9 @@ class HashingTransformer : TextTransformer(
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun Cell<ComboBox<HashAlgorithm>>.configure() = applyToComponent {
+  private fun Cell<ComboBox<HashAlgorithm>>.configure() = this.applyToComponent {
     selectedItem = algorithm
-    addItemListener { event ->
-      if (event.stateChange == ItemEvent.SELECTED) {
-        algorithm = selectedItem as HashAlgorithm
-        doTransform()
-      }
-    }
+    onChanged { algorithm = selectedItem as HashAlgorithm }
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

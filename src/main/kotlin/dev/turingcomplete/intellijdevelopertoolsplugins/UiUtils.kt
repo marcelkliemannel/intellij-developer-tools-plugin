@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAwareToggleAction
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.panel.ComponentPanelBuilder
 import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.util.ScalableIcon
@@ -11,6 +12,7 @@ import com.intellij.ui.ClickListener
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.SeparatorWithText
 import com.intellij.ui.SizedIcon
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBRadioButton
@@ -25,6 +27,7 @@ import java.awt.GridBagLayout
 import java.awt.LayoutManager
 import java.awt.datatransfer.StringSelection
 import java.awt.event.ActionEvent
+import java.awt.event.ItemEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
@@ -191,4 +194,28 @@ fun JComponent.bindToRadioButton(radioButton: JBRadioButton) {
       radioButton.isSelected = true
     }
   })
+}
+
+fun JBRadioButton.onSelected(selectListener: () -> Unit) = this.apply {
+  this.addItemListener { event ->
+    if (event.stateChange == ItemEvent.SELECTED) {
+      selectListener()
+    }
+  }
+}
+
+fun JBCheckBox.onSelected(selectListener: () -> Unit) = this.apply {
+  this.addItemListener { event ->
+    if (event.stateChange == ItemEvent.SELECTED) {
+      selectListener()
+    }
+  }
+}
+
+fun ComboBox<*>.onChanged(changeListener: () -> Unit) {
+  this.addItemListener { event ->
+    if (event.stateChange == ItemEvent.SELECTED) {
+      changeListener()
+    }
+  }
 }

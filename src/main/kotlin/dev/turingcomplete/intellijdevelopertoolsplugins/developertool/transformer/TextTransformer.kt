@@ -9,7 +9,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.DeveloperT
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor.EditorMode.OUTPUT
-import java.awt.event.ItemEvent
+import dev.turingcomplete.intellijdevelopertoolsplugins.onSelected
 
 abstract class TextTransformer(
         id: String,
@@ -27,6 +27,15 @@ abstract class TextTransformer(
   private lateinit var resultEditor: DeveloperToolEditor
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
+
+  init {
+    registerPropertyChangeListeners {
+      if (transformerMode == TransformerMode.LIVE) {
+        doTransform()
+      }
+    }
+  }
+
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   abstract fun transform(text: String): String
@@ -53,11 +62,11 @@ abstract class TextTransformer(
 
   protected open fun Panel.buildConfigurationUi(project: Project?, parentDisposable: Disposable) {}
 
-  fun doTransform() {
+  // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun doTransform() {
     resultEditor.text = transform(sourceEditor.text)
   }
-
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun createActionsComponent() = panel {
     buttonsGroup {
@@ -69,15 +78,9 @@ abstract class TextTransformer(
     }
   }
 
-  private fun Cell<JBRadioButton>.configure(value: TransformerMode): Cell<JBRadioButton> {
-    return this.apply {
-      component.isSelected = transformerMode == value
-      component.addItemListener { event ->
-        if (event.stateChange == ItemEvent.SELECTED) {
-          transformerMode = value
-        }
-      }
-    }
+  private fun Cell<JBRadioButton>.configure(value: TransformerMode) = this.applyToComponent {
+    isSelected = transformerMode == value
+    onSelected { transformerMode = value }
   }
 
   private fun createSourceInputEditor(): DeveloperToolEditor =

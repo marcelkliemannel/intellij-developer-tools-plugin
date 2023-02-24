@@ -11,7 +11,8 @@ import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.layout.ValidationInfoBuilder
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.NamespaceAndNameBasedUuidGenerator.NamespaceMode.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.NamespaceAndNameBasedUuidGenerator.NamespaceMode.PREDEFINED
-import java.awt.event.ItemEvent
+import dev.turingcomplete.intellijdevelopertoolsplugins.onChanged
+import dev.turingcomplete.intellijdevelopertoolsplugins.onSelected
 import java.security.MessageDigest
 import java.util.*
 
@@ -41,18 +42,14 @@ abstract class NamespaceAndNameBasedUuidGenerator(
       row {
         val individualRadioButton = radioButton("Individual:").configure(INDIVIDUAL).gap(RightGap.SMALL)
         textField().text(individualNamespace).validation(validateIndividualNamespace())
-                .whenTextChangedFromUi {
-                  individualNamespace = it
-                  doGenerate()
-                }
+                .whenTextChangedFromUi(parentDisposable) { individualNamespace = it }
                 .enabledIf(individualRadioButton.selected).component
       }
     }
 
     row {
-      textField().label("Name:").text(name).whenTextChangedFromUi {
+      textField().label("Name:").text(name).whenTextChangedFromUi(parentDisposable) {
         name = it
-        doGenerate()
       }
     }
   }
@@ -77,24 +74,14 @@ abstract class NamespaceAndNameBasedUuidGenerator(
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun Cell<JBRadioButton>.configure(value: NamespaceMode): Cell<JBRadioButton> = this.apply {
-    component.isSelected = namespaceMode == value
-    component.addItemListener { event ->
-      if (event.stateChange == ItemEvent.SELECTED) {
-        namespaceMode = value
-        doGenerate()
-      }
-    }
+  private fun Cell<JBRadioButton>.configure(value: NamespaceMode) = this.applyToComponent {
+    isSelected = namespaceMode == value
+    onSelected { namespaceMode = value }
   }
 
-  private fun Cell<ComboBox<PredefinedNamespace>>.configure(): Cell<ComboBox<PredefinedNamespace>> = this.apply {
-    component.selectedItem = predefinedNamespace
-    component.addItemListener { event ->
-      if (event.stateChange == ItemEvent.SELECTED) {
-        predefinedNamespace = component.selectedItem as PredefinedNamespace
-        doGenerate()
-      }
-    }
+  private fun Cell<ComboBox<PredefinedNamespace>>.configure() = this.applyToComponent {
+    selectedItem = predefinedNamespace
+    onChanged { predefinedNamespace = component.selectedItem as PredefinedNamespace }
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

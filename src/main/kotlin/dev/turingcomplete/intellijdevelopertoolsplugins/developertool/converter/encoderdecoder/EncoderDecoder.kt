@@ -3,18 +3,14 @@ package dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter
 import com.intellij.openapi.extensions.ExtensionPointName
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.TextConverter
 
-abstract class EncoderDecoder(
-        id: String,
-        title: String,
-        description: String? = null,
-        documentationLink: String? = null
-) : TextConverter(id = id,
-                  title = title,
-                  convertActionTitle = "Encode",
-                  revertActionTitle = "Decode",
-                  sourceTitle = "Encoded",
-                  targetTitle = "Decoded",
-                  description = description) {
+abstract class EncoderDecoder(id: String, title: String, description: String? = null) :
+  TextConverter(id = id,
+                title = title,
+                convertActionTitle = "Encode",
+                revertActionTitle = "Decode",
+                sourceTitle = "Encoded",
+                targetTitle = "Decoded",
+                description = description) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //

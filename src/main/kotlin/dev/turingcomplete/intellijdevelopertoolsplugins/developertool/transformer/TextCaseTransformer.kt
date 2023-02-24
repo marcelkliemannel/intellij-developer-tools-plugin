@@ -10,10 +10,11 @@ import com.intellij.ui.dsl.builder.*
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.GeneralDeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextCaseTransformer.OriginalParsingMode.FIXED_TEXT_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextCaseTransformer.OriginalParsingMode.INDIVIDUAL_DELIMITER
+import dev.turingcomplete.intellijdevelopertoolsplugins.onChanged
+import dev.turingcomplete.intellijdevelopertoolsplugins.onSelected
 import dev.turingcomplete.textcaseconverter.StandardTextCases
 import dev.turingcomplete.textcaseconverter.toTextCase
 import dev.turingcomplete.textcaseconverter.toWordsSplitter
-import java.awt.event.ItemEvent
 import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 
 class TextCaseTransformer : TextTransformer(
@@ -47,10 +48,8 @@ class TextCaseTransformer : TextTransformer(
       row {
         val individualDelimiterRadioButton = radioButton("Words split delimiter:").configure(INDIVIDUAL_DELIMITER).gap(RightGap.SMALL)
         textField().text(individualDelimiter)
-                .whenTextChangedFromUi {
-                  individualDelimiter = it
-                  doTransform()
-                }.enabledIf(individualDelimiterRadioButton.selected).component
+                .whenTextChangedFromUi(parentDisposable) { individualDelimiter = it }
+                .enabledIf(individualDelimiterRadioButton.selected).component
       }
     }
 
@@ -64,24 +63,13 @@ class TextCaseTransformer : TextTransformer(
   private fun Cell<ComboBox<TextCase>>.configure(initialTextCase: TextCase, setTextCase: (TextCase) -> Unit) =
     applyToComponent {
       selectedItem = initialTextCase
-      addItemListener { event ->
-        if (event.stateChange == ItemEvent.SELECTED) {
-          setTextCase(selectedItem as TextCase)
-          doTransform()
-        }
-      }
+      onChanged { setTextCase(selectedItem as TextCase) }
     }
 
-  private fun Cell<JBRadioButton>.configure(value: OriginalParsingMode): Cell<JBRadioButton> =
-    this.apply {
-      component.isSelected = originalParsingMode == value
-      component.addItemListener { event ->
-        if (event.stateChange == ItemEvent.SELECTED) {
-          originalParsingMode = value
-          doTransform()
-        }
-      }
-    }
+  private fun Cell<JBRadioButton>.configure(value: OriginalParsingMode) = this.applyToComponent {
+    isSelected = originalParsingMode == value
+    onSelected { originalParsingMode = value }
+  }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 

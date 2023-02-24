@@ -7,7 +7,7 @@ import com.intellij.ui.dsl.builder.*
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
-import java.awt.event.ItemEvent
+import dev.turingcomplete.intellijdevelopertoolsplugins.onSelected
 
 abstract class TextConverter(
         id: String,
@@ -116,15 +116,9 @@ abstract class TextConverter(
       }
     }
 
-  private fun Cell<JBRadioButton>.configure(value: ConverterMode): Cell<JBRadioButton> {
-    return this.apply {
-      component.isSelected = converterMode == value
-      component.addItemListener { event ->
-        if (event.stateChange == ItemEvent.SELECTED) {
-          switchConverterMode(value)
-        }
-      }
-    }
+  private fun Cell<JBRadioButton>.configure(value: ConverterMode) = this.applyToComponent {
+    isSelected = converterMode == value
+    onSelected { switchConverterMode(value) }
   }
 
   private fun switchConverterMode(value: ConverterMode) {

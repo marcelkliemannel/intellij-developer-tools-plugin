@@ -49,6 +49,10 @@ abstract class DeveloperTool(val id: String, val title: String, val description:
     validationListeners.add(listener)
   }
 
+  fun registerPropertyChangeListeners(listener: (String) -> Unit) {
+    propertyChangeListener.add(listener)
+  }
+
   override fun toString(): String = title
 
   override fun equals(other: Any?): Boolean {
@@ -74,7 +78,7 @@ abstract class DeveloperTool(val id: String, val title: String, val description:
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun <T> propertyChanged(key: String, defaultValue: T): (KProperty<*>, T, T) -> Unit = { property, old, new ->
+  private fun <T> propertyChanged(key: String, defaultValue: T): (KProperty<*>, T, T) -> Unit = { _, old, new ->
     if (old != new) {
       if (new != defaultValue) {
         setProperty(key, new as Any)
@@ -82,6 +86,7 @@ abstract class DeveloperTool(val id: String, val title: String, val description:
       else {
         unsetProperty(key)
       }
+      propertyChangeListener.forEach { it(key) }
     }
   }
 

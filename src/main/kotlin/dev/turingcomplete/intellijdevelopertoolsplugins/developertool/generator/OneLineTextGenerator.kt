@@ -30,6 +30,11 @@ abstract class OneLineTextGenerator(
   private lateinit var generatedTextLabel: JBLabel
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
+
+  init {
+    registerPropertyChangeListeners { doGenerate() }
+  }
+
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   final override fun Panel.buildUi(project: Project?, parentDisposable: Disposable) {
@@ -48,7 +53,9 @@ abstract class OneLineTextGenerator(
     doGenerate()
   }
 
-  fun doGenerate() {
+  // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun doGenerate() {
     if (validate().isEmpty()) {
       generatedTextLabel.apply {
         text = generate()
@@ -64,8 +71,6 @@ abstract class OneLineTextGenerator(
       }
     }
   }
-
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun Panel.buildBulkGenerationUi(parentDisposable: Disposable) {
     group("Bulk Generation", false) {

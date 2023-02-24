@@ -39,7 +39,7 @@ class LineBreaksEncoderDecoder : EncoderDecoder("line-breaks", "Line Breaks") {
     }
   }
 
-  private fun Cell<ComboBox<LineBreak>>.configure() = applyToComponent {
+  private fun Cell<ComboBox<LineBreak>>.configure() = this.applyToComponent {
     selectedItem = lineBreakDecoding
     addItemListener { event ->
       if (event.stateChange == ItemEvent.SELECTED) {

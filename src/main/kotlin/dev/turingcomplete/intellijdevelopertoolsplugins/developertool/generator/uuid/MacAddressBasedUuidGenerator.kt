@@ -11,8 +11,9 @@ import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.layout.ValidationInfoBuilder
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.*
+import dev.turingcomplete.intellijdevelopertoolsplugins.onChanged
+import dev.turingcomplete.intellijdevelopertoolsplugins.onSelected
 import dev.turingcomplete.intellijdevelopertoolsplugins.toHexMacAddress
-import java.awt.event.ItemEvent
 import java.net.NetworkInterface
 import java.net.SocketException
 
@@ -38,10 +39,7 @@ abstract class MacAddressBasedUuidGenerator(title: String, description: String? 
         @Suppress("UnstableApiUsage")
         textField().text(individualMacAddress)
                 .validation(validateIndividualMacAddress())
-                .whenTextChangedFromUi {
-                  individualMacAddress = it
-                  doGenerate()
-                }
+                .whenTextChangedFromUi(parentDisposable) { individualMacAddress = it }
                 .enabledIf(individualRadioButton.selected).component
       }
 
@@ -71,26 +69,16 @@ abstract class MacAddressBasedUuidGenerator(title: String, description: String? 
     }
   }
 
-  private fun Cell<JBRadioButton>.configure(value: MacAddressGenerationMode): Cell<JBRadioButton> = this.apply {
-    component.isSelected = macAddressGenerationMode == value
-    component.addItemListener { event ->
-      if (event.stateChange == ItemEvent.SELECTED) {
-        macAddressGenerationMode = value
-        doGenerate()
-      }
-    }
+  private fun Cell<JBRadioButton>.configure(value: MacAddressGenerationMode) = this.applyToComponent {
+    isSelected = macAddressGenerationMode == value
+    onSelected { macAddressGenerationMode = value }
   }
 
-  private fun Cell<ComboBox<LocalInterface>>.configure(): Cell<ComboBox<LocalInterface>> = this.apply {
-    component.model.asSequence().firstOrNull { it.macAddress.toHexMacAddress() == localInterface }?.let {
+  private fun Cell<ComboBox<LocalInterface>>.configure() = this.applyToComponent {
+    model.asSequence().firstOrNull { it.macAddress.toHexMacAddress() == localInterface }?.let {
       component.selectedItem = it
     }
-    component.addItemListener { event ->
-      if (event.stateChange == ItemEvent.SELECTED) {
-        localInterface = (component.selectedItem as LocalInterface).macAddress.toHexMacAddress()
-        doGenerate()
-      }
-    }
+    onChanged { localInterface = (component.selectedItem as LocalInterface).macAddress.toHexMacAddress() }
   }
 
   private fun collectLocalMacAddresses(): List<LocalInterface> {
