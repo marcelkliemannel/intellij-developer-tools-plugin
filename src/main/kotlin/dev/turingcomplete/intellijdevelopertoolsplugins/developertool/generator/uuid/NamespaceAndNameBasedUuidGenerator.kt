@@ -51,7 +51,7 @@ abstract class NamespaceAndNameBasedUuidGenerator(
       textField().label("Name:").text(name).whenTextChangedFromUi(parentDisposable) {
         name = it
       }
-    }.bottomGap(BottomGap.MEDIUM)
+    }
   }
 
   private fun validateIndividualNamespace(): ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {

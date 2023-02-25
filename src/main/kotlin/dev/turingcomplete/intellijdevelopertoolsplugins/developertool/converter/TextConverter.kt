@@ -2,12 +2,16 @@ package dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
-import com.intellij.ui.components.JBRadioButton
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.selected
+import com.intellij.ui.layout.not
+import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
-import dev.turingcomplete.intellijdevelopertoolsplugins.onSelected
+import dev.turingcomplete.intellijdevelopertoolsplugins.onSelectionChanged
 
 abstract class TextConverter(
         id: String,
@@ -20,7 +24,8 @@ abstract class TextConverter(
 ) : DeveloperTool(id = id, title = title, description = description) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var converterMode by createProperty("converterMode", ConverterMode.LIVE)
+  private var liveConversion by createProperty("liveConversion", true)
+  private lateinit var conversationAlarm: Alarm
 
   private var lastActiveInput: DeveloperToolEditor? = null
   private var currentActiveInput: DeveloperToolEditor? = null
@@ -32,6 +37,8 @@ abstract class TextConverter(
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun Panel.buildUi(project: Project?, parentDisposable: Disposable) {
+    conversationAlarm = Alarm(parentDisposable)
+
     sourceEditor = createEditor(id = id, title = sourceTitle) { doToTarget(it) }
     targetEditor = createEditor(id = id, title = targetTitle) { doToSource(it) }
 
@@ -59,7 +66,7 @@ abstract class TextConverter(
     doToTarget(sourceEditor.text)
   }
 
-  protected fun transformToSource() {
+  private fun transformToSource() {
     doToSource(targetEditor.text)
   }
 
@@ -68,28 +75,40 @@ abstract class TextConverter(
   private fun Panel.buildActionsUi() {
     buttonsGroup {
       row {
-        radioButton("Live conversion").configure(ConverterMode.LIVE)
-        val manualRadioButton = radioButton("Manual:").configure(ConverterMode.MANUAL).gap(RightGap.SMALL)
-        button("▼ $convertActionTitle") { transformToTarget() }.enabledIf(manualRadioButton.selected).gap(RightGap.SMALL)
-        button("▲ $revertActionTitle") { transformToSource() }.enabledIf(manualRadioButton.selected)
+        val liveConversionCheckBox = checkBox("Live conversion").applyToComponent {
+          isSelected = liveConversion
+          onSelectionChanged { switchLiveConversion(it) }
+        }
+
+        button("▼ $convertActionTitle") { transformToTarget() }.enabledIf(liveConversionCheckBox.selected.not()).gap(RightGap.SMALL)
+        button("▲ $revertActionTitle") { transformToSource() }.enabledIf(liveConversionCheckBox.selected.not())
       }
     }
   }
 
   private fun doToTarget(text: String) {
-    try {
-      targetEditor.text = toTarget(text)
-    }
-    catch (ignore: Exception) {
+    doConversation {
+      try {
+        targetEditor.text = toTarget(text)
+      }
+      catch (ignore: Exception) {
+      }
     }
   }
 
   private fun doToSource(text: String) {
-    try {
-      sourceEditor.text = toSource(text)
+    doConversation {
+      try {
+        sourceEditor.text = toSource(text)
+      }
+      catch (ignore: Exception) {
+      }
     }
-    catch (ignore: Exception) {
-    }
+  }
+
+  private fun doConversation(conversation: () -> Unit) {
+    conversationAlarm.cancelAllRequests()
+    conversationAlarm.addRequest(conversation, 0)
   }
 
   private fun createEditor(id: String, title: String, onTextChange: (String) -> Unit) =
@@ -103,7 +122,7 @@ abstract class TextConverter(
         currentActiveInput = null
       }
       onTextChange { nextText ->
-        if (converterMode == ConverterMode.LIVE) {
+        if (liveConversion) {
           if (currentActiveInput != this) {
             // The text change was triggered by an action, but the focus grab
             // will be done asynchronously, so this editor does not have the
@@ -116,19 +135,14 @@ abstract class TextConverter(
       }
     }
 
-  private fun Cell<JBRadioButton>.configure(value: ConverterMode) = this.applyToComponent {
-    isSelected = converterMode == value
-    onSelected { switchConverterMode(value) }
-  }
-
-  private fun switchConverterMode(value: ConverterMode) {
-    if (converterMode == value) {
+  private fun switchLiveConversion(value: Boolean) {
+    if (liveConversion == value) {
       return
     }
 
-    converterMode = value
+    liveConversion = value
 
-    if (value == ConverterMode.LIVE) {
+    if (liveConversion) {
       // Trigger a text change, so if the text was changed in manual mode it
       // will now be converted once during the switch to live mode.
       lastActiveInput?.let {
@@ -138,13 +152,6 @@ abstract class TextConverter(
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
-
-  protected enum class ConverterMode {
-
-    LIVE,
-    MANUAL
-  }
-
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 }
 

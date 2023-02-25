@@ -48,7 +48,7 @@ abstract class MacAddressBasedUuidGenerator(title: String, description: String? 
         visible(localMacAddresses.isNotEmpty())
         val useLocalInterface = radioButton("Local interface:").configure(LOCAL_INTERFACE).gap(RightGap.SMALL)
         comboBox(localMacAddresses).configure().enabledIf(useLocalInterface.selected).component
-      }.bottomGap(BottomGap.MEDIUM)
+      }
     }
   }
 

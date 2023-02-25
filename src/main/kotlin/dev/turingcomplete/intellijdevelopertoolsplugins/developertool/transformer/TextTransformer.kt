@@ -2,14 +2,18 @@ package dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transform
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
-import com.intellij.ui.components.JBRadioButton
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import com.intellij.ui.layout.not
+import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DeveloperToolEditor.EditorMode.OUTPUT
-import dev.turingcomplete.intellijdevelopertoolsplugins.onSelected
+import dev.turingcomplete.intellijdevelopertoolsplugins.onSelectionChanged
 
 abstract class TextTransformer(
         id: String,
@@ -21,7 +25,8 @@ abstract class TextTransformer(
 ) : DeveloperTool(id = id, title = title, description = description) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var transformerMode by createProperty("transformerMode", TransformerMode.LIVE)
+  private var liveTransformation: Boolean by createProperty("liveTransformation", true)
+  private lateinit var transformationAlarm: Alarm
 
   private lateinit var sourceEditor: DeveloperToolEditor
   private lateinit var resultEditor: DeveloperToolEditor
@@ -30,7 +35,7 @@ abstract class TextTransformer(
 
   init {
     registerPropertyChangeListeners {
-      if (transformerMode == TransformerMode.LIVE) {
+      if (liveTransformation) {
         doTransform()
       }
     }
@@ -41,6 +46,8 @@ abstract class TextTransformer(
   abstract fun transform(text: String): String
 
   override fun Panel.buildUi(project: Project?, parentDisposable: Disposable) {
+    transformationAlarm = Alarm(parentDisposable)
+
     row {
       resizableRow()
       sourceEditor = createSourceInputEditor()
@@ -65,40 +72,32 @@ abstract class TextTransformer(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun doTransform() {
-    resultEditor.text = transform(sourceEditor.text)
+    transformationAlarm.cancelAllRequests()
+    transformationAlarm.addRequest({ resultEditor.text = transform(sourceEditor.text) }, 0)
   }
 
   private fun createActionsComponent() = panel {
     buttonsGroup {
       row {
-        radioButton("Live transformation").configure(TransformerMode.LIVE)
-        val manualRadioButton = radioButton("Manual:").configure(TransformerMode.MANUAL).gap(RightGap.SMALL)
-        button("▼ $transformActionTitle") { doTransform() }.enabledIf(manualRadioButton.selected).gap(RightGap.SMALL)
+        val liveTransformationCheckBox = checkBox("Live transformation").applyToComponent {
+          isSelected = liveTransformation
+          onSelectionChanged { liveTransformation = it }
+        }
+
+        button("▼ $transformActionTitle") { doTransform() }.enabledIf(liveTransformationCheckBox.selected.not())
       }
     }
-  }
-
-  private fun Cell<JBRadioButton>.configure(value: TransformerMode) = this.applyToComponent {
-    isSelected = transformerMode == value
-    onSelected { transformerMode = value }
   }
 
   private fun createSourceInputEditor(): DeveloperToolEditor =
     DeveloperToolEditor(id, sourceTitle, editorMode = INPUT).apply {
       onTextChange {
-        if (transformerMode == TransformerMode.LIVE) {
+        if (liveTransformation) {
           doTransform()
         }
       }
     }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
-
-  private enum class TransformerMode {
-
-    LIVE,
-    MANUAL
-  }
-
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 }

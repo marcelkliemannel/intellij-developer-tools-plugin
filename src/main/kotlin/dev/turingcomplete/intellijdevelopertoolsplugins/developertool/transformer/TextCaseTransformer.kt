@@ -17,13 +17,15 @@ import dev.turingcomplete.textcaseconverter.toTextCase
 import dev.turingcomplete.textcaseconverter.toWordsSplitter
 import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 
-class TextCaseTransformer : TextTransformer(
+class TextCaseTransformer :
+  TextTransformer(
         id = "text-case",
         title = "Text Case",
         transformActionTitle = "Transform",
         sourceTitle = "Original",
         resultTitle = "Target"
-), GeneralDeveloperTool {
+  ),
+  GeneralDeveloperTool {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var originalParsingMode by createProperty("originalParsingMode", FIXED_TEXT_CASE)

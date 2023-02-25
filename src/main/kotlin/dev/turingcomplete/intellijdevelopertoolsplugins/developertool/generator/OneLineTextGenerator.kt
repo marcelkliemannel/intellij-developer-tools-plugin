@@ -8,6 +8,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.dsl.builder.*
+import com.intellij.util.Alarm
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugins.ToolBarPlace
 import dev.turingcomplete.intellijdevelopertoolsplugins.UiUtils.MONOSPACE_FONT
@@ -28,6 +29,7 @@ abstract class OneLineTextGenerator(
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private lateinit var generatedTextLabel: JBLabel
+  private lateinit var generationAlarm: Alarm
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -38,6 +40,8 @@ abstract class OneLineTextGenerator(
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   final override fun Panel.buildUi(project: Project?, parentDisposable: Disposable) {
+    generationAlarm = Alarm(parentDisposable)
+
     buildConfigurationUi(project, parentDisposable)
     buildGeneratedValueUi()
     if (supportsBulkGeneration) {
@@ -56,20 +60,24 @@ abstract class OneLineTextGenerator(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun doGenerate() {
-    if (validate().isEmpty()) {
-      generatedTextLabel.apply {
-        text = generate()
-        icon = null
-        font = GENERATED_TEXT_FONT
+    generationAlarm.cancelAllRequests()
+    val generate: () -> Unit = {
+      if (validate().isEmpty()) {
+        generatedTextLabel.apply {
+          text = generate()
+          icon = null
+          font = GENERATED_TEXT_FONT
+        }
+      }
+      else {
+        generatedTextLabel.apply {
+          text = "Invalid configuration"
+          icon = AllIcons.General.BalloonError
+          font = GENERATED_TEXT_INVALID_CONFIGURATION_FONT
+        }
       }
     }
-    else {
-      generatedTextLabel.apply {
-        text = "Invalid configuration"
-        icon = AllIcons.General.BalloonError
-        font = GENERATED_TEXT_INVALID_CONFIGURATION_FONT
-      }
-    }
+    generationAlarm.addRequest(generate, 0)
   }
 
   private fun Panel.buildBulkGenerationUi(parentDisposable: Disposable) {
@@ -130,7 +138,6 @@ abstract class OneLineTextGenerator(
   companion object {
 
     private const val DEFAULT_NUMBER_OF_VALUES = "10"
-
     private val GENERATED_TEXT_FONT = MONOSPACE_FONT.biggerOn(2f)
     private val GENERATED_TEXT_INVALID_CONFIGURATION_FONT = JBFont.label().biggerOn(2f)
   }

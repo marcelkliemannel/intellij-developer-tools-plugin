@@ -22,7 +22,7 @@ class LoremIpsumGenerator :
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var textMode: TextMode by createProperty("generatedTextKind", PARAGRAPHS)
-  private var numberOfValues: Int by createProperty("numberOfValues", 8)
+  private var numberOfValues: Int by createProperty("numberOfValues", 9)
   private var minWordsInParagraph: Int by createProperty("minWordsInParagraph", DEFAULT_MIN_PARAGRAPH_WORDS)
   private var maxWordsInParagraph: Int by createProperty("maxWordsInParagraph", DEFAULT_MAX_PARAGRAPH_WORDS)
   private var minWordsInBullet: Int by createProperty("minWordsInBullet", DEFAULT_MIN_BULLET_WORDS)
