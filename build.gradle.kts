@@ -27,10 +27,8 @@ dependencies {
   implementation("dev.turingcomplete:text-case-converter:1.0.0")
   implementation("dev.turingcomplete:text-case-converter-kotlin-extension:1.0.0")
   implementation(kotlin("stdlib"))
-}
 
-tasks.withType<Test> {
-  useJUnitPlatform()
+  testImplementation("org.assertj:assertj-core:2.4.1")
 }
 
 intellij {
