@@ -102,8 +102,7 @@ abstract class OneLineTextGenerator(
   private fun Panel.buildGeneratedValueUi() {
     row {
       label("Generated $title:")
-      bottomGap(BottomGap.NONE)
-    }
+    }.bottomGap(BottomGap.NONE)
 
     row {
       topGap(TopGap.NONE)

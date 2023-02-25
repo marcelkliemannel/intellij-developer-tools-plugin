@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolsService
+import java.awt.Dimension
 import javax.swing.JComponent
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
@@ -26,6 +27,13 @@ abstract class DeveloperTool(val id: String, val title: String, val description:
     panel = panel {
       buildUi(project, parentDisposable)
     }
+    // This prevents the `Editor` from increasing the size of the dialog if the
+    // to display all the text on the screen instead of using scrollbars. The
+    // reason for this behaviour is that the UI DSL always sets the minimum size
+    // to the preferred size. But the preferred size gets calculated as if the
+    // whole text gets displayed on the screen.
+    panel.minimumSize = Dimension(0, 0)
+    panel.preferredSize = Dimension(0, 0)
     panel.registerValidators(parentDisposable)
     return panel
   }

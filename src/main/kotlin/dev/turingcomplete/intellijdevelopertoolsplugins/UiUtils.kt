@@ -23,7 +23,6 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Font
 import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
 import java.awt.LayoutManager
 import java.awt.datatransfer.StringSelection
 import java.awt.event.ActionEvent
@@ -147,9 +146,7 @@ fun Font.sizeToXl(): Font = this.deriveFont(this.size + JBUIScale.scale(2f))
 fun Font.sizeToXxl(): Font = this.deriveFont(this.size + JBUIScale.scale(4f))
 
 fun JComponent.wrapWithToolBar(actionEventPlace: String, actions: ActionGroup, toolBarPlace: ToolBarPlace, withBorder: Boolean = true): JComponent {
-  return UiUtils.createJBPanel(GridBagLayout()).apply {
-    val bag = UiUtils.createDefaultGridBag().setDefaultWeightY(1.0)
-
+  return BorderLayoutPanel().apply {
     val actionToolbar = ActionManager.getInstance().createActionToolbar(actionEventPlace, actions, toolBarPlace.horizontal)
     actionToolbar.targetComponent = this@wrapWithToolBar
 
@@ -160,18 +157,13 @@ fun JComponent.wrapWithToolBar(actionEventPlace: String, actions: ActionGroup, t
     }
     when (toolBarPlace) {
       ToolBarPlace.LEFT -> {
-        add(actionToolbar.component, bag.nextLine().next().fillCellVertically())
-        add(component, bag.next().weightx(0.9).fillCell())
+        addToLeft(actionToolbar.component)
+        addToCenter(component)
       }
 
-      ToolBarPlace.RIGHT -> {
-        add(component, bag.nextLine().next().weightx(0.9).fillCell())
-        add(actionToolbar.component, bag.next().fillCellVertically())
-      }
-
-      ToolBarPlace.APPEND -> {
-        add(component, bag.nextLine().next().anchor(GridBagConstraints.WEST))
-        add(actionToolbar.component, bag.next().fillCellHorizontally())
+      ToolBarPlace.RIGHT, ToolBarPlace.APPEND -> {
+        addToCenter(component)
+        addToRight(actionToolbar.component)
       }
     }
   }
@@ -204,10 +196,13 @@ fun JBRadioButton.onSelected(selectListener: () -> Unit) = this.apply {
   }
 }
 
-fun JBCheckBox.onSelected(selectListener: () -> Unit) = this.apply {
+fun JBCheckBox.onSelectionChanged(selectionChangedListener: (Boolean) -> Unit) = this.apply {
   this.addItemListener { event ->
     if (event.stateChange == ItemEvent.SELECTED) {
-      selectListener()
+      selectionChangedListener(true)
+    }
+    else if (event.stateChange == ItemEvent.DESELECTED) {
+      selectionChangedListener(false)
     }
   }
 }

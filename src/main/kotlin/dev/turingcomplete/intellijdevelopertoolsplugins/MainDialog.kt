@@ -39,7 +39,6 @@ class MainDialog(private val project: Project?) : DialogWrapper(project) {
     title = "Developer Tools"
     setOKButtonText("Close")
     setSize(900, 700)
-    verticalStretch = 1.5F
     init()
   }
 

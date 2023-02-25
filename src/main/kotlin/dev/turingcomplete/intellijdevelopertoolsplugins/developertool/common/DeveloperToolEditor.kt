@@ -22,10 +22,7 @@ import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.ColorUtil
-import com.intellij.ui.dsl.builder.Align
-import com.intellij.ui.dsl.builder.BottomGap
-import com.intellij.ui.dsl.builder.TopGap
-import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
@@ -79,31 +76,22 @@ class DeveloperToolEditor(
     return this
   }
 
-  fun createComponent(parentDisposable: Disposable): JComponent = object : BorderLayoutPanel(), DataProvider {
-    init {
-      addToCenter(panel {
+  fun createComponent(parentDisposable: Disposable): JComponent =
+    object : BorderLayoutPanel(0, UIUtil.DEFAULT_VGAP), DataProvider {
+      init {
         title?.let {
-          row {
-            label("$it ${editorMode.title}:")
-            bottomGap(BottomGap.NONE)
-          }
+          addToTop(JBLabel("$it ${editorMode.title}:"))
         }
+        editor = createEditor(parentDisposable)
+        val editorComponent = editor.component.wrapWithToolBar(id, createActions(), ToolBarPlace.RIGHT)
+        addToCenter(editorComponent)
+      }
 
-        row {
-          topGap(TopGap.NONE)
-          resizableRow()
-          editor = createEditor(parentDisposable)
-          val editorComponent = editor.component.wrapWithToolBar(id, createActions(), ToolBarPlace.RIGHT)
-          cell(editorComponent).align(Align.FILL)
-        }
-      })
+      override fun getData(dataId: String): Any? = when {
+        CommonDataKeys.EDITOR.`is`(dataId) -> editor
+        else -> null
+      }
     }
-
-    override fun getData(dataId: String): Any? = when {
-      CommonDataKeys.EDITOR.`is`(dataId) -> editor
-      else -> null
-    }
-  }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
