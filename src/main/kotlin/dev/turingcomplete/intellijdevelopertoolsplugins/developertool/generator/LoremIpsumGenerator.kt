@@ -8,10 +8,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.layout.ComboBoxPredicate
+import dev.turingcomplete.intellijdevelopertoolsplugins.*
+import dev.turingcomplete.intellijdevelopertoolsplugins.ValidateMinIntValueSide.MAX
+import dev.turingcomplete.intellijdevelopertoolsplugins.ValidateMinIntValueSide.MIN
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.GeneralDeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.LoremIpsumGenerator.TextMode.*
-import dev.turingcomplete.intellijdevelopertoolsplugins.onChanged
-import dev.turingcomplete.intellijdevelopertoolsplugins.onSelectionChanged
 import java.security.SecureRandom
 import java.util.*
 import kotlin.math.max
@@ -41,7 +42,8 @@ class LoremIpsumGenerator :
   override fun Panel.buildConfigurationUi(project: Project?, parentDisposable: Disposable) {
     lateinit var textModeComboBox: ComboBox<TextMode>
     row {
-      intTextField(IntRange(1, 99999)).text(numberOfValues.toString())
+      textField().text(numberOfValues.toString()).columns(COLUMNS_TINY)
+              .validateIntValue(IntRange(1, 999))
               .whenTextChangedFromUi { numberOfValues = it.toInt() }
               .gap(RightGap.SMALL)
       textModeComboBox = comboBox(TextMode.values().toList()).applyToComponent {
@@ -51,22 +53,30 @@ class LoremIpsumGenerator :
     }
 
     row {
-      intTextField(IntRange(1, 9999)).label("Minimum words in paragraph:")
+      textField().label("Minimum words in paragraph:").columns(COLUMNS_TINY)
               .text(minWordsInParagraph.toString())
+              .validateIntValue(IntRange(1, 999))
+              .validation(validateMinMaxValueRelation(MIN) { maxWordsInParagraph })
               .whenTextChangedFromUi { minWordsInParagraph = it.toIntOrNull() ?: DEFAULT_MIN_PARAGRAPH_WORDS }
               .gap(RightGap.SMALL)
-      intTextField(IntRange(1, 9999)).label("Maximum:")
+      textField().label("Maximum:").columns(COLUMNS_TINY)
               .text(maxWordsInParagraph.toString())
+              .validateIntValue(IntRange(1, 999))
+              .validation(validateMinMaxValueRelation(MAX) { minWordsInParagraph })
               .whenTextChangedFromUi { maxWordsInParagraph = it.toIntOrNull() ?: DEFAULT_MAX_PARAGRAPH_WORDS }
     }.visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == PARAGRAPHS })
 
     row {
-      intTextField(IntRange(1, 9999)).label("Minimum words in bullet:")
+      textField().label("Minimum words in bullet:").columns(COLUMNS_TINY)
               .text(minWordsInBullet.toString())
+              .validateIntValue(IntRange(1, 999))
+              .validation(validateMinMaxValueRelation(MIN) { maxWordsInBullet })
               .whenTextChangedFromUi { minWordsInBullet = it.toIntOrNull() ?: DEFAULT_MIN_BULLET_WORDS }
               .gap(RightGap.SMALL)
-      intTextField(IntRange(1, 9999)).label("Maximum:")
+      textField().label("Maximum:").columns(COLUMNS_TINY)
               .text(maxWordsInBullet.toString())
+              .validateIntValue(IntRange(1, 999))
+              .validation(validateMinMaxValueRelation(MAX) { minWordsInBullet })
               .whenTextChangedFromUi { maxWordsInBullet = it.toIntOrNull() ?: DEFAULT_MAX_BULLET_WORDS }
     }.visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == BULLETS })
 
@@ -101,18 +111,17 @@ class LoremIpsumGenerator :
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun generateParagraphs() = IntRange(0, numberOfValues - 1).joinToString(PARAGRAPH_SEPARATOR) { paragraphIndex ->
-    val words = mutableListOf<String>()
 
     val totalWordsInParagraph = SECURE_RANDOM.nextInt(minWordsInParagraph, maxWordsInParagraph + 1)
 
-    if (paragraphIndex == 0 && startWithLoremIpsum) {
-      words.addAll(generateIconicText(totalWordsInParagraph, true))
+    val initialWords = if (paragraphIndex == 0 && startWithLoremIpsum) {
+      generateIconicText(totalWordsInParagraph, true)
+    }
+    else {
+      emptyList()
     }
 
-    // Avoid a single word sentence.
-    words.addAll(createSentences(words, totalWordsInParagraph))
-
-    words.joinToString(WORDS_SEPARATOR)
+    createSentences(initialWords, totalWordsInParagraph).joinToString(WORDS_SEPARATOR)
   }
 
   private fun generateWords(): String {

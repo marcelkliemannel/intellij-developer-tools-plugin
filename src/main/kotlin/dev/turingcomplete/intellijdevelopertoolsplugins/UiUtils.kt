@@ -5,17 +5,14 @@ import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.ui.ComboBox
+import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.panel.ComponentPanelBuilder
 import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.util.ScalableIcon
-import com.intellij.ui.ClickListener
-import com.intellij.ui.HyperlinkLabel
-import com.intellij.ui.SeparatorWithText
-import com.intellij.ui.SizedIcon
-import com.intellij.ui.components.JBCheckBox
-import com.intellij.ui.components.JBLabel
-import com.intellij.ui.components.JBPanel
-import com.intellij.ui.components.JBRadioButton
+import com.intellij.ui.*
+import com.intellij.ui.components.*
+import com.intellij.ui.dsl.builder.Cell
+import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.scale.JBUIScale
 import com.intellij.util.ui.GridBag
 import com.intellij.util.ui.JBFont
@@ -215,3 +212,46 @@ fun <T> ComboBox<T>.onChanged(changeListener: (T) -> Unit) {
     }
   }
 }
+
+/**
+ * The UI DSL only verifies an `intTextField` on input.
+ */
+fun Cell<JBTextField>.validateIntValue(range: IntRange? = null) = this.apply {
+  validation {
+    if (this@validateIntValue.component.isEnabled) {
+      val value = this@validateIntValue.component.text.toIntOrNull()
+      when {
+        value == null -> error(UIBundle.message("please.enter.a.number"))
+        range != null && value !in range -> error(UIBundle.message("please.enter.a.number.from.0.to.1", range.first, range.last))
+        else -> null
+      }
+    }
+    else {
+      null
+    }
+  }
+}
+
+
+fun validateMinMaxValueRelation(side: ValidateMinIntValueSide, getOppositeValue: () -> Int):
+        ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
+  if (this.component.isEnabled) {
+    it.text?.toIntOrNull()?.let { thisValue ->
+      when {
+        side == ValidateMinIntValueSide.MIN && thisValue > getOppositeValue() -> {
+          ValidationInfo("Minimum must be smaller than or equal to maximum")
+        }
+
+        side == ValidateMinIntValueSide.MAX && thisValue < getOppositeValue() ->
+          ValidationInfo("Maximum must be larger than or equal to minimum")
+
+        else -> null
+      }
+    }
+  }
+  else {
+    null
+  }
+}
+
+enum class ValidateMinIntValueSide { MIN, MAX }
