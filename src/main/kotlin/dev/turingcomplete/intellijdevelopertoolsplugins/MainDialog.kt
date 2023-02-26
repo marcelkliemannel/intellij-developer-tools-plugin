@@ -1,42 +1,42 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins
 
-import com.intellij.ide.projectView.PresentationData
 import com.intellij.ide.util.treeView.NodeRenderer
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.ColoredSideBorder
-import com.intellij.ui.JBSplitter
-import com.intellij.ui.ScrollPaneFactory
-import com.intellij.ui.SimpleTextAttributes
-import com.intellij.ui.SimpleTextAttributes.STYLE_BOLD
+import com.intellij.ui.*
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.navigation.Place.Navigator
+import com.intellij.ui.render.RenderingUtil
+import com.intellij.ui.treeStructure.SimpleTree
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBEmptyBorder
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.JBUI.CurrentTheme.CustomFrameDecorations
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.UIUtil.PANEL_REGULAR_INSETS
 import com.intellij.util.ui.components.BorderLayoutPanel
+import com.intellij.util.ui.tree.TreeUtil
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DynamicDeveloperToolsFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.GeneralDeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.encoderdecoder.EncoderDecoder
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.textescape.TextEscape
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidGenerator
-import java.awt.Color
 import javax.swing.JComponent
+import javax.swing.JTree
 import javax.swing.ScrollPaneConstants
 import javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
 import javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
 import javax.swing.event.TreeSelectionListener
+import javax.swing.plaf.TreeUI
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreePath
 import javax.swing.tree.TreeSelectionModel
 
-class MainDialog(private val project: Project?) : DialogWrapper(project) {
+class MainDialog(private val project: Project?) : DialogWrapper(project), Navigator {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val currentDeveloperToolHolderPanel = BorderLayoutPanel()
@@ -48,15 +48,19 @@ class MainDialog(private val project: Project?) : DialogWrapper(project) {
     title = "Developer Tools"
     setOKButtonText("Close")
     setSize(900, 700)
+    isModal = false
+    isAutoAdjustable = false
     init()
   }
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun createCenterPanel() = JBSplitter(0.25f).apply {
-    firstComponent = ScrollPaneFactory.createScrollPane(createMenu(), true)
+    firstComponent = ScrollPaneFactory.createScrollPane(createMenu(), true).apply {
+      border = ColoredSideBorder(null, null, null, CustomFrameDecorations.separatorForeground(), 1)
+    }
     secondComponent = currentDeveloperToolHolderPanel.apply {
-      border = JBEmptyBorder(UIUtil.PANEL_REGULAR_INSETS)
+      border = JBEmptyBorder(PANEL_REGULAR_INSETS)
     }
   }
 
@@ -67,11 +71,20 @@ class MainDialog(private val project: Project?) : DialogWrapper(project) {
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun createMenu(): JComponent {
-    val menuTree = buildMenuTree().apply {
-      isRootVisible = false
+    val menuTree = MenuTree().apply {
+      val menuRoot = model.root as DefaultMutableTreeNode
+      addDeveloperToolsNodes(menuRoot)
+      cellRenderer = MenuTreeNodeRenderer(menuRoot)
+      putClientProperty(RenderingUtil.ALWAYS_PAINT_SELECTION_AS_FOCUSED, true)
+      background = UIUtil.SIDE_PANEL_BACKGROUND
+      inputMap.clear()
+      TreeUtil.installActions(this)
+      isOpaque = true
       selectionModel.selectionMode = TreeSelectionModel.SINGLE_TREE_SELECTION
-
       addTreeSelectionListener(handleMenuTreeSelection())
+      isRootVisible = false
+      setExpandableItemsEnabled(false)
+      RelativeFont.BOLD.install<SimpleTree>(this)
     }
 
     return ScrollPaneFactory.createScrollPane(null, true).apply {
@@ -83,9 +96,9 @@ class MainDialog(private val project: Project?) : DialogWrapper(project) {
     }
   }
 
-  private fun buildMenuTree(): Tree = Tree().apply {
+  private fun Tree.addDeveloperToolsNodes(root: DefaultMutableTreeNode) {
     val encodersDecodersNodes = collectDeveloperToolNodes("Encoders/Decoders", EncoderDecoder.EP)
-    val root = DefaultMutableTreeNode().apply {
+    with(root) {
       add(encodersDecodersNodes)
       add(collectDeveloperToolNodes("Text Escape", TextEscape.EP))
       add(collectDeveloperToolNodes("UUID", UuidGenerator.EP))
@@ -96,7 +109,6 @@ class MainDialog(private val project: Project?) : DialogWrapper(project) {
 
       addDynamicDeveloperTools()
     }
-    model = DefaultTreeModel(root)
 
     expandPath(TreePath(encodersDecodersNodes.path))
   }
@@ -159,5 +171,35 @@ class MainDialog(private val project: Project?) : DialogWrapper(project) {
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class MenuTree : SimpleTree() {
+
+    override fun configureUiHelper(helper: TreeUIHelper) {
+      helper.installTreeSpeedSearch(this, { path: TreePath? -> path?.lastPathComponent?.toString() }, true)
+    }
+
+    override fun setUI(ui: TreeUI?) {
+      super.setUI(ui)
+      val standardRowHeight = JBUI.CurrentTheme.Tree.rowHeight()
+      setRowHeight(standardRowHeight + (standardRowHeight * 0.2f).toInt())
+    }
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class MenuTreeNodeRenderer(private val root: DefaultMutableTreeNode) : NodeRenderer() {
+
+    override fun customizeCellRenderer(tree: JTree,
+                                       value: Any?,
+                                       selected: Boolean,
+                                       expanded: Boolean,
+                                       leaf: Boolean,
+                                       row: Int,
+                                       hasFocus: Boolean) {
+      val isTopLevelNode = value is DefaultMutableTreeNode && value.parent == root
+      append(value.toString(), if (isTopLevelNode) SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES else SimpleTextAttributes.REGULAR_ATTRIBUTES)
+    }
+  }
+
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 }
