@@ -78,7 +78,7 @@ abstract class TextConverter(
         val liveConversionCheckBox = checkBox("Live conversion").applyToComponent {
           isSelected = liveConversion
           onSelectionChanged { switchLiveConversion(it) }
-        }
+        }.gap(RightGap.SMALL)
 
         button("▼ $convertActionTitle") { transformToTarget() }.enabledIf(liveConversionCheckBox.selected.not()).gap(RightGap.SMALL)
         button("▲ $revertActionTitle") { transformToSource() }.enabledIf(liveConversionCheckBox.selected.not())

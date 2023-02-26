@@ -1,12 +1,12 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer
 
+import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.selected
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.DeveloperTool
@@ -55,19 +55,18 @@ abstract class TextTransformer(
     }
 
     buildConfigurationUi(project, parentDisposable)
-
-    row {
-      cell(createActionsComponent()).horizontalAlign(HorizontalAlign.FILL)
-    }
+    buildActionsUi()
 
     row {
       resizableRow()
-      resultEditor = DeveloperToolEditor(id = id, title = resultTitle, editorMode = OUTPUT)
+      resultEditor = DeveloperToolEditor(id = id, title = resultTitle, editorMode = OUTPUT, language = getLanguage())
       cell(resultEditor.createComponent(parentDisposable)).align(Align.FILL)
     }
   }
 
   protected open fun Panel.buildConfigurationUi(project: Project?, parentDisposable: Disposable) {}
+
+  protected open fun getLanguage(): Language? = null
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
@@ -76,13 +75,13 @@ abstract class TextTransformer(
     transformationAlarm.addRequest({ resultEditor.text = transform(sourceEditor.text) }, 0)
   }
 
-  private fun createActionsComponent() = panel {
+  private fun Panel.buildActionsUi() {
     buttonsGroup {
       row {
         val liveTransformationCheckBox = checkBox("Live transformation").applyToComponent {
           isSelected = liveTransformation
           onSelectionChanged { liveTransformation = it }
-        }
+        }.gap(RightGap.SMALL)
 
         button("▼ $transformActionTitle") { doTransform() }.enabledIf(liveTransformationCheckBox.selected.not())
       }
@@ -90,7 +89,7 @@ abstract class TextTransformer(
   }
 
   private fun createSourceInputEditor(): DeveloperToolEditor =
-    DeveloperToolEditor(id, sourceTitle, editorMode = INPUT).apply {
+    DeveloperToolEditor(id = id, title = sourceTitle, editorMode = INPUT, language = getLanguage()).apply {
       onTextChange {
         if (liveTransformation) {
           doTransform()

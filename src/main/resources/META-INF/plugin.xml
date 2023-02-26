@@ -41,6 +41,9 @@
     <extensionPoint name="general"
                     interface="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.GeneralDeveloperTool"
                     dynamic="true"/>
+    <extensionPoint name="dynamic"
+                    interface="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DynamicDeveloperToolsFactory"
+                    dynamic="true"/>
   </extensionPoints>
 
   <extensions defaultExtensionNs="dev.turingcomplete.intellijdevelopertoolsplugins">
@@ -79,6 +82,9 @@
     <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV5Generator"/>
     <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV6Generator"/>
     <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV7Generator"/>
+
+    <dynamic
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.formatter.CodeStyleFormattersFactory"/>
   </extensions>
 
 </idea-plugin>

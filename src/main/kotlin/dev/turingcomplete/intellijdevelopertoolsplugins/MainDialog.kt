@@ -1,22 +1,31 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins
 
+import com.intellij.ide.projectView.PresentationData
+import com.intellij.ide.util.treeView.NodeRenderer
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.ui.ColoredSideBorder
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.ScrollPaneFactory
+import com.intellij.ui.SimpleTextAttributes
+import com.intellij.ui.SimpleTextAttributes.STYLE_BOLD
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBEmptyBorder
+import com.intellij.util.ui.JBUI.CurrentTheme.CustomFrameDecorations
 import com.intellij.util.ui.UIUtil
+import com.intellij.util.ui.UIUtil.PANEL_REGULAR_INSETS
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.DeveloperTool
+import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.DynamicDeveloperToolsFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common.GeneralDeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.encoderdecoder.EncoderDecoder
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.converter.textescape.TextEscape
 import dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidGenerator
+import java.awt.Color
 import javax.swing.JComponent
 import javax.swing.ScrollPaneConstants
 import javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
@@ -80,13 +89,26 @@ class MainDialog(private val project: Project?) : DialogWrapper(project) {
       add(encodersDecodersNodes)
       add(collectDeveloperToolNodes("Text Escape", TextEscape.EP))
       add(collectDeveloperToolNodes("UUID", UuidGenerator.EP))
+
       GeneralDeveloperTool.EP.forEachExtensionSafe {
         add(DefaultMutableTreeNode(it))
       }
+
+      addDynamicDeveloperTools()
     }
     model = DefaultTreeModel(root)
 
     expandPath(TreePath(encodersDecodersNodes.path))
+  }
+
+  private fun DefaultMutableTreeNode.addDynamicDeveloperTools() {
+    DynamicDeveloperToolsFactory.EP.forEachExtensionSafe { factory ->
+      if (!factory.requiresProject || project != null) {
+        add(DefaultMutableTreeNode(factory.title).apply {
+          factory.createDeveloperTools().forEach { add(DefaultMutableTreeNode(it)) }
+        })
+      }
+    }
   }
 
   private fun collectDeveloperToolNodes(title: String, extensionPoint: ExtensionPointName<out DeveloperTool>): DefaultMutableTreeNode {

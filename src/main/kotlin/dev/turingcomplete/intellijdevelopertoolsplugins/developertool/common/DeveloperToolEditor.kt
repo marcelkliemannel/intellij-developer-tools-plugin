@@ -1,6 +1,7 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins.developertool.common
 
 import com.intellij.icons.AllIcons
+import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -15,9 +16,11 @@ import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.FocusChangeListener
+import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
+import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.Disposer
@@ -40,7 +43,8 @@ import javax.swing.ScrollPaneConstants
 class DeveloperToolEditor(
         private val id: String,
         private val title: String?,
-        private val editorMode: EditorMode
+        private val editorMode: EditorMode,
+        private val language: Language? = null
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -57,6 +61,10 @@ class DeveloperToolEditor(
     get() = runReadAction {
       editor.document.text
     }
+
+  var isDisposed: Boolean = false
+    private set
+    get() = editor.isDisposed
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -137,6 +145,10 @@ class DeveloperToolEditor(
       scrollPane.horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
       scrollPane.verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
 
+      language?.let {
+        val syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(it, project, null)
+        highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(syntaxHighlighter, EditorColorsManager.getInstance().globalScheme)
+      }
 
       settings.apply {
         isLineMarkerAreaShown = true

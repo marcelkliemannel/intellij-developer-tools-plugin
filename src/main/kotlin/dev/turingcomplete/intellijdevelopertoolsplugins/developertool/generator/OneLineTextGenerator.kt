@@ -45,7 +45,7 @@ abstract class OneLineTextGenerator(
     buildConfigurationUi(project, parentDisposable)
     buildGeneratedValueUi()
     if (supportsBulkGeneration) {
-      buildBulkGenerationUi(parentDisposable)
+      buildBulkGenerationUi(project, parentDisposable)
     }
   }
 
@@ -80,7 +80,7 @@ abstract class OneLineTextGenerator(
     generationAlarm.addRequest(generate, 0)
   }
 
-  private fun Panel.buildBulkGenerationUi(parentDisposable: Disposable) {
+  private fun Panel.buildBulkGenerationUi(project: Project?, parentDisposable: Disposable) {
     group("Bulk Generation", false) {
       val resultEditor = DeveloperToolEditor(id = id, title = null, editorMode = OUTPUT)
 

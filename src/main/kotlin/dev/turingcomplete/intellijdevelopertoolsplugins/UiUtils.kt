@@ -17,6 +17,7 @@ import com.intellij.ui.scale.JBUIScale
 import com.intellij.util.ui.GridBag
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
+import com.intellij.util.ui.JBUI.CurrentTheme.CustomFrameDecorations
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Font
 import java.awt.GridBagConstraints
@@ -149,7 +150,7 @@ fun JComponent.wrapWithToolBar(actionEventPlace: String, actions: ActionGroup, t
 
     val component = this@wrapWithToolBar.apply {
       if (withBorder) {
-        border = BorderFactory.createEtchedBorder()
+        border = BorderFactory.createLineBorder(CustomFrameDecorations.separatorForeground())
       }
     }
     when (toolBarPlace) {
