@@ -1,5 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins
 
+import io.ktor.util.*
 import java.security.MessageDigest
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
@@ -17,6 +18,12 @@ fun ByteArray.toHexMacAddress() = StringBuilder(18).also {
 }.toString()
 
 fun String.toMessageDigest(): MessageDigest = MessageDigest.getInstance(this)
+
+fun Comparator<String>.makeCaseInsensitive(): Comparator<String> {
+  return Comparator { a, b ->
+    this.compare(a.toLowerCasePreservingASCIIRules(), b.toLowerCasePreservingASCIIRules())
+  }
+}
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

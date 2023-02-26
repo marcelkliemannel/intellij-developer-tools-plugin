@@ -48,7 +48,7 @@ class TextCaseTransformer :
         comboBox(TextCase.values().toList()).configure(inputTextCase) { inputTextCase = it }
       }
       row {
-        val individualDelimiterRadioButton = radioButton("Words split delimiter:").configure(INDIVIDUAL_DELIMITER).gap(RightGap.SMALL)
+        val individualDelimiterRadioButton = radioButton("Split words by:").configure(INDIVIDUAL_DELIMITER).gap(RightGap.SMALL)
         textField().text(individualDelimiter)
                 .whenTextChangedFromUi(parentDisposable) { individualDelimiter = it }
                 .enabledIf(individualDelimiterRadioButton.selected).component

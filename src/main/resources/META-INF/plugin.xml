@@ -70,6 +70,7 @@
 
     <general implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.HashingTransformer"/>
     <general implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextCaseTransformer"/>
+    <general implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.transformer.TextSortingTransformer"/>
     <general implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.LoremIpsumGenerator"/>
 
     <uuid implementation="dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator.uuid.UuidV1Generator"/>
