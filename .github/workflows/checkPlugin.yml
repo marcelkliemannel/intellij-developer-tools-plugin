@@ -20,6 +20,9 @@ jobs:
           java-version: '17'
       - uses: burrunan/gradle-cache-action@v1
 
+      - name: Run Checks
+        run: ./gradlew check --stacktrace
+
       - name: Verify Plugin
         run: ./gradlew verifyPlugin --stacktrace
 

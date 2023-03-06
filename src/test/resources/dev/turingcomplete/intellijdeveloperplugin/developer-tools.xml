@@ -1,0 +1,43 @@
+<State>
+  <developerToolsConfigurationProperties>
+    <property developerToolsId="base32-encoder-decoder" key="liveConversion" value="true"/>
+    <property developerToolsId="code-style-formatter" key="liveTransformation" value="true"/>
+    <property developerToolsId="code-style-formatter" key="selectedLanguageId" value="JSON"/>
+    <property developerToolsId="base64-encoder-decoder" key="liveConversion" value="true"/>
+    <property developerToolsId="json-text-escape" key="liveConversion" value="true"/>
+    <property developerToolsId="url-encoding-encoder-decoder" key="liveConversion" value="true"/>
+    <property developerToolsId="uuid-generator" key="version" value="UUIDv4"/>
+    <property developerToolsId="html-entities-escape" key="liveConversion" value="true"/>
+    <property developerToolsId="java-text-escape" key="liveConversion" value="true"/>
+    <property developerToolsId="text-case-transformer" key="outputTextCase" value="Cobol case (COBOL-CASE)"/>
+    <property developerToolsId="text-case-transformer" key="inputTextCase" value="Camel case (camelCase)"/>
+    <property developerToolsId="text-case-transformer" key="liveTransformation" value="true"/>
+    <property developerToolsId="text-case-transformer" key="originalParsingMode" value="FIXED_TEXT_CASE"/>
+    <property developerToolsId="text-case-transformer" key="individualDelimiter" value=" "/>
+    <property developerToolsId="lorem-ipsum-generator" key="startWithLoremIpsum" value="true"/>
+    <property developerToolsId="lorem-ipsum-generator" key="maxWordsInBullet" value="30"/>
+    <property developerToolsId="lorem-ipsum-generator" key="numberOfValues" value="9"/>
+    <property developerToolsId="lorem-ipsum-generator" key="minWordsInParagraph" value="20"/>
+    <property developerToolsId="lorem-ipsum-generator" key="maxWordsInParagraph" value="100"/>
+    <property developerToolsId="lorem-ipsum-generator" key="minWordsInBullet" value="10"/>
+    <property developerToolsId="lorem-ipsum-generator" key="generatedTextKind" value="Paragraphs"/>
+    <property developerToolsId="url-base64-encoder-decoder" key="liveConversion" value="true"/>
+    <property developerToolsId="csv-text-escape" key="liveConversion" value="true"/>
+    <property developerToolsId="hashing-transformer" key="selectedAlgorithm" value="SHA-256"/>
+    <property developerToolsId="hashing-transformer" key="liveTransformation" value="true"/>
+    <property developerToolsId="line-breaks-encoder-decoder" key="liveConversion" value="true"/>
+    <property developerToolsId="line-breaks-encoder-decoder" key="lineBreakDecoding" value="\r\n"/>
+    <property developerToolsId="xml-text-escape" key="liveConversion" value="true"/>
+    <property developerToolsId="text-sorting-transformer" key="removeDuplicates" value="true"/>
+    <property developerToolsId="text-sorting-transformer" key="sortingOrder" value="Lexicographic"/>
+    <property developerToolsId="text-sorting-transformer" key="trimWords" value="true"/>
+    <property developerToolsId="text-sorting-transformer" key="liveTransformation" value="true"/>
+    <property developerToolsId="text-sorting-transformer" key="unsortedIndividualSplitWordsDelimiter" value=" "/>
+    <property developerToolsId="text-sorting-transformer" key="sortedIndividualJoinWordsDelimiter" value=" "/>
+    <property developerToolsId="text-sorting-transformer" key="reverseOrder" value="false"/>
+    <property developerToolsId="text-sorting-transformer" key="unsortedPredefinedDelimiter" value="Line break"/>
+    <property developerToolsId="text-sorting-transformer" key="caseInsensitive" value="false"/>
+    <property developerToolsId="text-sorting-transformer" key="removeBlankWords" value="true"/>
+    <property developerToolsId="text-sorting-transformer" key="sortedJoinWordsDelimiter" value="Whitespace"/>
+  </developerToolsConfigurationProperties>
+</State>

@@ -1,6 +1,8 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -13,8 +15,8 @@ class LoremIpsumGeneratorTest(val atMostWords: Int, val expectedSentence: String
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   @Test
-  fun testGenerateIconicSentence() {
-    val actualSentence = LoremIpsumGenerator().generateIconicText(atMostWords, true)
+  fun `test generation of iconic sentence`() {
+    val actualSentence = LoremIpsumGenerator(DeveloperToolConfiguration()) { }.generateIconicText(atMostWords, true)
     assertThat(actualSentence.joinToString(" ")).isEqualTo(expectedSentence)
   }
 

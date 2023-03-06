@@ -29,6 +29,7 @@ dependencies {
   implementation(kotlin("stdlib"))
 
   testImplementation("org.assertj:assertj-core:2.4.1")
+  testImplementation("org.xmlunit:xmlunit-assertj:2.9.1")
 }
 
 intellij {
