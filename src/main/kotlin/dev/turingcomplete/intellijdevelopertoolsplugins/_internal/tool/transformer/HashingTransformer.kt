@@ -28,7 +28,7 @@ internal class HashingTransformer(configuration: DeveloperToolConfiguration, par
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun transform() {
-    val hash = selectedAlgorithm.messageDigest.digest(sourceText.encodeToByteArray())
+    val hash = selectedAlgorithm.getMessageDigest().digest(sourceText.encodeToByteArray())
     resultText = Hex.encode(hash).decodeToString()
   }
 
@@ -47,7 +47,7 @@ internal class HashingTransformer(configuration: DeveloperToolConfiguration, par
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private enum class HashAlgorithm(val messageDigest: MessageDigest) {
+  private enum class HashAlgorithm(val algorithm: String) {
     MD2("MD2"),
     MD4("MD4"),
     MD5("MD5"),
@@ -66,9 +66,9 @@ internal class HashingTransformer(configuration: DeveloperToolConfiguration, par
     RIPEMD_256("RIPEMD256"),
     RIPEMD_320("RIPEMD320");
 
-    constructor(algorithm: String) : this(MessageDigest.getInstance(algorithm))
+    fun getMessageDigest(): MessageDigest = MessageDigest.getInstance(algorithm)
 
-    override fun toString(): String = messageDigest.algorithm
+    override fun toString(): String = algorithm
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

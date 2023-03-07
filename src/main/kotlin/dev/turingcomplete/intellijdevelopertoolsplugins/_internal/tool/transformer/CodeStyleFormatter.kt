@@ -38,7 +38,10 @@ class CodeStyleFormatter(
     check(codeStyles.isNotEmpty())
 
     // Validate if selected language is still available
-    selectedCodeStyleLanguageId = (codeStyles.find { it.language.id == selectedCodeStyleLanguageId } ?: (codeStyles.find { it.language.id == FAVORITE_DEFAULT_LANGUAGE_ID } ?: codeStyles.first())).language.id
+    if (codeStyles.find { it.language.id == selectedCodeStyleLanguageId } == null) {
+      selectedCodeStyleLanguageId = (codeStyles.find { it.language.id == FAVORITE_DEFAULT_LANGUAGE_ID }
+                                     ?: codeStyles.first()).language.id
+    }
   }
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //

@@ -73,13 +73,19 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   class DeveloperToolConfigurationValueConverter : Converter<Any>() {
 
     override fun toString(value: Any): String {
-      val serializedValue = when (value) {
-        is Enum<*> -> value.name
-        is Boolean, is Int, is Long, is Float, is Double -> value.toString()
-        is String -> value
+      val (serializedValue, valueType) = when (value) {
+        is Enum<*> -> {
+          // It's important to use the Java qualified name here because it
+          // separates subclass names with a `$` and not with a `.` as in
+          // Kotlin. Otherwise, the deserialization via `Class.forName()` would
+          // not work.
+          Pair(value.name, value::class.java.name)
+        }
+        is Boolean, is Int, is Long, is Float, is Double -> Pair(value.toString(), value::class.qualifiedName!!)
+        is String -> Pair(value, value::class.qualifiedName!!)
         else -> error("Unsupported configuration property: ${value::class.qualifiedName}")
       }
-      return "${value::class.qualifiedName}${PROPERTY_TYPE_VALUE_DELIMITER}$serializedValue"
+      return "${valueType}${PROPERTY_TYPE_VALUE_DELIMITER}$serializedValue"
     }
 
     /**
@@ -92,15 +98,22 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
       check(valueAndType.size == 2) { "Malformed serialized value: $serializedValue" }
       val valueType = valueAndType[0]
       val value = valueAndType[1]
-      return when {
-        valueType == Boolean::class.qualifiedName -> value.toBoolean()
-        valueType == Int::class.qualifiedName -> value.toInt()
-        valueType == Long::class.qualifiedName -> value.toLong()
-        valueType == Float::class.qualifiedName -> value.toFloat()
-        valueType == Double::class.qualifiedName -> value.toDouble()
-        valueType == String::class.qualifiedName -> value
-        Class.forName(valueType).isEnum -> Class.forName(valueType).enumConstants.first { Enum::class.cast(it).name == value }
-        else -> error("Unsupported configuration property: $valueType")
+      return when (valueType) {
+        Boolean::class.qualifiedName -> value.toBoolean()
+        Int::class.qualifiedName -> value.toInt()
+        Long::class.qualifiedName -> value.toLong()
+        Float::class.qualifiedName -> value.toFloat()
+        Double::class.qualifiedName -> value.toDouble()
+        String::class.qualifiedName -> value
+        else -> {
+          val valueTypeClass = Class.forName(valueType, false, this::class.java.classLoader)
+          return if (valueTypeClass.isEnum) {
+            valueTypeClass.enumConstants.first { Enum::class.cast(it).name == value }
+          }
+          else {
+            error("Unsupported configuration property: $valueType")
+          }
+        }
       }
     }
   }
