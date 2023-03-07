@@ -119,9 +119,13 @@
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$Factory"
             weight="6"/>
     <developerTool
+            id="unix-timestamp-converter"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter$Factory"
+            weight="8"/>
+    <developerTool
             id="lorem-ipsum-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$Factory"
-            weight="8"/>
+            weight="9"/>
   </extensions>
 
 </idea-plugin>

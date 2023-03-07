@@ -7,7 +7,7 @@ import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAwareAction
 import java.awt.datatransfer.StringSelection
 
-internal class CopyAction :
+internal class CopyAction(private val contentDataKey: DataKey<String> = CONTENT_DATA_KEY) :
   DumbAwareAction(
           "Copy to Clipboard",
           "Copy the text into the system clipboard",
@@ -18,7 +18,7 @@ internal class CopyAction :
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun actionPerformed(e: AnActionEvent) {
-    val content = e.getData(CONTENT_DATA_KEY) ?: error("Data missing for: ${CONTENT_DATA_KEY.name}")
+    val content = e.getData(contentDataKey) ?: error("Data missing for: ${contentDataKey.name}")
     CopyPasteManager.getInstance().setContents(StringSelection(content))
   }
 

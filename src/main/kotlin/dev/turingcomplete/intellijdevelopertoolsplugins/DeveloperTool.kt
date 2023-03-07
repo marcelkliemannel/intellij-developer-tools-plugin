@@ -37,16 +37,24 @@ abstract class DeveloperTool(
     panel.preferredSize = Dimension(0, 0)
     panel.registerValidators(parentDisposable)
 
-    return object : BorderLayoutPanel(), DataProvider {
+    val wrapper = object : BorderLayoutPanel(), DataProvider {
       init {
         addToCenter(panel)
       }
 
       override fun getData(dataId: String): Any? = this@DeveloperTool.getData(dataId)
     }
+
+    afterBuildUi()
+
+    return wrapper
   }
 
   abstract fun Panel.buildUi()
+
+  open fun afterBuildUi() {
+    // Override if needed
+  }
 
   open fun group(): String? = null
 

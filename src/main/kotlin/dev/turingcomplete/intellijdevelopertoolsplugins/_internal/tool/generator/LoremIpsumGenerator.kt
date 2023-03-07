@@ -9,14 +9,10 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.layout.ComboBoxPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins.*
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ValidateMinIntValueSide.MAX
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ValidateMinIntValueSide.MIN
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.onChanged
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateIntValue
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateMinMaxValueRelation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator.TextMode.*
 import java.security.SecureRandom
@@ -54,7 +50,7 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
     lateinit var textModeComboBox: ComboBox<TextMode>
     row {
       textField().text(numberOfValues.toString()).columns(COLUMNS_TINY)
-              .validateIntValue(IntRange(1, 999))
+              .validateLongValue(LongRange(1, 999))
               .whenTextChangedFromUi { numberOfValues = it.toInt() }
               .gap(RightGap.SMALL)
       textModeComboBox = comboBox(TextMode.values().toList()).applyToComponent {
@@ -66,13 +62,13 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
     row {
       textField().label("Minimum words in paragraph:").columns(COLUMNS_TINY)
               .text(minWordsInParagraph.toString())
-              .validateIntValue(IntRange(1, 999))
+              .validateLongValue(LongRange(1, 999))
               .validation(validateMinMaxValueRelation(MIN) { maxWordsInParagraph })
               .whenTextChangedFromUi { minWordsInParagraph = it.toIntOrNull() ?: DEFAULT_MIN_PARAGRAPH_WORDS }
               .gap(RightGap.SMALL)
       textField().label("Maximum:").columns(COLUMNS_TINY)
               .text(maxWordsInParagraph.toString())
-              .validateIntValue(IntRange(1, 999))
+              .validateLongValue(LongRange(1, 999))
               .validation(validateMinMaxValueRelation(MAX) { minWordsInParagraph })
               .whenTextChangedFromUi { maxWordsInParagraph = it.toIntOrNull() ?: DEFAULT_MAX_PARAGRAPH_WORDS }
     }.visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == PARAGRAPHS })
@@ -80,13 +76,13 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
     row {
       textField().label("Minimum words in bullet:").columns(COLUMNS_TINY)
               .text(minWordsInBullet.toString())
-              .validateIntValue(IntRange(1, 999))
+              .validateLongValue(LongRange(1, 999))
               .validation(validateMinMaxValueRelation(MIN) { maxWordsInBullet })
               .whenTextChangedFromUi { minWordsInBullet = it.toIntOrNull() ?: DEFAULT_MIN_BULLET_WORDS }
               .gap(RightGap.SMALL)
       textField().label("Maximum:").columns(COLUMNS_TINY)
               .text(maxWordsInBullet.toString())
-              .validateIntValue(IntRange(1, 999))
+              .validateLongValue(LongRange(1, 999))
               .validation(validateMinMaxValueRelation(MAX) { minWordsInBullet })
               .whenTextChangedFromUi { maxWordsInBullet = it.toIntOrNull() ?: DEFAULT_MAX_BULLET_WORDS }
     }.visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == BULLETS })

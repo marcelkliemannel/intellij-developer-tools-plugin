@@ -1,6 +1,7 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.UIBundle
@@ -8,6 +9,7 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Cell
+import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
@@ -21,12 +23,12 @@ import javax.swing.JComponent
 // -- Exposed Methods ----------------------------------------------------------------------------------------------- //
 
 /**
- * The UI DSL only verifies an `intTextField` on input.
+ * The UI DSL only verifies the range of an `intTextField` on a user input.
  */
-fun Cell<JBTextField>.validateIntValue(range: IntRange? = null) = this.apply {
+fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) = this.apply {
   validation {
-    if (this@validateIntValue.component.isEnabled) {
-      val value = this@validateIntValue.component.text.toIntOrNull()
+    if (this@validateLongValue.component.isEnabled) {
+      val value = this@validateLongValue.component.text.toLongOrNull()
       when {
         value == null -> error(UIBundle.message("please.enter.a.number"))
         range != null && value !in range -> error(UIBundle.message("please.enter.a.number.from.0.to.1", range.first, range.last))
@@ -104,6 +106,17 @@ fun JComponent.wrapWithToolBar(actionEventPlace: String, actions: ActionGroup, t
 }
 
 fun JBFont.toMonospace(): JBFont = JBFont.create(Font(Font.MONOSPACED, this.style, this.size))
+
+fun <T> ObservableMutableProperty<T>.toComponentPredicate(predicate: (T?) -> Boolean): ComponentPredicate =
+  object : ComponentPredicate() {
+
+    override fun invoke(): Boolean = predicate(this@toComponentPredicate.get())
+
+    override fun addListener(listener: (Boolean) -> Unit) {
+      this@toComponentPredicate.afterChange { listener(predicate(this@toComponentPredicate.get())) }
+    }
+  }
+
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //
