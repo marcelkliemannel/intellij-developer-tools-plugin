@@ -1,5 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins
 
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.checkConfigurationPropertyType
 import io.ktor.util.reflect.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -17,9 +18,7 @@ class DeveloperToolConfiguration {
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   fun <T : Any> register(key: String, defaultValue: T): ReadWriteProperty<Any?, T> {
-    check(defaultValue::class.javaPrimitiveType != null
-          || defaultValue.javaClass.isEnum
-          || defaultValue::class == String::class) { "Can't persist type: ${defaultValue::class}" }
+    checkConfigurationPropertyType(defaultValue::class)
 
     @Suppress("UNCHECKED_CAST")
     val initialValue : T = if (properties.containsKey(key)) (properties[key] as T) else defaultValue
