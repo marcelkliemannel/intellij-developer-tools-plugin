@@ -26,10 +26,10 @@ internal class TextSortingTransformer(configuration: DeveloperToolConfiguration,
   ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var unsortedSplitWordsDelimiter: WordsDelimiter by configuration.register("unsortedPredefinedDelimiter", SPACE)
+  private var unsortedSplitWordsDelimiter: WordsDelimiter by configuration.register("unsortedPredefinedDelimiter", LINE_BREAK)
   private var unsortedIndividualSplitWordsDelimiter: String by configuration.register("unsortedIndividualSplitWordsDelimiter", " ")
 
-  private var sortedJoinWordsDelimiter: WordsDelimiter by configuration.register("sortedJoinWordsDelimiter", SPACE)
+  private var sortedJoinWordsDelimiter: WordsDelimiter by configuration.register("sortedJoinWordsDelimiter", LINE_BREAK)
   private var sortedIndividualJoinWordsDelimiter: String by configuration.register("sortedIndividualJoinWordsDelimiter", " ")
 
   private var sortingOrder: SortingOrder by configuration.register("sortingOrder", SortingOrder.LEXICOGRAPHIC)

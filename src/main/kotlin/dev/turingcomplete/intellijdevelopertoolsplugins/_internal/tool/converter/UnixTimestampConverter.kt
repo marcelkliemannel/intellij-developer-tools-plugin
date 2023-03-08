@@ -157,7 +157,7 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
 
     row {
       label(title).gap(RightGap.SMALL)
-      label = JBLabel("").copyable().apply { font = JBFont.label().toMonospace() }
+      label = JBLabel("Calculating...").copyable().apply { font = JBFont.label().toMonospace() }
       val actions = DefaultActionGroup().apply { add(CopyAction(contentDataKey)) }
       cell(label.wrapWithToolBar(title, actions, ToolBarPlace.APPEND, false))
     }.layout(RowLayout.PARENT_GRID)
@@ -167,7 +167,7 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
 
   override fun afterBuildUi() {
     unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
-    convert(UNIX_TIMESTAMP_MILLIS)
+    convert(UNIX_TIMESTAMP_MILLIS, 0)
   }
 
   override fun getData(dataId: String): Any? = when {
@@ -181,7 +181,7 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
   }
 
   override fun activated() {
-    scheduleCurrentUnixTimestampUpdate()
+    scheduleCurrentUnixTimestampUpdate(0)
   }
 
   override fun deactivated() {
@@ -201,11 +201,11 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
     scheduleCurrentUnixTimestampUpdate()
   }
 
-  private fun scheduleCurrentUnixTimestampUpdate() {
-    currentUnixTimestampUpdateAlarm.addRequest(currentUnixTimestampUpdate, TIMESTAMP_UPDATE_INTERVAL_MILLIS)
+  private fun scheduleCurrentUnixTimestampUpdate(delayMillis: Long = TIMESTAMP_UPDATE_INTERVAL_MILLIS) {
+    currentUnixTimestampUpdateAlarm.addRequest(currentUnixTimestampUpdate, delayMillis)
   }
 
-  private fun convert(conversionOrigin: ConversionOrigin) {
+  private fun convert(conversionOrigin: ConversionOrigin, delayMillis: Long = 100) {
     if (validate().isNotEmpty()) {
       return
     }
@@ -240,7 +240,7 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
       }
     }
     convertAlarm.cancelAllRequests()
-    convertAlarm.addRequest(convert, 100)
+    convertAlarm.addRequest(convert, delayMillis)
   }
 
   private fun setConvertedValues(localDateTime: LocalDateTime, conversionOrigin: ConversionOrigin) {
