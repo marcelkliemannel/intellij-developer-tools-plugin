@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.xmlb.Converter
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
@@ -105,15 +106,23 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
         Float::class.qualifiedName -> value.toFloat()
         Double::class.qualifiedName -> value.toDouble()
         String::class.qualifiedName -> value
-        else -> {
-          val valueTypeClass = Class.forName(valueType, false, this::class.java.classLoader)
-          return if (valueTypeClass.isEnum) {
-            valueTypeClass.enumConstants.first { Enum::class.cast(it).name == value }
-          }
-          else {
-            error("Unsupported configuration property: $valueType")
-          }
+        else -> parseValue(valueType, value)
+      }
+    }
+
+    private fun parseValue(valueType: String, value: String): Any? {
+      return try {
+        val valueTypeClass = Class.forName(valueType, false, this::class.java.classLoader)
+        if (valueTypeClass.isEnum) {
+          valueTypeClass.enumConstants.first { Enum::class.cast(it).name == value }
         }
+        else {
+          error("Unsupported configuration property: $valueType")
+        }
+      }
+      catch (e: Exception) {
+        log.error("Failed to load class '$valueType' of value '$value'", e)
+        null
       }
     }
   }
@@ -124,6 +133,8 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
 
     val instance: DeveloperToolsPluginService
       get() = ApplicationManager.getApplication().getService(DeveloperToolsPluginService::class.java)
+
+    private val log = logger<DeveloperToolsPluginService>()
 
     private const val PROPERTY_TYPE_VALUE_DELIMITER = "|"
 

@@ -43,7 +43,7 @@ internal class TextSortingTransformer(configuration: DeveloperToolConfiguration,
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun transform() {
+  override fun doTransform() {
     val unsortedSplitWordsDelimiterPattern: Regex = when (unsortedSplitWordsDelimiter) {
       LINE_BREAK, SPACE, DASH, UNDERSCORE, COMMA, SEMICOLON -> unsortedSplitWordsDelimiter.splitPattern!!
       INDIVIDUAL -> Regex("${Regex.escape(unsortedIndividualSplitWordsDelimiter)}+")
@@ -77,7 +77,7 @@ internal class TextSortingTransformer(configuration: DeveloperToolConfiguration,
     resultText = unsortedWords.joinToString(sortedJoinWordsDelimiter)
   }
 
-  override fun Panel.buildConfigurationUi() {
+  override fun Panel.buildMiddleConfigurationUi() {
     row {
       buildSplitConfigurationUi(
               "Split unsorted words by:",

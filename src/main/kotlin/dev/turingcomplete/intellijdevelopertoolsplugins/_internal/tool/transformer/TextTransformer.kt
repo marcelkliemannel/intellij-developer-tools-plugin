@@ -13,16 +13,16 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.Develop
 import kotlin.properties.Delegates
 
 abstract class TextTransformer(
-  presentation: DeveloperToolPresentation,
-  private val transformActionTitle: String,
-  private val sourceTitle: String,
-  private val resultTitle: String,
-  private val configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+        presentation: DeveloperToolPresentation,
+        private val transformActionTitle: String,
+        private val sourceTitle: String,
+        private val resultTitle: String,
+        private val configuration: DeveloperToolConfiguration,
+        parentDisposable: Disposable
 ) : DeveloperTool(presentation, parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var liveTransformation: Boolean by configuration.register("liveTransformation", true)
+  protected var liveTransformation: Boolean by configuration.register("liveTransformation", true)
 
   private val sourceEditor: DeveloperToolEditor by lazy { createSourceInputEditor() }
   private val resultEditor by lazy { DeveloperToolEditor(title = resultTitle, editorMode = OUTPUT, parentDisposable = parentDisposable) }
@@ -34,21 +34,24 @@ abstract class TextTransformer(
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  abstract fun transform()
+  protected fun transform() {
+    if (validate().isNotEmpty()) {
+      return
+    }
+
+    doTransform()
+  }
+
+  protected abstract fun doTransform()
 
   override fun Panel.buildUi() {
-    if (configurationPosition() == ConfigurationPosition.TOP) {
-      buildConfigurationUi()
-    }
+    buildTopConfigurationUi()
 
     row {
       cell(sourceEditor.createComponent()).align(Align.FILL)
     }.resizableRow()
 
-    if (configurationPosition() == ConfigurationPosition.MIDDLE) {
-      buildConfigurationUi()
-    }
-
+    buildMiddleConfigurationUi()
     buildActionsUi()
 
     row {
@@ -56,7 +59,15 @@ abstract class TextTransformer(
     }.resizableRow()
   }
 
-  protected open fun Panel.buildConfigurationUi() {
+  override fun afterBuildUi() {
+    transform()
+  }
+
+  protected open fun Panel.buildTopConfigurationUi() {
+    // Override if needed
+  }
+
+  protected open fun Panel.buildMiddleConfigurationUi() {
     // Override if needed
   }
 
@@ -64,8 +75,6 @@ abstract class TextTransformer(
     sourceEditor.language = language
     resultEditor.language = language
   }
-
-  protected open fun configurationPosition() = ConfigurationPosition.MIDDLE
 
   override fun configurationChanged(key: String) {
     if (!isDisposed && liveTransformation) {
@@ -113,12 +122,5 @@ abstract class TextTransformer(
     }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
-
-  enum class ConfigurationPosition {
-
-    TOP,
-    MIDDLE
-  }
-
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 }

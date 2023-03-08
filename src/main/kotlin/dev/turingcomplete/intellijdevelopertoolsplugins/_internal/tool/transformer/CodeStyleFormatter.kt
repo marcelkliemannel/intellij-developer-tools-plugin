@@ -47,7 +47,7 @@ class CodeStyleFormatter(
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
-  override fun Panel.buildConfigurationUi() {
+  override fun Panel.buildTopConfigurationUi() {
     val selectedCodeStyle = getSelectedCodeStyle()
 
     row {
@@ -65,7 +65,7 @@ class CodeStyleFormatter(
     setLanguage(selectedCodeStyle.language)
   }
 
-  override fun transform() {
+  override fun doTransform() {
     val workingVirtualFile = LightVirtualFile(this.javaClass.canonicalName, getSelectedCodeStyle().language, sourceText)
     PsiManager.getInstance(project).findFile(workingVirtualFile)?.let { workingPsiFile ->
       val processor = RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))
@@ -75,8 +75,6 @@ class CodeStyleFormatter(
       processor.run()
     } ?: error("snh: Can't get PSI file for `LightVirtualFile`")
   }
-
-  override fun configurationPosition() = ConfigurationPosition.TOP
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 

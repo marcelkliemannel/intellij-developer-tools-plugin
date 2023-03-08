@@ -51,6 +51,11 @@
                         menuTitle="Text Escape"
                         detailTitle="Text Escape"
                         weight="7"/>
+    <developerToolGroup id="cryptography"
+                        menuTitle="Cryptography"
+                        detailTitle="Cryptography"
+                        initiallyExpanded="true"
+                        weight="3"/>
 
     <!-- encoder-decoder -->
     <developerTool
@@ -97,35 +102,40 @@
             groupId="text-escape"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.XmlTextEscape$Factory"/>
 
+    <!-- cryptography -->
+    <developerTool
+            id="hashing-transformer"
+            groupId="cryptography"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.HashingTransformer$Factory"/>
+    <developerTool
+            id="hmac-transformer"
+            groupId="cryptography"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.HmacTransformer$Factory"/>
+
     <!-- root level -->
     <developerTool
             id="uuid-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.UuidGenerator$Factory"
             weight="2"/>
     <developerTool
-            id="hashing-transformer"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.HashingTransformer$Factory"
-            weight="3"/>
-    <developerTool
             id="code-style-formatter"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.CodeStyleFormatter$Factory"
-            weight="4"/>
+            weight="5"/>
     <developerTool
             id="text-sorting-transformer"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$Factory"
-            weight="5"/>
+            weight="6"/>
     <developerTool
             id="text-case-transformer"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$Factory"
-            weight="6"/>
+            weight="7"/>
     <developerTool
             id="unix-timestamp-converter"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter$Factory"
-            weight="8"/>
+            weight="9"/>
     <developerTool
             id="lorem-ipsum-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$Factory"
-            weight="9"/>
+            weight="10"/>
   </extensions>
-
 </idea-plugin>

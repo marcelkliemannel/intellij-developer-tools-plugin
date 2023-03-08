@@ -36,7 +36,7 @@ class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDispo
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun transform() {
+  override fun doTransform() {
     resultText = when (originalParsingMode) {
       FIXED_TEXT_CASE -> sourceText.toTextCase(outputTextCase.textCase, inputTextCase.textCase.wordsSplitter())
       INDIVIDUAL_DELIMITER -> sourceText.toTextCase(outputTextCase.textCase, individualDelimiter.toWordsSplitter())
@@ -44,7 +44,7 @@ class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDispo
   }
 
   @Suppress("UnstableApiUsage")
-  override fun Panel.buildConfigurationUi() {
+  override fun Panel.buildMiddleConfigurationUi() {
     buttonsGroup("Original:") {
       row {
         radioButton("Fixed text case:").applyToComponent {

@@ -11,10 +11,12 @@ import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
+import com.intellij.util.ui.GridBag
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Font
+import java.awt.GridBagConstraints
 import java.awt.event.ItemEvent
 import javax.swing.BorderFactory
 import javax.swing.JComponent
@@ -117,6 +119,10 @@ fun <T> ObservableMutableProperty<T>.toComponentPredicate(predicate: (T?) -> Boo
     }
   }
 
+fun GridBag.setDefaults() = this
+        .setDefaultAnchor(GridBagConstraints.NORTHWEST)
+        .setDefaultInsets(0, 0, 0, 0)
+        .setDefaultFill(GridBagConstraints.NONE)
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //
