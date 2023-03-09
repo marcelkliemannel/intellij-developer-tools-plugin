@@ -30,6 +30,7 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
+import java.awt.Dimension
 import java.awt.datatransfer.StringSelection
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
@@ -95,6 +96,9 @@ internal class DeveloperToolEditor(
         }
         val editorComponent = editor.component.wrapWithToolBar(DeveloperToolEditor::class.java.simpleName, createActions(), ToolBarPlace.RIGHT)
         addToCenter(editorComponent)
+        // This prevents the `Editor` from increasing the size of the dialog if
+        // the to display all the text on the screen instead of using scrollbars.
+        preferredSize = Dimension(preferredSize.width, 1)
       }
 
       override fun getData(dataId: String): Any? = when {

@@ -134,8 +134,12 @@
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter$Factory"
             weight="9"/>
     <developerTool
+            id="json-path"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.JsonPathTransformer$Factory"
+            weight="10"/>
+    <developerTool
             id="lorem-ipsum-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$Factory"
-            weight="10"/>
+            weight="11"/>
   </extensions>
 </idea-plugin>

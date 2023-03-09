@@ -25,7 +25,7 @@ abstract class TextTransformer(
   protected var liveTransformation: Boolean by configuration.register("liveTransformation", true)
 
   private val sourceEditor: DeveloperToolEditor by lazy { createSourceInputEditor() }
-  private val resultEditor by lazy { DeveloperToolEditor(title = resultTitle, editorMode = OUTPUT, parentDisposable = parentDisposable) }
+  private val resultEditor by lazy { createResultOutputEditor(parentDisposable) }
 
   protected val sourceText: String
     get() = sourceEditor.text
@@ -71,7 +71,17 @@ abstract class TextTransformer(
     // Override if needed
   }
 
-  protected open fun setLanguage(language: Language) {
+  protected open fun getInitialOriginalText(): String? {
+    // Override if needed
+    return null
+  }
+
+  protected open fun getInitialLanguage(): Language? {
+    // Override if needed
+    return null
+  }
+
+  protected fun setLanguage(language: Language) {
     sourceEditor.language = language
     resultEditor.language = language
   }
@@ -113,12 +123,27 @@ abstract class TextTransformer(
   }
 
   private fun createSourceInputEditor(): DeveloperToolEditor =
-    DeveloperToolEditor(title = sourceTitle, editorMode = INPUT, parentDisposable = parentDisposable).apply {
+    DeveloperToolEditor(
+            title = sourceTitle,
+            editorMode = INPUT,
+            parentDisposable = parentDisposable
+    ).apply {
+      getInitialLanguage()?.let { language = it }
+      getInitialOriginalText()?.let { text = it }
       onTextChange {
         if (liveTransformation) {
           transform()
         }
       }
+    }
+
+  private fun createResultOutputEditor(parentDisposable: Disposable) =
+    DeveloperToolEditor(
+            title = resultTitle,
+            editorMode = OUTPUT,
+            parentDisposable = parentDisposable
+    ).apply {
+      getInitialLanguage()?.let { language = it }
     }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

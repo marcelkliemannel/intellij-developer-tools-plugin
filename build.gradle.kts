@@ -23,6 +23,9 @@ dependencies {
   implementation("com.fasterxml.uuid:java-uuid-generator:4.1.0") {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
+  implementation("com.jayway.jsonpath:json-path:2.7.0") {
+    exclude(group = "org.slf4j", module = "slf4j-api")
+  }
   implementation("org.apache.commons:commons-text:1.10.0")
   implementation("dev.turingcomplete:text-case-converter:1.0.0")
   implementation("dev.turingcomplete:text-case-converter-kotlin-extension:1.0.0")
