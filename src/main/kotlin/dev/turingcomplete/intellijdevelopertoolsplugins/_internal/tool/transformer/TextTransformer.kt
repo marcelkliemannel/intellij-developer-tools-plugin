@@ -35,11 +35,13 @@ abstract class TextTransformer(
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   protected fun transform() {
+    println("Start")
     if (validate().isNotEmpty()) {
       return
     }
 
     doTransform()
+    println("Finished")
   }
 
   protected abstract fun doTransform()

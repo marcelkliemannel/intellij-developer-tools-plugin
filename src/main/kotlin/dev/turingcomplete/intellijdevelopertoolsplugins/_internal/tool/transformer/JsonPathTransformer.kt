@@ -3,6 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transfor
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.intellij.icons.AllIcons
 import com.intellij.json.JsonLanguage
+import com.intellij.jsonpath.JsonPathLanguage
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
@@ -78,7 +79,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, parentDispo
             title = "JSON path query",
             editorMode = INPUT,
             parentDisposable = parentDisposable,
-            initialLanguage = JsonLanguage.INSTANCE
+            initialLanguage = JsonPathLanguage.INSTANCE
     ).apply {
       text = ORIGINAL_JSON_PATH_EXAMPLE
       onTextChange {
@@ -108,25 +109,26 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, parentDispo
               .build()
     }
 
+    @org.intellij.lang.annotations.Language("JSON")
     private const val ORIGINAL_EXAMPLE = """{
   "starWars": {
     "characters": [
       {
         "forename": "Luke",
         "surname": "Skywalker",
-        "birthday": "19 BBY",
+        "birthdate": "19 BBY",
         "homeWorld": "Tatooine"
       },
       {
         "forename": "Leia",
         "surname": "Organa",
-        "birthday": "19 BBY",
+        "birthdate": "19 BBY",
         "homeWorld": "Alderaan"
       },
       {
         "forename": "Ben",
         "surname": "Solo",
-        "birthday": "5 ABY",
+        "birthdate": "5 ABY",
         "homeWorld": "Chandrila"
       }
     ],
@@ -136,7 +138,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, parentDispo
         "class": "Carrier"
       },
       {
-        "type": "X-wing starfighter",
+        "type": "X-Wing Starfighter",
         "class": "Space superiority fighter"
       }
     ]
