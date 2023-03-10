@@ -1,5 +1,9 @@
 # IntelliJ Developer Tools Plugin
 
+Bugs:
+- Undo action in text field causes an exception
+- Enter in text fields triggers dialog close
+
 ## Development
 
 This plugin is not seen as a library. Therefore, code changes do not necessarily adhere to the semantics version rules.

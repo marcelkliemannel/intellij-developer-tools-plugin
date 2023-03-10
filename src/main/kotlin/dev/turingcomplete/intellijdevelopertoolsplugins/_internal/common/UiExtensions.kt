@@ -1,6 +1,11 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 
+import com.intellij.lang.Language
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.editor.colors.EditorColorsManager
+import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory
+import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ValidationInfo
@@ -123,6 +128,11 @@ fun GridBag.setDefaults() = this
         .setDefaultAnchor(GridBagConstraints.NORTHWEST)
         .setDefaultInsets(0, 0, 0, 0)
         .setDefaultFill(GridBagConstraints.NONE)
+
+fun EditorEx.setLanguage(language: Language) {
+  val syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(language, project, null)
+  highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(syntaxHighlighter, EditorColorsManager.getInstance().globalScheme)
+}
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

@@ -40,7 +40,7 @@ internal class HmacTransformer(
 
     secretKey.afterChange {
       if (liveTransformation) {
-        doTransform()
+       transform()
       }
     }
 
@@ -52,7 +52,11 @@ internal class HmacTransformer(
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun doTransform() {
+  override fun transform() {
+    if (validate().isNotEmpty()) {
+      return
+    }
+
     val hmac: ByteArray = Mac.getInstance(selectedAlgorithm).run {
       init(SecretKeySpec(secretKey.get().encodeToByteArray(), selectedAlgorithm))
       doFinal(sourceText.encodeToByteArray())

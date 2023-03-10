@@ -65,7 +65,7 @@ class CodeStyleFormatter(
     setLanguage(selectedCodeStyle.language)
   }
 
-  override fun doTransform() {
+  override fun transform() {
     val workingVirtualFile = LightVirtualFile(this.javaClass.canonicalName, getSelectedCodeStyle().language, sourceText)
     PsiManager.getInstance(project).findFile(workingVirtualFile)?.let { workingPsiFile ->
       val processor = RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))

@@ -43,7 +43,7 @@ internal class TextSortingTransformer(configuration: DeveloperToolConfiguration,
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun doTransform() {
+  override fun transform() {
     val unsortedSplitWordsDelimiterPattern: Regex = when (unsortedSplitWordsDelimiter) {
       LINE_BREAK, SPACE, DASH, UNDERSCORE, COMMA, SEMICOLON -> unsortedSplitWordsDelimiter.splitPattern!!
       INDIVIDUAL -> Regex("${Regex.escape(unsortedIndividualSplitWordsDelimiter)}+")

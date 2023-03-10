@@ -40,7 +40,7 @@ internal class HashingTransformer(
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun doTransform() {
+  override fun transform() {
     val hash = selectedAlgorithm.toMessageDigest().digest(sourceText.encodeToByteArray())
     resultText = Hex.encode(hash).decodeToString()
   }

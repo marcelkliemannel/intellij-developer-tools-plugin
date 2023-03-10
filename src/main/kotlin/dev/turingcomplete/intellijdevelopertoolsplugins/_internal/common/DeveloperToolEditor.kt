@@ -16,12 +16,10 @@ import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.FocusChangeListener
-import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.fileTypes.PlainTextLanguage
-import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.Disposer
@@ -165,11 +163,6 @@ internal class DeveloperToolEditor(
     }
   }
 
-  private fun EditorEx.setLanguage(language: Language) {
-    val syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(language, project, null)
-    highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(syntaxHighlighter, EditorColorsManager.getInstance().globalScheme)
-  }
-
   private fun EditorEx.syncEditorColors() {
     setBackgroundColor(null) // To use background from set color scheme
 
@@ -234,7 +227,7 @@ internal class DeveloperToolEditor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class SaveContentToFile()
+  private class SaveContentToFile
     : DumbAwareAction("Save to File", "Save the text into a file", AllIcons.Actions.MenuSaveall) {
 
     override fun actionPerformed(e: AnActionEvent) {

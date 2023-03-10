@@ -34,17 +34,7 @@ abstract class TextTransformer(
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  protected fun transform() {
-    println("Start")
-    if (validate().isNotEmpty()) {
-      return
-    }
-
-    doTransform()
-    println("Finished")
-  }
-
-  protected abstract fun doTransform()
+  protected abstract fun transform()
 
   override fun Panel.buildUi() {
     buildTopConfigurationUi()

@@ -1,13 +1,18 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer
 
 import com.fasterxml.jackson.databind.node.ArrayNode
-import com.intellij.icons.AllIcons
 import com.intellij.json.JsonLanguage
 import com.intellij.jsonpath.JsonPathLanguage
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.editor.event.DocumentEvent
+import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.EditorTextField
+import com.intellij.ui.LanguageTextField
 import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.jayway.jsonpath.Configuration
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.JsonPathException
@@ -17,11 +22,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 
-class JsonPathTransformer(configuration: DeveloperToolConfiguration, parentDisposable: Disposable)
+class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable)
   : TextTransformer(
         presentation = DeveloperToolPresentation("JSON Path", "JSON Path Transformer"),
         transformActionTitle = "Execute Query",
@@ -32,7 +35,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, parentDispo
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val queryEditor: DeveloperToolEditor by lazy { createQueryInputEditor() }
+  private val queryEditor: EditorTextField by lazy { createQueryInputEditor(project) }
   private var errorHolder = ErrorHolder()
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
@@ -40,19 +43,19 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, parentDispo
 
   override fun Panel.buildMiddleConfigurationUi() {
     row {
-      cell(queryEditor.createComponent()).align(Align.FILL)
-    }.resizableRow().topGap(TopGap.SMALL)
+      label("JSON path query:")
+    }.bottomGap(BottomGap.NONE)
 
     row {
-      icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
-      label("").bindText(errorHolder.asObservableNonNullProperty())
-    }.visibleIf(errorHolder.asComponentPredicate())
+      cell(queryEditor).validationOnApply { errorHolder.error?.let { ValidationInfo(it) } }
+              .horizontalAlign(HorizontalAlign.FILL)
+    }.topGap(TopGap.NONE)
   }
 
-  override fun doTransform() {
+  override fun transform() {
     errorHolder.error = null
 
-    if (queryEditor.text.isBlank()) {
+    if (sourceText.isBlank() || queryEditor.text.isBlank()) {
       return
     }
 
@@ -66,6 +69,10 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, parentDispo
     catch (e: JsonPathException) {
       errorHolder.error = "<html>${e.message}</html>"
     }
+
+    // The `validate` in this class is not used as a validation mechanism. We
+    // make use of its text field error UI to display the `errorHolder`.
+    validate()
   }
 
   override fun getInitialOriginalText(): String = ORIGINAL_EXAMPLE
@@ -74,19 +81,15 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, parentDispo
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun createQueryInputEditor(): DeveloperToolEditor =
-    DeveloperToolEditor(
-            title = "JSON path query",
-            editorMode = INPUT,
-            parentDisposable = parentDisposable,
-            initialLanguage = JsonPathLanguage.INSTANCE
-    ).apply {
-      text = ORIGINAL_JSON_PATH_EXAMPLE
-      onTextChange {
-        if (liveTransformation) {
-          transform()
+  private fun createQueryInputEditor(project: Project?): EditorTextField =
+    LanguageTextField(JsonPathLanguage.INSTANCE, project, ORIGINAL_JSON_PATH_EXAMPLE, true).apply {
+      addDocumentListener(object: DocumentListener {
+        override fun documentChanged(event: DocumentEvent) {
+          if (liveTransformation) {
+            transform()
+          }
         }
-      }
+      })
     }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -94,7 +97,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, parentDispo
   class Factory : DeveloperToolFactory {
 
     override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return JsonPathTransformer(configuration, parentDisposable)
+      return JsonPathTransformer(configuration, project, parentDisposable)
     }
   }
 

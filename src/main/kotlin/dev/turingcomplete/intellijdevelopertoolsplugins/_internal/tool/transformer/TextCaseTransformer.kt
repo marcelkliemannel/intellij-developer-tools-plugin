@@ -36,7 +36,7 @@ class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDispo
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun doTransform() {
+  override fun transform() {
     resultText = when (originalParsingMode) {
       FIXED_TEXT_CASE -> sourceText.toTextCase(outputTextCase.textCase, inputTextCase.textCase.wordsSplitter())
       INDIVIDUAL_DELIMITER -> sourceText.toTextCase(outputTextCase.textCase, individualDelimiter.toWordsSplitter())
