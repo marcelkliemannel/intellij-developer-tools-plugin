@@ -17,12 +17,16 @@ import io.ktor.util.*
 
 internal class TextSortingTransformer(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextTransformer(
-    presentation = DeveloperToolPresentation("Text Sorting", "Text Sorting"),
-    transformActionTitle = "Sort",
-    sourceTitle = "Unsorted",
-    resultTitle = "Sorted",
-    configuration = configuration,
-    parentDisposable = parentDisposable
+          presentation = DeveloperToolPresentation(
+                  menuTitle = "Text Sorting",
+                  contentTitle = "Text Sorting"
+          ),
+          context = Context(
+                  transformActionTitle = "Sort",
+                  sourceTitle = "Unsorted",
+                  resultTitle = "Sorted"),
+          configuration = configuration,
+          parentDisposable = parentDisposable
   ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 

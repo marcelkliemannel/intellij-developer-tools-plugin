@@ -16,10 +16,15 @@ internal class HashingTransformer(
         configuration: DeveloperToolConfiguration,
         parentDisposable: Disposable
 ) : TextTransformer(
-        presentation = DeveloperToolPresentation("Hashing", "Hashing Transformer"),
-        transformActionTitle = "Hash",
-        sourceTitle = "Plain",
-        resultTitle = "Hashed",
+        presentation = DeveloperToolPresentation(
+                menuTitle = "Hashing",
+                contentTitle = "Hashing Transformer"
+        ),
+        context = Context(
+                transformActionTitle = "Hash",
+                sourceTitle = "Plain",
+                resultTitle = "Hashed"
+        ),
         configuration = configuration,
         parentDisposable = parentDisposable
 ) {

@@ -12,7 +12,7 @@ import javax.swing.JComponent
 
 abstract class DeveloperTool(
   val presentation: DeveloperToolPresentation,
-  val parentDisposable: Disposable
+  protected val parentDisposable: Disposable
 ) : DataProvider, Disposable {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 

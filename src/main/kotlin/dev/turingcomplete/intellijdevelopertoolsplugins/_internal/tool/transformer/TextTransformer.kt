@@ -14,9 +14,7 @@ import kotlin.properties.Delegates
 
 abstract class TextTransformer(
         presentation: DeveloperToolPresentation,
-        private val transformActionTitle: String,
-        private val sourceTitle: String,
-        private val resultTitle: String,
+        private val context: Context,
         private val configuration: DeveloperToolConfiguration,
         parentDisposable: Disposable
 ) : DeveloperTool(presentation, parentDisposable), DeveloperToolConfiguration.ChangeListener {
@@ -107,7 +105,7 @@ abstract class TextTransformer(
                 .whenStateChangedFromUi { liveTransformation = it }
                 .gap(RightGap.SMALL)
 
-        button("▼ $transformActionTitle") { transform() }
+        button("▼ ${context.transformActionTitle}") { transform() }
                 .enabledIf(liveTransformationCheckBox.selected.not())
                 .component
       }
@@ -116,13 +114,13 @@ abstract class TextTransformer(
 
   private fun createSourceInputEditor(): DeveloperToolEditor =
     DeveloperToolEditor(
-            title = sourceTitle,
+            title = context.sourceTitle,
             editorMode = INPUT,
             parentDisposable = parentDisposable
     ).apply {
       getInitialLanguage()?.let { language = it }
       getInitialOriginalText()?.let { text = it }
-      onTextChange {
+      this.onTextChangeFromUi { _ ->
         if (liveTransformation) {
           transform()
         }
@@ -131,7 +129,7 @@ abstract class TextTransformer(
 
   private fun createResultOutputEditor(parentDisposable: Disposable) =
     DeveloperToolEditor(
-            title = resultTitle,
+            title = context.resultTitle,
             editorMode = OUTPUT,
             parentDisposable = parentDisposable
     ).apply {
@@ -139,5 +137,12 @@ abstract class TextTransformer(
     }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  data class Context(
+          val transformActionTitle: String,
+          val sourceTitle: String,
+          val resultTitle: String
+  )
+
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 }

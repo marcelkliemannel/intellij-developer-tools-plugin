@@ -19,12 +19,17 @@ import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 
 class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextTransformer(
-    presentation = DeveloperToolPresentation("Text Case", "Text Case Transformer"),
-    transformActionTitle = "Transform",
-    sourceTitle = "Original",
-    resultTitle = "Target",
-    configuration = configuration,
-    parentDisposable = parentDisposable
+          presentation = DeveloperToolPresentation(
+                  menuTitle = "Text Case",
+                  contentTitle = "Text Case Transformer"
+          ),
+          context = Context(
+                  transformActionTitle = "Transform",
+                  sourceTitle = "Original",
+                  resultTitle = "Target"
+          ),
+          configuration = configuration,
+          parentDisposable = parentDisposable
   ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 

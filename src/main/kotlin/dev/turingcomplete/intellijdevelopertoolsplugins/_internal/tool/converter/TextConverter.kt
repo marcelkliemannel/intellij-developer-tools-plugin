@@ -9,23 +9,24 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.SOURCE
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.TARGET
 
 internal abstract class TextConverter(
-  presentation: DeveloperToolPresentation,
-  private val context: Context,
-  protected val configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+        presentation: DeveloperToolPresentation,
+        private val context: Context,
+        protected val configuration: DeveloperToolConfiguration,
+        parentDisposable: Disposable
 ) : DeveloperTool(presentation, parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveConversion: Boolean by configuration.register("liveConversion", true)
   private val conversationAlarm by lazy { Alarm(parentDisposable) }
 
-  private var lastActiveInput: DeveloperToolEditor? = null
-  private var currentActiveInput: DeveloperToolEditor? = null
+  private var lastActiveInput: ActiveInput? = null
 
-  private val sourceEditor by lazy { createEditor(title = context.sourceTitle) { doToTarget(it) } }
-  private val targetEditor by lazy { createEditor(title = context.targetTitle) { doToSource(it) } }
+  private val sourceEditor by lazy { createEditor(SOURCE, context.sourceTitle) { doToTarget(it) } }
+  private val targetEditor by lazy { createEditor(TARGET, context.targetTitle) { doToSource(it) } }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -69,7 +70,7 @@ internal abstract class TextConverter(
       row {
         val liveConversionCheckBox = checkBox("Live conversion")
                 .applyToComponent { isSelected = liveConversion }
-                .whenStateChangedFromUi {switchLiveConversion(it)  }
+                .whenStateChangedFromUi { switchLiveConversion(it) }
                 .gap(RightGap.SMALL)
 
         button("▼ ${context.convertActionTitle}") { transformToTarget() }
@@ -106,26 +107,15 @@ internal abstract class TextConverter(
     conversationAlarm.addRequest(conversation, 0)
   }
 
-  private fun createEditor(title: String, onTextChange: (String) -> Unit) =
+  private fun createEditor(activeInput: ActiveInput, title: String, onTextChange: (String) -> Unit) =
     DeveloperToolEditor(title = title, editorMode = INPUT_OUTPUT, parentDisposable = parentDisposable).apply {
       onFocusGained {
-        currentActiveInput = this
-        lastActiveInput = this
-
+        lastActiveInput = activeInput
       }
-      onFocusLost {
-        currentActiveInput = null
-      }
-      onTextChange { nextText ->
+      this.onTextChangeFromUi { text ->
         if (liveConversion) {
-          if (currentActiveInput != this) {
-            // The text change was triggered by an action, but the focus grab
-            // will be done asynchronously, so this editor does not have the
-            // focus yet.
-            currentActiveInput = this
-            lastActiveInput = this
-          }
-          onTextChange(nextText)
+          lastActiveInput = activeInput
+          onTextChange(text)
         }
       }
     }
@@ -140,10 +130,20 @@ internal abstract class TextConverter(
     if (liveConversion) {
       // Trigger a text change, so if the text was changed in manual mode it
       // will now be converted once during the switch to live mode.
-      lastActiveInput?.let {
-        it.text = it.text
+      when (lastActiveInput) {
+        SOURCE -> transformToTarget()
+        TARGET -> transformToSource()
+        null -> {}
       }
     }
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  enum class ActiveInput {
+
+    SOURCE,
+    TARGET
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

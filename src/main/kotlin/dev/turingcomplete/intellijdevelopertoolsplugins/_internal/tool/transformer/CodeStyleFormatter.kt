@@ -16,17 +16,21 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 
 class CodeStyleFormatter(
-  private val codeStyles: List<CodeStyle>,
-  private val project: Project,
-  configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+        private val codeStyles: List<CodeStyle>,
+        private val project: Project,
+        configuration: DeveloperToolConfiguration,
+        parentDisposable: Disposable
 ) : TextTransformer(
-  presentation = DeveloperToolPresentation("Code Style Formatting", "Code Style Formatter"),
-  transformActionTitle = "Format",
-  sourceTitle = "Original",
-  resultTitle = "Formatted",
-  configuration = configuration,
-  parentDisposable = parentDisposable
+        presentation = DeveloperToolPresentation(
+                menuTitle = "Code Style Formatting",
+                contentTitle = "Code Style Formatter"),
+        context = Context(
+                transformActionTitle = "Format",
+                sourceTitle = "Original",
+                resultTitle = "Formatted"
+        ),
+        configuration = configuration,
+        parentDisposable = parentDisposable
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 

@@ -20,10 +20,15 @@ internal class HmacTransformer(
         configuration: DeveloperToolConfiguration,
         parentDisposable: Disposable
 ) : TextTransformer(
-        presentation = DeveloperToolPresentation("HMAC", "HMAC Transformer"),
-        transformActionTitle = "Generate",
-        sourceTitle = "Data",
-        resultTitle = "Hash",
+        presentation = DeveloperToolPresentation(
+                menuTitle = "HMAC",
+                contentTitle = "HMAC Transformer"
+        ),
+        context = Context(
+                transformActionTitle = "Generate",
+                sourceTitle = "Data",
+                resultTitle = "Hash"
+        ),
         configuration = configuration,
         parentDisposable = parentDisposable
 ) {
@@ -40,7 +45,7 @@ internal class HmacTransformer(
 
     secretKey.afterChange {
       if (liveTransformation) {
-       transform()
+        transform()
       }
     }
 

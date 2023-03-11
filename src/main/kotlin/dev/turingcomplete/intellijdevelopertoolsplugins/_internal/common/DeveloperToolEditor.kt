@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 
 import com.intellij.icons.AllIcons
@@ -23,6 +25,7 @@ import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.Key
 import com.intellij.ui.ColorUtil
 import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.JBUI
@@ -45,7 +48,7 @@ internal class DeveloperToolEditor(
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var onTextChange: ((String) -> Unit)? = null
+  private var onTextChangeFromUi = mutableListOf<((String) -> Unit)>()
   private var onFocusGained: (() -> Unit)? = null
   private var onFocusLost: (() -> Unit)? = null
 
@@ -71,8 +74,9 @@ internal class DeveloperToolEditor(
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  fun onTextChange(changeListener: ((String) -> Unit)?): DeveloperToolEditor {
-    onTextChange = changeListener
+
+  fun onTextChangeFromUi(changeListener: ((String) -> Unit)): DeveloperToolEditor {
+    onTextChangeFromUi.add(changeListener)
     return this
   }
 
@@ -96,7 +100,7 @@ internal class DeveloperToolEditor(
         addToCenter(editorComponent)
         // This prevents the `Editor` from increasing the size of the dialog if
         // the to display all the text on the screen instead of using scrollbars.
-        preferredSize = Dimension(preferredSize.width, 1)
+        preferredSize = Dimension(preferredSize.width, 200)
       }
 
       override fun getData(dataId: String): Any? = when {
@@ -135,6 +139,7 @@ internal class DeveloperToolEditor(
     else {
       editorFactory.createViewer(document) as EditorEx
     }
+    editor.putUserData(editorActiveKey, UIUtil.hasFocus(editor.contentComponent))
     Disposer.register(parentDisposable) { EditorFactory.getInstance().releaseEditor(editor) }
 
     return editor.apply {
@@ -182,7 +187,9 @@ internal class DeveloperToolEditor(
 
     override fun documentChanged(event: DocumentEvent) {
       val currentText = event.document.text
-      onTextChange?.invoke(currentText)
+      if (editor.getUserData(editorActiveKey)!!) {
+        onTextChangeFromUi.forEach { it(currentText) }
+      }
     }
   }
 
@@ -191,10 +198,12 @@ internal class DeveloperToolEditor(
   private inner class FocusListener : FocusChangeListener {
 
     override fun focusGained(editor: Editor) {
+      editor.putUserData(editorActiveKey, true)
       onFocusGained?.invoke()
     }
 
     override fun focusLost(editor: Editor) {
+      editor.putUserData(editorActiveKey, false)
       onFocusLost?.invoke()
     }
   }
@@ -208,6 +217,7 @@ internal class DeveloperToolEditor(
       val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
       editor.contentComponent.grabFocus()
       runWriteAction {
+        editor.putUserData(editorActiveKey, true)
         editor.document.setText("")
       }
     }
@@ -233,7 +243,7 @@ internal class DeveloperToolEditor(
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
       val fileSaverDescriptor = FileSaverDescriptor("Save Content As", "")
-      val timeStamp = LocalDateTime.now().format(TIMESTAMP_FORMAT)
+      val timeStamp = LocalDateTime.now().format(timestampFormat)
       val defaultFilename = "$timeStamp.txt"
       FileChooserFactory.getInstance()
               .createSaveFileDialog(fileSaverDescriptor, e.project)
@@ -256,6 +266,7 @@ internal class DeveloperToolEditor(
               .createFileChooser(fileChooserDescriptor, e.project, editor.component)
               .choose(e.project).first()?.let {
                 runWriteAction {
+                  editor.putUserData(editorActiveKey, true)
                   editor.document.setText(Files.readString(it.toNioPath()))
                 }
                 editor.contentComponent.grabFocus()
@@ -276,6 +287,7 @@ internal class DeveloperToolEditor(
 
   companion object {
 
-    private val TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-SS")
+    private val editorActiveKey = Key<Boolean>("editorActive")
+    private val timestampFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-SS")
   }
 }

@@ -26,10 +26,15 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHo
 
 class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable)
   : TextTransformer(
-        presentation = DeveloperToolPresentation("JSON Path", "JSON Path Transformer"),
-        transformActionTitle = "Execute Query",
-        sourceTitle = "Original",
-        resultTitle = "Result",
+        presentation = DeveloperToolPresentation(
+                menuTitle = "JSON Path",
+                contentTitle = "JSON Path Transformer"
+        ),
+        context = Context(
+                transformActionTitle = "Execute Query",
+                sourceTitle = "Original",
+                resultTitle = "Result"
+        ),
         configuration = configuration,
         parentDisposable = parentDisposable
 ) {
@@ -61,7 +66,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
 
     try {
       val result = JsonPath.parse(sourceText, jsonPathConfiguration).read<Any>(queryEditor.text)
-      resultText = when(result) {
+      resultText = when (result) {
         is ArrayNode -> result.toPrettyString()
         else -> result.toString()
       }
@@ -83,7 +88,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
 
   private fun createQueryInputEditor(project: Project?): EditorTextField =
     LanguageTextField(JsonPathLanguage.INSTANCE, project, ORIGINAL_JSON_PATH_EXAMPLE, true).apply {
-      addDocumentListener(object: DocumentListener {
+      addDocumentListener(object : DocumentListener {
         override fun documentChanged(event: DocumentEvent) {
           if (liveTransformation) {
             transform()
