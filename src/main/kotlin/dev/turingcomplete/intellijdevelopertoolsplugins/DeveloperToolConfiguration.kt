@@ -1,6 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins
 
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.checkConfigurationPropertyType
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.checkStateType
 import io.ktor.util.reflect.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -18,7 +18,7 @@ class DeveloperToolConfiguration {
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   fun <T : Any> register(key: String, defaultValue: T): ReadWriteProperty<Any?, T> {
-    checkConfigurationPropertyType(defaultValue::class)
+    checkStateType(defaultValue::class)
 
     @Suppress("UNCHECKED_CAST")
     val initialValue : T = if (properties.containsKey(key)) (properties[key] as T) else defaultValue

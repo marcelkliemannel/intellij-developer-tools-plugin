@@ -11,7 +11,7 @@ import javax.swing.tree.TreeNode
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-abstract class ContentNode(title: String, private val weight: Int) : DefaultMutableTreeNode(title) {
+abstract class ContentNode(val id: String, title: String, private val weight: Int) : DefaultMutableTreeNode(title) {
 
   open fun selected() {
     // Override if needed
@@ -35,17 +35,21 @@ abstract class ContentNode(title: String, private val weight: Int) : DefaultMuta
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class RootNode : ContentNode("Root", Int.MIN_VALUE)
+internal class RootNode : ContentNode("root", "Root", Int.MIN_VALUE)
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
 internal class GroupNode(val developerToolGroup: DeveloperToolGroup) :
-  ContentNode(developerToolGroup.menuTitle, checkNotNull(developerToolGroup.weight) { "No weight set" })
+  ContentNode(
+          id = developerToolGroup.id,
+          title = developerToolGroup.menuTitle,
+          weight = checkNotNull(developerToolGroup.weight) { "No weight set" }
+  )
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class DeveloperToolNode(val developerTool: DeveloperTool, weight: Int) :
-  ContentNode(developerTool.presentation.menuTitle, weight) {
+internal class DeveloperToolNode(val developerToolId: String, val developerTool: DeveloperTool, weight: Int) :
+  ContentNode(developerToolId, developerTool.presentation.menuTitle, weight) {
 
   override fun selected() {
     developerTool.activated()

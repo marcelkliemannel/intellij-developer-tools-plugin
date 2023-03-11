@@ -17,8 +17,8 @@ class DeveloperToolFactoryEp<T : DeveloperToolFactory> : CustomLoadingExtensionP
   @RequiredElement
   lateinit var implementationClass: String
 
-  @Attribute("initiallySelected")
-  var initiallySelected: Boolean = false
+  @Attribute("preferredSelected")
+  var preferredSelected: Boolean = false
 
   @Attribute("weight")
   var weight: Int? = Int.MAX_VALUE

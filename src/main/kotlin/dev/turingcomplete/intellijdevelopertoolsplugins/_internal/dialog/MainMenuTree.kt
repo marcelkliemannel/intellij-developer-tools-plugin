@@ -20,6 +20,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolFactoryEp
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.getSetting
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.safeCastTo
 import javax.swing.JTree
 import javax.swing.event.TreeSelectionListener
@@ -38,7 +39,7 @@ class MainMenuTree(
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
-    val (rootNode, groupNodesToExpand, initiallySelectedDeveloperToolNode) = createTreeNodes(project, parentDisposable)
+    val (rootNode, groupNodesToExpand, preferredSelectedDeveloperToolNode) = createTreeNodes(project, parentDisposable)
 
     model = DefaultTreeModel(rootNode)
     setCellRenderer(MenuTreeNodeRenderer(rootNode))
@@ -55,12 +56,35 @@ class MainMenuTree(
 
     groupNodesToExpand.forEach { TreeUtil.promiseExpand(this, TreeUtil.getPath(rootNode, it)) }
 
-    selectInitiallySelectedDeveloperToolNode(initiallySelectedDeveloperToolNode)
+    selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode)
   }
 
-  private fun selectInitiallySelectedDeveloperToolNode(initiallySelectedDeveloperToolNode: ContentNode?) {
-    if (initiallySelectedDeveloperToolNode != null) {
-      TreeUtil.selectNode(this, initiallySelectedDeveloperToolNode)
+  private fun selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode: ContentNode?) {
+    var lastSelectedContentNodeSelected = false
+    val lastSelectedComponentNodeId = getSetting(LAST_SELECTED_CONTENT_NODE_ID_PROPERTY_KEY, String::class.java)
+    if (lastSelectedComponentNodeId != null) {
+      TreeUtil.promiseVisit(this) {
+        val lastPathComponent = it.lastPathComponent
+        if (lastPathComponent is ContentNode
+            && lastPathComponent.id == lastSelectedComponentNodeId) {
+          INTERRUPT
+        }
+        else {
+          CONTINUE
+        }
+      }.onSuccess {
+        if (it != null) {
+          TreeUtil.selectNode(this, it.lastPathComponent as ContentNode)
+          lastSelectedContentNodeSelected = true
+        }
+      }
+    }
+    if (lastSelectedContentNodeSelected) {
+      return
+    }
+
+    if (preferredSelectedDeveloperToolNode != null) {
+      TreeUtil.selectNode(this, preferredSelectedDeveloperToolNode)
     }
     else {
       // Select first `DeveloperToolNode`
@@ -86,7 +110,10 @@ class MainMenuTree(
   private fun handleMenuTreeSelection() = TreeSelectionListener { e ->
     e.path?.lastPathComponent
             ?.safeCastTo<ContentNode>()
-            ?.let { onContentNodeSelection(it) }
+            ?.let {
+              onContentNodeSelection(it)
+              DeveloperToolsPluginService.instance.setSetting(LAST_SELECTED_CONTENT_NODE_ID_PROPERTY_KEY, it.id)
+            }
   }
 
 
@@ -104,7 +131,7 @@ class MainMenuTree(
       rootNode.add(groupNode)
     }
 
-    var initiallySelectedDeveloperToolNode: DeveloperToolNode? = null
+    var preferredSelectedDeveloperToolNode: DeveloperToolNode? = null
     val application = ApplicationManager.getApplication()
     DeveloperToolFactoryEp.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
       val developerToolFactory: DeveloperToolFactory = developerToolFactoryEp.createInstance(application)
@@ -116,20 +143,20 @@ class MainMenuTree(
         val groupId: String? = developerToolFactoryEp.groupId
         val parentNode = if (groupId != null) (groupNodes[groupId]?: error("Unknown group: $groupId")) else rootNode
         val weight: Int = checkNotNull(developerToolFactoryEp.weight) { "No weight set" }
-        val developerToolNode = DeveloperToolNode(developerTool, weight)
+        val developerToolNode = DeveloperToolNode(developerToolFactoryEp.id, developerTool, weight)
 
         parentNode.add(developerToolNode)
 
-        if (developerToolFactoryEp.initiallySelected) {
-          check(initiallySelectedDeveloperToolNode == null) { "Multiple initial selected developer tools" }
-          initiallySelectedDeveloperToolNode = developerToolNode
+        if (developerToolFactoryEp.preferredSelected) {
+          check(preferredSelectedDeveloperToolNode == null) { "Multiple initial selected developer tools" }
+          preferredSelectedDeveloperToolNode = developerToolNode
         }
       }
     }
 
     rootNode.sortChildren()
 
-    return Triple(rootNode, groupNodesToExpand, initiallySelectedDeveloperToolNode)
+    return Triple(rootNode, groupNodesToExpand, preferredSelectedDeveloperToolNode)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -150,4 +177,9 @@ class MainMenuTree(
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    private const val LAST_SELECTED_CONTENT_NODE_ID_PROPERTY_KEY = "mainMenuTree_lastSelectedContentNodeId"
+  }
 }

@@ -65,7 +65,7 @@
     <developerTool
             id="base64-encoder-decoder"
             groupId="encoder-decoder"
-            initiallySelected="true"
+            preferredSelected="true"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.Base64EncoderDecoder$Factory"/>
     <developerTool
             id="url-base64-encoder-decoder"

@@ -5,6 +5,7 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.util.ObjectUtils
 import com.intellij.util.xmlb.Converter
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
@@ -23,6 +24,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val developerToolsConfigurations = ConcurrentHashMap<String, DeveloperToolConfiguration>()
+  private val generalSettings = ConcurrentHashMap<String, Any>()
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -30,48 +32,75 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   fun getOrCreateDeveloperToolConfiguration(id: String) =
     developerToolsConfigurations.getOrCreate(id) { DeveloperToolConfiguration() }
 
+  fun <T> getSetting(key: String, type: Class<T>): T? = generalSettings[key]?.let { ObjectUtils.tryCast(it, type) }
+
+  fun setSetting(key: String, value: Any?) {
+    if (value != null) {
+      checkStateType(value::class)
+      generalSettings[key] = value
+    }
+    else {
+      generalSettings.remove(key)
+    }
+  }
+
   override fun getState(): State {
-    val developerToolsConfigurationProperties: List<DeveloperToolConfigurationProperty> =
-      developerToolsConfigurations.asSequence().flatMap { (developerToolId, developerToolConfiguration) ->
-        developerToolConfiguration.properties.map {
-          DeveloperToolConfigurationProperty(developerToolId = developerToolId, key = it.key, value = it.value)
-        }
-      }.toList()
-    return State(developerToolsConfigurationProperties)
+    val stateDeveloperToolsConfigurations = developerToolsConfigurations.asSequence()
+            .flatMap { (developerToolId, developerToolConfiguration) ->
+              developerToolConfiguration.properties.map {
+                Property(referenceId = developerToolId, key = it.key, value = it.value)
+              }
+            }.toList()
+
+    val stateGeneralProperties = generalSettings.map { Property(key = it.key, value = it.value) }
+
+    return State(stateDeveloperToolsConfigurations, stateGeneralProperties)
   }
 
   override fun loadState(state: State) {
-    state.developerToolsConfigurationProperties?.groupBy { it.developerToolId }?.forEach { (developerToolId, properties) ->
-      val developerToolConfiguration = DeveloperToolConfiguration().apply {
-        this.properties.putAll(properties.filter { it.key != null && it.value != null }.associate { it.key!! to it.value!! })
-      }
-      developerToolsConfigurations[developerToolId!!] = developerToolConfiguration
-    }
+    developerToolsConfigurations.clear()
+    state.developerToolsConfigurations?.filter { it.referenceId != null && it.key != null && it.value != null }
+            ?.groupBy { it.referenceId!! }
+            ?.forEach { (developerToolId, properties) ->
+              val developerToolConfiguration = DeveloperToolConfiguration().apply {
+                this.properties.putAll(
+                        properties.filter { it.key != null && it.value != null }.associate { it.key!! to it.value!! }
+                )
+              }
+              developerToolsConfigurations[developerToolId] = developerToolConfiguration
+            }
+
+    generalSettings.clear()
+    state.developerToolsConfigurations
+            ?.filter { it.key != null && it.value != null }
+            ?.forEach { property -> generalSettings[property.key!!] = property.value!! }
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   data class State(
-          @get:XCollection(style = v2, elementName = "developerToolsConfigurationProperties", elementTypes = [DeveloperToolConfigurationProperty::class])
-          var developerToolsConfigurationProperties: List<DeveloperToolConfigurationProperty>? = null
+          @get:XCollection(style = v2, elementName = "developerToolsConfigurations")
+          var developerToolsConfigurations: List<Property>? = null,
+          @get:XCollection(style = v2, elementName = "generalSettings")
+          var generalSettings: List<Property>? = null
   )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   @Tag(value = "property")
-  data class DeveloperToolConfigurationProperty(
-          @get:Attribute("developerToolsId")
-          var developerToolId: String? = null,
+  data class Property(
+          @get:Attribute("referenceId")
+          var referenceId: String? = null,
           @get:Attribute("key")
           var key: String? = null,
-          @get:Attribute("value", converter = DeveloperToolConfigurationValueConverter::class)
+          @get:Attribute("value", converter = StatePropertyValueConverter::class)
           var value: Any? = null
   )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class DeveloperToolConfigurationValueConverter : Converter<Any>() {
+  class StatePropertyValueConverter : Converter<Any>() {
 
     override fun toString(value: Any): String {
       val (serializedValue, valueType) = when (value) {
@@ -82,6 +111,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
           // not work.
           Pair(value.name, value::class.java.name)
         }
+
         is Boolean, is Int, is Long, is Float, is Double -> Pair(value.toString(), value::class.qualifiedName!!)
         is String -> Pair(value, value::class.qualifiedName!!)
         else -> error("Unsupported configuration property: ${value::class.qualifiedName}")
@@ -137,13 +167,14 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     private val log = logger<DeveloperToolsPluginService>()
 
     private const val PROPERTY_TYPE_VALUE_DELIMITER = "|"
-
     private val SUPPORTED_TYPES = setOf<KClass<*>>(Boolean::class, Int::class, Long::class, Float::class, Double::class, String::class)
 
-    fun checkConfigurationPropertyType(type: KClass<*>) {
+    fun checkStateType(type: KClass<*>) {
       check(type.java.isEnum || SUPPORTED_TYPES.contains(type)) {
         "Unsupported configuration property type: ${type.qualifiedName}"
       }
     }
+
+    fun <T> getSetting(key: String, type: Class<T>): T? = instance.getSetting(key, type)
   }
 }
