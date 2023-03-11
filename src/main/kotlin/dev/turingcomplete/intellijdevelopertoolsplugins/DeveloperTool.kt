@@ -34,7 +34,7 @@ abstract class DeveloperTool(
     // to the preferred size. But the preferred size gets calculated as if the
     // whole text gets displayed on the screen.
     panel.minimumSize = Dimension(0, 0)
-    panel.preferredSize = Dimension(0, 0)
+    panel.preferredSize = Dimension(0, 500)
     panel.registerValidators(parentDisposable)
 
     val wrapper = object : BorderLayoutPanel(), DataProvider {
@@ -55,8 +55,6 @@ abstract class DeveloperTool(
   open fun afterBuildUi() {
     // Override if needed
   }
-
-  open fun group(): String? = null
 
   open fun activated() {
     // Override if needed

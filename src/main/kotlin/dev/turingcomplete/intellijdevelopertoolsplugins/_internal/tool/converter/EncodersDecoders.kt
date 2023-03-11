@@ -7,11 +7,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import org.bouncycastle.util.encoders.Base32
-import org.bouncycastle.util.encoders.Base64
-import org.bouncycastle.util.encoders.UrlBase64
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.util.*
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
 
@@ -40,8 +39,6 @@ internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, p
 
   override fun toSource(text: String): String = Base32.decode(text).decodeToString()
 
-  override fun group(): String = GROUP
-
   class Factory : DeveloperToolFactory {
 
     override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
@@ -60,11 +57,9 @@ internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, p
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = Base64.toBase64String(text.encodeToByteArray())
+  override fun toTarget(text: String): String = Base64.getEncoder().encodeToString(text.encodeToByteArray())
 
-  override fun toSource(text: String): String = Base64.decode(text).decodeToString()
-
-  override fun group(): String = GROUP
+  override fun toSource(text: String): String = Base64.getDecoder().decode(text).decodeToString()
 
   class Factory : DeveloperToolFactory {
 
@@ -84,16 +79,36 @@ internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = UrlBase64.encode(text.encodeToByteArray()).decodeToString()
+  override fun toTarget(text: String): String = Base64.getUrlEncoder().encodeToString(text.encodeToByteArray())
 
-  override fun toSource(text: String): String = UrlBase64.decode(text).decodeToString()
-
-  override fun group(): String = GROUP
+  override fun toSource(text: String): String = Base64.getUrlDecoder().decode(text).decodeToString()
 
   class Factory : DeveloperToolFactory {
 
     override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
       return UrlBase64EncoderDecoder(configuration, parentDisposable)
+    }
+  }
+}
+
+// -- Type ---------------------------------------------------------------------------------------------------------- //
+
+internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+  TextConverter(
+          presentation = DeveloperToolPresentation(menuTitle = "MIME Base64", contentTitle = "MIME Base64 Encoder/Decoder"),
+          context = encoderDecoderContext,
+          configuration = configuration,
+          parentDisposable = parentDisposable
+  ) {
+
+  override fun toTarget(text: String): String = Base64.getMimeEncoder().encodeToString(text.encodeToByteArray())
+
+  override fun toSource(text: String): String = Base64.getMimeDecoder().decode(text).decodeToString()
+
+  class Factory : DeveloperToolFactory {
+
+    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
+      return MimeBase64EncoderDecoder(configuration, parentDisposable)
     }
   }
 }
@@ -111,8 +126,6 @@ internal class UrlEncodingEncoderDecoder(configuration: DeveloperToolConfigurati
   override fun toTarget(text: String): String = URLEncoder.encode(text, StandardCharsets.UTF_8)
 
   override fun toSource(text: String): String = URLDecoder.decode(text, StandardCharsets.UTF_8)
-
-  override fun group(): String = GROUP
 
   class Factory : DeveloperToolFactory {
 

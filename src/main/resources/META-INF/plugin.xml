@@ -72,6 +72,10 @@
             groupId="encoder-decoder"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UrlBase64EncoderDecoder$Factory"/>
     <developerTool
+            id="mime-base64-encoder-decoder"
+            groupId="encoder-decoder"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.MimeBase64EncoderDecoder$Factory"/>
+    <developerTool
             id="url-encoding-encoder-decoder"
             groupId="encoder-decoder"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UrlEncodingEncoderDecoder$Factory"/>

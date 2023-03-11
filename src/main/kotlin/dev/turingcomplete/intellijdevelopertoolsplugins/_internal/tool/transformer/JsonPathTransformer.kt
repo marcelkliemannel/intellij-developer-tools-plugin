@@ -8,7 +8,6 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.EditorTextField
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.dsl.builder.*
@@ -52,13 +51,14 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
     }.bottomGap(BottomGap.NONE)
 
     row {
-      cell(queryEditor).validationOnApply { errorHolder.error?.let { ValidationInfo(it) } }
+      cell(queryEditor)
+              .validationOnApply(errorHolder.asValidation())
               .horizontalAlign(HorizontalAlign.FILL)
     }.topGap(TopGap.NONE)
   }
 
   override fun transform() {
-    errorHolder.error = null
+    errorHolder.unset()
 
     if (sourceText.isBlank() || queryEditor.text.isBlank()) {
       return
@@ -72,7 +72,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
       }
     }
     catch (e: JsonPathException) {
-      errorHolder.error = "<html>${e.message}</html>"
+      errorHolder.set(e)
     }
 
     // The `validate` in this class is not used as a validation mechanism. We

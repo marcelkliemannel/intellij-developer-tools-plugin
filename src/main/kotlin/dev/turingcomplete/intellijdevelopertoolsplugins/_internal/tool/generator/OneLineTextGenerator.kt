@@ -131,7 +131,7 @@ abstract class OneLineTextGenerator(
         add(RefreshAction { doGenerate() })
         add(CopyAction())
       }
-      cell(generatedTextLabel.wrapWithToolBar(this.javaClass.simpleName, actions, ToolBarPlace.APPEND, false))
+      cell(generatedTextLabel.wrapWithToolBar(this.javaClass.simpleName, actions, ToolBarPlace.APPEND))
     }
   }
 

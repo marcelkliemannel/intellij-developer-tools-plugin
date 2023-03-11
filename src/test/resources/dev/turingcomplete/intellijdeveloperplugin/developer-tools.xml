@@ -1,56 +1,53 @@
-<State>
-  <developerToolsConfigurationProperties>
-    <property developerToolsId="base32-encoder-decoder" key="liveConversion" value="kotlin.Boolean|true"/>
-    <property developerToolsId="code-style-formatter" key="liveTransformation" value="kotlin.Boolean|true"/>
-    <property developerToolsId="code-style-formatter" key="selectedLanguageId" value="kotlin.String|JSON"/>
-    <property developerToolsId="base64-encoder-decoder" key="liveConversion" value="kotlin.Boolean|true"/>
-    <property developerToolsId="json-text-escape" key="liveConversion" value="kotlin.Boolean|true"/>
-    <property developerToolsId="url-encoding-encoder-decoder" key="liveConversion" value="kotlin.Boolean|true"/>
-    <property developerToolsId="uuid-generator" key="version"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.UuidVersion|V4"/>
-    <property developerToolsId="html-entities-escape" key="liveConversion" value="kotlin.Boolean|true"/>
-    <property developerToolsId="java-text-escape" key="liveConversion" value="kotlin.Boolean|true"/>
-    <property developerToolsId="text-case-transformer" key="outputTextCase"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$TextCase|COBOL_CASE"/>
-    <property developerToolsId="text-case-transformer" key="inputTextCase"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$TextCase|CAMEL_CASE"/>
-    <property developerToolsId="text-case-transformer" key="liveTransformation" value="kotlin.Boolean|true"/>
-    <property developerToolsId="text-case-transformer" key="originalParsingMode"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$OriginalParsingMode|FIXED_TEXT_CASE"/>
-    <property developerToolsId="text-case-transformer" key="individualDelimiter" value="kotlin.String| "/>
-    <property developerToolsId="lorem-ipsum-generator" key="startWithLoremIpsum" value="kotlin.Boolean|true"/>
-    <property developerToolsId="lorem-ipsum-generator" key="maxWordsInBullet" value="kotlin.Int|30"/>
-    <property developerToolsId="lorem-ipsum-generator" key="selectedTimeZoneId" value="kotlin.String|Europe/Berlin"/>
-    <property developerToolsId="lorem-ipsum-generator" key="numberOfValues" value="kotlin.Int|9"/>
-    <property developerToolsId="lorem-ipsum-generator" key="minWordsInParagraph" value="kotlin.Int|20"/>
-    <property developerToolsId="lorem-ipsum-generator" key="maxWordsInParagraph" value="kotlin.Int|100"/>
-    <property developerToolsId="lorem-ipsum-generator" key="minWordsInBullet" value="kotlin.Int|10"/>
-    <property developerToolsId="lorem-ipsum-generator" key="generatedTextKind"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$TextMode|PARAGRAPHS"/>
-    <property developerToolsId="url-base64-encoder-decoder" key="liveConversion" value="kotlin.Boolean|true"/>
-    <property developerToolsId="csv-text-escape" key="liveConversion" value="kotlin.Boolean|true"/>
-    <property developerToolsId="hashing-transformer" key="selectedAlgorithm"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.HashingTransformer$HashAlgorithm|SHA_256"/>
-    <property developerToolsId="hashing-transformer" key="liveTransformation" value="kotlin.Boolean|true"/>
-    <property developerToolsId="line-breaks-encoder-decoder" key="liveConversion" value="kotlin.Boolean|true"/>
-    <property developerToolsId="line-breaks-encoder-decoder" key="lineBreakDecoding"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.LineBreaksEncoderDecoder$LineBreak|CRLF"/>
-    <property developerToolsId="xml-text-escape" key="liveConversion" value="kotlin.Boolean|true"/>
-    <property developerToolsId="text-sorting-transformer" key="removeDuplicates" value="kotlin.Boolean|true"/>
-    <property developerToolsId="text-sorting-transformer" key="sortingOrder"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$SortingOrder|LEXICOGRAPHIC"/>
-    <property developerToolsId="text-sorting-transformer" key="trimWords" value="kotlin.Boolean|true"/>
-    <property developerToolsId="text-sorting-transformer" key="liveTransformation" value="kotlin.Boolean|true"/>
-    <property developerToolsId="text-sorting-transformer" key="unsortedIndividualSplitWordsDelimiter"
-              value="kotlin.String| "/>
-    <property developerToolsId="text-sorting-transformer" key="sortedIndividualJoinWordsDelimiter"
-              value="kotlin.String| "/>
-    <property developerToolsId="text-sorting-transformer" key="reverseOrder" value="kotlin.Boolean|false"/>
-    <property developerToolsId="text-sorting-transformer" key="unsortedPredefinedDelimiter"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$WordsDelimiter|SPACE"/>
-    <property developerToolsId="text-sorting-transformer" key="caseInsensitive" value="kotlin.Boolean|false"/>
-    <property developerToolsId="text-sorting-transformer" key="removeBlankWords" value="kotlin.Boolean|true"/>
-    <property developerToolsId="text-sorting-transformer" key="sortedJoinWordsDelimiter"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$WordsDelimiter|SPACE"/>
-  </developerToolsConfigurationProperties>
-</State>
+<application>
+  <component name="DeveloperToolsPluginService">
+    <developerToolsConfigurations>
+      <property key="selectedTimeZoneId" referenceId="unix-timestamp-converter" value="kotlin.String|Europe/Berlin" />
+      <property key="liveConversion" referenceId="base32-encoder-decoder" value="kotlin.Boolean|true" />
+      <property key="liveTransformation" referenceId="code-style-formatter" value="kotlin.Boolean|true" />
+      <property key="selectedLanguageId" referenceId="code-style-formatter" value="kotlin.String|JSON" />
+      <property key="liveConversion" referenceId="base64-encoder-decoder" value="kotlin.Boolean|true" />
+      <property key="liveConversion" referenceId="json-text-escape" value="kotlin.Boolean|true" />
+      <property key="liveConversion" referenceId="url-encoding-encoder-decoder" value="kotlin.Boolean|true" />
+      <property key="version" referenceId="uuid-generator" value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.UuidVersion|V4" />
+      <property key="liveConversion" referenceId="html-entities-escape" value="kotlin.Boolean|true" />
+      <property key="liveConversion" referenceId="java-text-escape" value="kotlin.Boolean|true" />
+      <property key="liveConversion" referenceId="jwt-encoder-decoder" value="kotlin.Boolean|true" />
+      <property key="outputTextCase" referenceId="text-case-transformer" value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$TextCase|COBOL_CASE" />
+      <property key="inputTextCase" referenceId="text-case-transformer" value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$TextCase|CAMEL_CASE" />
+      <property key="liveTransformation" referenceId="text-case-transformer" value="kotlin.Boolean|true" />
+      <property key="originalParsingMode" referenceId="text-case-transformer" value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$OriginalParsingMode|FIXED_TEXT_CASE" />
+      <property key="individualDelimiter" referenceId="text-case-transformer" value="kotlin.String| " />
+      <property key="startWithLoremIpsum" referenceId="lorem-ipsum-generator" value="kotlin.Boolean|true" />
+      <property key="maxWordsInBullet" referenceId="lorem-ipsum-generator" value="kotlin.Int|30" />
+      <property key="numberOfValues" referenceId="lorem-ipsum-generator" value="kotlin.Int|9" />
+      <property key="minWordsInParagraph" referenceId="lorem-ipsum-generator" value="kotlin.Int|20" />
+      <property key="maxWordsInParagraph" referenceId="lorem-ipsum-generator" value="kotlin.Int|100" />
+      <property key="minWordsInBullet" referenceId="lorem-ipsum-generator" value="kotlin.Int|10" />
+      <property key="generatedTextKind" referenceId="lorem-ipsum-generator" value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$TextMode|PARAGRAPHS" />
+      <property key="liveConversion" referenceId="url-base64-encoder-decoder" value="kotlin.Boolean|true" />
+      <property key="liveConversion" referenceId="csv-text-escape" value="kotlin.Boolean|true" />
+      <property key="selectedAlgorithm" referenceId="hashing-transformer" value="kotlin.String|SHA-256" />
+      <property key="liveTransformation" referenceId="hashing-transformer" value="kotlin.Boolean|true" />
+      <property key="selectedAlgorithm" referenceId="hmac-transformer" value="kotlin.String|HmacSHA256" />
+      <property key="liveTransformation" referenceId="hmac-transformer" value="kotlin.Boolean|true" />
+      <property key="liveConversion" referenceId="line-breaks-encoder-decoder" value="kotlin.Boolean|true" />
+      <property key="lineBreakDecoding" referenceId="line-breaks-encoder-decoder" value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.LineBreaksEncoderDecoder$LineBreak|CRLF" />
+      <property key="liveConversion" referenceId="xml-text-escape" value="kotlin.Boolean|true" />
+      <property key="removeDuplicates" referenceId="text-sorting-transformer" value="kotlin.Boolean|true" />
+      <property key="sortingOrder" referenceId="text-sorting-transformer" value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$SortingOrder|LEXICOGRAPHIC" />
+      <property key="trimWords" referenceId="text-sorting-transformer" value="kotlin.Boolean|true" />
+      <property key="liveTransformation" referenceId="text-sorting-transformer" value="kotlin.Boolean|true" />
+      <property key="unsortedIndividualSplitWordsDelimiter" referenceId="text-sorting-transformer" value="kotlin.String| " />
+      <property key="sortedIndividualJoinWordsDelimiter" referenceId="text-sorting-transformer" value="kotlin.String| " />
+      <property key="reverseOrder" referenceId="text-sorting-transformer" value="kotlin.Boolean|false" />
+      <property key="unsortedPredefinedDelimiter" referenceId="text-sorting-transformer" value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$WordsDelimiter|LINE_BREAK" />
+      <property key="caseInsensitive" referenceId="text-sorting-transformer" value="kotlin.Boolean|false" />
+      <property key="removeBlankWords" referenceId="text-sorting-transformer" value="kotlin.Boolean|true" />
+      <property key="sortedJoinWordsDelimiter" referenceId="text-sorting-transformer" value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$WordsDelimiter|LINE_BREAK" />
+      <property key="liveTransformation" referenceId="json-path" value="kotlin.Boolean|true" />
+    </developerToolsConfigurations>
+    <generalSettings>
+      <property key="mainMenuTree_lastSelectedContentNodeId" value="kotlin.String|jwt-encoder-decoder" />
+    </generalSettings>
+  </component>
+</application>

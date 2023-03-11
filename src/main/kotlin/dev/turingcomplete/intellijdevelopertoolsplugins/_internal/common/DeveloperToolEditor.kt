@@ -18,20 +18,25 @@ import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.FocusChangeListener
+import com.intellij.openapi.editor.impl.EditorFactoryImpl
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import com.intellij.ui.ColorUtil
 import com.intellij.ui.components.JBLabel
+import com.intellij.ui.layout.ValidationInfoBuilder
+import com.intellij.util.ObjectUtils
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
-import java.awt.Dimension
+import java.awt.Component
+import java.awt.Graphics
 import java.awt.datatransfer.StringSelection
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
@@ -39,12 +44,13 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.swing.JComponent
 import javax.swing.ScrollPaneConstants
+import javax.swing.border.LineBorder
 
 internal class DeveloperToolEditor(
-  private val title: String?,
-  private val editorMode: EditorMode,
-  private val parentDisposable: Disposable,
-  initialLanguage: Language = PlainTextLanguage.INSTANCE
+        private val title: String?,
+        private val editorMode: EditorMode,
+        private val parentDisposable: Disposable,
+        initialLanguage: Language = PlainTextLanguage.INSTANCE
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -96,11 +102,14 @@ internal class DeveloperToolEditor(
         title?.let {
           addToTop(JBLabel("$it ${editorMode.title}:"))
         }
+        editor.component.apply {
+          border = EditorBorder(this)
+        }
         val editorComponent = editor.component.wrapWithToolBar(DeveloperToolEditor::class.java.simpleName, createActions(), ToolBarPlace.RIGHT)
         addToCenter(editorComponent)
         // This prevents the `Editor` from increasing the size of the dialog if
         // the to display all the text on the screen instead of using scrollbars.
-        preferredSize = Dimension(preferredSize.width, 200)
+        preferredSize = JBUI.size(0, 100)
       }
 
       override fun getData(dataId: String): Any? = when {
@@ -108,6 +117,10 @@ internal class DeveloperToolEditor(
         else -> null
       }
     }
+
+  fun <T> bindValidator(validation: ValidationInfoBuilder.(T) -> ValidationInfo?): ValidationInfoBuilder.(T) -> ValidationInfo? = {
+    validation(it)?.forComponent(editor.component)
+  }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
@@ -132,7 +145,7 @@ internal class DeveloperToolEditor(
 
   private fun createEditor(): EditorEx {
     val editorFactory = EditorFactory.getInstance()
-    val document = editorFactory.createDocument("")
+    val document = (editorFactory as EditorFactoryImpl).createDocument("", true, false)
     val editor = if (editorMode.editable) {
       editorFactory.createEditor(document) as EditorEx
     }
@@ -199,11 +212,13 @@ internal class DeveloperToolEditor(
 
     override fun focusGained(editor: Editor) {
       editor.putUserData(editorActiveKey, true)
+      editor.component.repaint()
       onFocusGained?.invoke()
     }
 
     override fun focusLost(editor: Editor) {
       editor.putUserData(editorActiveKey, false)
+      editor.component.repaint()
       onFocusLost?.invoke()
     }
   }
@@ -283,11 +298,30 @@ internal class DeveloperToolEditor(
     INPUT_OUTPUT("input/output", true),
   }
 
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class EditorBorder(private val ownerComponent: JComponent) : LineBorder(defaultEditorBorder) {
+
+    override fun paintBorder(c: Component?, g: Graphics?, x: Int, y: Int, width: Int, height: Int) {
+      val outline = ObjectUtils.tryCast(ownerComponent.getClientProperty("JComponent.outline"), String::class.java)
+      when (outline) {
+        "error" -> Pair(JBUI.CurrentTheme.Focus.errorColor(ownerComponent.hasFocus()), 5)
+        "warning" -> Pair(JBUI.CurrentTheme.Focus.warningColor(ownerComponent.hasFocus()), 5)
+        else -> Pair(defaultEditorBorder, 1)
+      }.let { (lineColor, thickness) ->
+        this.lineColor = lineColor
+        this.thickness = thickness
+      }
+      super.paintBorder(c, g, x, y, width, height)
+    }
+  }
+
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 
   companion object {
 
     private val editorActiveKey = Key<Boolean>("editorActive")
     private val timestampFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-SS")
+    private val defaultEditorBorder = JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground()
   }
 }

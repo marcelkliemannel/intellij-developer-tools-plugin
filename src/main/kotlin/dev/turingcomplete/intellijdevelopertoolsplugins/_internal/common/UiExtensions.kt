@@ -18,12 +18,10 @@ import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.util.ui.GridBag
 import com.intellij.util.ui.JBFont
-import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Font
 import java.awt.GridBagConstraints
 import java.awt.event.ItemEvent
-import javax.swing.BorderFactory
 import javax.swing.JComponent
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
@@ -88,24 +86,19 @@ fun <T> ComboBox<T>.onChanged(changeListener: (T) -> Unit) {
 
 fun JBLabel.copyable() = this.apply { setCopyable(true) }
 
-fun JComponent.wrapWithToolBar(actionEventPlace: String, actions: ActionGroup, toolBarPlace: ToolBarPlace, withBorder: Boolean = true): JComponent {
+fun JComponent.wrapWithToolBar(actionEventPlace: String, actions: ActionGroup, toolBarPlace: ToolBarPlace): JComponent {
   return BorderLayoutPanel().apply {
     val actionToolbar = ActionManager.getInstance().createActionToolbar(actionEventPlace, actions, toolBarPlace.horizontal)
     actionToolbar.targetComponent = this@wrapWithToolBar
 
-    val component = this@wrapWithToolBar.apply {
-      if (withBorder) {
-        border = BorderFactory.createLineBorder(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground())
-      }
-    }
     when (toolBarPlace) {
       ToolBarPlace.LEFT -> {
         addToLeft(actionToolbar.component)
-        addToCenter(component)
+        addToCenter(this@wrapWithToolBar)
       }
 
       ToolBarPlace.RIGHT, ToolBarPlace.APPEND -> {
-        addToCenter(component)
+        addToCenter(this@wrapWithToolBar)
         addToRight(actionToolbar.component)
       }
     }

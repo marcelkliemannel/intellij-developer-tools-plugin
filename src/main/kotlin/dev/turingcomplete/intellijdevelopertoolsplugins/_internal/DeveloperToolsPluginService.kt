@@ -71,7 +71,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
             }
 
     generalSettings.clear()
-    state.developerToolsConfigurations
+    state.generalSettings
             ?.filter { it.key != null && it.value != null }
             ?.forEach { property -> generalSettings[property.key!!] = property.value!! }
   }

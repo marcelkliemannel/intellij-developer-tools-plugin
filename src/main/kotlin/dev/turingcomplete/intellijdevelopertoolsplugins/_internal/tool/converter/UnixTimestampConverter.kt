@@ -159,7 +159,7 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
       label(title).gap(RightGap.SMALL)
       label = JBLabel("Calculating...").copyable().apply { font = JBFont.label().toMonospace() }
       val actions = DefaultActionGroup().apply { add(CopyAction(contentDataKey)) }
-      cell(label.wrapWithToolBar(title, actions, ToolBarPlace.APPEND, false))
+      cell(label.wrapWithToolBar(title, actions, ToolBarPlace.APPEND))
     }.layout(RowLayout.PARENT_GRID)
 
     return label
@@ -289,7 +289,7 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
     panel {
       row {
         label(title).gap(RightGap.SMALL)
-        cell(timestampLabel.wrapWithToolBar(UnixTimestampConverter::class.java.name, actions, ToolBarPlace.APPEND, false))
+        cell(timestampLabel.wrapWithToolBar(UnixTimestampConverter::class.java.name, actions, ToolBarPlace.APPEND))
       }.topGap(TopGap.NONE)
     }
   }
