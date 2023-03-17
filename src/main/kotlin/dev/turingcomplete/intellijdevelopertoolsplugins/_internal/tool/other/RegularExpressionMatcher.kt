@@ -29,6 +29,7 @@ import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.SimpleTextAttributes.GRAYED_ATTRIBUTES
 import com.intellij.ui.SimpleTextAttributes.REGULAR_ATTRIBUTES
 import com.intellij.ui.SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
+import com.intellij.ui.TableSpeedSearch
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBViewport
@@ -293,6 +294,9 @@ class RegularExpressionMatcher(
       selectionModel.addListSelectionListener(createSelectionListener())
       setContextMenu(this::class.java.name, DefaultActionGroup(CopyValuesAction()))
       setEmptyState("No matches")
+      TableSpeedSearch(this) { value, cell ->
+        if (cell.column == 0 || cell.column == 1) value as String else null
+      }
     }
 
     override fun getData(dataId: String): Any? = when {
@@ -445,8 +449,8 @@ class RegularExpressionMatcher(
 
   companion object {
 
-    private const val EXAMPLE_REGEX = "((?<firstChar>[a-zA-Z])[a-zA-Z]*(?<lastChar>[a-zA-Z]))"
-    private const val EXAMPLE_INPUT_TEXT = "Luke Skywalker"
+    private const val EXAMPLE_REGEX = "mid(?<postfix>[a-zA-Z]+)"
+    private const val EXAMPLE_INPUT_TEXT = "aurora midsummer midnight earth"
 
     private const val REGEX_MATCH_HIGHLIGHT_LAYER = HighlighterLayer.SELECTION - 2
     private const val REGEX_MATCH_SELECTED_HIGHLIGHT_LAYER = HighlighterLayer.SELECTION - 1
