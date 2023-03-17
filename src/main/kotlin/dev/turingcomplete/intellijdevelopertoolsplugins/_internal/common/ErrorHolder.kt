@@ -5,6 +5,7 @@ import com.intellij.openapi.observable.properties.ObservableProperty
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
+import javax.swing.JComponent
 import kotlin.properties.Delegates
 
 class ErrorHolder {
@@ -42,8 +43,8 @@ class ErrorHolder {
     override fun invoke(): Boolean = error != null
   }
 
-  fun <T> asValidation(): ValidationInfoBuilder.(T) -> ValidationInfo? =
-    { error?.let { ValidationInfo("<html>$it</html>") } }
+  fun <T> asValidation(forComponnt: JComponent? = null): ValidationInfoBuilder.(T) -> ValidationInfo? =
+    { error?.let { ValidationInfo("<html>$it</html>", forComponnt) } }
 
   /**
    * Creates a [ObservableProperty] that will return an empty string if there is

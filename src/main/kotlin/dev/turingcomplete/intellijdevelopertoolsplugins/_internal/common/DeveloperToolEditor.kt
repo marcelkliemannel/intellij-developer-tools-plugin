@@ -19,6 +19,9 @@ import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.FocusChangeListener
 import com.intellij.openapi.editor.impl.EditorFactoryImpl
+import com.intellij.openapi.editor.markup.HighlighterTargetArea
+import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
@@ -28,6 +31,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.TextRange
 import com.intellij.ui.ColorUtil
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.layout.ValidationInfoBuilder
@@ -57,6 +61,7 @@ internal class DeveloperToolEditor(
   private var onTextChangeFromUi = mutableListOf<((String) -> Unit)>()
   private var onFocusGained: (() -> Unit)? = null
   private var onFocusLost: (() -> Unit)? = null
+  private var rangeHighlighters = mutableMapOf<String, MutableList<RangeHighlighter>>()
 
   private val editor: EditorEx by lazy { createEditor() }
 
@@ -122,6 +127,29 @@ internal class DeveloperToolEditor(
     validation(it)?.forComponent(editor.component)
   }
 
+  fun removeAllTextRangeHighlighters() {
+    editor.markupModel.removeAllHighlighters()
+    rangeHighlighters.clear()
+  }
+
+  fun removeTextRangeHighlighters(groupId: String) {
+    rangeHighlighters.get(groupId)?.forEach { editor.markupModel.removeHighlighter(it) }
+    rangeHighlighters.remove(groupId)
+  }
+
+  fun highlightTextRange(textRange: TextRange, layer: Int, textAttributes: TextAttributes, groupId: String = "other") {
+    rangeHighlighters.computeIfAbsent(groupId) { mutableListOf() }
+      .add(
+        editor.markupModel.addRangeHighlighter(
+          textRange.startOffset,
+          textRange.endOffset,
+          layer,
+          textAttributes,
+          HighlighterTargetArea.EXACT_RANGE
+        )
+      )
+  }
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun createActions() = DefaultActionGroup().apply {
@@ -163,7 +191,6 @@ internal class DeveloperToolEditor(
 
       setBorder(JBUI.Borders.empty())
       setCaretVisible(true)
-      markupModel.removeAllHighlighters()
       scrollPane.horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
       scrollPane.verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
 

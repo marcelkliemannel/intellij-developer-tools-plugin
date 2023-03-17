@@ -7,7 +7,6 @@ import com.intellij.ui.ColoredSideBorder
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.navigation.Place
-import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
@@ -50,11 +49,7 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
       horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
     }
 
-    secondComponent = contentPanel.apply {
-      border = JBEmptyBorder(UIUtil.PANEL_REGULAR_INSETS)
-    }
-
-    //menuTree.selectInitiallySelectedDeveloperTool(initiallySelectedDeveloperTool)
+    secondComponent = contentPanel
   }
 
   override fun getStyle(): DialogStyle = DialogStyle.COMPACT

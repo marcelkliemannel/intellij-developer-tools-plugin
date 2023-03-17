@@ -59,6 +59,11 @@
 
     <!-- encoder-decoder -->
     <developerTool
+            id="jwt-encoder-decoder"
+            groupId="encoder-decoder"
+            weight="1"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder$Factory"/>
+    <developerTool
             id="base32-encoder-decoder"
             groupId="encoder-decoder"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.Base32EncoderDecoder$Factory"/>
@@ -117,6 +122,11 @@
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.HmacTransformer$Factory"/>
 
     <!-- root level -->
+    <developerTool
+            id="regular-expression-matcher"
+            weight="1"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RegularExpressionMatcher$Factory"/>
+
     <developerTool
             id="uuid-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.UuidGenerator$Factory"

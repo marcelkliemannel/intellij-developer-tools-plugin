@@ -14,6 +14,7 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Cell
+import com.intellij.ui.dsl.builder.DslComponentProperty
 import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.util.ui.GridBag
@@ -21,8 +22,12 @@ import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Font
 import java.awt.GridBagConstraints
+import java.awt.event.InputEvent
 import java.awt.event.ItemEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.JComponent
+import javax.swing.JTable
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
 // -- Exposed Methods ----------------------------------------------------------------------------------------------- //
@@ -105,6 +110,32 @@ fun JComponent.wrapWithToolBar(actionEventPlace: String, actions: ActionGroup, t
   }
 }
 
+fun JComponent.allowUiDslLabel(component: JComponent = this) {
+  putClientProperty(DslComponentProperty.LABEL_FOR, component)
+}
+
+fun JTable.setContextMenu(place: String, actionGroup: ActionGroup) {
+  val mouseAdapter = object : MouseAdapter() {
+
+    override fun mousePressed(e: MouseEvent) {
+      handleMouseEvent(e)
+    }
+
+    override fun mouseReleased(e: MouseEvent) {
+      handleMouseEvent(e)
+    }
+
+    private fun handleMouseEvent(e: InputEvent) {
+      if (e is MouseEvent && e.isPopupTrigger) {
+        ActionManager.getInstance()
+          .createActionPopupMenu(place, actionGroup).component
+          .show(e.getComponent(), e.x, e.y)
+      }
+    }
+  }
+  addMouseListener(mouseAdapter)
+}
+
 fun JBFont.toMonospace(): JBFont = JBFont.create(Font(Font.MONOSPACED, this.style, this.size))
 
 fun <T> ObservableMutableProperty<T>.toComponentPredicate(predicate: (T?) -> Boolean): ComponentPredicate =
@@ -118,9 +149,9 @@ fun <T> ObservableMutableProperty<T>.toComponentPredicate(predicate: (T?) -> Boo
   }
 
 fun GridBag.setDefaults() = this
-        .setDefaultAnchor(GridBagConstraints.NORTHWEST)
-        .setDefaultInsets(0, 0, 0, 0)
-        .setDefaultFill(GridBagConstraints.NONE)
+  .setDefaultAnchor(GridBagConstraints.NORTHWEST)
+  .setDefaultInsets(0, 0, 0, 0)
+  .setDefaultFill(GridBagConstraints.NONE)
 
 fun EditorEx.setLanguage(language: Language) {
   val syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(language, project, null)

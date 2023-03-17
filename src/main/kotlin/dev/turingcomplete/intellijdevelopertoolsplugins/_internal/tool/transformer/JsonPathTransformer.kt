@@ -22,20 +22,21 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.allowUiDslLabel
 
 class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable)
   : TextTransformer(
-        presentation = DeveloperToolPresentation(
-                menuTitle = "JSON Path",
-                contentTitle = "JSON Path Transformer"
-        ),
-        context = Context(
-                transformActionTitle = "Execute Query",
-                sourceTitle = "Original",
-                resultTitle = "Result"
-        ),
-        configuration = configuration,
-        parentDisposable = parentDisposable
+  presentation = DeveloperToolPresentation(
+    menuTitle = "JSON Path",
+    contentTitle = "JSON Path Transformer"
+  ),
+  context = Context(
+    transformActionTitle = "Execute Query",
+    sourceTitle = "Original",
+    resultTitle = "Result"
+  ),
+  configuration = configuration,
+  parentDisposable = parentDisposable
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -47,14 +48,11 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
 
   override fun Panel.buildMiddleConfigurationUi() {
     row {
-      label("JSON path query:")
-    }.bottomGap(BottomGap.NONE)
-
-    row {
       cell(queryEditor)
-              .validationOnApply(errorHolder.asValidation())
-              .horizontalAlign(HorizontalAlign.FILL)
-    }.topGap(TopGap.NONE)
+        .label("JSON path:", LabelPosition.TOP)
+        .validationOnApply(errorHolder.asValidation())
+        .horizontalAlign(HorizontalAlign.FILL)
+    }
   }
 
   override fun transform() {
@@ -95,6 +93,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
           }
         }
       })
+      allowUiDslLabel(this.component)
     }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -112,9 +111,9 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
 
     private val jsonPathConfiguration by lazy {
       Configuration.builder()
-              .mappingProvider(JacksonMappingProvider())
-              .jsonProvider(JacksonJsonNodeJsonProvider())
-              .build()
+        .mappingProvider(JacksonMappingProvider())
+        .jsonProvider(JacksonJsonNodeJsonProvider())
+        .build()
     }
 
     @org.intellij.lang.annotations.Language("JSON")
