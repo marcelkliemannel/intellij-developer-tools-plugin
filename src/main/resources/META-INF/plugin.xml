@@ -120,6 +120,10 @@
             id="hmac-transformer"
             groupId="cryptography"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.HmacTransformer$Factory"/>
+    <developerTool
+            id="password-generator"
+            groupId="cryptography"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator$Factory"/>
 
     <!-- root level -->
     <developerTool
