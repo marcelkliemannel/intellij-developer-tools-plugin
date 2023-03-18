@@ -21,11 +21,11 @@ class CodeStyleFormatter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextTransformer(
-  presentation = DeveloperToolContext(
+  developerToolContext = DeveloperToolContext(
     menuTitle = "Code Style Formatting",
     contentTitle = "Code Style Formatter"
   ),
-  context = Context(
+  textTransformerContext = TextTransformerContext(
     transformActionTitle = "Format",
     sourceTitle = "Original",
     resultTitle = "Formatted"

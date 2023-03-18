@@ -23,7 +23,7 @@ private val escapeUnescapeContext = TextConverter.Context(
 
 internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolContext("HTML Entities", "HTML Entities Escape/Unescape"),
+    developerToolContext = DeveloperToolContext("HTML Entities", "HTML Entities Escape/Unescape"),
     context = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -45,7 +45,7 @@ internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, par
 
 internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolContext("Java Text", "Java Text Escape/Unescape"),
+    developerToolContext = DeveloperToolContext("Java Text", "Java Text Escape/Unescape"),
     context = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -67,7 +67,7 @@ internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentD
 
 internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolContext("JSON Text", "JSON Text Escape/Unescape"),
+    developerToolContext = DeveloperToolContext("JSON Text", "JSON Text Escape/Unescape"),
     context = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -89,7 +89,7 @@ internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentD
 
 internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolContext("CSV Text", "CSV Text Escape/Unescape"),
+    developerToolContext = DeveloperToolContext("CSV Text", "CSV Text Escape/Unescape"),
     context = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -111,7 +111,7 @@ internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDi
 
 internal class XmlTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolContext("XML Text", "XML Text Escape/Unescape"),
+    developerToolContext = DeveloperToolContext("XML Text", "XML Text Escape/Unescape"),
     context = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable

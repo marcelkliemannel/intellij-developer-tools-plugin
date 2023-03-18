@@ -27,7 +27,7 @@ internal val encoderDecoderContext = TextConverter.Context(
 
 internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolContext("Base32", "Base32 Encoder/Decoder"),
+    developerToolContext = DeveloperToolContext("Base32", "Base32 Encoder/Decoder"),
     context = encoderDecoderContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -49,7 +49,7 @@ internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, p
 
 internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolContext("Base64", "Base64 Encoder/Decoder"),
+    developerToolContext = DeveloperToolContext("Base64", "Base64 Encoder/Decoder"),
     context = encoderDecoderContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -71,7 +71,7 @@ internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, p
 
 internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolContext("URL Base64", "URL Base64 Encoder/Decoder"),
+    developerToolContext = DeveloperToolContext("URL Base64", "URL Base64 Encoder/Decoder"),
     context = encoderDecoderContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -93,7 +93,7 @@ internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration
 
 internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolContext(menuTitle = "MIME Base64", contentTitle = "MIME Base64 Encoder/Decoder"),
+    developerToolContext = DeveloperToolContext(menuTitle = "MIME Base64", contentTitle = "MIME Base64 Encoder/Decoder"),
     context = encoderDecoderContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -115,7 +115,7 @@ internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguratio
 
 internal class UrlEncodingEncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolContext("URL Encoding", "URL Encoding Encoder/Decoder"),
+    developerToolContext = DeveloperToolContext("URL Encoding", "URL Encoding Encoder/Decoder"),
     context = encoderDecoderContext,
     configuration = configuration,
     parentDisposable = parentDisposable

@@ -18,11 +18,11 @@ import io.ktor.util.*
 
 internal class TextSortingTransformer(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextTransformer(
-    presentation = DeveloperToolContext(
+    developerToolContext = DeveloperToolContext(
       menuTitle = "Text Sorting",
       contentTitle = "Text Sorting"
     ),
-    context = Context(
+    textTransformerContext = TextTransformerContext(
       transformActionTitle = "Sort",
       sourceTitle = "Unsorted",
       resultTitle = "Sorted"

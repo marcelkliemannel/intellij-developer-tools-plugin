@@ -16,11 +16,11 @@ internal class HashingTransformer(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextTransformer(
-  presentation = DeveloperToolContext(
+  developerToolContext = DeveloperToolContext(
     menuTitle = "Hashing",
     contentTitle = "Hashing Transformer"
   ),
-  context = Context(
+  textTransformerContext = TextTransformerContext(
     transformActionTitle = "Hash",
     sourceTitle = "Plain",
     resultTitle = "Hashed"

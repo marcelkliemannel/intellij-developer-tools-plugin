@@ -17,11 +17,11 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.TARGET
 
 internal abstract class TextConverter(
-  presentation: DeveloperToolContext,
+  developerToolContext: DeveloperToolContext,
   private val context: Context,
   protected val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
-) : DeveloperTool(presentation, parentDisposable), DeveloperToolConfiguration.ChangeListener {
+) : DeveloperTool(developerToolContext, parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)

@@ -32,11 +32,11 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.wrapWit
 import org.apache.commons.text.StringEscapeUtils
 
 abstract class OneLineTextGenerator(
-  presentation: DeveloperToolContext,
+  developerToolContext: DeveloperToolContext,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   initialGeneratedTextTitle: String = "Generated text:"
-) : DeveloperTool(presentation, parentDisposable), DeveloperToolConfiguration.ChangeListener {
+) : DeveloperTool(developerToolContext, parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   protected val supportsBulkGeneration = BooleanComponentPredicate(true)

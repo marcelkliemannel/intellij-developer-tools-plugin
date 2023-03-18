@@ -9,11 +9,11 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 
 abstract class MultiLineTextGenerator(
-  presentation: DeveloperToolContext,
+  developerToolContext: DeveloperToolContext,
   private val generatedTextTitle: String,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
-) : DeveloperTool(presentation, parentDisposable), DeveloperToolConfiguration.ChangeListener {
+) : DeveloperTool(developerToolContext, parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val generatedTextEditor: DeveloperToolEditor by lazy { createGeneratedTextEditor() }

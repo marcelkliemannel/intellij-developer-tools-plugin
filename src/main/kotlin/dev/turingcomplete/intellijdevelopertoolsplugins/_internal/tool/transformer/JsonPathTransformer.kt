@@ -3,7 +3,6 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transfor
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.intellij.json.JsonLanguage
 import com.intellij.jsonpath.JsonPathLanguage
-import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
@@ -26,14 +25,16 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.allowUi
 
 class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable)
   : TextTransformer(
-  presentation = DeveloperToolContext(
+  developerToolContext = DeveloperToolContext(
     menuTitle = "JSON Path",
     contentTitle = "JSON Path Transformer"
   ),
-  context = Context(
+  textTransformerContext = TextTransformerContext(
     transformActionTitle = "Execute Query",
     sourceTitle = "Original",
-    resultTitle = "Result"
+    resultTitle = "Result",
+    initialSourceText = ORIGINAL_EXAMPLE,
+    initialLanguage = JsonLanguage.INSTANCE
   ),
   configuration = configuration,
   parentDisposable = parentDisposable
@@ -68,8 +69,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
         is ArrayNode -> result.toPrettyString()
         else -> result.toString()
       }
-    }
-    catch (e: JsonPathException) {
+    } catch (e: JsonPathException) {
       errorHolder.set(e)
     }
 
@@ -77,10 +77,6 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
     // make use of its text field error UI to display the `errorHolder`.
     validate()
   }
-
-  override fun getInitialOriginalText(): String = ORIGINAL_EXAMPLE
-
-  override fun getInitialLanguage(): Language = JsonLanguage.INSTANCE
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 

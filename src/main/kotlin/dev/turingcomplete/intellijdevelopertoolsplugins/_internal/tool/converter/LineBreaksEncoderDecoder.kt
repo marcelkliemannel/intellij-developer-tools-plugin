@@ -14,7 +14,7 @@ internal class LineBreaksEncoderDecoder(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextConverter(
-  presentation = DeveloperToolContext("Line Breaks", "Line Breaks Encoder/Decoder"),
+  developerToolContext = DeveloperToolContext("Line Breaks", "Line Breaks Encoder/Decoder"),
   context = encoderDecoderContext,
   configuration = configuration,
   parentDisposable = parentDisposable

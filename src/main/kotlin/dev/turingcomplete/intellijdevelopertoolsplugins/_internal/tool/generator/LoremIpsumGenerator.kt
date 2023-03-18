@@ -22,7 +22,7 @@ import kotlin.math.min
 
 class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   MultiLineTextGenerator(
-    presentation = DeveloperToolContext("Lorem Ipsum", "Lorem Ipsum Generator"),
+    developerToolContext = DeveloperToolContext("Lorem Ipsum", "Lorem Ipsum Generator"),
     generatedTextTitle = "Generated lorem ipsum",
     configuration = configuration,
     parentDisposable = parentDisposable

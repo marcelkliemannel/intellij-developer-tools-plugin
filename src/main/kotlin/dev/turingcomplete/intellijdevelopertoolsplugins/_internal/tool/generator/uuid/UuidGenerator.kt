@@ -17,7 +17,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator
 
 internal class UuidGenerator(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   OneLineTextGenerator(
-    presentation = DeveloperToolContext("UUID", "UUID Generator"),
+    developerToolContext = DeveloperToolContext("UUID", "UUID Generator"),
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {

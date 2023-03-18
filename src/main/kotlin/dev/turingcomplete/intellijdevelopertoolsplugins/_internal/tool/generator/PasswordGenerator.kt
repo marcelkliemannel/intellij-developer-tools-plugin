@@ -29,7 +29,7 @@ internal class PasswordGenerator(
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : OneLineTextGenerator(
-  presentation = DeveloperToolContext(
+  developerToolContext = DeveloperToolContext(
     menuTitle = "Password Generator",
     contentTitle = "Password Generator",
     supportsReset = true

@@ -23,11 +23,11 @@ import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 
 class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextTransformer(
-    presentation = DeveloperToolContext(
+    developerToolContext = DeveloperToolContext(
       menuTitle = "Text Case",
       contentTitle = "Text Case Transformer"
     ),
-    context = Context(
+    textTransformerContext = TextTransformerContext(
       transformActionTitle = "Transform",
       sourceTitle = "Original",
       resultTitle = "Target"

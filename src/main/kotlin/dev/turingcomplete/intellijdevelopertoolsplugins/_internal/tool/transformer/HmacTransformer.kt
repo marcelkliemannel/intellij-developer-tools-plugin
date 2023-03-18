@@ -20,11 +20,11 @@ internal class HmacTransformer(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextTransformer(
-  presentation = DeveloperToolContext(
+  developerToolContext = DeveloperToolContext(
     menuTitle = "HMAC",
     contentTitle = "HMAC Transformer"
   ),
-  context = Context(
+  textTransformerContext = TextTransformerContext(
     transformActionTitle = "Generate",
     sourceTitle = "Data",
     resultTitle = "Hash"
