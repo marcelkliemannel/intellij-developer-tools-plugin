@@ -31,6 +31,7 @@ dependencies {
   implementation("org.apache.commons:commons-text:1.10.0")
   implementation("dev.turingcomplete:text-case-converter:1.0.0")
   implementation("dev.turingcomplete:text-case-converter-kotlin-extension:1.0.0")
+  implementation("com.github.vertical-blank:sql-formatter:2.0.3")
   implementation(kotlin("stdlib"))
 
   testImplementation("org.assertj:assertj-core:2.4.1")

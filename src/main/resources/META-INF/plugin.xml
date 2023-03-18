@@ -56,6 +56,11 @@
                         detailTitle="Cryptography"
                         initiallyExpanded="true"
                         weight="3"/>
+    <developerToolGroup id="formatter"
+                        menuTitle="Formatter"
+                        detailTitle="Formatter"
+                        initiallyExpanded="true"
+                        weight="12"/>
 
     <!-- encoder-decoder -->
     <developerTool
@@ -135,10 +140,7 @@
             id="uuid-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.UuidGenerator$Factory"
             weight="2"/>
-    <developerTool
-            id="code-style-formatter"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.CodeStyleFormatter$Factory"
-            weight="5"/>
+
     <developerTool
             id="text-sorting-transformer"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$Factory"
@@ -159,5 +161,17 @@
             id="lorem-ipsum-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$Factory"
             weight="11"/>
+
+    <!-- formatter -->
+    <developerTool
+            id="code-style-formatter"
+            groupId="formatter"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.CodeStyleFormatter$Factory"
+            weight="1"/>
+    <developerTool
+            id="sql-formatter"
+            groupId="formatter"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.SqlFormatterTransformer$Factory"
+            weight="2"/>
   </extensions>
 </idea-plugin>
