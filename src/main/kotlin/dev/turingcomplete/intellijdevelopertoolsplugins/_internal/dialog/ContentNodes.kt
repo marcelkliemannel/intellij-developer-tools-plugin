@@ -2,7 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
 
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup
-import java.util.*
+import java.util.Vector
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeNode
 
@@ -48,8 +48,8 @@ internal class GroupNode(val developerToolGroup: DeveloperToolGroup) :
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class DeveloperToolNode(val developerToolId: String, val developerTool: DeveloperTool, weight: Int) :
-  ContentNode(developerToolId, developerTool.presentation.menuTitle, weight) {
+internal class DeveloperToolNode(developerToolId: String, val developerTool: DeveloperTool, weight: Int) :
+  ContentNode(developerToolId, developerTool.developerToolContext.menuTitle, weight) {
 
   override fun selected() {
     developerTool.activated()

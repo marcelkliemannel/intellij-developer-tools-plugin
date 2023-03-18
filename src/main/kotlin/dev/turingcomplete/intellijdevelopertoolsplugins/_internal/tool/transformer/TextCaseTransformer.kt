@@ -2,12 +2,16 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transfor
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.selected
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.onSelected
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer.OriginalParsingMode.FIXED_TEXT_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer.OriginalParsingMode.INDIVIDUAL_DELIMITER
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer.TextCase.CAMEL_CASE
@@ -19,65 +23,59 @@ import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 
 class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextTransformer(
-          presentation = DeveloperToolPresentation(
-                  menuTitle = "Text Case",
-                  contentTitle = "Text Case Transformer"
-          ),
-          context = Context(
-                  transformActionTitle = "Transform",
-                  sourceTitle = "Original",
-                  resultTitle = "Target"
-          ),
-          configuration = configuration,
-          parentDisposable = parentDisposable
+    presentation = DeveloperToolContext(
+      menuTitle = "Text Case",
+      contentTitle = "Text Case Transformer"
+    ),
+    context = Context(
+      transformActionTitle = "Transform",
+      sourceTitle = "Original",
+      resultTitle = "Target"
+    ),
+    configuration = configuration,
+    parentDisposable = parentDisposable
   ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var originalParsingMode by configuration.register("originalParsingMode", FIXED_TEXT_CASE)
-  private var individualDelimiter by configuration.register("individualDelimiter", " ")
-  private var inputTextCase by configuration.register("inputTextCase", CAMEL_CASE)
-  private var outputTextCase by configuration.register("outputTextCase", COBOL_CASE)
+  private var originalParsingMode = configuration.register("originalParsingMode", FIXED_TEXT_CASE)
+  private var individualDelimiter = configuration.register("individualDelimiter", " ")
+  private var inputTextCase = configuration.register("inputTextCase", CAMEL_CASE)
+  private var outputTextCase = configuration.register("outputTextCase", COBOL_CASE)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun transform() {
-    resultText = when (originalParsingMode) {
-      FIXED_TEXT_CASE -> sourceText.toTextCase(outputTextCase.textCase, inputTextCase.textCase.wordsSplitter())
-      INDIVIDUAL_DELIMITER -> sourceText.toTextCase(outputTextCase.textCase, individualDelimiter.toWordsSplitter())
+    resultText = when (originalParsingMode.get()) {
+      FIXED_TEXT_CASE -> sourceText.toTextCase(outputTextCase.get().textCase, inputTextCase.get().textCase.wordsSplitter())
+      INDIVIDUAL_DELIMITER -> sourceText.toTextCase(outputTextCase.get().textCase, individualDelimiter.get().toWordsSplitter())
     }
   }
 
-  @Suppress("UnstableApiUsage")
   override fun Panel.buildMiddleConfigurationUi() {
     buttonsGroup("Original:") {
       row {
-        radioButton("Fixed text case:").applyToComponent {
-          isSelected = originalParsingMode == FIXED_TEXT_CASE
-          onSelected { originalParsingMode = FIXED_TEXT_CASE }
-        }.gap(RightGap.SMALL)
+        radioButton("Fixed text case:")
+          .bind(originalParsingMode, FIXED_TEXT_CASE)
+          .gap(RightGap.SMALL)
         comboBox(TextCase.values().toList())
-                .applyToComponent { selectedItem = inputTextCase }
-                .whenItemSelectedFromUi { inputTextCase = it }
+          .bindItem(inputTextCase)
       }
 
       row {
         val individualDelimiterRadioButton = radioButton("Split words by:")
-                .applyToComponent {
-                  isSelected = originalParsingMode == INDIVIDUAL_DELIMITER
-                  onSelected { originalParsingMode = INDIVIDUAL_DELIMITER }
-                }.gap(RightGap.SMALL)
-        textField().text(individualDelimiter)
-                .whenTextChangedFromUi(parentDisposable) { individualDelimiter = it }
-                .enabledIf(individualDelimiterRadioButton.selected).component
+          .bind(originalParsingMode, INDIVIDUAL_DELIMITER)
+          .gap(RightGap.SMALL)
+        textField()
+          .bindText(individualDelimiter)
+          .enabledIf(individualDelimiterRadioButton.selected).component
       }
     }
 
     row {
       comboBox(TextCase.values().toList())
-              .label("Target:")
-              .applyToComponent { selectedItem = outputTextCase }
-              .whenItemSelectedFromUi { outputTextCase = it }
+        .label("Target:")
+        .bindItem(outputTextCase)
     }
   }
 

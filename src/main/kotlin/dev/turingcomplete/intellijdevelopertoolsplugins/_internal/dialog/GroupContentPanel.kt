@@ -6,6 +6,7 @@ import com.intellij.ui.components.ActionLink
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.UIUtil
 import org.jdesktop.swingx.VerticalLayout
@@ -32,12 +33,12 @@ internal class GroupContentPanel(groupNode: GroupNode, private val onContentNode
         cell(componentWrapper).align(Align.FILL)
       }.resizableRow()
     }
-  }
+  }.apply { border = JBEmptyBorder(0, 8, 0, 8) }
 
   private fun createDeveloperToolLinksPanel(groupNode: GroupNode) = object : JPanel(VerticalLayout(UIUtil.DEFAULT_VGAP)) {
     init {
       groupNode.children().asSequence().filterIsInstance(DeveloperToolNode::class.java).forEach { developerToolNode ->
-        add(ActionLink(developerToolNode.developerTool.presentation.menuTitle) { onContentNodeSelection(developerToolNode) })
+        add(ActionLink(developerToolNode.developerTool.developerToolContext.menuTitle) { onContentNodeSelection(developerToolNode) })
       }
     }
   }

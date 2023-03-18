@@ -7,25 +7,40 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.observable.properties.AtomicProperty
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.ui.components.JBLabel
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.BottomGap
+import com.intellij.ui.dsl.builder.COLUMNS_TINY
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.TopGap
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.columns
 import com.intellij.util.Alarm
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.*
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.BooleanComponentPredicate
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction.Companion.CONTENT_DATA_KEY
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ToolBarPlace
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.copyable
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toMonospace
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.wrapWithToolBar
+import org.apache.commons.text.StringEscapeUtils
 
 abstract class OneLineTextGenerator(
-  presentation: DeveloperToolPresentation,
+  presentation: DeveloperToolContext,
   private val configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  initialGeneratedTextTitle: String = "Generated text:"
 ) : DeveloperTool(presentation, parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   protected val supportsBulkGeneration = BooleanComponentPredicate(true)
-  protected val generatedTextTitle = AtomicProperty("Generated text:")
+  protected val generatedTextTitle = AtomicProperty(initialGeneratedTextTitle)
 
   private lateinit var generatedTextLabel: JBLabel
   private val generationAlarm by lazy { Alarm(parentDisposable) }
@@ -47,14 +62,14 @@ abstract class OneLineTextGenerator(
 
   override fun activated() {
     doGenerate()
-    configuration.addChangeListener(this)
+    configuration.addChangeListener(parentDisposable, this)
   }
 
   override fun deactivated() {
     configuration.removeChangeListener(this)
   }
 
-  override fun configurationChanged(key: String) {
+  override fun configurationChanged() {
     if (!isDisposed) {
       doGenerate()
     }
@@ -76,7 +91,7 @@ abstract class OneLineTextGenerator(
     val generate: () -> Unit = {
       if (validate().isEmpty()) {
         generatedTextLabel.apply {
-          text = generate()
+          text = StringEscapeUtils.escapeHtml4(generate())
           icon = null
           font = GENERATED_TEXT_FONT
         }
@@ -149,8 +164,8 @@ abstract class OneLineTextGenerator(
   companion object {
 
     private const val DEFAULT_NUMBER_OF_VALUES = "10"
-    private val GENERATED_TEXT_FONT = JBFont.label().toMonospace().biggerOn(2f)
-    private val GENERATED_TEXT_INVALID_CONFIGURATION_FONT = JBFont.label().biggerOn(2f)
+    private val GENERATED_TEXT_FONT = JBFont.label().toMonospace().biggerOn(1.5f)
+    private val GENERATED_TEXT_INVALID_CONFIGURATION_FONT = JBFont.label().biggerOn(1.5f)
   }
 }
 

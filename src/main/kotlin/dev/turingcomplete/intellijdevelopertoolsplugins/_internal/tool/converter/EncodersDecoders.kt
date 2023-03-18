@@ -4,17 +4,15 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import org.bouncycastle.util.encoders.Base32
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.Base64
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
-
-internal const val GROUP = "Encoder/Decoder"
 
 internal val encoderDecoderContext = TextConverter.Context(
   convertActionTitle = "Encode",
@@ -29,7 +27,7 @@ internal val encoderDecoderContext = TextConverter.Context(
 
 internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolPresentation("Base32", "Base32 Encoder/Decoder"),
+    presentation = DeveloperToolContext("Base32", "Base32 Encoder/Decoder"),
     context = encoderDecoderContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -51,7 +49,7 @@ internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, p
 
 internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolPresentation("Base64", "Base64 Encoder/Decoder"),
+    presentation = DeveloperToolContext("Base64", "Base64 Encoder/Decoder"),
     context = encoderDecoderContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -73,7 +71,7 @@ internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, p
 
 internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolPresentation("URL Base64", "URL Base64 Encoder/Decoder"),
+    presentation = DeveloperToolContext("URL Base64", "URL Base64 Encoder/Decoder"),
     context = encoderDecoderContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -95,10 +93,10 @@ internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration
 
 internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-          presentation = DeveloperToolPresentation(menuTitle = "MIME Base64", contentTitle = "MIME Base64 Encoder/Decoder"),
-          context = encoderDecoderContext,
-          configuration = configuration,
-          parentDisposable = parentDisposable
+    presentation = DeveloperToolContext(menuTitle = "MIME Base64", contentTitle = "MIME Base64 Encoder/Decoder"),
+    context = encoderDecoderContext,
+    configuration = configuration,
+    parentDisposable = parentDisposable
   ) {
 
   override fun toTarget(text: String): String = Base64.getMimeEncoder().encodeToString(text.encodeToByteArray())
@@ -117,7 +115,7 @@ internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguratio
 
 internal class UrlEncodingEncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolPresentation("URL Encoding", "URL Encoding Encoder/Decoder"),
+    presentation = DeveloperToolContext("URL Encoding", "URL Encoding Encoder/Decoder"),
     context = encoderDecoderContext,
     configuration = configuration,
     parentDisposable = parentDisposable

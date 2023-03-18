@@ -5,11 +5,11 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 
 abstract class MultiLineTextGenerator(
-  presentation: DeveloperToolPresentation,
+  presentation: DeveloperToolContext,
   private val generatedTextTitle: String,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
@@ -39,7 +39,7 @@ abstract class MultiLineTextGenerator(
     // Override if needed
   }
 
-  override fun configurationChanged(key: String) {
+  override fun configurationChanged() {
     if (!isDisposed) {
       doGenerate()
     }
@@ -47,7 +47,7 @@ abstract class MultiLineTextGenerator(
 
   override fun activated() {
     doGenerate()
-    configuration.addChangeListener(this)
+    configuration.addChangeListener(parentDisposable, this)
   }
 
   override fun deactivated() {

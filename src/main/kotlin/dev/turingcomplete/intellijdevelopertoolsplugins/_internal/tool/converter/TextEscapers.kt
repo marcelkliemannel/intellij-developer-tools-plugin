@@ -4,8 +4,8 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import org.apache.commons.text.StringEscapeUtils
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
@@ -23,7 +23,7 @@ private val escapeUnescapeContext = TextConverter.Context(
 
 internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolPresentation("HTML Entities", "HTML Entities Escape/Unescape"),
+    presentation = DeveloperToolContext("HTML Entities", "HTML Entities Escape/Unescape"),
     context = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -45,7 +45,7 @@ internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, par
 
 internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolPresentation("Java Text", "Java Text Escape/Unescape"),
+    presentation = DeveloperToolContext("Java Text", "Java Text Escape/Unescape"),
     context = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -67,7 +67,7 @@ internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentD
 
 internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolPresentation("JSON Text", "JSON Text Escape/Unescape"),
+    presentation = DeveloperToolContext("JSON Text", "JSON Text Escape/Unescape"),
     context = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -89,7 +89,7 @@ internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentD
 
 internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolPresentation("CSV Text", "CSV Text Escape/Unescape"),
+    presentation = DeveloperToolContext("CSV Text", "CSV Text Escape/Unescape"),
     context = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -111,7 +111,7 @@ internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDi
 
 internal class XmlTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    presentation = DeveloperToolPresentation("XML Text", "XML Text Escape/Unescape"),
+    presentation = DeveloperToolContext("XML Text", "XML Text Escape/Unescape"),
     context = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable

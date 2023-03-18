@@ -1,58 +1,72 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins
 
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.observable.properties.AtomicProperty
+import com.intellij.openapi.observable.properties.ObservableMutableProperty
+import com.intellij.openapi.util.Disposer
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.checkStateType
 import io.ktor.util.reflect.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.properties.Delegates
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
+import java.util.concurrent.atomic.AtomicBoolean
 
 class DeveloperToolConfiguration {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   internal val properties = ConcurrentHashMap<String, Any>()
   private val changeListeners = CopyOnWriteArrayList<ChangeListener>()
+  private val bulkChangeInProgress = AtomicBoolean(false)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  fun <T : Any> register(key: String, defaultValue: T): ReadWriteProperty<Any?, T> {
+  fun <T : Any> register(key: String, defaultValue: T): ObservableMutableProperty<T> {
     checkStateType(defaultValue::class)
 
     @Suppress("UNCHECKED_CAST")
-    val initialValue : T = if (properties.containsKey(key)) (properties[key] as T) else defaultValue
+    val initialValue: T = if (properties.containsKey(key)) (properties[key] as T) else defaultValue
     properties[key] = initialValue
-    return Delegates.observable(initialValue, handleChange(key, defaultValue))
+    return AtomicProperty(initialValue).apply {
+      afterChange { newValue ->
+        val oldValue = properties[key]
+        properties[key] = newValue
+        if (newValue != oldValue && !bulkChangeInProgress.get()) {
+          fireConfigurationChanged()
+        }
+      }
+    }
   }
 
-  fun addChangeListener(changeListener: ChangeListener) {
+  fun addChangeListener(parentDisposable: Disposable, changeListener: ChangeListener) {
     changeListeners.add(changeListener)
+    Disposer.register(parentDisposable) { changeListeners.remove(changeListener) }
   }
 
   fun removeChangeListener(changeListener: ChangeListener) {
     changeListeners.remove(changeListener)
   }
 
+  fun bulkChange(change: () -> Unit) {
+    synchronized(bulkChangeInProgress) {
+      bulkChangeInProgress.set(true)
+      change()
+      fireConfigurationChanged()
+      bulkChangeInProgress.set(false)
+    }
+  }
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun <T : Any> handleChange(key: String, defaultValue: T): (KProperty<*>, T, T) -> Unit = { _, old, new ->
-    if (old != new) {
-      if (new != defaultValue) {
-        properties[key] = new as Any
-      }
-      else {
-        properties.remove(key)
-      }
-      changeListeners.forEach { it.configurationChanged(key) }
-    }
+  private fun fireConfigurationChanged() {
+    changeListeners.forEach { it.configurationChanged() }
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
+  @FunctionalInterface
   interface ChangeListener {
 
-    fun configurationChanged(key: String)
+    fun configurationChanged()
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

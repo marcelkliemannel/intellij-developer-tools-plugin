@@ -12,29 +12,30 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 
 class CodeStyleFormatter(
-        private val codeStyles: List<CodeStyle>,
-        private val project: Project,
-        configuration: DeveloperToolConfiguration,
-        parentDisposable: Disposable
+  private val codeStyles: List<CodeStyle>,
+  private val project: Project,
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
 ) : TextTransformer(
-        presentation = DeveloperToolPresentation(
-                menuTitle = "Code Style Formatting",
-                contentTitle = "Code Style Formatter"),
-        context = Context(
-                transformActionTitle = "Format",
-                sourceTitle = "Original",
-                resultTitle = "Formatted"
-        ),
-        configuration = configuration,
-        parentDisposable = parentDisposable
+  presentation = DeveloperToolContext(
+    menuTitle = "Code Style Formatting",
+    contentTitle = "Code Style Formatter"
+  ),
+  context = Context(
+    transformActionTitle = "Format",
+    sourceTitle = "Original",
+    resultTitle = "Formatted"
+  ),
+  configuration = configuration,
+  parentDisposable = parentDisposable
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var selectedCodeStyleLanguageId: String by configuration.register("selectedLanguageId", FAVORITE_DEFAULT_LANGUAGE_ID)
+  private var selectedCodeStyleLanguageId = configuration.register("selectedLanguageId", FAVORITE_DEFAULT_LANGUAGE_ID)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -42,9 +43,8 @@ class CodeStyleFormatter(
     check(codeStyles.isNotEmpty())
 
     // Validate if selected language is still available
-    if (codeStyles.find { it.language.id == selectedCodeStyleLanguageId } == null) {
-      selectedCodeStyleLanguageId = (codeStyles.find { it.language.id == FAVORITE_DEFAULT_LANGUAGE_ID }
-                                     ?: codeStyles.first()).language.id
+    if (codeStyles.find { it.language.id == selectedCodeStyleLanguageId.get() } == null) {
+      selectedCodeStyleLanguageId.set((codeStyles.find { it.language.id == FAVORITE_DEFAULT_LANGUAGE_ID } ?: codeStyles.first()).language.id)
     }
   }
 
@@ -56,14 +56,14 @@ class CodeStyleFormatter(
 
     row {
       comboBox(codeStyles.toList())
-              .label("Language:")
-              .applyToComponent {
-                selectedItem = selectedCodeStyle
-              }
-              .whenItemSelectedFromUi {
-                selectedCodeStyleLanguageId = it.language.id
-                setLanguage(it.language)
-              }
+        .label("Language:")
+        .applyToComponent {
+          selectedItem = selectedCodeStyle
+        }
+        .whenItemSelectedFromUi {
+          selectedCodeStyleLanguageId.set(it.language.id)
+          setLanguage(it.language)
+        }
     }
 
     setLanguage(selectedCodeStyle.language)
@@ -82,7 +82,7 @@ class CodeStyleFormatter(
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun getSelectedCodeStyle() = codeStyles.first { it.language.id == selectedCodeStyleLanguageId }
+  private fun getSelectedCodeStyle() = codeStyles.first { it.language.id == selectedCodeStyleLanguageId.get() }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
@@ -101,9 +101,9 @@ class CodeStyleFormatter(
       }
 
       val codeStyles: List<CodeStyle> = LanguageCodeStyleSettingsProvider
-              .EP_NAME.extensionList
-              .sortedBy { it.language.displayName }
-              .map { CodeStyle(it.language.displayName, it.language) }
+        .EP_NAME.extensionList
+        .sortedBy { it.language.displayName }
+        .map { CodeStyle(it.language.displayName, it.language) }
       if (codeStyles.isEmpty()) {
         return null
       }

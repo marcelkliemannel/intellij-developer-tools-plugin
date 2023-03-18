@@ -11,8 +11,8 @@ import com.intellij.ui.layout.ComboBoxPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins.*
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ValidateMinIntValueSide.MAX
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ValidateMinIntValueSide.MIN
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.onChanged
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bindIntTextImproved
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateIntValue
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateMinMaxValueRelation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator.TextMode.*
 import java.security.SecureRandom
@@ -22,25 +22,25 @@ import kotlin.math.min
 
 class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   MultiLineTextGenerator(
-    presentation = DeveloperToolPresentation("Lorem Ipsum", "Lorem Ipsum Generator"),
+    presentation = DeveloperToolContext("Lorem Ipsum", "Lorem Ipsum Generator"),
     generatedTextTitle = "Generated lorem ipsum",
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var textMode: TextMode by configuration.register("generatedTextKind", PARAGRAPHS)
-  private var numberOfValues: Int by configuration.register("numberOfValues", 9)
-  private var minWordsInParagraph: Int by configuration.register("minWordsInParagraph", DEFAULT_MIN_PARAGRAPH_WORDS)
-  private var maxWordsInParagraph: Int by configuration.register("maxWordsInParagraph", DEFAULT_MAX_PARAGRAPH_WORDS)
-  private var minWordsInBullet: Int by configuration.register("minWordsInBullet", DEFAULT_MIN_BULLET_WORDS)
-  private var maxWordsInBullet: Int by configuration.register("maxWordsInBullet", DEFAULT_MAX_BULLET_WORDS)
-  private var startWithLoremIpsum: Boolean by configuration.register("startWithLoremIpsum", true)
+  private var textMode = configuration.register("generatedTextKind", PARAGRAPHS)
+  private var numberOfValues = configuration.register("numberOfValues", 9)
+  private var minWordsInParagraph = configuration.register("minWordsInParagraph", DEFAULT_MIN_PARAGRAPH_WORDS)
+  private var maxWordsInParagraph = configuration.register("maxWordsInParagraph", DEFAULT_MAX_PARAGRAPH_WORDS)
+  private var minWordsInBullet = configuration.register("minWordsInBullet", DEFAULT_MIN_BULLET_WORDS)
+  private var maxWordsInBullet = configuration.register("maxWordsInBullet", DEFAULT_MAX_BULLET_WORDS)
+  private var startWithLoremIpsum = configuration.register("startWithLoremIpsum", true)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun generate(): String = when (textMode) {
+  override fun generate(): String = when (textMode.get()) {
     WORDS -> generateWords()
     PARAGRAPHS -> generateParagraphs()
     BULLETS -> generateBullets()
@@ -49,48 +49,51 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
   override fun Panel.buildConfigurationUi() {
     lateinit var textModeComboBox: ComboBox<TextMode>
     row {
-      textField().text(numberOfValues.toString()).columns(COLUMNS_TINY)
-              .validateLongValue(LongRange(1, 999))
-              .whenTextChangedFromUi { numberOfValues = it.toInt() }
-              .gap(RightGap.SMALL)
-      textModeComboBox = comboBox(TextMode.values().toList()).applyToComponent {
-        selectedItem = textMode
-        onChanged { textMode = it }
-      }.component
+      textField()
+        .bindIntTextImproved(numberOfValues)
+        .validateIntValue(IntRange(1, 999))
+        .columns(COLUMNS_TINY)
+        .gap(RightGap.SMALL)
+      textModeComboBox = comboBox(TextMode.values().toList())
+        .bindItem(textMode)
+        .component
     }
 
     row {
-      textField().label("Minimum words in paragraph:").columns(COLUMNS_TINY)
-              .text(minWordsInParagraph.toString())
-              .validateLongValue(LongRange(1, 999))
-              .validation(validateMinMaxValueRelation(MIN) { maxWordsInParagraph })
-              .whenTextChangedFromUi { minWordsInParagraph = it.toIntOrNull() ?: DEFAULT_MIN_PARAGRAPH_WORDS }
-              .gap(RightGap.SMALL)
-      textField().label("Maximum:").columns(COLUMNS_TINY)
-              .text(maxWordsInParagraph.toString())
-              .validateLongValue(LongRange(1, 999))
-              .validation(validateMinMaxValueRelation(MAX) { minWordsInParagraph })
-              .whenTextChangedFromUi { maxWordsInParagraph = it.toIntOrNull() ?: DEFAULT_MAX_PARAGRAPH_WORDS }
+      textField()
+        .label("Minimum words in paragraph:")
+        .bindIntTextImproved(minWordsInParagraph)
+        .validateIntValue(IntRange(1, 999))
+        .columns(COLUMNS_TINY)
+        .validation(validateMinMaxValueRelation(MIN) { maxWordsInParagraph.get() })
+        .gap(RightGap.SMALL)
+      textField()
+        .label("Maximum:")
+        .bindIntTextImproved(maxWordsInParagraph)
+        .validateIntValue(IntRange(1, 999))
+        .columns(COLUMNS_TINY)
+        .validation(validateMinMaxValueRelation(MAX) { minWordsInParagraph.get() })
     }.visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == PARAGRAPHS })
 
     row {
-      textField().label("Minimum words in bullet:").columns(COLUMNS_TINY)
-              .text(minWordsInBullet.toString())
-              .validateLongValue(LongRange(1, 999))
-              .validation(validateMinMaxValueRelation(MIN) { maxWordsInBullet })
-              .whenTextChangedFromUi { minWordsInBullet = it.toIntOrNull() ?: DEFAULT_MIN_BULLET_WORDS }
-              .gap(RightGap.SMALL)
-      textField().label("Maximum:").columns(COLUMNS_TINY)
-              .text(maxWordsInBullet.toString())
-              .validateLongValue(LongRange(1, 999))
-              .validation(validateMinMaxValueRelation(MAX) { minWordsInBullet })
-              .whenTextChangedFromUi { maxWordsInBullet = it.toIntOrNull() ?: DEFAULT_MAX_BULLET_WORDS }
+      textField()
+        .label("Minimum words in bullet:")
+        .bindIntTextImproved(minWordsInBullet)
+        .validateIntValue(IntRange(1, 999))
+        .columns(COLUMNS_TINY)
+        .validation(validateMinMaxValueRelation(MIN) { maxWordsInBullet.get() })
+        .gap(RightGap.SMALL)
+      textField()
+        .label("Maximum:")
+        .bindIntTextImproved(maxWordsInBullet)
+        .validateIntValue(IntRange(1, 999))
+        .columns(COLUMNS_TINY)
+        .validation(validateMinMaxValueRelation(MAX) { minWordsInBullet.get() })
     }.visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == BULLETS })
 
     row {
       checkBox("<html>Start with iconic <i>Lorem ipsum dolor sit amet…</i></html>")
-              .applyToComponent { isSelected = startWithLoremIpsum }
-              .whenStateChangedFromUi { startWithLoremIpsum = it }
+        .bindSelected(startWithLoremIpsum)
     }
   }
 
@@ -116,11 +119,11 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun generateParagraphs() = IntRange(0, numberOfValues - 1).joinToString(PARAGRAPH_SEPARATOR) { paragraphIndex ->
+  private fun generateParagraphs() = IntRange(0, numberOfValues.get() - 1).joinToString(PARAGRAPH_SEPARATOR) { paragraphIndex ->
 
-    val totalWordsInParagraph = SECURE_RANDOM.nextInt(minWordsInParagraph, maxWordsInParagraph + 1)
+    val totalWordsInParagraph = SECURE_RANDOM.nextInt(minWordsInParagraph.get(), maxWordsInParagraph.get() + 1)
 
-    val initialWords = if (paragraphIndex == 0 && startWithLoremIpsum) {
+    val initialWords = if (paragraphIndex == 0 && startWithLoremIpsum.get()) {
       generateIconicText(totalWordsInParagraph, true)
     }
     else {
@@ -133,23 +136,23 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
   private fun generateWords(): String {
     val words = mutableListOf<String>()
 
-    if (startWithLoremIpsum) {
-      words.addAll(generateIconicText(numberOfValues, false))
+    if (startWithLoremIpsum.get()) {
+      words.addAll(generateIconicText(numberOfValues.get(), false))
     }
 
-    if (words.size < numberOfValues) {
-      words.addAll(getRandomWords(numberOfValues - words.size))
+    if (words.size < numberOfValues.get()) {
+      words.addAll(getRandomWords(numberOfValues.get() - words.size))
     }
 
     return words.joinToString(WORDS_SEPARATOR)
   }
 
-  private fun generateBullets() = IntRange(0, numberOfValues - 1).joinToString(BULLET_SEPARATOR) { bulletIndex ->
+  private fun generateBullets() = IntRange(0, numberOfValues.get() - 1).joinToString(BULLET_SEPARATOR) { bulletIndex ->
     val words = mutableListOf<String>()
 
-    val totalWordsInBullet = SECURE_RANDOM.nextInt(minWordsInBullet, maxWordsInBullet)
+    val totalWordsInBullet = SECURE_RANDOM.nextInt(minWordsInBullet.get(), maxWordsInBullet.get())
 
-    if (bulletIndex == 0 && startWithLoremIpsum) {
+    if (bulletIndex == 0 && startWithLoremIpsum.get()) {
       words.addAll(generateIconicText(totalWordsInBullet, true))
     }
 
@@ -162,8 +165,8 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
   }
 
   private fun getRandomWords(words: Int): List<String> = IntRange(0, words - 1).asSequence()
-          .map { getRandomWord() }
-          .toList()
+    .map { getRandomWord() }
+    .toList()
 
   private fun getRandomWord() = LOREM_IPSUM_WORDS[SECURE_RANDOM.nextInt(LOREM_IPSUM_WORDS.size)]
 
@@ -171,14 +174,14 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
     // Divide sentence in n-1 fragments (the last fragment does not get a comma).
     val fragments = Math.floorDiv(words.size, TEXT_FRAGMENT_LENGTH) - 1
     val indiciesOfWordsWithCommas = IntRange(0, fragments - 1)
-            // Randomly decide with a 2/3 change to put comma in fragment
-            .filter { SECURE_RANDOM.nextInt(1, 4) != 3 }
-            // Randomly decide index after the first word
-            .map { fragmentIndex ->
-              val commaIndexInFragment = SECURE_RANDOM.nextInt(1, TEXT_FRAGMENT_LENGTH)
-              (TEXT_FRAGMENT_LENGTH * fragmentIndex) + commaIndexInFragment
-            }
-            .toSet()
+      // Randomly decide with a 2/3 change to put comma in fragment
+      .filter { SECURE_RANDOM.nextInt(1, 4) != 3 }
+      // Randomly decide index after the first word
+      .map { fragmentIndex ->
+        val commaIndexInFragment = SECURE_RANDOM.nextInt(1, TEXT_FRAGMENT_LENGTH)
+        (TEXT_FRAGMENT_LENGTH * fragmentIndex) + commaIndexInFragment
+      }
+      .toSet()
 
     return words.mapIndexed { i: Int, rawWord: String ->
       var word = rawWord

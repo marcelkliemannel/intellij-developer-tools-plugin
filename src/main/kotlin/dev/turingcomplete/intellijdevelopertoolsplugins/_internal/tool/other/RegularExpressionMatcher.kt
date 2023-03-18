@@ -15,6 +15,7 @@ import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.markup.HighlighterLayer
+import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.observable.util.whenFocusLost
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
@@ -47,8 +48,8 @@ import com.intellij.util.ui.UIUtil
 import dev.turingcomplete.intellijbytecodeplugin._ui.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CommonsDataKeys
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
@@ -72,12 +73,12 @@ class RegularExpressionMatcher(
   project: Project?,
   parentDisposable: Disposable
 ) : DeveloperTool(
-  presentation = DeveloperToolPresentation(menuTitle = "Regular Expression", contentTitle = "Regular Expression Matcher"),
+  developerToolContext = DeveloperToolContext(menuTitle = "Regular Expression", contentTitle = "Regular Expression Matcher"),
   parentDisposable = parentDisposable
 ), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var selectedRegexOptionFlag: Int by configuration.register("selectedRegexOption", 0)
+  private var selectedRegexOptionFlag = configuration.register("selectedRegexOption", 0)
 
   private val regexInputEditor: EditorTextField by lazy { createRegexInputEditor(project) }
   private val inputEditor: DeveloperToolEditor by lazy { createInputEditor() }
@@ -91,7 +92,7 @@ class RegularExpressionMatcher(
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun configurationChanged(key: String) {
+  override fun configurationChanged() {
     match()
   }
 
@@ -144,7 +145,7 @@ class RegularExpressionMatcher(
 
   override fun activated() {
     match()
-    configuration.addChangeListener(this)
+    configuration.addChangeListener(parentDisposable, this)
   }
 
   override fun deactivated() {
@@ -169,7 +170,7 @@ class RegularExpressionMatcher(
     }
 
     try {
-      val pattern = Pattern.compile(regex, selectedRegexOptionFlag)
+      val pattern = Pattern.compile(regex, selectedRegexOptionFlag.get())
       val matcher = pattern.matcher(inputEditor.text)
 
       val namedGroups = matcher.namedGroups()
@@ -223,7 +224,7 @@ class RegularExpressionMatcher(
 
   private fun createSelectRegexOptionsButton(): ActionButton =
     ActionButton(
-      SelectRegexOptionsAction(regexInputEditor, { selectedRegexOptionFlag }, { selectedRegexOptionFlag = it }),
+      SelectRegexOptionsAction(regexInputEditor, selectedRegexOptionFlag),
       null,
       RegularExpressionMatcher::class.java.name,
       DEFAULT_MINIMUM_BUTTON_SIZE
@@ -233,8 +234,7 @@ class RegularExpressionMatcher(
 
   private class SelectRegexOptionsAction(
     val regexInputEditor: EditorTextField,
-    val getSelectedRegexOptionFlag: () -> Int,
-    val setSelectedRegexOptionFlag: (Int) -> Unit
+    val selectedRegexOptionFlag: ObservableMutableProperty<Int>
   ) : DumbAwareAction("Regular Expression Options", null, AllIcons.General.GearPlain) {
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -255,10 +255,10 @@ class RegularExpressionMatcher(
       val regexOptionCheckBox = mutableMapOf<RegexOption, JBCheckBox>()
 
       val setSelectedRegexOptionFlag: () -> Unit = {
-        setSelectedRegexOptionFlag(regexOptionCheckBox.filter { it.value.isSelected }.map { it.key.patternFlag }.sum())
+        selectedRegexOptionFlag.set(regexOptionCheckBox.filter { it.value.isSelected }.map { it.key.patternFlag }.sum())
       }
 
-      val selectedRegexOptionFlag = getSelectedRegexOptionFlag()
+      val selectedRegexOptionFlag = selectedRegexOptionFlag.get()
       RegexOption.values().forEach { regexOption ->
         row {
           regexOptionCheckBox[regexOption] = checkBox(regexOption.title)
@@ -427,7 +427,7 @@ class RegularExpressionMatcher(
     ),
     COMMENTS(
       JavaPattern.COMMENTS,
-      "Permits whitespace and comments in pattern",
+      "Permit whitespace and comments in pattern",
       "Whitespace will be ignored, and embedded comments starting with <code>#</code> are ignored until the end of a line."
     );
 

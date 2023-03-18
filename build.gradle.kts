@@ -26,6 +26,8 @@ dependencies {
   implementation("com.jayway.jsonpath:json-path:2.7.0") {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
+  implementation("com.auth0:java-jwt:4.3.0")
+  implementation("com.github.tony19:named-regexp:0.2.8")
   implementation("org.apache.commons:commons-text:1.10.0")
   implementation("dev.turingcomplete:text-case-converter:1.0.0")
   implementation("dev.turingcomplete:text-case-converter-kotlin-extension:1.0.0")

@@ -2,25 +2,29 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transfor
 
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.layout.not
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
 import kotlin.properties.Delegates
 
 abstract class TextTransformer(
-        presentation: DeveloperToolPresentation,
-        private val context: Context,
-        private val configuration: DeveloperToolConfiguration,
-        parentDisposable: Disposable
+  presentation: DeveloperToolContext,
+  private val context: Context,
+  private val configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
 ) : DeveloperTool(presentation, parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  protected var liveTransformation: Boolean by configuration.register("liveTransformation", true)
+  protected var liveTransformation = configuration.register("liveTransformation", true)
 
   private val sourceEditor: DeveloperToolEditor by lazy { createSourceInputEditor() }
   private val resultEditor by lazy { createResultOutputEditor(parentDisposable) }
@@ -76,14 +80,14 @@ abstract class TextTransformer(
     resultEditor.language = language
   }
 
-  override fun configurationChanged(key: String) {
-    if (!isDisposed && liveTransformation) {
+  override fun configurationChanged() {
+    if (!isDisposed && liveTransformation.get()) {
       transform()
     }
   }
 
   override fun activated() {
-    configuration.addChangeListener(this)
+    configuration.addChangeListener(parentDisposable, this)
   }
 
   override fun deactivated() {
@@ -96,32 +100,30 @@ abstract class TextTransformer(
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  @Suppress("UnstableApiUsage")
   private fun Panel.buildActionsUi() {
     buttonsGroup {
       row {
         val liveTransformationCheckBox = checkBox("Live transformation")
-                .applyToComponent { isSelected = liveTransformation }
-                .whenStateChangedFromUi { liveTransformation = it }
-                .gap(RightGap.SMALL)
+          .bindSelected(liveTransformation)
+          .gap(RightGap.SMALL)
 
         button("▼ ${context.transformActionTitle}") { transform() }
-                .enabledIf(liveTransformationCheckBox.selected.not())
-                .component
+          .enabledIf(liveTransformationCheckBox.selected.not())
+          .component
       }
     }
   }
 
   private fun createSourceInputEditor(): DeveloperToolEditor =
     DeveloperToolEditor(
-            title = context.sourceTitle,
-            editorMode = INPUT,
-            parentDisposable = parentDisposable
+      title = context.sourceTitle,
+      editorMode = INPUT,
+      parentDisposable = parentDisposable
     ).apply {
       getInitialLanguage()?.let { language = it }
       getInitialOriginalText()?.let { text = it }
-      this.onTextChangeFromUi { _ ->
-        if (liveTransformation) {
+      onTextChangeFromUi { _ ->
+        if (liveTransformation.get()) {
           transform()
         }
       }
@@ -129,9 +131,9 @@ abstract class TextTransformer(
 
   private fun createResultOutputEditor(parentDisposable: Disposable) =
     DeveloperToolEditor(
-            title = context.resultTitle,
-            editorMode = OUTPUT,
-            parentDisposable = parentDisposable
+      title = context.resultTitle,
+      editorMode = OUTPUT,
+      parentDisposable = parentDisposable
     ).apply {
       getInitialLanguage()?.let { language = it }
     }
@@ -139,9 +141,9 @@ abstract class TextTransformer(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   data class Context(
-          val transformActionTitle: String,
-          val sourceTitle: String,
-          val resultTitle: String
+    val transformActionTitle: String,
+    val sourceTitle: String,
+    val resultTitle: String
   )
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

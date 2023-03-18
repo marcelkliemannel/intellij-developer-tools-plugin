@@ -1,13 +1,13 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 
 import com.intellij.lang.Language
-import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.actionSystem.ActionGroup
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
-import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.UIBundle
 import com.intellij.ui.components.JBLabel
@@ -15,13 +15,11 @@ import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.DslComponentProperty
-import com.intellij.ui.layout.ComponentPredicate
+import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.ValidationInfoBuilder
-import com.intellij.util.ui.GridBag
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Font
-import java.awt.GridBagConstraints
 import java.awt.event.InputEvent
 import java.awt.event.ItemEvent
 import java.awt.event.MouseAdapter
@@ -35,10 +33,10 @@ import javax.swing.JTable
 /**
  * The UI DSL only verifies the range of an `intTextField` on a user input.
  */
-fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) = this.apply {
+fun Cell<JBTextField>.validateIntValue(range: IntRange? = null) = this.apply {
   validation {
-    if (this@validateLongValue.component.isEnabled) {
-      val value = this@validateLongValue.component.text.toLongOrNull()
+    if (this@validateIntValue.component.isEnabled) {
+      val value = this@validateIntValue.component.text.toIntOrNull()
       when {
         value == null -> error(UIBundle.message("please.enter.a.number"))
         range != null && value !in range -> error(UIBundle.message("please.enter.a.number.from.0.to.1", range.first, range.last))
@@ -48,6 +46,33 @@ fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) = this.apply {
     else {
       null
     }
+  }
+}
+
+fun <T> Cell<JBRadioButton>.bind(property: ObservableMutableProperty<T>, value: T) = this.apply {
+  this.applyToComponent {
+    isSelected = property.get() == value
+
+    this.addItemListener { event ->
+      if (event.stateChange == ItemEvent.SELECTED) {
+        property.set(value)
+      }
+    }
+  }
+}
+
+/**
+ * IntelliJ's `bindIntText` will silently fail if the input is empty and will
+ * not execute any other validators.
+ */
+@Suppress("UnstableApiUsage")
+fun Cell<JBTextField>.bindIntTextImproved(property: ObservableMutableProperty<Int>) = this.apply {
+  applyToComponent {
+    text = property.get().toString()
+    property.afterChange { text = it.toString() }
+  }
+  this.whenTextChangedFromUi {
+    it.toIntOrNull()?.let { intValue -> property.set(intValue) }
   }
 }
 
@@ -69,23 +94,6 @@ fun validateMinMaxValueRelation(side: ValidateMinIntValueSide, getOppositeValue:
   }
   else {
     null
-  }
-}
-
-fun JBRadioButton.onSelected(selectListener: () -> Unit) = this.apply {
-  this.addItemListener { event ->
-    if (event.stateChange == ItemEvent.SELECTED) {
-      selectListener()
-    }
-  }
-}
-
-fun <T> ComboBox<T>.onChanged(changeListener: (T) -> Unit) {
-  this.addItemListener { event ->
-    if (event.stateChange == ItemEvent.SELECTED) {
-      @Suppress("UNCHECKED_CAST")
-      changeListener(selectedItem as T)
-    }
   }
 }
 
@@ -137,21 +145,6 @@ fun JTable.setContextMenu(place: String, actionGroup: ActionGroup) {
 }
 
 fun JBFont.toMonospace(): JBFont = JBFont.create(Font(Font.MONOSPACED, this.style, this.size))
-
-fun <T> ObservableMutableProperty<T>.toComponentPredicate(predicate: (T?) -> Boolean): ComponentPredicate =
-  object : ComponentPredicate() {
-
-    override fun invoke(): Boolean = predicate(this@toComponentPredicate.get())
-
-    override fun addListener(listener: (Boolean) -> Unit) {
-      this@toComponentPredicate.afterChange { listener(predicate(this@toComponentPredicate.get())) }
-    }
-  }
-
-fun GridBag.setDefaults() = this
-  .setDefaultAnchor(GridBagConstraints.NORTHWEST)
-  .setDefaultInsets(0, 0, 0, 0)
-  .setDefaultFill(GridBagConstraints.NONE)
 
 fun EditorEx.setLanguage(language: Language) {
   val syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(language, project, null)

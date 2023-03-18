@@ -43,8 +43,8 @@ class ErrorHolder {
     override fun invoke(): Boolean = error != null
   }
 
-  fun <T> asValidation(forComponnt: JComponent? = null): ValidationInfoBuilder.(T) -> ValidationInfo? =
-    { error?.let { ValidationInfo("<html>$it</html>", forComponnt) } }
+  fun <T> asValidation(forComponent: JComponent? = null): ValidationInfoBuilder.(T) -> ValidationInfo? =
+    { error?.let { ValidationInfo("<html>$it</html>", forComponent) } }
 
   /**
    * Creates a [ObservableProperty] that will return an empty string if there is

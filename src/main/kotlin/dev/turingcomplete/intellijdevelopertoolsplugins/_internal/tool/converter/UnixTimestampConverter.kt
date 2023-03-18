@@ -15,8 +15,8 @@ import com.intellij.util.Alarm
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.*
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.*
 import kotlinx.datetime.*
@@ -28,18 +28,18 @@ import java.time.format.DateTimeFormatter
 
 class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   DeveloperTool(
-          presentation = DeveloperToolPresentation("Unix Timestamp", "Unix Timestamp Converter"),
-          parentDisposable = parentDisposable
+    developerToolContext = DeveloperToolContext("Unix Timestamp", "Unix Timestamp Converter"),
+    parentDisposable = parentDisposable
   ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val currentUnixTimestampUpdateAlarm = Alarm(parentDisposable)
+  private val currentUnixTimestampUpdateAlarm by lazy { Alarm(parentDisposable) }
   private val currentUnixTimestampUpdate: Runnable by lazy { createCurrentUnixTimestampUpdate() }
   private val currentUnixTimestampSeconds: ObservableMutableProperty<String> = AtomicProperty(System.currentTimeMillis().div(1000).toString())
   private val currentUnixTimestampMillis: ObservableMutableProperty<String> = AtomicProperty(System.currentTimeMillis().toString())
 
-  private val convertAlarm = Alarm(parentDisposable)
-  private var selectedTimeZoneId: String by configuration.register("selectedTimeZoneId", TimeZone.currentSystemDefault().id)
+  private val convertAlarm by lazy { Alarm(parentDisposable) }
+  private var selectedTimeZoneId = configuration.register("selectedTimeZoneId", TimeZone.currentSystemDefault().id)
   private lateinit var unixTimeStampSecondsTextField: JBTextField
   private lateinit var unixTimeStampMillisTextField: JBTextField
   private lateinit var dayTextField: JBTextField
@@ -57,8 +57,8 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
 
   init {
     // Validate if selected time zone is still available
-    if (!ZoneId.getAvailableZoneIds().contains(selectedTimeZoneId)) {
-      selectedTimeZoneId = TimeZone.currentSystemDefault().id
+    if (!ZoneId.getAvailableZoneIds().contains(selectedTimeZoneId.get())) {
+      selectedTimeZoneId.set(TimeZone.currentSystemDefault().id)
     }
   }
 
@@ -75,11 +75,11 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
 
     group("Convert") {
       val initialInstant = Instant.fromEpochMilliseconds(System.currentTimeMillis())
-      val initialLocalDateTime = initialInstant.toLocalDateTime(TimeZone.of(selectedTimeZoneId))
+      val initialLocalDateTime = initialInstant.toLocalDateTime(TimeZone.of(selectedTimeZoneId.get()))
 
       group("Unix Timestamp as Seconds") {
         row {
-          unixTimeStampSecondsTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
+          unixTimeStampSecondsTextField = textField().validateIntValue(IntRange(0, Int.MAX_VALUE))
                   .text(initialInstant.epochSeconds.toString())
                   .columns(COLUMNS_MEDIUM)
                   .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_SECONDS) }
@@ -89,7 +89,7 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
 
       group("Unix Timestamp as Milliseconds") {
         row {
-          unixTimeStampMillisTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
+          unixTimeStampMillisTextField = textField().validateIntValue(IntRange(0, Int.MAX_VALUE))
                   .text(initialInstant.toEpochMilliseconds().toString())
                   .columns(COLUMNS_MEDIUM)
                   .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
@@ -101,43 +101,42 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
         row {
           comboBox(ZoneId.getAvailableZoneIds().sorted())
                   .label("Time zone:")
-                  .applyToComponent { selectedItem = selectedTimeZoneId }
+                  .bindItem(selectedTimeZoneId)
                   .whenItemSelectedFromUi {
-                    selectedTimeZoneId = it
                     convert(TIME_ZONE)
                   }
         }.layout(RowLayout.PARENT_GRID)
         row {
-          yearTextField = intTextField().label("Year:")
+          yearTextField = textField().label("Year:")
                   .text(initialLocalDateTime.year.toString())
-                  .validateLongValue(LongRange(1970, 9999))
+                  .validateIntValue(IntRange(1970, 9999))
                   .whenTextChangedFromUi { convert(YEAR) }
                   .component
-          monthTextField = intTextField().label("Month:")
+          monthTextField = textField().label("Month:")
                   .text(initialLocalDateTime.monthNumber.toString())
-                  .validateLongValue(LongRange(1, 12))
+                  .validateIntValue(IntRange(1, 12))
                   .whenTextChangedFromUi { convert(MONTH) }
                   .component
-          dayTextField = intTextField().label("Day:")
+          dayTextField = textField().label("Day:")
                   .text(initialLocalDateTime.dayOfMonth.toString())
-                  .validateLongValue(LongRange(1, 31))
+                  .validateIntValue(IntRange(1, 31))
                   .whenTextChangedFromUi { convert(DAY) }
                   .component
         }.layout(RowLayout.PARENT_GRID)
         row {
-          hourTextField = intTextField().label("Hour:")
+          hourTextField = textField().label("Hour:")
                   .text(initialLocalDateTime.hour.toString())
-                  .validateLongValue(LongRange(0, 23))
+                  .validateIntValue(IntRange(0, 23))
                   .whenTextChangedFromUi { convert(HOUR) }
                   .component
-          minuteTextField = intTextField().label("Minute:")
+          minuteTextField = textField().label("Minute:")
                   .text(initialLocalDateTime.minute.toString())
-                  .validateLongValue(LongRange(0, 59))
+                  .validateIntValue(IntRange(0, 59))
                   .whenTextChangedFromUi { convert(MINUTE) }
                   .component
-          secondTextField = intTextField().label("Second:")
+          secondTextField = textField().label("Second:")
                   .text(initialLocalDateTime.second.toString())
-                  .validateLongValue(LongRange(0, 59))
+                  .validateIntValue(IntRange(0, 59))
                   .whenTextChangedFromUi { convert(SECOND) }
                   .component
         }.layout(RowLayout.PARENT_GRID)
@@ -188,11 +187,6 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
     currentUnixTimestampUpdateAlarm.cancelAllRequests()
   }
 
-  override fun doDispose() {
-    currentUnixTimestampUpdateAlarm.cancelAllRequests()
-    convertAlarm.cancelAllRequests()
-  }
-
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun createCurrentUnixTimestampUpdate(): Runnable = Runnable {
@@ -224,12 +218,12 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
     val convert = {
       when (conversionOrigin) {
         UNIX_TIMESTAMP_SECONDS -> {
-          val localDateTime = LocalDateTime.ofInstant(java.time.Instant.ofEpochSecond(unixTimeStampSeconds), ZoneId.of(selectedTimeZoneId))
+          val localDateTime = LocalDateTime.ofInstant(java.time.Instant.ofEpochSecond(unixTimeStampSeconds), ZoneId.of(selectedTimeZoneId.get()))
           setConvertedValues(localDateTime, conversionOrigin)
         }
 
         TIME_ZONE, UNIX_TIMESTAMP_MILLIS -> {
-          val localDateTime = LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(unixTimeStampMillis), ZoneId.of(selectedTimeZoneId))
+          val localDateTime = LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(unixTimeStampMillis), ZoneId.of(selectedTimeZoneId.get()))
           setConvertedValues(localDateTime, conversionOrigin)
         }
 
@@ -270,7 +264,7 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
       secondTextField.text = localDateTime.second.toString()
     }
 
-    val zoneId = ZoneId.of(selectedTimeZoneId)
+    val zoneId = ZoneId.of(selectedTimeZoneId.get())
     formattedIso8601.text = localDateTime.atZone(zoneId).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).toString()
     formattedIso8601Utc.text = localDateTime.atZone(zoneId).format(DateTimeFormatter.ISO_INSTANT).toString()
     formattedIso8601WithZone.text = localDateTime.atZone(zoneId).format(DateTimeFormatter.ISO_DATE_TIME).toString()

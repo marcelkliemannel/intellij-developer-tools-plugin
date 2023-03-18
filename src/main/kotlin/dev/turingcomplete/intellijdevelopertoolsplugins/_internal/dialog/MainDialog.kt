@@ -1,17 +1,18 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
 
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.ColoredSideBorder
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.navigation.Place
+import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
+import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants
 import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
@@ -38,18 +39,24 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun createCenterPanel() = JBSplitter(0.25f).apply {
+  override fun createCenterPanel(): JBSplitter {
     menuTree = MainMenuTree({ selectedContentNode = it }, project, disposable)
 
-    firstComponent = ScrollPaneFactory.createScrollPane(menuTree, true).apply {
-      border = ColoredSideBorder(null, null, null, JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(), 1)
-      background = UIUtil.SIDE_PANEL_BACKGROUND
-      viewport.background = UIUtil.SIDE_PANEL_BACKGROUND
-      verticalScrollBar.background = UIUtil.SIDE_PANEL_BACKGROUND
-      horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-    }
+    return JBSplitter(0.25f).apply {
+      dividerWidth = DIVIDER_WIDTH
 
-    secondComponent = contentPanel
+      firstComponent = ScrollPaneFactory.createScrollPane(menuTree, true).apply {
+        border = ColoredSideBorder(null, null, null, JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(), 1)
+        background = UIUtil.SIDE_PANEL_BACKGROUND
+        viewport.background = UIUtil.SIDE_PANEL_BACKGROUND
+        verticalScrollBar.background = UIUtil.SIDE_PANEL_BACKGROUND
+        horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+      }
+
+      secondComponent = contentPanel.apply {
+        border = JBEmptyBorder(0, 0, 0, DIVIDER_WIDTH)
+      }
+    }
   }
 
   override fun getStyle(): DialogStyle = DialogStyle.COMPACT
@@ -63,13 +70,14 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
       old?.deselected()
 
       if (new != null) {
-        val nodePanel: DialogPanel = when (new) {
+        val nodePanel: JPanel = when (new) {
           is GroupNode -> groupsPanels.getOrPut(new.developerToolGroup.id) {
             GroupContentPanel(new) {
               selectedContentNode = it
               TreeUtil.selectNode(menuTree, it)
             }
           }.panel
+
           is DeveloperToolNode -> developerToolsPanels.getOrPut(new.developerTool) { DeveloperToolContentPanel(new.developerTool) }.panel
           else -> error("Unexpected menu node: ${new::class}")
         }
@@ -86,4 +94,9 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    const val DIVIDER_WIDTH = 4
+  }
 }

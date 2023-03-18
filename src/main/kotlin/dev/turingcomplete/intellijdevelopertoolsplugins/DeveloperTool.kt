@@ -7,14 +7,12 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBEmptyBorder
-import com.intellij.util.ui.JBInsets
-import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Dimension
 import javax.swing.JComponent
 
 abstract class DeveloperTool(
-  val presentation: DeveloperToolPresentation,
+  val developerToolContext: DeveloperToolContext,
   protected val parentDisposable: Disposable
 ) : DataProvider, Disposable {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -38,13 +36,13 @@ abstract class DeveloperTool(
     // whole text gets displayed on the screen.
     panel.minimumSize = Dimension(0, 0)
     panel.preferredSize = Dimension(0, 500)
-    val regularPanelInsets = UIUtil.getRegularPanelInsets()
-    panel.border = JBEmptyBorder(JBInsets(regularPanelInsets.top, regularPanelInsets.left, regularPanelInsets.bottom, regularPanelInsets.right + 8))
 
     panel.registerValidators(parentDisposable)
 
     val wrapper = object : BorderLayoutPanel(), DataProvider {
+
       init {
+        border = JBEmptyBorder(4, 16, 16, 16)
         addToCenter(panel)
       }
 
@@ -84,7 +82,11 @@ abstract class DeveloperTool(
     // Override if needed
   }
 
-  override fun toString(): String = presentation.contentTitle
+  override fun toString(): String = developerToolContext.contentTitle
+
+  internal fun reset() {
+    panel.reset()
+  }
 
   fun validate(): List<ValidationInfo> {
     val result = panel.validateAll()
