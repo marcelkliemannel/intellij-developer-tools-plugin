@@ -1,5 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter
 
+import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
@@ -13,12 +14,14 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.SOURCE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.TARGET
+import kotlin.properties.Delegates
 
 internal abstract class TextConverter(
   developerToolContext: DeveloperToolContext,
-  private val context: Context,
+  protected val textConverterContext: TextConverterContext,
   protected val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : DeveloperTool(developerToolContext, parentDisposable), DeveloperToolConfiguration.ChangeListener {
@@ -29,8 +32,11 @@ internal abstract class TextConverter(
 
   private var lastActiveInput: ActiveInput? = null
 
-  private val sourceEditor by lazy { createEditor(SOURCE, context.sourceTitle) { doToTarget(it) } }
-  private val targetEditor by lazy { createEditor(TARGET, context.targetTitle) { doToSource(it) } }
+  private val sourceEditor by lazy { createEditor(SOURCE, textConverterContext.sourceTitle) { doToTarget(it) } }
+  private val targetEditor by lazy { createEditor(TARGET, textConverterContext.targetTitle) { doToSource(it) } }
+
+  protected var sourceText: String by Delegates.observable("") { _, _, new -> sourceEditor.text = new }
+  protected var targetText: String by Delegates.observable("") { _, _, new -> targetEditor.text = new }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -43,27 +49,52 @@ internal abstract class TextConverter(
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun Panel.buildUi() {
+    buildTopConfigurationUi()
+
     row {
       resizableRow()
-      cell(sourceEditor.createComponent()).align(Align.FILL)
+      val sourceEditorCell = cell(sourceEditor.createComponent()).align(Align.FILL)
+      textConverterContext.sourceErrorHolder?.let { sourceErrorHolder ->
+        sourceEditorCell.validationOnApply(sourceEditor.bindValidator(sourceErrorHolder.asValidation()))
+      }
     }
 
-    buildConfigurationUi()
+    buildMiddleFirstConfigurationUi()
     buildActionsUi()
+    buildMiddleSecondConfigurationUi()
 
     row {
       resizableRow()
-      cell(targetEditor.createComponent()).align(Align.FILL)
+      val targetEditorCell = cell(targetEditor.createComponent()).align(Align.FILL)
+      textConverterContext.targetErrorHolder?.let { targetErrorHolder ->
+        targetEditorCell.validationOnApply(targetEditor.bindValidator(targetErrorHolder.asValidation()))
+      }
     }
   }
 
-  protected open fun Panel.buildConfigurationUi() {
+  protected open fun Panel.buildTopConfigurationUi() {
     // Override if needed
   }
 
-  abstract fun toTarget(text: String): String
+  protected open fun Panel.buildMiddleFirstConfigurationUi() {
+    // Override if needed
+  }
 
-  abstract fun toSource(text: String): String
+  protected open fun Panel.buildMiddleSecondConfigurationUi() {
+    // Override if needed
+  }
+
+  protected fun setSourceLanguage(language: Language) {
+    sourceEditor.language = language
+  }
+
+  protected fun setTargetLanguage(language: Language) {
+    targetEditor.language = language
+  }
+
+  abstract fun toTarget(text: String)
+
+  abstract fun toSource(text: String)
 
   override fun configurationChanged() {
     transformToTarget()
@@ -84,13 +115,13 @@ internal abstract class TextConverter(
       row {
         val liveConversionCheckBox = checkBox("Live conversion")
           .bindSelected(liveConversion)
-                .gap(RightGap.SMALL)
+          .gap(RightGap.SMALL)
 
-        button("▼ ${context.convertActionTitle}") { transformToTarget() }
-                .enabledIf(liveConversionCheckBox.selected.not())
-                .gap(RightGap.SMALL)
-        button("▲ ${context.revertActionTitle}") { transformToSource() }
-                .enabledIf(liveConversionCheckBox.selected.not())
+        button("▼ ${textConverterContext.convertActionTitle}") { transformToTarget() }
+          .enabledIf(liveConversionCheckBox.selected.not())
+          .gap(RightGap.SMALL)
+        button("▲ ${textConverterContext.revertActionTitle}") { transformToSource() }
+          .enabledIf(liveConversionCheckBox.selected.not())
       }
     }
   }
@@ -106,7 +137,7 @@ internal abstract class TextConverter(
   private fun doToTarget(text: String) {
     doConversation {
       try {
-        targetEditor.text = toTarget(text)
+        toTarget(text)
       }
       catch (ignore: Exception) {
       }
@@ -116,7 +147,7 @@ internal abstract class TextConverter(
   private fun doToSource(text: String) {
     doConversation {
       try {
-        sourceEditor.text = toSource(text)
+        toSource(text)
       }
       catch (ignore: Exception) {
       }
@@ -163,11 +194,13 @@ internal abstract class TextConverter(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  data class Context(
-          val convertActionTitle: String,
-          val revertActionTitle: String,
-          val sourceTitle: String,
-          val targetTitle: String
+  data class TextConverterContext(
+    val convertActionTitle: String,
+    val revertActionTitle: String,
+    val sourceTitle: String,
+    val targetTitle: String,
+    val sourceErrorHolder: ErrorHolder? = null,
+    val targetErrorHolder: ErrorHolder? = null
   )
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

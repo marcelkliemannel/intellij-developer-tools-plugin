@@ -14,7 +14,7 @@ import java.util.Base64
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
 
-internal val encoderDecoderContext = TextConverter.Context(
+internal val encoderDecoderTextConverterContext = TextConverter.TextConverterContext(
   convertActionTitle = "Encode",
   revertActionTitle = "Decode",
   sourceTitle = "Encoded",
@@ -28,14 +28,18 @@ internal val encoderDecoderContext = TextConverter.Context(
 internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
     developerToolContext = DeveloperToolContext("Base32", "Base32 Encoder/Decoder"),
-    context = encoderDecoderContext,
+    textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = Base32.toBase32String(text.encodeToByteArray())
+  override fun toTarget(text: String) {
+    targetText = Base32.toBase32String(text.encodeToByteArray())
+  }
 
-  override fun toSource(text: String): String = Base32.decode(text).decodeToString()
+  override fun toSource(text: String) {
+    sourceText = Base32.decode(text).decodeToString()
+  }
 
   class Factory : DeveloperToolFactory {
 
@@ -50,14 +54,18 @@ internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, p
 internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
     developerToolContext = DeveloperToolContext("Base64", "Base64 Encoder/Decoder"),
-    context = encoderDecoderContext,
+    textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = Base64.getEncoder().encodeToString(text.encodeToByteArray())
+  override fun toTarget(text: String) {
+    targetText = Base64.getEncoder().encodeToString(text.encodeToByteArray())
+  }
 
-  override fun toSource(text: String): String = Base64.getDecoder().decode(text).decodeToString()
+  override fun toSource(text: String) {
+    sourceText = Base64.getDecoder().decode(text).decodeToString()
+  }
 
   class Factory : DeveloperToolFactory {
 
@@ -72,14 +80,18 @@ internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, p
 internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
     developerToolContext = DeveloperToolContext("URL Base64", "URL Base64 Encoder/Decoder"),
-    context = encoderDecoderContext,
+    textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = Base64.getUrlEncoder().encodeToString(text.encodeToByteArray())
+  override fun toTarget(text: String) {
+    targetText = Base64.getUrlEncoder().encodeToString(text.encodeToByteArray())
+  }
 
-  override fun toSource(text: String): String = Base64.getUrlDecoder().decode(text).decodeToString()
+  override fun toSource(text: String) {
+    sourceText = Base64.getUrlDecoder().decode(text).decodeToString()
+  }
 
   class Factory : DeveloperToolFactory {
 
@@ -94,14 +106,18 @@ internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration
 internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
     developerToolContext = DeveloperToolContext(menuTitle = "MIME Base64", contentTitle = "MIME Base64 Encoder/Decoder"),
-    context = encoderDecoderContext,
+    textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = Base64.getMimeEncoder().encodeToString(text.encodeToByteArray())
+  override fun toTarget(text: String) {
+    targetText = Base64.getMimeEncoder().encodeToString(text.encodeToByteArray())
+  }
 
-  override fun toSource(text: String): String = Base64.getMimeDecoder().decode(text).decodeToString()
+  override fun toSource(text: String) {
+    sourceText = Base64.getMimeDecoder().decode(text).decodeToString()
+  }
 
   class Factory : DeveloperToolFactory {
 
@@ -116,14 +132,18 @@ internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguratio
 internal class UrlEncodingEncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
     developerToolContext = DeveloperToolContext("URL Encoding", "URL Encoding Encoder/Decoder"),
-    context = encoderDecoderContext,
+    textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = URLEncoder.encode(text, StandardCharsets.UTF_8)
+  override fun toTarget(text: String) {
+    targetText = URLEncoder.encode(text, StandardCharsets.UTF_8)
+  }
 
-  override fun toSource(text: String): String = URLDecoder.decode(text, StandardCharsets.UTF_8)
+  override fun toSource(text: String) {
+    sourceText = URLDecoder.decode(text, StandardCharsets.UTF_8)
+  }
 
   class Factory : DeveloperToolFactory {
 

@@ -137,6 +137,11 @@
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RegularExpressionMatcher$Factory"/>
 
     <developerTool
+            id="text-format-converter"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextFormatConverter$Factory"
+            weight="2"/>
+
+    <developerTool
             id="uuid-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.UuidGenerator$Factory"
             weight="2"/>

@@ -15,7 +15,7 @@ internal class LineBreaksEncoderDecoder(
   parentDisposable: Disposable
 ) : TextConverter(
   developerToolContext = DeveloperToolContext("Line Breaks", "Line Breaks Encoder/Decoder"),
-  context = encoderDecoderContext,
+  textConverterContext = encoderDecoderTextConverterContext,
   configuration = configuration,
   parentDisposable = parentDisposable
 ) {
@@ -26,22 +26,22 @@ internal class LineBreaksEncoderDecoder(
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun toTarget(text: String): String {
-    return when (lineBreakDecoding.get()) {
+  override fun toTarget(text: String) {
+    targetText = when (lineBreakDecoding.get()) {
       LineBreak.CRLF -> StringUtil.convertLineSeparators(text, "\\r\\n")
       LineBreak.LF -> StringUtil.convertLineSeparators(text, "\\n")
     }
   }
 
-  override fun toSource(text: String): String {
+  override fun toSource(text: String) {
     // The target input is not depending on the selected line break decoding,
     // because the user can put anything into the editor without changing the
     // configuration first.
-    return text.replace("\\r\\n", System.lineSeparator())
-            .replace("\\n", System.lineSeparator())
+    sourceText = text.replace("\\r\\n", System.lineSeparator())
+      .replace("\\n", System.lineSeparator())
   }
 
-  override fun Panel.buildConfigurationUi() {
+  override fun Panel.buildMiddleFirstConfigurationUi() {
     row {
       comboBox(LineBreak.values().toList())
         .label("Decode line break to:")

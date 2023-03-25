@@ -18,8 +18,9 @@ repositories {
 }
 
 dependencies {
-  implementation("org.bouncycastle:bcprov-jdk18on:1.72")
-  implementation("org.bouncycastle:bcpkix-jdk18on:1.72")
+  val bouncycastleVersion = 1.72
+  implementation("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
+  implementation("org.bouncycastle:bcpkix-jdk18on:$bouncycastleVersion")
   implementation("com.fasterxml.uuid:java-uuid-generator:4.1.0") {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
@@ -27,14 +28,20 @@ dependencies {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
   implementation("com.auth0:java-jwt:4.3.0")
+  val jacksonVersion = "2.14.2"
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-properties:$jacksonVersion")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:$jacksonVersion")
   implementation("com.github.tony19:named-regexp:0.2.8")
   implementation("org.apache.commons:commons-text:1.10.0")
-  implementation("dev.turingcomplete:text-case-converter:1.0.0")
-  implementation("dev.turingcomplete:text-case-converter-kotlin-extension:1.0.0")
+  val textCaseConverterVersion = "1.0.0"
+  implementation("dev.turingcomplete:text-case-converter:$textCaseConverterVersion")
+  implementation("dev.turingcomplete:text-case-converter-kotlin-extension:$textCaseConverterVersion")
   implementation("com.github.vertical-blank:sql-formatter:2.0.3")
   implementation(kotlin("stdlib"))
 
-  testImplementation("org.assertj:assertj-core:2.4.1")
+  testImplementation("org.assertj:assertj-core:3.24.2")
   testImplementation("org.xmlunit:xmlunit-assertj:2.9.1")
 }
 

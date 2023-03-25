@@ -10,7 +10,7 @@ import org.apache.commons.text.StringEscapeUtils
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
 
-private val escapeUnescapeContext = TextConverter.Context(
+private val escapeUnescapeContext = TextConverter.TextConverterContext(
   convertActionTitle = "Escape",
   revertActionTitle = "Unescape",
   sourceTitle = "Unescaped",
@@ -24,14 +24,18 @@ private val escapeUnescapeContext = TextConverter.Context(
 internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
     developerToolContext = DeveloperToolContext("HTML Entities", "HTML Entities Escape/Unescape"),
-    context = escapeUnescapeContext,
+    textConverterContext = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = StringEscapeUtils.escapeHtml4(text)
+  override fun toTarget(text: String) {
+    targetText = StringEscapeUtils.escapeHtml4(text)
+  }
 
-  override fun toSource(text: String): String = StringEscapeUtils.unescapeHtml4(text)
+  override fun toSource(text: String) {
+    sourceText = StringEscapeUtils.unescapeHtml4(text)
+  }
 
   class Factory : DeveloperToolFactory {
 
@@ -46,14 +50,18 @@ internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, par
 internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
     developerToolContext = DeveloperToolContext("Java Text", "Java Text Escape/Unescape"),
-    context = escapeUnescapeContext,
+    textConverterContext = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = StringEscapeUtils.escapeJava(text)
+  override fun toTarget(text: String) {
+    targetText = StringEscapeUtils.escapeJava(text)
+  }
 
-  override fun toSource(text: String): String = StringEscapeUtils.unescapeJava(text)
+  override fun toSource(text: String) {
+    sourceText = StringEscapeUtils.unescapeJava(text)
+  }
 
   class Factory : DeveloperToolFactory {
 
@@ -68,14 +76,18 @@ internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentD
 internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
     developerToolContext = DeveloperToolContext("JSON Text", "JSON Text Escape/Unescape"),
-    context = escapeUnescapeContext,
+    textConverterContext = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = StringEscapeUtils.escapeJson(text)
+  override fun toTarget(text: String) {
+    targetText = StringEscapeUtils.escapeJson(text)
+  }
 
-  override fun toSource(text: String): String = StringEscapeUtils.unescapeJson(text)
+  override fun toSource(text: String) {
+    sourceText = StringEscapeUtils.unescapeJson(text)
+  }
 
   class Factory : DeveloperToolFactory {
 
@@ -90,14 +102,18 @@ internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentD
 internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
     developerToolContext = DeveloperToolContext("CSV Text", "CSV Text Escape/Unescape"),
-    context = escapeUnescapeContext,
+    textConverterContext = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = StringEscapeUtils.escapeCsv(text)
+  override fun toTarget(text: String) {
+    targetText = StringEscapeUtils.escapeCsv(text)
+  }
 
-  override fun toSource(text: String): String = StringEscapeUtils.unescapeCsv(text)
+  override fun toSource(text: String) {
+    sourceText = StringEscapeUtils.unescapeCsv(text)
+  }
 
   class Factory : DeveloperToolFactory {
 
@@ -112,14 +128,18 @@ internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDi
 internal class XmlTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
     developerToolContext = DeveloperToolContext("XML Text", "XML Text Escape/Unescape"),
-    context = escapeUnescapeContext,
+    textConverterContext = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
 
-  override fun toTarget(text: String): String = StringEscapeUtils.escapeXml11(text)
+  override fun toTarget(text: String) {
+    targetText = StringEscapeUtils.escapeXml11(text)
+  }
 
-  override fun toSource(text: String): String = StringEscapeUtils.unescapeXml(text)
+  override fun toSource(text: String) {
+    sourceText = StringEscapeUtils.unescapeXml(text)
+  }
 
   class Factory : DeveloperToolFactory {
 

@@ -107,9 +107,7 @@ internal class DeveloperToolEditor(
         title?.let {
           addToTop(JBLabel("$it ${editorMode.title}:"))
         }
-        editor.component.apply {
-          border = EditorBorder(this)
-        }
+        editor.component.border = EditorBorder(editor.component)
         val editorComponent = editor.component.wrapWithToolBar(DeveloperToolEditor::class.java.simpleName, createActions(), ToolBarPlace.RIGHT)
         addToCenter(editorComponent)
         // This prevents the `Editor` from increasing the size of the dialog if
@@ -133,7 +131,7 @@ internal class DeveloperToolEditor(
   }
 
   fun removeTextRangeHighlighters(groupId: String) {
-    rangeHighlighters.get(groupId)?.forEach { editor.markupModel.removeHighlighter(it) }
+    rangeHighlighters[groupId]?.forEach { editor.markupModel.removeHighlighter(it) }
     rangeHighlighters.remove(groupId)
   }
 
@@ -327,17 +325,19 @@ internal class DeveloperToolEditor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class EditorBorder(private val ownerComponent: JComponent) : LineBorder(defaultEditorBorder) {
+  private class EditorBorder(private val ownerComponent: JComponent) : LineBorder(defaultEditorBorder, 1) {
+
+    private val errorBorder by lazy { JBUI.CurrentTheme.Focus.errorColor(false) }
+    private val errorFocusBorder by lazy { JBUI.CurrentTheme.Focus.errorColor(true) }
+    private val warningBorder by lazy { JBUI.CurrentTheme.Focus.warningColor(false) }
+    private val warningFocusBorder by lazy { JBUI.CurrentTheme.Focus.warningColor(true) }
 
     override fun paintBorder(c: Component?, g: Graphics?, x: Int, y: Int, width: Int, height: Int) {
       val outline = ObjectUtils.tryCast(ownerComponent.getClientProperty("JComponent.outline"), String::class.java)
-      when (outline) {
-        "error" -> Pair(JBUI.CurrentTheme.Focus.errorColor(ownerComponent.hasFocus()), 5)
-        "warning" -> Pair(JBUI.CurrentTheme.Focus.warningColor(ownerComponent.hasFocus()), 5)
-        else -> Pair(defaultEditorBorder, 1)
-      }.let { (lineColor, thickness) ->
-        this.lineColor = lineColor
-        this.thickness = thickness
+      this.lineColor = when (outline) {
+        "error" -> if (ownerComponent.hasFocus()) errorBorder else errorFocusBorder
+        "warning" -> if (ownerComponent.hasFocus()) warningBorder else warningFocusBorder
+        else -> defaultEditorBorder
       }
       super.paintBorder(c, g, x, y, width, height)
     }
