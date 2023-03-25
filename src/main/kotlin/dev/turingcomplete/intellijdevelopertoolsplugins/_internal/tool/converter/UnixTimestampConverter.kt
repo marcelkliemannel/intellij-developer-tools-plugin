@@ -79,7 +79,7 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
 
       group("Unix Timestamp as Seconds") {
         row {
-          unixTimeStampSecondsTextField = textField().validateIntValue(IntRange(0, Int.MAX_VALUE))
+          unixTimeStampSecondsTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
                   .text(initialInstant.epochSeconds.toString())
                   .columns(COLUMNS_MEDIUM)
                   .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_SECONDS) }
@@ -89,7 +89,7 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
 
       group("Unix Timestamp as Milliseconds") {
         row {
-          unixTimeStampMillisTextField = textField().validateIntValue(IntRange(0, Int.MAX_VALUE))
+          unixTimeStampMillisTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
                   .text(initialInstant.toEpochMilliseconds().toString())
                   .columns(COLUMNS_MEDIUM)
                   .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
@@ -109,34 +109,34 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
         row {
           yearTextField = textField().label("Year:")
                   .text(initialLocalDateTime.year.toString())
-                  .validateIntValue(IntRange(1970, 9999))
+                  .validateLongValue(LongRange(1970, 9999))
                   .whenTextChangedFromUi { convert(YEAR) }
                   .component
           monthTextField = textField().label("Month:")
                   .text(initialLocalDateTime.monthNumber.toString())
-                  .validateIntValue(IntRange(1, 12))
+                  .validateLongValue(LongRange(1, 12))
                   .whenTextChangedFromUi { convert(MONTH) }
                   .component
           dayTextField = textField().label("Day:")
                   .text(initialLocalDateTime.dayOfMonth.toString())
-                  .validateIntValue(IntRange(1, 31))
+                  .validateLongValue(LongRange(1, 31))
                   .whenTextChangedFromUi { convert(DAY) }
                   .component
         }.layout(RowLayout.PARENT_GRID)
         row {
           hourTextField = textField().label("Hour:")
                   .text(initialLocalDateTime.hour.toString())
-                  .validateIntValue(IntRange(0, 23))
+                  .validateLongValue(LongRange(0, 23))
                   .whenTextChangedFromUi { convert(HOUR) }
                   .component
           minuteTextField = textField().label("Minute:")
                   .text(initialLocalDateTime.minute.toString())
-                  .validateIntValue(IntRange(0, 59))
+                  .validateLongValue(LongRange(0, 59))
                   .whenTextChangedFromUi { convert(MINUTE) }
                   .component
           secondTextField = textField().label("Second:")
                   .text(initialLocalDateTime.second.toString())
-                  .validateIntValue(IntRange(0, 59))
+                  .validateLongValue(LongRange(0, 59))
                   .whenTextChangedFromUi { convert(SECOND) }
                   .component
         }.layout(RowLayout.PARENT_GRID)

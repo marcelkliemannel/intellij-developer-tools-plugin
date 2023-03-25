@@ -13,7 +13,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bindIntTextImproved
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateIntValue
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
 
 class SqlFormatterTransformer(
   configuration: DeveloperToolConfiguration,
@@ -57,21 +57,21 @@ class SqlFormatterTransformer(
       textField()
         .label("Indent spaces:")
         .bindIntTextImproved(indentSpaces)
-        .validateIntValue(IntRange(0, 99))
+        .validateLongValue(LongRange(0, 99))
     }.layout(RowLayout.PARENT_GRID)
 
     row {
       textField()
         .label("Lines between queries:")
         .bindIntTextImproved(linesBetweenQueries)
-        .validateIntValue(IntRange(0, 99))
+        .validateLongValue(LongRange(0, 99))
     }.layout(RowLayout.PARENT_GRID)
 
     row {
       textField()
         .label("Maximum column length:")
         .bindIntTextImproved(maxColumnLength)
-        .validateIntValue(IntRange(0, 99))
+        .validateLongValue(LongRange(0, 99))
     }.layout(RowLayout.PARENT_GRID)
 
     row {

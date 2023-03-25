@@ -33,10 +33,10 @@ import javax.swing.JTable
 /**
  * The UI DSL only verifies the range of an `intTextField` on a user input.
  */
-fun Cell<JBTextField>.validateIntValue(range: IntRange? = null) = this.apply {
+fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) = this.apply {
   validation {
-    if (this@validateIntValue.component.isEnabled) {
-      val value = this@validateIntValue.component.text.toIntOrNull()
+    if (this@validateLongValue.component.isEnabled) {
+      val value = this@validateLongValue.component.text.toLongOrNull()
       when {
         value == null -> error(UIBundle.message("please.enter.a.number"))
         range != null && value !in range -> error(UIBundle.message("please.enter.a.number.from.0.to.1", range.first, range.last))

@@ -15,7 +15,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bindIntTextImproved
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateIntValue
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_LOWERCASE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_UPPERCASE
@@ -54,7 +54,7 @@ internal class PasswordGenerator(
       row {
         textField()
           .label("Length:")
-          .validateIntValue(IntRange(1, 100))
+          .validateLongValue(LongRange(1, 100))
           .bindIntTextImproved(length)
           .horizontalAlign(HorizontalAlign.FILL)
       }.layout(RowLayout.PARENT_GRID)
