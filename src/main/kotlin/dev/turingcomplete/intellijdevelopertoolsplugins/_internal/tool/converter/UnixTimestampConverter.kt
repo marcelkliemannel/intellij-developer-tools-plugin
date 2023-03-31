@@ -80,65 +80,65 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
       group("Unix Timestamp as Seconds") {
         row {
           unixTimeStampSecondsTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
-                  .text(initialInstant.epochSeconds.toString())
-                  .columns(COLUMNS_MEDIUM)
-                  .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_SECONDS) }
-                  .component
+            .text(initialInstant.epochSeconds.toString())
+            .columns(COLUMNS_MEDIUM)
+            .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_SECONDS) }
+            .component
         }
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
       group("Unix Timestamp as Milliseconds") {
         row {
           unixTimeStampMillisTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
-                  .text(initialInstant.toEpochMilliseconds().toString())
-                  .columns(COLUMNS_MEDIUM)
-                  .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
-                  .component
+            .text(initialInstant.toEpochMilliseconds().toString())
+            .columns(COLUMNS_MEDIUM)
+            .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
+            .component
         }
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
       group("Date and Time") {
         row {
           comboBox(ZoneId.getAvailableZoneIds().sorted())
-                  .label("Time zone:")
-                  .bindItem(selectedTimeZoneId)
-                  .whenItemSelectedFromUi {
-                    convert(TIME_ZONE)
-                  }
+            .label("Time zone:")
+            .bindItem(selectedTimeZoneId)
+            .whenItemSelectedFromUi {
+              convert(TIME_ZONE)
+            }
         }.layout(RowLayout.PARENT_GRID)
         row {
           yearTextField = textField().label("Year:")
-                  .text(initialLocalDateTime.year.toString())
-                  .validateLongValue(LongRange(1970, 9999))
-                  .whenTextChangedFromUi { convert(YEAR) }
-                  .component
+            .text(initialLocalDateTime.year.toString())
+            .validateLongValue(LongRange(1970, 9999))
+            .whenTextChangedFromUi { convert(YEAR) }
+            .component
           monthTextField = textField().label("Month:")
-                  .text(initialLocalDateTime.monthNumber.toString())
-                  .validateLongValue(LongRange(1, 12))
-                  .whenTextChangedFromUi { convert(MONTH) }
-                  .component
+            .text(initialLocalDateTime.monthNumber.toString())
+            .validateLongValue(LongRange(1, 12))
+            .whenTextChangedFromUi { convert(MONTH) }
+            .component
           dayTextField = textField().label("Day:")
-                  .text(initialLocalDateTime.dayOfMonth.toString())
-                  .validateLongValue(LongRange(1, 31))
-                  .whenTextChangedFromUi { convert(DAY) }
-                  .component
+            .text(initialLocalDateTime.dayOfMonth.toString())
+            .validateLongValue(LongRange(1, 31))
+            .whenTextChangedFromUi { convert(DAY) }
+            .component
         }.layout(RowLayout.PARENT_GRID)
         row {
           hourTextField = textField().label("Hour:")
-                  .text(initialLocalDateTime.hour.toString())
-                  .validateLongValue(LongRange(0, 23))
-                  .whenTextChangedFromUi { convert(HOUR) }
-                  .component
+            .text(initialLocalDateTime.hour.toString())
+            .validateLongValue(LongRange(0, 23))
+            .whenTextChangedFromUi { convert(HOUR) }
+            .component
           minuteTextField = textField().label("Minute:")
-                  .text(initialLocalDateTime.minute.toString())
-                  .validateLongValue(LongRange(0, 59))
-                  .whenTextChangedFromUi { convert(MINUTE) }
-                  .component
+            .text(initialLocalDateTime.minute.toString())
+            .validateLongValue(LongRange(0, 59))
+            .whenTextChangedFromUi { convert(MINUTE) }
+            .component
           secondTextField = textField().label("Second:")
-                  .text(initialLocalDateTime.second.toString())
-                  .validateLongValue(LongRange(0, 59))
-                  .whenTextChangedFromUi { convert(SECOND) }
-                  .component
+            .text(initialLocalDateTime.second.toString())
+            .validateLongValue(LongRange(0, 59))
+            .whenTextChangedFromUi { convert(SECOND) }
+            .component
         }.layout(RowLayout.PARENT_GRID)
       }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE)
 
@@ -272,9 +272,9 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
   }
 
   private fun Row.buildTimestampLabelUi(
-          title: String,
-          timestampProperty: ObservableProperty<String>,
-          contentDataKey: DataKey<String>
+    title: String,
+    timestampProperty: ObservableProperty<String>,
+    contentDataKey: DataKey<String>
   ) {
     val timestampLabel = JBLabel().apply { font = TIMESTAMP_TEXT_FONT }.copyable().bind(timestampProperty)
     val actions = DefaultActionGroup().apply {
@@ -290,11 +290,13 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<UnixTimestampConverter> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return UnixTimestampConverter(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = UnixTimestampConverter(configuration, parentDisposable)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

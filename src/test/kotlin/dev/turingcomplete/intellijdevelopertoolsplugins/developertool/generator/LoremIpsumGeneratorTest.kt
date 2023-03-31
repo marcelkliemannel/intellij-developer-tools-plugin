@@ -9,7 +9,10 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-class LoremIpsumGeneratorTest(val atMostWords: Int, val expectedSentence: String) : BasePlatformTestCase() {
+class LoremIpsumGeneratorTest(
+  private val atMostWords: Int,
+  private val expectedSentence: String
+) : BasePlatformTestCase() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -19,7 +22,6 @@ class LoremIpsumGeneratorTest(val atMostWords: Int, val expectedSentence: String
     val actualSentence = LoremIpsumGenerator(DeveloperToolConfiguration()) { }.generateIconicText(atMostWords, true)
     assertThat(actualSentence.joinToString(" ")).isEqualTo(expectedSentence)
   }
-
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

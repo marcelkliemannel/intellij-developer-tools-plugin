@@ -93,4 +93,8 @@ tasks {
       jvmTarget = "17"
     }
   }
+
+  withType<Test> {
+    systemProperty("idea.test.execution.policy", "dev.turingcomplete.intellijdevelopertoolsplugins.developertool._internal.tool.DeveloperToolTestPolicy")
+  }
 }

@@ -1,19 +1,16 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins
+package dev.turingcomplete.intellijdevelopertoolsplugins.developertool._internal.tool
 
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.project.Project
+import com.intellij.testFramework.fixtures.IdeaTestExecutionPolicy
 
-interface DeveloperToolFactory<T: DeveloperTool> {
+@Suppress("unused") // Referenced in build.gradle.kts
+class DeveloperToolTestPolicy  : IdeaTestExecutionPolicy() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
-
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  fun createDeveloperTool(
-          configuration: DeveloperToolConfiguration,
-          project: Project?,
-          parentDisposable: Disposable
-  ): T?
+  override fun getName(): String = "developer-tool-test"
+
+  override fun runInDispatchThread(): Boolean = false
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

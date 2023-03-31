@@ -1,19 +1,27 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.project.Project
+import com.intellij.ui.layout.ComponentPredicate
+import kotlin.properties.Delegates
 
-interface DeveloperToolFactory<T: DeveloperTool> {
+class BooleanComponentPredicate(initialValue: Boolean) : ComponentPredicate() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
+
+  private val listeners = mutableListOf<(Boolean) -> Unit>()
+
+  var value: Boolean by Delegates.observable(initialValue) { _, oldValue, newValue ->
+    if (oldValue != newValue) {
+      listeners.forEach { it(newValue) }
+    }
+  }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  fun createDeveloperTool(
-          configuration: DeveloperToolConfiguration,
-          project: Project?,
-          parentDisposable: Disposable
-  ): T?
+  override fun addListener(listener: (Boolean) -> Unit) {
+    listeners.add(listener)
+  }
+
+  override fun invoke(): Boolean = value
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

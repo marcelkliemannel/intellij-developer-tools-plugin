@@ -39,6 +39,7 @@ import com.intellij.util.ObjectUtils
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
+import org.jetbrains.annotations.TestOnly
 import java.awt.Component
 import java.awt.Graphics
 import java.awt.datatransfer.StringSelection
@@ -112,7 +113,7 @@ internal class DeveloperToolEditor(
         addToCenter(editorComponent)
         // This prevents the `Editor` from increasing the size of the dialog if
         // the to display all the text on the screen instead of using scrollbars.
-        preferredSize = JBUI.size(0, 100)
+        preferredSize = JBUI.size(0, 120)
       }
 
       override fun getData(dataId: String): Any? = when {
@@ -146,6 +147,17 @@ internal class DeveloperToolEditor(
           HighlighterTargetArea.EXACT_RANGE
         )
       )
+  }
+
+  @TestOnly
+  fun setTextUnderTest(text: String) {
+    try {
+      editor.putUserData(editorActiveKey, true)
+      this@DeveloperToolEditor.text = text
+    }
+    finally {
+      editor.putUserData(editorActiveKey, false)
+    }
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //

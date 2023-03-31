@@ -150,10 +150,13 @@ internal class PasswordGenerator(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<PasswordGenerator> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable) =
-      PasswordGenerator(configuration, parentDisposable)
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = PasswordGenerator(configuration, parentDisposable)
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

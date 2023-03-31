@@ -134,7 +134,7 @@ class MainMenuTree(
     var preferredSelectedDeveloperToolNode: DeveloperToolNode? = null
     val application = ApplicationManager.getApplication()
     DeveloperToolFactoryEp.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
-      val developerToolFactory: DeveloperToolFactory = developerToolFactoryEp.createInstance(application)
+      val developerToolFactory: DeveloperToolFactory<*> = developerToolFactoryEp.createInstance(application)
       val developerToolConfiguration = DeveloperToolsPluginService.instance.getOrCreateDeveloperToolConfiguration(developerToolFactoryEp.id)
 
       developerToolFactory.createDeveloperTool(developerToolConfiguration, project, parentDisposable)?.let { developerTool ->

@@ -2,7 +2,6 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converte
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
@@ -41,11 +40,13 @@ internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, p
     sourceText = Base32.decode(text).decodeToString()
   }
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<Base32EncoderDecoder> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return Base32EncoderDecoder(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = Base32EncoderDecoder(configuration, parentDisposable)
   }
 }
 
@@ -67,11 +68,13 @@ internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, p
     sourceText = Base64.getDecoder().decode(text).decodeToString()
   }
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<Base64EncoderDecoder> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return Base64EncoderDecoder(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = Base64EncoderDecoder(configuration, parentDisposable)
   }
 }
 
@@ -93,11 +96,13 @@ internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration
     sourceText = Base64.getUrlDecoder().decode(text).decodeToString()
   }
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<UrlBase64EncoderDecoder> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return UrlBase64EncoderDecoder(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = UrlBase64EncoderDecoder(configuration, parentDisposable)
   }
 }
 
@@ -119,11 +124,13 @@ internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguratio
     sourceText = Base64.getMimeDecoder().decode(text).decodeToString()
   }
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<MimeBase64EncoderDecoder> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return MimeBase64EncoderDecoder(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = MimeBase64EncoderDecoder(configuration, parentDisposable)
   }
 }
 
@@ -145,11 +152,13 @@ internal class UrlEncodingEncoderDecoder(configuration: DeveloperToolConfigurati
     sourceText = URLDecoder.decode(text, StandardCharsets.UTF_8)
   }
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<UrlEncodingEncoderDecoder> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return UrlEncodingEncoderDecoder(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = UrlEncodingEncoderDecoder(configuration, parentDisposable)
   }
 }
 

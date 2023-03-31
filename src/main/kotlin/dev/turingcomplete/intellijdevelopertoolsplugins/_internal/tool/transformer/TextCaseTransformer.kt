@@ -7,7 +7,6 @@ import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.selected
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
@@ -111,11 +110,13 @@ class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDispo
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<TextCaseTransformer> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return TextCaseTransformer(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = TextCaseTransformer(configuration, parentDisposable)
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

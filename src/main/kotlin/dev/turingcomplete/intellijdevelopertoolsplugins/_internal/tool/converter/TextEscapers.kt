@@ -2,7 +2,6 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converte
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
@@ -37,11 +36,13 @@ internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, par
     sourceText = StringEscapeUtils.unescapeHtml4(text)
   }
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<HtmlEntitiesEscape> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return HtmlEntitiesEscape(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = HtmlEntitiesEscape(configuration, parentDisposable)
   }
 }
 
@@ -63,11 +64,13 @@ internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentD
     sourceText = StringEscapeUtils.unescapeJava(text)
   }
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<JavaTextEscape> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return JavaTextEscape(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = JavaTextEscape(configuration, parentDisposable)
   }
 }
 
@@ -89,11 +92,13 @@ internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentD
     sourceText = StringEscapeUtils.unescapeJson(text)
   }
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<JsonTextEscape> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return JsonTextEscape(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = JsonTextEscape(configuration, parentDisposable)
   }
 }
 
@@ -115,11 +120,13 @@ internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDi
     sourceText = StringEscapeUtils.unescapeCsv(text)
   }
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<CsvTextEscape> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return CsvTextEscape(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = CsvTextEscape(configuration, parentDisposable)
   }
 }
 
@@ -141,10 +148,12 @@ internal class XmlTextEscape(configuration: DeveloperToolConfiguration, parentDi
     sourceText = StringEscapeUtils.unescapeXml(text)
   }
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<XmlTextEscape> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return XmlTextEscape(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = XmlTextEscape(configuration, parentDisposable)
   }
 }

@@ -10,7 +10,6 @@ import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
@@ -93,9 +92,13 @@ class CodeStyleFormatter(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<CodeStyleFormatter> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool? {
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ): CodeStyleFormatter? {
       if (project == null) {
         return null
       }

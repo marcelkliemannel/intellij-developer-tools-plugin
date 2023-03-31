@@ -16,7 +16,6 @@ import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.JsonPathException
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
@@ -94,11 +93,13 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<JsonPathTransformer> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return JsonPathTransformer(configuration, project, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = JsonPathTransformer(configuration, project, parentDisposable)
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

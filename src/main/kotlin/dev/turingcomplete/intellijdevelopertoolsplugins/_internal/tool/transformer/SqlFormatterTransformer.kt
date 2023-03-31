@@ -117,7 +117,7 @@ class SqlFormatterTransformer(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<SqlFormatterTransformer> {
 
     override fun createDeveloperTool(
       configuration: DeveloperToolConfiguration,

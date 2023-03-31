@@ -16,7 +16,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validat
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateMinMaxValueRelation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator.TextMode.*
 import java.security.SecureRandom
-import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -227,11 +226,13 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<LoremIpsumGenerator> {
 
-    override fun createDeveloperTool(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable): DeveloperTool {
-      return LoremIpsumGenerator(configuration, parentDisposable)
-    }
+    override fun createDeveloperTool(
+      configuration: DeveloperToolConfiguration,
+      project: Project?,
+      parentDisposable: Disposable
+    ) = LoremIpsumGenerator(configuration, parentDisposable)
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

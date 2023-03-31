@@ -436,7 +436,7 @@ class RegularExpressionMatcher(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<RegularExpressionMatcher> {
 
     override fun createDeveloperTool(
       configuration: DeveloperToolConfiguration,

@@ -6,7 +6,7 @@ import com.intellij.openapi.extensions.RequiredElement
 import com.intellij.util.xmlb.annotations.Attribute
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 
-class DeveloperToolFactoryEp<T : DeveloperToolFactory> : CustomLoadingExtensionPointBean<T>() {
+class DeveloperToolFactoryEp<T : DeveloperToolFactory<*>> : CustomLoadingExtensionPointBean<T>() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   @Attribute("id")
@@ -37,7 +37,7 @@ class DeveloperToolFactoryEp<T : DeveloperToolFactory> : CustomLoadingExtensionP
 
   companion object {
 
-    val EP_NAME: ExtensionPointName<DeveloperToolFactoryEp<out DeveloperToolFactory>> =
+    val EP_NAME: ExtensionPointName<DeveloperToolFactoryEp<out DeveloperToolFactory<*>>> =
       ExtensionPointName.create("dev.turingcomplete.intellijdevelopertoolsplugins.developerTool")
   }
 }

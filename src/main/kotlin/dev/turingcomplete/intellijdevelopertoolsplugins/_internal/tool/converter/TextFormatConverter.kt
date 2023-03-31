@@ -117,7 +117,7 @@ internal class TextFormatConverter(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory {
+  class Factory : DeveloperToolFactory<TextFormatConverter> {
 
     override fun createDeveloperTool(
       configuration: DeveloperToolConfiguration,
