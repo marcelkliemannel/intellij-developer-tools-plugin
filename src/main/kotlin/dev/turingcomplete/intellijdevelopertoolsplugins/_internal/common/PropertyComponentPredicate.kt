@@ -1,27 +1,33 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 
+import com.intellij.openapi.observable.properties.ObservableProperty
 import com.intellij.ui.layout.ComponentPredicate
-import kotlin.properties.Delegates
 
-class BooleanComponentPredicate(initialValue: Boolean) : ComponentPredicate() {
+class PropertyComponentPredicate<T>(
+  private val property: ObservableProperty<T>,
+  private val expectedValue: T
+) : ComponentPredicate() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val listeners = mutableListOf<(Boolean) -> Unit>()
+  private val listeners = mutableListOf<(T) -> Unit>()
 
-  var value: Boolean by Delegates.observable(initialValue) { _, oldValue, newValue ->
-    if (oldValue != newValue) {
-      listeners.forEach { it(newValue) }
+  // -- Initialization ---------------------------------------------------------------------------------------------- //
+
+  init {
+    property.afterChange { value ->
+      listeners.forEach { it(value) }
     }
   }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun addListener(listener: (Boolean) -> Unit) {
-    listeners.add(listener)
+    listeners.add { value ->
+      listener(value?.equals(expectedValue) ?: false)
+    }
   }
 
-  override fun invoke(): Boolean = value
+  override fun invoke(): Boolean = property.get()?.equals(expectedValue) ?: false
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

@@ -1,55 +1,61 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.jsonschema
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.intellij.icons.AllIcons
 import com.intellij.json.JsonLanguage
-import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.fileTypes.PlainTextLanguage
+import com.intellij.openapi.observable.properties.AtomicProperty
+import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.project.Project
-import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.selected
+import com.intellij.ui.layout.not
+import com.networknt.schema.JsonSchema
+import com.networknt.schema.JsonSchemaFactory
+import com.networknt.schema.SpecVersionDetector
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
-import net.pwall.json.schema.codegen.CodeGenerator
-import net.pwall.json.schema.codegen.TargetLanguage
-import java.io.PrintWriter
-import java.io.StringWriter
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.PropertyComponentPredicate
 
-
-class JsonSchemaCodeGenerator(
+class JsonSchemaValidator(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : DeveloperTool(
   developerToolContext = DeveloperToolContext(
-    menuTitle = "Schema to Code Generator",
-    contentTitle = "Schema to Code Generator"
+    menuTitle = "JSON Schema",
+    contentTitle = "JSON Schema Validator"
   ),
   parentDisposable = parentDisposable
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var codeLanguage = configuration.register("language", Language.JAVA)
-  private var liveConversion = configuration.register("liveConversion", true)
+  private var liveValidation = configuration.register("liveValidation", true)
 
   private val schemaEditor by lazy { this.createSchemaEditor() }
   private val schemaErrorHolder = ErrorHolder()
-  private val codeEditor by lazy { this.createCodeEditor() }
+  private val dataEditor by lazy { this.createDataEditor() }
+  private val dataErrorHolder = ErrorHolder()
 
-  private val codeStyles by lazy { LanguageCodeStyleSettingsProvider.EP_NAME.extensionList.associate { it.language.id to it.language } }
+  private val validationState: ObservableMutableProperty<ValidationState> = AtomicProperty(ValidationState.VALIDATED)
+  private val validationError: ObservableMutableProperty<String> = AtomicProperty("")
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
-    codeLanguage.afterChange {
-      codeStyles[it.languageId]?.let { codeStyle -> codeEditor.language = codeStyle }
-      transform()
+    liveValidation.afterChange {
+      if (it) {
+        validateSchema()
+      }
     }
   }
 
@@ -62,133 +68,172 @@ class JsonSchemaCodeGenerator(
     }.resizableRow()
 
     row {
-      comboBox(Language.values().toList())
-        .bindItem(codeLanguage)
-        .label("Generated code language:")
+      val liveValidationCheckBox = checkBox("Live validation")
+        .bindSelected(liveValidation)
+        .gap(RightGap.SMALL)
+
+      button("Validate") { validateSchema() }
+        .enabledIf(liveValidationCheckBox.selected.not())
+        .gap(RightGap.SMALL)
     }
 
     row {
-      cell(codeEditor.createComponent()).align(Align.FILL)
+      cell(dataEditor.createComponent()).align(Align.FILL)
+        .validationOnApply(dataEditor.bindValidator(dataErrorHolder.asValidation()))
     }.resizableRow()
+
+    row {
+      icon(AllIcons.General.InspectionsOK).gap(RightGap.SMALL)
+      label("Data matches schema")
+    }.visibleIf(PropertyComponentPredicate(validationState, ValidationState.VALIDATED))
+
+    row {
+      icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
+      label("").bindText(validationError)
+    }.visibleIf(PropertyComponentPredicate(validationState, ValidationState.ERROR))
+
+    row {
+      icon(AllIcons.General.Warning).gap(RightGap.SMALL)
+      label("Invalid input")
+    }.visibleIf(PropertyComponentPredicate(validationState, ValidationState.INVALID_INPUT))
   }
 
   override fun afterBuildUi() {
-    transform()
+    if (liveValidation.get()) {
+      validateSchema()
+    }
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun transform() {
+  private fun validateSchema() {
     schemaErrorHolder.unset()
+    dataErrorHolder.unset()
 
-    try {
-      val codeWriter = StringWriter()
-      val codeGenerator = CodeGenerator().apply {
-        targetLanguage = codeLanguage.get().targetLanguage
-        baseDirectoryName = "output/directory"
-        basePackageName = "com.example"
-
-        outputResolver = { PrintWriter(codeWriter) }
-      }
-      val schema = codeGenerator.schemaParser.parse(schemaEditor.text)
-      codeGenerator.generateClass(schema, "GeneratedClass")
-      codeEditor.text = codeWriter.toString()
+    val schema: JsonSchema? = try {
+      val schemaNode = objectMapper.readTree(schemaEditor.text)
+      JsonSchemaFactory.getInstance(SpecVersionDetector.detect(schemaNode)).getSchema(schemaNode)
     } catch (e: Exception) {
       schemaErrorHolder.set(e)
+      validationState.set(ValidationState.INVALID_INPUT)
+      null
+    }
+
+    val dataNode: JsonNode? = try {
+      objectMapper.readTree(dataEditor.text)
+    } catch (e: Exception) {
+      dataErrorHolder.set(e)
+      validationState.set(ValidationState.INVALID_INPUT)
+      null
     }
 
     // The `validate` in this class is not used as a validation mechanism. We
     // make use of its text field error UI to display the `errorHolder`.
     validate()
+
+    if (schema != null && dataNode != null) {
+      val errors = schema.validate(dataNode)
+      if (errors.isEmpty()) {
+        validationState.set(ValidationState.VALIDATED)
+      }
+      else {
+        validationState.set(ValidationState.ERROR)
+        validationError.set(
+          """
+            <html>
+            Data does not match schema:<br />
+              ${errors.joinToString(separator = "<br />") { "- $it" }}
+            </html>
+          """.trimIndent()
+        )
+      }
+    }
   }
 
   private fun createSchemaEditor() =
     DeveloperToolEditor(
-      title = "JSON Schema",
+      title = "JSON schema",
       editorMode = INPUT,
       parentDisposable = parentDisposable,
       initialLanguage = JsonLanguage.INSTANCE
     ).apply {
-      text = DEFAULT_SCHEMA
+      text = EXAMPLE_SCHEMA
       onTextChangeFromUi {
-        if (liveConversion.get()) {
-          transform()
+        if (liveValidation.get()) {
+          validateSchema()
         }
       }
     }
 
-  private fun createCodeEditor() =
+  private fun createDataEditor() =
     DeveloperToolEditor(
-      title = "Generated code",
-      editorMode = OUTPUT,
+      title = "JSON data",
+      editorMode = INPUT,
       parentDisposable = parentDisposable,
-      initialLanguage = codeStyles[codeLanguage.get().languageId] ?: PlainTextLanguage.INSTANCE
-    )
+      initialLanguage = JsonLanguage.INSTANCE
+    ).apply {
+      text = EXAMPLE_DATA
+      onTextChangeFromUi {
+        if (liveValidation.get()) {
+          validateSchema()
+        }
+      }
+    }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private enum class Language(val targetLanguage: TargetLanguage, val title: String, val languageId: String) {
+  private enum class ValidationState {
 
-    KOTLIN(TargetLanguage.KOTLIN, "Kotlin", "KOTLIN"),
-    JAVA(TargetLanguage.JAVA, "Java", "JAVA"),
-    TYPESCRIPT(TargetLanguage.TYPESCRIPT, "TypeScript", "TYPE_SCRIPT");
-
-    override fun toString(): String = title
+    VALIDATED,
+    ERROR,
+    INVALID_INPUT
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory<JsonSchemaCodeGenerator> {
+  class Factory : DeveloperToolFactory<JsonSchemaValidator> {
 
     override fun createDeveloperTool(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = JsonSchemaCodeGenerator(configuration, parentDisposable)
+    ) = JsonSchemaValidator(configuration, parentDisposable)
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 
   companion object {
 
-    private const val DEFAULT_SCHEMA = """
+    private val objectMapper = ObjectMapper()
+
+    private const val EXAMPLE_SCHEMA = """
 {
-  "${'$'}schema": "http://json-schema.org/draft/2019-09/schema",
-  "${'$'}id": "http://pwall.net/test",
-  "title": "Product",
+  "${'$'}id": "https://example.com/person.schema.json",
+  "${'$'}schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Person",
   "type": "object",
-  "required": ["id", "name", "price"],
   "properties": {
-    "id": {
-      "type": "number",
-      "description": "Product identifier"
-    },
-    "name": {
+    "firstName": {
       "type": "string",
-      "description": "Name of the product"
+      "description": "The person's first name."
     },
-    "price": {
-      "type": "number",
+    "lastName": {
+      "type": "string",
+      "description": "The person's last name."
+    },
+    "age": {
+      "description": "Age in years which must be equal to or greater than zero.",
+      "type": "integer",
       "minimum": 0
-    },
-    "tags": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "stock": {
-      "type": "object",
-      "properties": {
-        "warehouse": {
-          "type": "number"
-        },
-        "retail": {
-          "type": "number"
-        }
-      }
     }
   }
+}
+    """
+    private const val EXAMPLE_DATA = """
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "age": 21
 }
     """
   }

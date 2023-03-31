@@ -163,9 +163,13 @@
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.JsonPathTransformer$Factory"
             weight="10"/>
     <developerTool
+            id="json-schema-code-generator"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.jsonschema.JsonSchemaValidator$Factory"
+            weight="11"/>
+    <developerTool
             id="lorem-ipsum-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$Factory"
-            weight="11"/>
+            weight="12"/>
 
     <!-- formatter -->
     <developerTool
@@ -178,5 +182,6 @@
             groupId="formatter"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.SqlFormatterTransformer$Factory"
             weight="2"/>
+
   </extensions>
 </idea-plugin>

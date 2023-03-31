@@ -40,6 +40,10 @@ dependencies {
   implementation("dev.turingcomplete:text-case-converter-kotlin-extension:$textCaseConverterVersion")
   implementation("com.github.vertical-blank:sql-formatter:2.0.3")
   implementation(kotlin("stdlib"))
+  implementation("com.networknt:json-schema-validator:1.0.79") {
+    exclude("org.apache.commons", "commons-lang3")
+    exclude(group = "org.slf4j", module = "slf4j-api")
+  }
 
   testImplementation("org.assertj:assertj-core:3.24.2")
   testImplementation("org.xmlunit:xmlunit-assertj:2.9.1")
