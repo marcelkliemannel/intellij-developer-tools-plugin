@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.jsonschema
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper

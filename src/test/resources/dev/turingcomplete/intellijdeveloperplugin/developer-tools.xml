@@ -27,9 +27,9 @@
     <property key="liveTransformation" referenceId="code-style-formatter" value="kotlin.Boolean|true"/>
     <property key="liveConversion" referenceId="text-format-converter" value="kotlin.Boolean|true"/>
     <property key="secondLanguage" referenceId="text-format-converter"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextFormatConverter$Language|YAML"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.CodeFormattingConverter$Language|YAML"/>
     <property key="firstLanguage" referenceId="text-format-converter"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextFormatConverter$Language|JSON"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.CodeFormattingConverter$Language|JSON"/>
     <property key="liveConversion" referenceId="mime-base64-encoder-decoder" value="kotlin.Boolean|true"/>
     <property key="selectedRegexOption" referenceId="regular-expression-matcher" value="kotlin.Int|0"/>
     <property key="uppercase" referenceId="sql-formatter" value="kotlin.Boolean|true"/>

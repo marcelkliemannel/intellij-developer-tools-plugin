@@ -17,13 +17,13 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toPrettyStringWithDefaultObjectMapper
 
-internal class TextFormatConverter(
+internal class CodeFormattingConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextConverter(
   developerToolContext = DeveloperToolContext(
-    menuTitle = "Text Format Converter",
-    contentTitle = "Text Format Converter"
+    menuTitle = "Code Formatting",
+    contentTitle = "Code Formatting Converter"
   ),
   textConverterContext = TextConverterContext(
     convertActionTitle = "Convert",
@@ -118,13 +118,13 @@ internal class TextFormatConverter(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory<TextFormatConverter> {
+  class Factory : DeveloperToolFactory<CodeFormattingConverter> {
 
     override fun createDeveloperTool(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = TextFormatConverter(configuration, parentDisposable)
+    ) = CodeFormattingConverter(configuration, parentDisposable)
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

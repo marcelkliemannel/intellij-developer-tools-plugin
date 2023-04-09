@@ -138,7 +138,7 @@
 
     <developerTool
             id="text-format-converter"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextFormatConverter$Factory"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.CodeFormattingConverter$Factory"
             weight="2"/>
 
     <developerTool
@@ -164,7 +164,7 @@
             weight="10"/>
     <developerTool
             id="json-schema-code-generator"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.jsonschema.JsonSchemaValidator$Factory"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.JsonSchemaValidator$Factory"
             weight="11"/>
     <developerTool
             id="lorem-ipsum-generator"
