@@ -34,7 +34,7 @@ class CodeStyleFormatter(
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var selectedCodeStyleLanguageId = configuration.register("selectedLanguageId", FAVORITE_DEFAULT_LANGUAGE_ID)
+  private var selectedCodeStyleLanguageId = configuration.register("languageId", FAVORITE_DEFAULT_LANGUAGE_ID)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 

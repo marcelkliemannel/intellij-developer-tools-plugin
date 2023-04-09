@@ -10,16 +10,42 @@ import com.intellij.openapi.observable.util.bind
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.BottomGap
+import com.intellij.ui.dsl.builder.COLUMNS_MEDIUM
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.RowLayout
+import com.intellij.ui.dsl.builder.TopGap
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.columns
+import com.intellij.ui.dsl.builder.text
+import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
+import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.util.Alarm
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.*
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.*
-import kotlinx.datetime.*
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ToolBarPlace
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.copyable
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toMonospace
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.wrapWithToolBar
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.DAY
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.HOUR
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.MINUTE
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.MONTH
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.SECOND
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.TIME_ZONE
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.UNIX_TIMESTAMP_MILLIS
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.UNIX_TIMESTAMP_SECONDS
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.YEAR
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -39,7 +65,7 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
   private val currentUnixTimestampMillis: ObservableMutableProperty<String> = AtomicProperty(System.currentTimeMillis().toString())
 
   private val convertAlarm by lazy { Alarm(parentDisposable) }
-  private var selectedTimeZoneId = configuration.register("selectedTimeZoneId", TimeZone.currentSystemDefault().id)
+  private var selectedTimeZoneId = configuration.register("timeZoneId", TimeZone.currentSystemDefault().id)
   private lateinit var unixTimeStampSecondsTextField: JBTextField
   private lateinit var unixTimeStampMillisTextField: JBTextField
   private lateinit var dayTextField: JBTextField
@@ -170,8 +196,8 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
   }
 
   override fun getData(dataId: String): Any? = when {
-    TIMESTAMP_SECONDS_CONTENT_DATA_KEY.`is`(dataId) -> currentUnixTimestampSeconds.toString()
-    TIMESTAMP_MILLIS_CONTENT_DATA_KEY.`is`(dataId) -> currentUnixTimestampMillis.toString()
+    TIMESTAMP_SECONDS_CONTENT_DATA_KEY.`is`(dataId) -> currentUnixTimestampSeconds.get()
+    TIMESTAMP_MILLIS_CONTENT_DATA_KEY.`is`(dataId) -> currentUnixTimestampMillis.get()
     FORMATTED_ISO_8601_CONTENT_DATA_KEY.`is`(dataId) -> formattedIso8601.text
     FORMATTED_ISO_8601_UTC_CONTENT_DATA_KEY.`is`(dataId) -> formattedIso8601Utc.text
     FORMATTED_ISO_8601_WITH_ZONE_CONTENT_DATA_KEY.`is`(dataId) -> formattedIso8601WithZone.text

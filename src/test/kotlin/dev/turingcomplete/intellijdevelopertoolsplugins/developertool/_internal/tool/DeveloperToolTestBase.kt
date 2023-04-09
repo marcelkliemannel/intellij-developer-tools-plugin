@@ -27,6 +27,11 @@ abstract class DeveloperToolTestBase<T : DeveloperTool>(
     }
   }
 
+  protected fun uiInput(runnable: () -> Unit) {
+    ApplicationManager.getApplication().invokeAndWait { runnable() }
+    shortWait()
+  }
+
   protected fun runInEdt(runnable: () -> Unit) {
     ApplicationManager.getApplication().invokeAndWait { runnable() }
   }

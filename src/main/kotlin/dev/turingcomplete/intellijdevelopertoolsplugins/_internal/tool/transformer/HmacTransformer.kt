@@ -4,10 +4,15 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.observable.properties.AtomicProperty
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.project.Project
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.COLUMNS_LARGE
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.columns
+import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateNonEmpty
 import org.bouncycastle.util.encoders.Hex
 import java.security.Security
 import javax.crypto.Mac
@@ -32,7 +37,7 @@ internal class HmacTransformer(
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var selectedAlgorithm = configuration.register("selectedAlgorithm", DEFAULT_ALGORITHM)
+  private var selectedAlgorithm = configuration.register("algorithm", DEFAULT_ALGORITHM)
 
   private val secretKey: ObservableMutableProperty<String> = AtomicProperty("")
 
@@ -84,15 +89,7 @@ internal class HmacTransformer(
         .label("Secret key:")
         .bindText(secretKey)
         .columns(COLUMNS_LARGE)
-        //.align(Align.FILL)
-        .validation {
-          if (it.text.isEmpty()) {
-            error("A secret key must be provided")
-          }
-          else {
-            null
-          }
-        }
+        .validateNonEmpty("A secret key must be provided")
     }
   }
 

@@ -78,7 +78,7 @@ class RegularExpressionMatcher(
 ), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var selectedRegexOptionFlag = configuration.register("selectedRegexOption", 0)
+  private var selectedRegexOptionFlag = configuration.register("regexOption", 0)
 
   private val regexInputEditor: EditorTextField by lazy { createRegexInputEditor(project) }
   private val inputEditor: DeveloperToolEditor by lazy { createInputEditor() }
@@ -161,7 +161,7 @@ class RegularExpressionMatcher(
    */
   private fun match() {
     inputEditor.removeAllTextRangeHighlighters()
-    regexInputErrorHolder.unset()
+    regexInputErrorHolder.clear()
     matchResultsTableModel.setMatches(emptyList())
 
     val regex = regexInputEditor.text
@@ -192,7 +192,7 @@ class RegularExpressionMatcher(
 
       matchResultsTableModel.setMatches(results)
     } catch (e: Exception) {
-      regexInputErrorHolder.set(e)
+      regexInputErrorHolder.add(e)
     }
 
     // The `validate` in this class is not used as a validation mechanism. We
@@ -455,7 +455,7 @@ class RegularExpressionMatcher(
     private const val REGEX_MATCH_HIGHLIGHT_LAYER = HighlighterLayer.SELECTION - 2
     private const val REGEX_MATCH_SELECTED_HIGHLIGHT_LAYER = HighlighterLayer.SELECTION - 1
 
-    private const val SELECTED_MATCH_RESULT_HIGHLIGHTING_GROUP_ID = "selectedMatchResultHighlighting"
+    private const val SELECTED_MATCH_RESULT_HIGHLIGHTING_GROUP_ID = "matchResultHighlighting"
 
     private val matchResultAfterFirstMatchBorder = JBUI.Borders.customLineTop(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground())
     private val matchResultGroupBorder = JBUI.Borders.emptyLeft(5)

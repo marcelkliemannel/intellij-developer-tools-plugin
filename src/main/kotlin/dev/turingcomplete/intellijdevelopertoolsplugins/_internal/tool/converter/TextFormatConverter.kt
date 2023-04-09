@@ -15,6 +15,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toPrettyStringWithDefaultObjectMapper
 
 internal class TextFormatConverter(
   configuration: DeveloperToolConfiguration,
@@ -81,11 +82,11 @@ internal class TextFormatConverter(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun covert(errorHolder: ErrorHolder, doConvert: () -> Unit) {
-    errorHolder.unset()
+    errorHolder.clear()
     try {
       doConvert()
     } catch (e: Exception) {
-      errorHolder.set(e)
+      errorHolder.add(e)
     }
 
     // The `validate` in this class is not used as a validation mechanism. We
@@ -112,7 +113,7 @@ internal class TextFormatConverter(
 
     fun parse(text: String): JsonNode = objectMapper.readTree(text)
 
-    fun asString(root: JsonNode): String = objectMapper.writeValueAsString(root)
+    fun asString(root: JsonNode): String = root.toPrettyStringWithDefaultObjectMapper()
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

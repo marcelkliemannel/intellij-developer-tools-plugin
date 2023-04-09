@@ -21,6 +21,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.allowUiDslLabel
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.objectMapper
 
 class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable)
   : TextTransformer(
@@ -56,7 +57,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
   }
 
   override fun transform() {
-    errorHolder.unset()
+    errorHolder.clear()
 
     if (sourceText.isBlank() || queryEditor.text.isBlank()) {
       return
@@ -65,11 +66,11 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
     try {
       val result = JsonPath.parse(sourceText, jsonPathConfiguration).read<Any>(queryEditor.text)
       resultText = when (result) {
-        is ArrayNode -> result.toPrettyString()
+        is ArrayNode -> objectMapper.writeValueAsString(result)
         else -> result.toString()
       }
     } catch (e: JsonPathException) {
-      errorHolder.set(e)
+      errorHolder.add(e)
     }
 
     // The `validate` in this class is not used as a validation mechanism. We

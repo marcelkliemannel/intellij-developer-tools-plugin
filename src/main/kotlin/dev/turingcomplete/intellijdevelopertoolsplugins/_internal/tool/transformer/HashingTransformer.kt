@@ -29,7 +29,7 @@ internal class HashingTransformer(
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var selectedAlgorithm = configuration.register("selectedAlgorithm", DEFAULT_ALGORITHM)
+  private var selectedAlgorithm = configuration.register("algorithm", DEFAULT_ALGORITHM)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 

@@ -47,6 +47,7 @@ dependencies {
 
   testImplementation("org.assertj:assertj-core:3.24.2")
   testImplementation("org.xmlunit:xmlunit-assertj:2.9.1")
+  testImplementation("org.skyscreamer:jsonassert:1.5.0")
 }
 
 intellij {

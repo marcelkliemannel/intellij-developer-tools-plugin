@@ -19,6 +19,7 @@ import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.FocusChangeListener
 import com.intellij.openapi.editor.impl.EditorFactoryImpl
+import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
@@ -27,6 +28,7 @@ import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.ide.CopyPasteManager
+import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.Disposer
@@ -35,13 +37,10 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.ui.ColorUtil
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.layout.ValidationInfoBuilder
-import com.intellij.util.ObjectUtils
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import org.jetbrains.annotations.TestOnly
-import java.awt.Component
-import java.awt.Graphics
 import java.awt.datatransfer.StringSelection
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
@@ -49,7 +48,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.swing.JComponent
 import javax.swing.ScrollPaneConstants
-import javax.swing.border.LineBorder
 
 internal class DeveloperToolEditor(
         private val title: String?,
@@ -66,13 +64,11 @@ internal class DeveloperToolEditor(
 
   private val editor: EditorEx by lazy { createEditor() }
 
+  val textProperty: ObservableMutableProperty<String> by lazy { EditorTextProperty(editor) }
+
   var text: String
-    set(value) = runWriteAction {
-      editor.document.setText(value)
-    }
-    get() = runReadAction {
-      editor.document.text
-    }
+    set(value) = textProperty.set(value)
+    get() = textProperty.get()
 
   var isDisposed: Boolean = false
     private set
@@ -108,7 +104,7 @@ internal class DeveloperToolEditor(
         title?.let {
           addToTop(JBLabel("$it ${editorMode.title}:"))
         }
-        editor.component.border = EditorBorder(editor.component)
+        editor.component.border = ValidationResultBorder(editor.component, editor.contentComponent)
         val editorComponent = editor.component.wrapWithToolBar(DeveloperToolEditor::class.java.simpleName, createActions(), ToolBarPlace.RIGHT)
         addToCenter(editorComponent)
         // This prevents the `Editor` from increasing the size of the dialog if
@@ -136,17 +132,22 @@ internal class DeveloperToolEditor(
     rangeHighlighters.remove(groupId)
   }
 
-  fun highlightTextRange(textRange: TextRange, layer: Int, textAttributes: TextAttributes, groupId: String = "other") {
-    rangeHighlighters.computeIfAbsent(groupId) { mutableListOf() }
-      .add(
-        editor.markupModel.addRangeHighlighter(
-          textRange.startOffset,
-          textRange.endOffset,
-          layer,
-          textAttributes,
-          HighlighterTargetArea.EXACT_RANGE
-        )
-      )
+  fun highlightTextRange(
+    textRange: TextRange,
+    layer: Int,
+    textAttributes: TextAttributes?,
+    groupId: String = "other",
+    gutterIconRenderer: GutterIconRenderer? = null,
+  ) {
+    val rangeHighlighter = editor.markupModel.addRangeHighlighter(
+      textRange.startOffset,
+      textRange.endOffset,
+      layer,
+      textAttributes,
+      HighlighterTargetArea.EXACT_RANGE
+    )
+    rangeHighlighter.gutterIconRenderer = gutterIconRenderer
+    rangeHighlighters.computeIfAbsent(groupId) { mutableListOf() }.add(rangeHighlighter)
   }
 
   @TestOnly
@@ -337,21 +338,27 @@ internal class DeveloperToolEditor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class EditorBorder(private val ownerComponent: JComponent) : LineBorder(defaultEditorBorder, 1) {
+  private class EditorTextProperty(private val editor: Editor) : ObservableMutableProperty<String> {
 
-    private val errorBorder by lazy { JBUI.CurrentTheme.Focus.errorColor(false) }
-    private val errorFocusBorder by lazy { JBUI.CurrentTheme.Focus.errorColor(true) }
-    private val warningBorder by lazy { JBUI.CurrentTheme.Focus.warningColor(false) }
-    private val warningFocusBorder by lazy { JBUI.CurrentTheme.Focus.warningColor(true) }
+    private val listeners: MutableSet<(String) -> Unit> = mutableSetOf()
 
-    override fun paintBorder(c: Component?, g: Graphics?, x: Int, y: Int, width: Int, height: Int) {
-      val outline = ObjectUtils.tryCast(ownerComponent.getClientProperty("JComponent.outline"), String::class.java)
-      this.lineColor = when (outline) {
-        "error" -> if (ownerComponent.hasFocus()) errorBorder else errorFocusBorder
-        "warning" -> if (ownerComponent.hasFocus()) warningBorder else warningFocusBorder
-        else -> defaultEditorBorder
+    override fun set(value: String) {
+      runWriteAction {
+        editor.document.setText(value)
       }
-      super.paintBorder(c, g, x, y, width, height)
+    }
+
+    override fun afterChange(listener: (String) -> Unit) {
+      listeners.add(listener)
+    }
+
+    override fun afterChange(listener: (String) -> Unit, parentDisposable: Disposable) {
+      listeners.add(listener)
+      Disposer.register(parentDisposable) { listeners.remove(listener) }
+    }
+
+    override fun get(): String = runReadAction {
+      editor.document.text
     }
   }
 
@@ -361,6 +368,5 @@ internal class DeveloperToolEditor(
 
     private val editorActiveKey = Key<Boolean>("editorActive")
     private val timestampFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-SS")
-    private val defaultEditorBorder = JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground()
   }
 }

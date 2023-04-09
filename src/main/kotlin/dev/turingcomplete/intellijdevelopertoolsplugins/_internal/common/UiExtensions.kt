@@ -12,11 +12,13 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.UIBundle
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBRadioButton
+import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.DslComponentProperty
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.ValidationInfoBuilder
+import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Font
@@ -26,6 +28,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
 import javax.swing.JTable
+import javax.swing.border.CompoundBorder
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
 // -- Exposed Methods ----------------------------------------------------------------------------------------------- //
@@ -74,6 +77,21 @@ fun Cell<JBTextField>.bindIntTextImproved(property: ObservableMutableProperty<In
   this.whenTextChangedFromUi {
     it.toIntOrNull()?.let { intValue -> property.set(intValue) }
   }
+}
+
+fun Cell<JBTextField>.validateNonEmpty(errorMessage: String) = this.applyToComponent {
+  validation {
+    if (it.text.isEmpty()) {
+      ValidationInfo(errorMessage)
+    }
+    else {
+      null
+    }
+  }
+}
+
+fun Cell<JBTextArea>.setValidationResultBorder() = this.applyToComponent {
+  border = CompoundBorder(ValidationResultBorder(this), JBEmptyBorder(3, 5, 3, 5))
 }
 
 fun validateMinMaxValueRelation(side: ValidateMinIntValueSide, getOppositeValue: () -> Int):

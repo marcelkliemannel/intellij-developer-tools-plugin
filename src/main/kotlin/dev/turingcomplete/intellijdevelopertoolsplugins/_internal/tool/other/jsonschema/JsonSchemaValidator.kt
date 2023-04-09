@@ -107,14 +107,14 @@ class JsonSchemaValidator(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun validateSchema() {
-    schemaErrorHolder.unset()
-    dataErrorHolder.unset()
+    schemaErrorHolder.clear()
+    dataErrorHolder.clear()
 
     val schema: JsonSchema? = try {
       val schemaNode = objectMapper.readTree(schemaEditor.text)
       JsonSchemaFactory.getInstance(SpecVersionDetector.detect(schemaNode)).getSchema(schemaNode)
     } catch (e: Exception) {
-      schemaErrorHolder.set(e)
+      schemaErrorHolder.add(e)
       validationState.set(ValidationState.INVALID_INPUT)
       null
     }
@@ -122,7 +122,7 @@ class JsonSchemaValidator(
     val dataNode: JsonNode? = try {
       objectMapper.readTree(dataEditor.text)
     } catch (e: Exception) {
-      dataErrorHolder.set(e)
+      dataErrorHolder.add(e)
       validationState.set(ValidationState.INVALID_INPUT)
       null
     }
