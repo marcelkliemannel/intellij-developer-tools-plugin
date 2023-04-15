@@ -12,6 +12,8 @@ import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
+import javax.swing.Action
+import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants
 import kotlin.properties.Delegates
@@ -30,7 +32,6 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
 
   init {
     title = "Developer Tools"
-    setOKButtonText("Close")
     setSize(900, 700)
     isModal = false
     isAutoAdjustable = false
@@ -61,7 +62,9 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
 
   override fun getStyle(): DialogStyle = DialogStyle.COMPACT
 
-  override fun createActions() = arrayOf(okAction)
+  override fun createActions() = emptyArray<Action>()
+
+  override fun createSouthPanel(): JComponent? = null
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
