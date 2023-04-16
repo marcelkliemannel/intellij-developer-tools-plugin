@@ -1,8 +1,8 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
 
 import com.intellij.ui.ScrollPaneFactory
+import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.components.BorderLayoutPanel
@@ -30,7 +30,7 @@ internal class DeveloperToolContentPanel(private val developerTool: DeveloperToo
     row {
       label(developerTool.developerToolContext.contentTitle)
         .applyToComponent { font = JBFont.label().asBold() }
-        .horizontalAlign(HorizontalAlign.FILL)
+        .align(Align.FILL)
         .resizableColumn()
 
       if (developerTool.developerToolContext.supportsReset) {

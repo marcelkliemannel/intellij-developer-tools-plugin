@@ -3,12 +3,12 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generato
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.selected
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
@@ -20,7 +20,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_LOWERCASE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_UPPERCASE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator.LettersMode.NONE
-import io.ktor.util.toCharArray
+import io.ktor.util.*
 import org.apache.commons.text.RandomStringGenerator
 import java.security.SecureRandom
 import javax.swing.JComponent
@@ -49,6 +49,7 @@ internal class PasswordGenerator(
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
+  @Suppress("UnstableApiUsage")
   override fun Panel.buildConfigurationUi() {
     rowsRange {
       row {
@@ -56,33 +57,33 @@ internal class PasswordGenerator(
           .label("Length:")
           .validateLongValue(LongRange(1, 100))
           .bindIntTextImproved(length)
-          .horizontalAlign(HorizontalAlign.FILL)
+          .align(Align.FILL)
       }.layout(RowLayout.PARENT_GRID)
 
       row {
         comboBox(LettersMode.values().toList())
           .label("Letters:")
           .bindItem(lettersMode)
-          .validation(validateAtLeastOneCharacter())
+          .validationInfo(validateAtLeastOneCharacter())
           .component
       }.layout(RowLayout.PARENT_GRID)
 
       row {
         checkBox("Add digits")
           .bindSelected(addDigits)
-          .validation(validateAtLeastOneCharacter())
-          .horizontalAlign(HorizontalAlign.FILL)
+          .validationInfo(validateAtLeastOneCharacter())
+          .align(Align.FILL)
       }.layout(RowLayout.PARENT_GRID)
 
       row {
         val addSymbolsCheckBox = checkBox("Add symbols:")
           .bindSelected(addSymbols)
-          .validation(validateAtLeastOneCharacter())
+          .validationInfo(validateAtLeastOneCharacter())
           .component
         textField()
           .bindText(symbols)
           .enabledIf(addSymbolsCheckBox.selected)
-          .horizontalAlign(HorizontalAlign.FILL)
+          .align(Align.FILL)
       }.layout(RowLayout.PARENT_GRID)
 
       onReset {

@@ -170,6 +170,10 @@
             id="lorem-ipsum-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$Factory"
             weight="12"/>
+    <developerTool
+            id="qr-code-generator"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.BarcodeGenerator$Factory"
+            weight="13"/>
 
     <!-- formatter -->
     <developerTool

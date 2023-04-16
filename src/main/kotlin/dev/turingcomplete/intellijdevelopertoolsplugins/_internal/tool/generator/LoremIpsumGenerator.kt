@@ -6,15 +6,24 @@ import ai.grazie.utils.capitalize
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.COLUMNS_TINY
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.layout.ComboBoxPredicate
-import dev.turingcomplete.intellijdevelopertoolsplugins.*
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ValidateMinIntValueSide.MAX
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ValidateMinIntValueSide.MIN
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateMinMaxValueRelation
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator.TextMode.*
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator.TextMode.BULLETS
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator.TextMode.PARAGRAPHS
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator.TextMode.WORDS
 import java.security.SecureRandom
 import kotlin.math.max
 import kotlin.math.min
@@ -64,14 +73,14 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
         .bindIntTextImproved(minWordsInParagraph)
         .validateLongValue(LongRange(1, 999))
         .columns(COLUMNS_TINY)
-        .validation(validateMinMaxValueRelation(MIN) { maxWordsInParagraph.get() })
+        .validateMinMaxValueRelation(MIN) { maxWordsInParagraph.get() }
         .gap(RightGap.SMALL)
       textField()
         .label("Maximum:")
         .bindIntTextImproved(maxWordsInParagraph)
         .validateLongValue(LongRange(1, 999))
         .columns(COLUMNS_TINY)
-        .validation(validateMinMaxValueRelation(MAX) { minWordsInParagraph.get() })
+        .validateMinMaxValueRelation(MAX) { minWordsInParagraph.get() }
     }.visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == PARAGRAPHS })
 
     row {
@@ -80,14 +89,14 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
         .bindIntTextImproved(minWordsInBullet)
         .validateLongValue(LongRange(1, 999))
         .columns(COLUMNS_TINY)
-        .validation(validateMinMaxValueRelation(MIN) { maxWordsInBullet.get() })
+        .validateMinMaxValueRelation(MIN) { maxWordsInBullet.get() }
         .gap(RightGap.SMALL)
       textField()
         .label("Maximum:")
         .bindIntTextImproved(maxWordsInBullet)
         .validateLongValue(LongRange(1, 999))
         .columns(COLUMNS_TINY)
-        .validation(validateMinMaxValueRelation(MAX) { minWordsInBullet.get() })
+        .validateMinMaxValueRelation(MAX) { minWordsInBullet.get() }
     }.visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == BULLETS })
 
     row {

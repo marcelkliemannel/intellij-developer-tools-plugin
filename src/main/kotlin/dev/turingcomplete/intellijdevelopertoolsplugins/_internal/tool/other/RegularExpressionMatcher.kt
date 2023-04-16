@@ -41,7 +41,6 @@ import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.whenStateChangedFromUi
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
@@ -101,7 +100,7 @@ class RegularExpressionMatcher(
       cell(regexInputEditor)
         .label("Regular expression:", LabelPosition.TOP)
         .validationOnApply(regexInputErrorHolder.asValidation())
-        .horizontalAlign(HorizontalAlign.FILL)
+        .align(Align.FILL)
         .resizableColumn()
         .gap(RightGap.SMALL)
       cell(createSelectRegexOptionsButton())
@@ -135,7 +134,7 @@ class RegularExpressionMatcher(
       }
       cell(matchResultsTableWrapper)
         .label("Matches:", LabelPosition.TOP)
-        .horizontalAlign(HorizontalAlign.FILL)
+        .align(Align.FILL)
     }.topGap(TopGap.SMALL)
   }
 

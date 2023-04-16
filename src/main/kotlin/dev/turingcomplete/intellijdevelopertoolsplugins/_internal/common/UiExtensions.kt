@@ -9,6 +9,7 @@ import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.JBColor
 import com.intellij.ui.UIBundle
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBRadioButton
@@ -17,10 +18,10 @@ import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.DslComponentProperty
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
-import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.components.BorderLayoutPanel
+import java.awt.Color
 import java.awt.Font
 import java.awt.event.InputEvent
 import java.awt.event.ItemEvent
@@ -28,6 +29,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
 import javax.swing.JTable
+import javax.swing.JTextField
 import javax.swing.border.CompoundBorder
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
@@ -37,7 +39,7 @@ import javax.swing.border.CompoundBorder
  * The UI DSL only verifies the range of an `intTextField` on a user input.
  */
 fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) = this.apply {
-  validation {
+  validationInfo {
     if (this@validateLongValue.component.isEnabled) {
       val value = this@validateLongValue.component.text.toLongOrNull()
       when {
@@ -79,8 +81,9 @@ fun Cell<JBTextField>.bindIntTextImproved(property: ObservableMutableProperty<In
   }
 }
 
+@Suppress("UnstableApiUsage")
 fun Cell<JBTextField>.validateNonEmpty(errorMessage: String) = this.applyToComponent {
-  validation {
+  validationInfo {
     if (it.text.isEmpty()) {
       ValidationInfo(errorMessage)
     }
@@ -94,26 +97,27 @@ fun Cell<JBTextArea>.setValidationResultBorder() = this.applyToComponent {
   border = CompoundBorder(ValidationResultBorder(this), JBEmptyBorder(3, 5, 3, 5))
 }
 
-fun validateMinMaxValueRelation(side: ValidateMinIntValueSide, getOppositeValue: () -> Int):
-        ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
-  if (this.component.isEnabled) {
-    it.text?.toIntOrNull()?.let { thisValue ->
-      when {
-        side == ValidateMinIntValueSide.MIN && thisValue > getOppositeValue() -> {
-          ValidationInfo("Minimum must be smaller than or equal to maximum")
+@Suppress("UnstableApiUsage")
+fun <T : JTextField> Cell<T>.validateMinMaxValueRelation(side: ValidateMinIntValueSide, getOppositeValue: () -> Int): Cell<T> =
+  this.validationInfo {
+    if (this.component.isEnabled) {
+      it.text?.toIntOrNull()?.let { thisValue ->
+        when {
+          side == ValidateMinIntValueSide.MIN && thisValue > getOppositeValue() -> {
+            ValidationInfo("Minimum must be smaller than or equal to maximum")
+          }
+
+          side == ValidateMinIntValueSide.MAX && thisValue < getOppositeValue() ->
+            ValidationInfo("Maximum must be larger than or equal to minimum")
+
+          else -> null
         }
-
-        side == ValidateMinIntValueSide.MAX && thisValue < getOppositeValue() ->
-          ValidationInfo("Maximum must be larger than or equal to minimum")
-
-        else -> null
       }
     }
+    else {
+      null
+    }
   }
-  else {
-    null
-  }
-}
 
 fun JBLabel.copyable() = this.apply { setCopyable(true) }
 
@@ -168,6 +172,8 @@ fun EditorEx.setLanguage(language: Language) {
   val syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(language, project, null)
   highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(syntaxHighlighter, EditorColorsManager.getInstance().globalScheme)
 }
+
+fun Color.toJBColor() = if (this is JBColor) this else JBColor(this, this)
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

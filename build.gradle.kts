@@ -44,6 +44,9 @@ dependencies {
     exclude("org.apache.commons", "commons-lang3")
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
+  val zxing = "3.5.1"
+  implementation("com.google.zxing:core:$zxing")
+  implementation("com.google.zxing:javase:$zxing")
 
   testImplementation("org.assertj:assertj-core:3.24.2")
   testImplementation("org.xmlunit:xmlunit-assertj:2.9.1")

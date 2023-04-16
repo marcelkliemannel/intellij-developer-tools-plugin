@@ -4,7 +4,13 @@ import com.fasterxml.uuid.Generators
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.selected
+import com.intellij.ui.dsl.builder.text
+import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
@@ -50,7 +56,7 @@ abstract class NamespaceAndNameBasedUuidGenerator(
             .gap(RightGap.SMALL)
           textField()
             .text(individualNamespace.get())
-            .validation(validateIndividualNamespace())
+            .validationInfo(validateIndividualNamespace())
             .whenTextChangedFromUi(parentDisposable) { individualNamespace.set(it) }
             .enabledIf(individualRadioButton.selected).component
         }

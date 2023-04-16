@@ -206,7 +206,7 @@ class JsonSchemaValidator(
 
     private val objectMapper = ObjectMapper()
 
-    private const val EXAMPLE_SCHEMA = """
+    private val EXAMPLE_SCHEMA = """
 {
   "${'$'}id": "https://example.com/person.schema.json",
   "${'$'}schema": "https://json-schema.org/draft/2020-12/schema",
@@ -228,13 +228,13 @@ class JsonSchemaValidator(
     }
   }
 }
-    """
-    private const val EXAMPLE_DATA = """
+    """.trimIndent()
+    private val EXAMPLE_DATA = """
 {
   "firstName": "John",
   "lastName": "Doe",
   "age": 21
 }
-    """
+    """.trimIndent()
   }
 }

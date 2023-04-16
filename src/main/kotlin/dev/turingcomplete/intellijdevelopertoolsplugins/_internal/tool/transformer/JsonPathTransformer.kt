@@ -10,7 +10,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.EditorTextField
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.dsl.builder.*
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.jayway.jsonpath.Configuration
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.JsonPathException
@@ -52,7 +51,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
       cell(queryEditor)
         .label("JSON path:", LabelPosition.TOP)
         .validationOnApply(errorHolder.asValidation())
-        .horizontalAlign(HorizontalAlign.FILL)
+        .align(Align.FILL)
     }
   }
 

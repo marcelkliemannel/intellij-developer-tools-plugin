@@ -177,7 +177,7 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
           .bindText(jwt.signature.publicKey)
           .setValidationResultBorder()
           .whenTextChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
-          .validation(jwt.signature.publicKeyErrorHolder.asValidation())
+          .validationInfo(jwt.signature.publicKeyErrorHolder.asValidation())
 
         textArea()
           .rows(2)
@@ -187,7 +187,7 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
           .bindText(jwt.signature.privateKey)
           .setValidationResultBorder()
           .whenTextChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
-          .validation(jwt.signature.privateKeyErrorHolder.asValidation())
+          .validationInfo(jwt.signature.privateKeyErrorHolder.asValidation())
       }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind != HMAC })
     }
   }

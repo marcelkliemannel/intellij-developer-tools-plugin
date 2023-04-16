@@ -4,13 +4,19 @@ import com.fasterxml.uuid.EthernetAddress
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.asSequence
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.selected
+import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toHexMacAddress
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.*
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.INDIVIDUAL
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.LOCAL_INTERFACE
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.RANDOM
 import java.net.NetworkInterface
 import java.net.SocketException
 
@@ -42,7 +48,7 @@ abstract class MacAddressBasedUuidGenerator(
           .gap(RightGap.SMALL)
         textField()
           .bindText(individualMacAddress)
-          .validation(validateIndividualMacAddress())
+          .validationInfo(validateIndividualMacAddress())
           .enabledIf(individualRadioButton.selected).component
       }
 
