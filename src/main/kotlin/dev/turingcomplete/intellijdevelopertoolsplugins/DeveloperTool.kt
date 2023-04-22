@@ -12,7 +12,6 @@ import java.awt.Dimension
 import javax.swing.JComponent
 
 abstract class DeveloperTool(
-  val developerToolContext: DeveloperToolContext,
   protected val parentDisposable: Disposable
 ) : DataProvider, Disposable {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -81,8 +80,6 @@ abstract class DeveloperTool(
   open fun doDispose() {
     // Override if needed
   }
-
-  override fun toString(): String = developerToolContext.contentTitle
 
   internal fun reset() {
     panel.reset()

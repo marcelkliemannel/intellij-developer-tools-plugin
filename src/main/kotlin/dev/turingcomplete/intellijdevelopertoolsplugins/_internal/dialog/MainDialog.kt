@@ -11,7 +11,6 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -25,7 +24,7 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
   private var selectedContentNode: ContentNode? by Delegates.observable(null, handleContentNodeSelection())
   private val contentPanel = BorderLayoutPanel()
   private val groupsPanels = mutableMapOf<String, GroupContentPanel>()
-  private val developerToolsPanels = mutableMapOf<DeveloperTool, DeveloperToolContentPanel>()
+  private val developerToolsPanels = mutableMapOf<DeveloperToolNode, DeveloperToolContentPanel>()
   private lateinit var menuTree: MainMenuTree
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
@@ -81,7 +80,7 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
             }
           }.panel
 
-          is DeveloperToolNode -> developerToolsPanels.getOrPut(new.developerTool) { DeveloperToolContentPanel(new.developerTool) }.panel
+          is DeveloperToolNode -> developerToolsPanels.getOrPut(new) { DeveloperToolContentPanel(new) }.panel
           else -> error("Unexpected menu node: ${new::class}")
         }
         new.selected()

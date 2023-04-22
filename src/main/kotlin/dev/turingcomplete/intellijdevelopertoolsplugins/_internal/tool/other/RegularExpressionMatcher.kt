@@ -71,10 +71,7 @@ class RegularExpressionMatcher(
   private val configuration: DeveloperToolConfiguration,
   project: Project?,
   parentDisposable: Disposable
-) : DeveloperTool(
-  developerToolContext = DeveloperToolContext(menuTitle = "Regular Expression", contentTitle = "Regular Expression Matcher"),
-  parentDisposable = parentDisposable
-), DeveloperToolConfiguration.ChangeListener {
+) : DeveloperTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var selectedRegexOptionFlag = configuration.register("regexOption", 0)
@@ -437,11 +434,16 @@ class RegularExpressionMatcher(
 
   class Factory : DeveloperToolFactory<RegularExpressionMatcher> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Regular Expression",
+      contentTitle = "Regular Expression Matcher"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = RegularExpressionMatcher(configuration, project, parentDisposable)
+    ): () -> RegularExpressionMatcher = { RegularExpressionMatcher(configuration, project, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

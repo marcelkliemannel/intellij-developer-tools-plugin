@@ -5,15 +5,13 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 
 abstract class MultiLineTextGenerator(
-  developerToolContext: DeveloperToolContext,
   private val generatedTextTitle: String,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
-) : DeveloperTool(developerToolContext, parentDisposable), DeveloperToolConfiguration.ChangeListener {
+) : DeveloperTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val generatedTextEditor: DeveloperToolEditor by lazy { createGeneratedTextEditor() }

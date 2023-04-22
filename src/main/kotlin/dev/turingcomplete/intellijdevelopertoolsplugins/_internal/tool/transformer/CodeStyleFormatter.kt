@@ -20,10 +20,6 @@ class CodeStyleFormatter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextTransformer(
-  developerToolContext = DeveloperToolContext(
-    menuTitle = "Code Style Formatting",
-    contentTitle = "Code Style Formatter"
-  ),
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Format",
     sourceTitle = "Original",
@@ -94,11 +90,16 @@ class CodeStyleFormatter(
 
   class Factory : DeveloperToolFactory<CodeStyleFormatter> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Code Style Formatting",
+      contentTitle = "Code Style Formatter"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): CodeStyleFormatter? {
+    ): (() -> CodeStyleFormatter)? {
       if (project == null) {
         return null
       }
@@ -111,7 +112,9 @@ class CodeStyleFormatter(
         return null
       }
 
-      return CodeStyleFormatter(codeStyles, project, configuration, parentDisposable)
+      return {
+        CodeStyleFormatter(codeStyles, project, configuration, parentDisposable)
+      }
     }
   }
 

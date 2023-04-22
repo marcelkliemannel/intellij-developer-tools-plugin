@@ -40,6 +40,7 @@ import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import org.jetbrains.annotations.TestOnly
 import java.awt.datatransfer.StringSelection
 import java.nio.file.Files
@@ -50,10 +51,10 @@ import javax.swing.JComponent
 import javax.swing.ScrollPaneConstants
 
 internal class DeveloperToolEditor(
-        private val title: String?,
-        private val editorMode: EditorMode,
-        private val parentDisposable: Disposable,
-        initialLanguage: Language = PlainTextLanguage.INSTANCE
+  private val title: String?,
+  private val editorMode: EditorMode,
+  private val parentDisposable: Disposable,
+  initialLanguage: Language = PlainTextLanguage.INSTANCE
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -150,6 +151,16 @@ internal class DeveloperToolEditor(
     rangeHighlighters.computeIfAbsent(groupId) { mutableListOf() }.add(rangeHighlighter)
   }
 
+  fun setConfigurationHandler(
+    id: String,
+    configuration: DeveloperToolConfiguration,
+    defaultText: String = "",
+  ) {
+    val configurationProperty = configuration.register("input-$id", defaultText)
+    textProperty.set(configurationProperty.get())
+    textProperty.afterChange { configurationProperty.set(it) }
+  }
+
   @TestOnly
   fun setTextUnderTest(text: String) {
     try {
@@ -170,10 +181,10 @@ internal class DeveloperToolEditor(
     }
     addSeparator()
     add(SimpleToggleAction(
-            text = "Soft-Wrap",
-            icon = AllIcons.Actions.ToggleSoftWrap,
-            isSelected = { editor.settings.isUseSoftWraps },
-            setSelected = { editor.settings.isUseSoftWraps = it }
+      text = "Soft-Wrap",
+      icon = AllIcons.Actions.ToggleSoftWrap,
+      isSelected = { editor.settings.isUseSoftWraps },
+      setSelected = { editor.settings.isUseSoftWraps = it }
     ))
     addSeparator()
     add(SaveContentToFile())
@@ -299,11 +310,11 @@ internal class DeveloperToolEditor(
       val timeStamp = LocalDateTime.now().format(timestampFormat)
       val defaultFilename = "$timeStamp.txt"
       FileChooserFactory.getInstance()
-              .createSaveFileDialog(fileSaverDescriptor, e.project)
-              .save(defaultFilename)?.file?.toPath()?.let {
-                val content = runReadAction { editor.document.text }
-                Files.writeString(it, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-              }
+        .createSaveFileDialog(fileSaverDescriptor, e.project)
+        .save(defaultFilename)?.file?.toPath()?.let {
+          val content = runReadAction { editor.document.text }
+          Files.writeString(it, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+        }
     }
   }
 
@@ -316,14 +327,14 @@ internal class DeveloperToolEditor(
       val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
       val fileChooserDescriptor = FileChooserDescriptor(true, true, false, false, false, false)
       FileChooserFactory.getInstance()
-              .createFileChooser(fileChooserDescriptor, e.project, editor.component)
-              .choose(e.project).first()?.let {
-                runWriteAction {
-                  editor.putUserData(editorActiveKey, true)
-                  editor.document.setText(Files.readString(it.toNioPath()))
-                }
-                editor.contentComponent.grabFocus()
-              }
+        .createFileChooser(fileChooserDescriptor, e.project, editor.component)
+        .choose(e.project).first()?.let {
+          runWriteAction {
+            editor.putUserData(editorActiveKey, true)
+            editor.document.setText(Files.readString(it.toNioPath()))
+          }
+          editor.contentComponent.grabFocus()
+        }
     }
   }
 
@@ -352,9 +363,9 @@ internal class DeveloperToolEditor(
       listeners.add(listener)
     }
 
-    override fun afterChange(listener: (String) -> Unit, parentDisposable: Disposable) {
+    override fun afterChange(parentDisposable: Disposable?, listener: (String) -> Unit) {
       listeners.add(listener)
-      Disposer.register(parentDisposable) { listeners.remove(listener) }
+      parentDisposable?.let { Disposer.register(it) { listeners.remove(listener) }  }
     }
 
     override fun get(): String = runReadAction {

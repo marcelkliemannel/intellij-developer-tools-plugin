@@ -15,10 +15,6 @@ internal class HashingTransformer(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextTransformer(
-  developerToolContext = DeveloperToolContext(
-    menuTitle = "Hashing",
-    contentTitle = "Hashing Transformer"
-  ),
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Hash",
     sourceTitle = "Plain",
@@ -61,16 +57,22 @@ internal class HashingTransformer(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   class Factory : DeveloperToolFactory<HashingTransformer> {
-    override fun createDeveloperTool(
+
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Hashing",
+      contentTitle = "Hashing Transformer"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): HashingTransformer? {
+    ): (() -> HashingTransformer)? {
       if (messageDigestAlgorithms.isEmpty()) {
         return null
       }
 
-      return HashingTransformer(configuration, parentDisposable)
+      return { HashingTransformer(configuration, parentDisposable) }
     }
   }
 

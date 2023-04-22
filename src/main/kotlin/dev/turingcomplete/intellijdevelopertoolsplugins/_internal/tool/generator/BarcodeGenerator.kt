@@ -77,13 +77,7 @@ internal class BarcodeGenerator private constructor(
   configuration: DeveloperToolConfiguration,
   private val project: Project?,
   parentDisposable: Disposable
-) : DeveloperTool(
-  developerToolContext = DeveloperToolContext(
-    menuTitle = "QR Code/Barcode",
-    contentTitle = "QR Code/Barcode Generator"
-  ),
-  parentDisposable = parentDisposable
-) {
+) : DeveloperTool(parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveGeneration = configuration.register("liveGeneration", true)
@@ -829,13 +823,18 @@ internal class BarcodeGenerator private constructor(
 
   class Factory : DeveloperToolFactory<BarcodeGenerator> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "QR Code/Barcode",
+      contentTitle = "QR Code/Barcode Generator"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): BarcodeGenerator {
+    ): () -> BarcodeGenerator = {
       val formats: Map<Format, FormatConfiguration> = Format.values().associateWith { it.createConfiguration(configuration) }
-      return BarcodeGenerator(formats, configuration, project, parentDisposable)
+      BarcodeGenerator(formats, configuration, project, parentDisposable)
     }
   }
 

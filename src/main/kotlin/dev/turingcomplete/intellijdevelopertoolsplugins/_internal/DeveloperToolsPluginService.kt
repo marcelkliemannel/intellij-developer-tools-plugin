@@ -5,8 +5,9 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.observable.properties.AtomicProperty
+import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.ui.JBColor
-import com.intellij.util.ObjectUtils
 import com.intellij.util.xmlb.Converter
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
@@ -27,25 +28,16 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val developerToolsConfigurations = ConcurrentHashMap<String, DeveloperToolConfiguration>()
-  private val generalSettings = ConcurrentHashMap<String, Any>()
+  private val lastSelectedContentNodeId: ObservableMutableProperty<String?> = AtomicProperty(null)
+  private val loadExamples: ObservableMutableProperty<Boolean> = AtomicProperty(LOAD_EXAMPLES_DEFAULT)
+  private val saveInputs: ObservableMutableProperty<Boolean> = AtomicProperty(SAVE_INPUTS_DEFAULT)
+  private val inputs = ConcurrentHashMap<String, String?>()
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   fun getOrCreateDeveloperToolConfiguration(id: String) =
     developerToolsConfigurations.getOrCreate(id) { DeveloperToolConfiguration() }
-
-  fun <T> getSetting(key: String, type: Class<T>): T? = generalSettings[key]?.let { ObjectUtils.tryCast(it, type) }
-
-  fun setSetting(key: String, value: Any?) {
-    if (value != null) {
-      checkStateType(value::class)
-      generalSettings[key] = value
-    }
-    else {
-      generalSettings.remove(key)
-    }
-  }
 
   override fun getState(): State {
     val stateDeveloperToolsConfigurations = developerToolsConfigurations.asSequence()
@@ -54,10 +46,13 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
           Property(referenceId = developerToolId, key = it.key, value = it.value)
         }
       }.toList()
-
-    val stateGeneralProperties = generalSettings.map { Property(key = it.key, value = it.value) }
-
-    return State(stateDeveloperToolsConfigurations, stateGeneralProperties)
+    loadExamples.afterChange {  }
+    return State(
+      developerToolsConfigurations = stateDeveloperToolsConfigurations,
+      lastSelectedContentNodeId = lastSelectedContentNodeId.get(),
+      loadExamples = loadExamples.get(),
+      saveInputs = saveInputs.get()
+    )
   }
 
   override fun loadState(state: State) {
@@ -73,10 +68,9 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
         developerToolsConfigurations[developerToolId] = developerToolConfiguration
       }
 
-    generalSettings.clear()
-    state.generalSettings
-      ?.filter { it.key != null && it.value != null }
-      ?.forEach { property -> generalSettings[property.key!!] = property.value!! }
+    lastSelectedContentNodeId.set(state.lastSelectedContentNodeId)
+    loadExamples.set(state.loadExamples ?: LOAD_EXAMPLES_DEFAULT)
+    saveInputs.set(state.saveInputs ?: SAVE_INPUTS_DEFAULT)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
@@ -85,8 +79,12 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   data class State(
     @get:XCollection(style = v2, elementName = "developerToolsConfigurations")
     var developerToolsConfigurations: List<Property>? = null,
-    @get:XCollection(style = v2, elementName = "generalSettings")
-    var generalSettings: List<Property>? = null
+    @get:Attribute("lastSelectedContentNodeId")
+    var lastSelectedContentNodeId: String? = null,
+    @get:Attribute("loadExamples")
+    var loadExamples: Boolean? = null,
+    @get:Attribute("saveInputs")
+    var saveInputs: Boolean? = null,
   )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -187,6 +185,11 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
       }
     }
 
-    fun <T> getSetting(key: String, type: Class<T>): T? = instance.getSetting(key, type)
+    private const val LOAD_EXAMPLES_DEFAULT = true
+    private const val SAVE_INPUTS_DEFAULT = true
+
+    val lastSelectedContentNodeId = instance.lastSelectedContentNodeId
+    val loadExamples = instance.loadExamples
+    val saveInputs = instance.saveInputs
   }
 }

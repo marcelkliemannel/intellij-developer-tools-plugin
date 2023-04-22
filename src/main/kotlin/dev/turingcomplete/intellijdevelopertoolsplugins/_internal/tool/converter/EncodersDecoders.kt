@@ -9,7 +9,7 @@ import org.bouncycastle.util.encoders.Base32
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.Base64
+import java.util.*
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
 
@@ -26,7 +26,6 @@ internal val encoderDecoderTextConverterContext = TextConverter.TextConverterCon
 
 internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    developerToolContext = DeveloperToolContext("Base32", "Base32 Encoder/Decoder"),
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -42,11 +41,16 @@ internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, p
 
   class Factory : DeveloperToolFactory<Base32EncoderDecoder> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Base32",
+      contentTitle = "Base32 Encoder/Decoder"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = Base32EncoderDecoder(configuration, parentDisposable)
+    ): () -> Base32EncoderDecoder = { Base32EncoderDecoder(configuration, parentDisposable) }
   }
 }
 
@@ -54,7 +58,6 @@ internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, p
 
 internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    developerToolContext = DeveloperToolContext("Base64", "Base64 Encoder/Decoder"),
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -70,11 +73,16 @@ internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, p
 
   class Factory : DeveloperToolFactory<Base64EncoderDecoder> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Base64",
+      contentTitle = "Base64 Encoder/Decoder"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = Base64EncoderDecoder(configuration, parentDisposable)
+    ): () -> Base64EncoderDecoder = { Base64EncoderDecoder(configuration, parentDisposable) }
   }
 }
 
@@ -82,7 +90,6 @@ internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, p
 
 internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    developerToolContext = DeveloperToolContext("URL Base64", "URL Base64 Encoder/Decoder"),
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -98,11 +105,16 @@ internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration
 
   class Factory : DeveloperToolFactory<UrlBase64EncoderDecoder> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "URL Base64",
+      contentTitle = "URL Base64 Encoder/Decoder"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = UrlBase64EncoderDecoder(configuration, parentDisposable)
+    ): () -> UrlBase64EncoderDecoder = { UrlBase64EncoderDecoder(configuration, parentDisposable) }
   }
 }
 
@@ -110,7 +122,6 @@ internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration
 
 internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    developerToolContext = DeveloperToolContext(menuTitle = "MIME Base64", contentTitle = "MIME Base64 Encoder/Decoder"),
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -126,11 +137,16 @@ internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguratio
 
   class Factory : DeveloperToolFactory<MimeBase64EncoderDecoder> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "MIME Base64",
+      contentTitle = "MIME Base64 Encoder/Decoder"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = MimeBase64EncoderDecoder(configuration, parentDisposable)
+    ): () -> MimeBase64EncoderDecoder = { MimeBase64EncoderDecoder(configuration, parentDisposable) }
   }
 }
 
@@ -138,7 +154,6 @@ internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguratio
 
 internal class UrlEncodingEncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    developerToolContext = DeveloperToolContext("URL Encoding", "URL Encoding Encoder/Decoder"),
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -154,11 +169,16 @@ internal class UrlEncodingEncoderDecoder(configuration: DeveloperToolConfigurati
 
   class Factory : DeveloperToolFactory<UrlEncodingEncoderDecoder> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "URL Encoding",
+      contentTitle = "URL Encoding Encoder/Decoder"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = UrlEncodingEncoderDecoder(configuration, parentDisposable)
+    ): () -> UrlEncodingEncoderDecoder = { UrlEncodingEncoderDecoder(configuration, parentDisposable) }
   }
 }
 

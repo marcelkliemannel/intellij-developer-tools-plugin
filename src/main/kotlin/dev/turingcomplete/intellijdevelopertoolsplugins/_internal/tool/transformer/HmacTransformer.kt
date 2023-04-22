@@ -23,10 +23,6 @@ internal class HmacTransformer(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextTransformer(
-  developerToolContext = DeveloperToolContext(
-    menuTitle = "HMAC",
-    contentTitle = "HMAC Transformer"
-  ),
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Generate",
     sourceTitle = "Data",
@@ -105,16 +101,21 @@ internal class HmacTransformer(
 
   class Factory : DeveloperToolFactory<HmacTransformer> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "HMAC",
+      contentTitle = "HMAC Transformer"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): HmacTransformer? {
+    ): (() -> HmacTransformer)? {
       if (algorithms.isEmpty()) {
         return null
       }
 
-      return HmacTransformer(configuration, parentDisposable)
+      return { HmacTransformer(configuration, parentDisposable) }
     }
   }
 

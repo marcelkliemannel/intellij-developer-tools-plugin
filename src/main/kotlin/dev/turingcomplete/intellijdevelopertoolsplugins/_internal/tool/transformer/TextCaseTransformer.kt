@@ -22,10 +22,6 @@ import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 
 class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextTransformer(
-    developerToolContext = DeveloperToolContext(
-      menuTitle = "Text Case",
-      contentTitle = "Text Case Transformer"
-    ),
     textTransformerContext = TextTransformerContext(
       transformActionTitle = "Transform",
       sourceTitle = "Original",
@@ -112,11 +108,16 @@ class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDispo
 
   class Factory : DeveloperToolFactory<TextCaseTransformer> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Text Case",
+      contentTitle = "Text Case Transformer"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = TextCaseTransformer(configuration, parentDisposable)
+    ): () -> TextCaseTransformer = { TextCaseTransformer(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

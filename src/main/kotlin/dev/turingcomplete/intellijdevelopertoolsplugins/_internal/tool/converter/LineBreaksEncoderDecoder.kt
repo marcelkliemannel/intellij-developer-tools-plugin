@@ -13,7 +13,6 @@ internal class LineBreaksEncoderDecoder(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextConverter(
-  developerToolContext = DeveloperToolContext("Line Breaks", "Line Breaks Encoder/Decoder"),
   textConverterContext = encoderDecoderTextConverterContext,
   configuration = configuration,
   parentDisposable = parentDisposable
@@ -63,11 +62,16 @@ internal class LineBreaksEncoderDecoder(
 
   class Factory : DeveloperToolFactory<LineBreaksEncoderDecoder> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Line Breaks",
+      contentTitle = "Line Breaks Encoder/Decoder"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = LineBreaksEncoderDecoder(configuration, parentDisposable)
+    ): () -> LineBreaksEncoderDecoder = { LineBreaksEncoderDecoder(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

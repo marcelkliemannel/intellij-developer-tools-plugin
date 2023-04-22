@@ -22,7 +22,6 @@ private val escapeUnescapeContext = TextConverter.TextConverterContext(
 
 internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    developerToolContext = DeveloperToolContext("HTML Entities", "HTML Entities Escape/Unescape"),
     textConverterContext = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -38,11 +37,16 @@ internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, par
 
   class Factory : DeveloperToolFactory<HtmlEntitiesEscape> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "HTML Entities",
+      contentTitle = "HTML Entities Escape/Unescape"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = HtmlEntitiesEscape(configuration, parentDisposable)
+    ): () -> HtmlEntitiesEscape = { HtmlEntitiesEscape(configuration, parentDisposable) }
   }
 }
 
@@ -50,7 +54,6 @@ internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, par
 
 internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    developerToolContext = DeveloperToolContext("Java Text", "Java Text Escape/Unescape"),
     textConverterContext = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -66,11 +69,16 @@ internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentD
 
   class Factory : DeveloperToolFactory<JavaTextEscape> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Java Text",
+      contentTitle = "Java Text Escape/Unescape"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = JavaTextEscape(configuration, parentDisposable)
+    ): () -> JavaTextEscape = { JavaTextEscape(configuration, parentDisposable) }
   }
 }
 
@@ -78,7 +86,6 @@ internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentD
 
 internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    developerToolContext = DeveloperToolContext("JSON Text", "JSON Text Escape/Unescape"),
     textConverterContext = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -94,11 +101,16 @@ internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentD
 
   class Factory : DeveloperToolFactory<JsonTextEscape> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "JSON Text",
+      contentTitle = "JSON Text Escape/Unescape"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = JsonTextEscape(configuration, parentDisposable)
+    ): () -> JsonTextEscape = { JsonTextEscape(configuration, parentDisposable) }
   }
 }
 
@@ -106,7 +118,6 @@ internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentD
 
 internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    developerToolContext = DeveloperToolContext("CSV Text", "CSV Text Escape/Unescape"),
     textConverterContext = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -122,11 +133,16 @@ internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDi
 
   class Factory : DeveloperToolFactory<CsvTextEscape> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "CSV Text",
+      contentTitle = "CSV Text Escape/Unescape"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = CsvTextEscape(configuration, parentDisposable)
+    ): () -> CsvTextEscape = { CsvTextEscape(configuration, parentDisposable) }
   }
 }
 
@@ -134,7 +150,6 @@ internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDi
 
 internal class XmlTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextConverter(
-    developerToolContext = DeveloperToolContext("XML Text", "XML Text Escape/Unescape"),
     textConverterContext = escapeUnescapeContext,
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -150,10 +165,15 @@ internal class XmlTextEscape(configuration: DeveloperToolConfiguration, parentDi
 
   class Factory : DeveloperToolFactory<XmlTextEscape> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "XML Text",
+      contentTitle = "XML Text Escape/Unescape"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = XmlTextEscape(configuration, parentDisposable)
+    ): () -> XmlTextEscape = { XmlTextEscape(configuration, parentDisposable) }
   }
 }

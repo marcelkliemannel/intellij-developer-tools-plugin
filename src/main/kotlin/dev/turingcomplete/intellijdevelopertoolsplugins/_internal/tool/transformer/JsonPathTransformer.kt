@@ -24,10 +24,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.objectM
 
 class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable)
   : TextTransformer(
-  developerToolContext = DeveloperToolContext(
-    menuTitle = "JSON Path",
-    contentTitle = "JSON Path Transformer"
-  ),
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Execute Query",
     sourceTitle = "Original",
@@ -95,11 +91,16 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
 
   class Factory : DeveloperToolFactory<JsonPathTransformer> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "JSON Path",
+      contentTitle = "JSON Path Transformer"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = JsonPathTransformer(configuration, project, parentDisposable)
+    ): () -> JsonPathTransformer = { JsonPathTransformer(configuration, project, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

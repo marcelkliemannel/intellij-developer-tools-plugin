@@ -6,20 +6,21 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.NaturalComparator
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.layout.ComboBoxPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.makeCaseInsensitive
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer.WordsDelimiter.*
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer.WordsDelimiter.INDIVIDUAL
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer.WordsDelimiter.LINE_BREAK
 
 internal class TextSortingTransformer(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   TextTransformer(
-    developerToolContext = DeveloperToolContext(
-      menuTitle = "Text Sorting",
-      contentTitle = "Text Sorting"
-    ),
     textTransformerContext = TextTransformerContext(
       transformActionTitle = "Sort",
       sourceTitle = "Unsorted",
@@ -159,11 +160,16 @@ internal class TextSortingTransformer(configuration: DeveloperToolConfiguration,
 
   class Factory : DeveloperToolFactory<TextSortingTransformer> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Text Sorting",
+      contentTitle = "Text Sorting"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = TextSortingTransformer(configuration, parentDisposable)
+    ): () -> TextSortingTransformer = { TextSortingTransformer(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

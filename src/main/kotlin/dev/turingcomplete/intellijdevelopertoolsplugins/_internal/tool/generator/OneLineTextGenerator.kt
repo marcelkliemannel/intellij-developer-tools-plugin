@@ -19,7 +19,6 @@ import com.intellij.util.Alarm
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.BooleanComponentPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction.Companion.CONTENT_DATA_KEY
@@ -32,11 +31,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.wrapWit
 import org.apache.commons.text.StringEscapeUtils
 
 abstract class OneLineTextGenerator(
-  developerToolContext: DeveloperToolContext,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   initialGeneratedTextTitle: String = "Generated text:"
-) : DeveloperTool(developerToolContext, parentDisposable), DeveloperToolConfiguration.ChangeListener {
+) : DeveloperTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   protected val supportsBulkGeneration = BooleanComponentPredicate(true)
@@ -139,20 +137,20 @@ abstract class OneLineTextGenerator(
     }.bottomGap(BottomGap.NONE)
 
     row {
-      topGap(TopGap.NONE)
       generatedTextLabel = JBLabel().apply { font = GENERATED_TEXT_FONT }.copyable()
 
       val actions = DefaultActionGroup().apply {
-        add(RefreshAction { doGenerate() })
+        add(RegenerateAction { doGenerate() })
         add(CopyAction())
       }
       cell(generatedTextLabel.wrapWithToolBar(this.javaClass.simpleName, actions, ToolBarPlace.APPEND))
-    }
+    }.topGap(TopGap.NONE)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class RefreshAction(private val generateContent: () -> Unit) : DumbAwareAction(AllIcons.Actions.Refresh) {
+  private class RegenerateAction(private val generateContent: () -> Unit) :
+    DumbAwareAction("Regenerate", null, AllIcons.Actions.Refresh) {
 
     override fun actionPerformed(e: AnActionEvent) {
       generateContent()

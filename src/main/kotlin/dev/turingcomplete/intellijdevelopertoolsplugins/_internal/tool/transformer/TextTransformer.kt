@@ -10,18 +10,16 @@ import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.layout.not
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
 import kotlin.properties.Delegates
 
 abstract class TextTransformer(
-  developerToolContext: DeveloperToolContext,
   private val textTransformerContext: TextTransformerContext,
   protected val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
-) : DeveloperTool(developerToolContext, parentDisposable), DeveloperToolConfiguration.ChangeListener {
+) : DeveloperTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   protected var liveTransformation = configuration.register("liveTransformation", true)

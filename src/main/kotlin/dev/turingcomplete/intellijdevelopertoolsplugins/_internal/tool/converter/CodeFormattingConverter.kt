@@ -21,10 +21,6 @@ internal class CodeFormattingConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextConverter(
-  developerToolContext = DeveloperToolContext(
-    menuTitle = "Code Formatting",
-    contentTitle = "Code Formatting Converter"
-  ),
   textConverterContext = TextConverterContext(
     convertActionTitle = "Convert",
     revertActionTitle = "Convert",
@@ -120,11 +116,18 @@ internal class CodeFormattingConverter(
 
   class Factory : DeveloperToolFactory<CodeFormattingConverter> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Code Formatting",
+      contentTitle = "Code Formatting Converter"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = CodeFormattingConverter(configuration, parentDisposable)
+    ): () -> CodeFormattingConverter = {
+      CodeFormattingConverter(configuration, parentDisposable)
+    }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

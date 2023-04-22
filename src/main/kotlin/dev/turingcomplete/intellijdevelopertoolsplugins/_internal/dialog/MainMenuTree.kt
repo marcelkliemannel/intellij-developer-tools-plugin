@@ -4,7 +4,6 @@ import com.intellij.ide.util.treeView.NodeRenderer
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import com.intellij.ui.RelativeFont
 import com.intellij.ui.SimpleTextAttributes.REGULAR_ATTRIBUTES
 import com.intellij.ui.SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
@@ -20,7 +19,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolFactoryEp
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.getSetting
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.lastSelectedContentNodeId
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.safeCastTo
 import javax.swing.JTree
 import javax.swing.event.TreeSelectionListener
@@ -61,12 +60,12 @@ class MainMenuTree(
 
   private fun selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode: ContentNode?) {
     var lastSelectedContentNodeSelected = false
-    val lastSelectedComponentNodeId = getSetting(LAST_SELECTED_CONTENT_NODE_ID_PROPERTY_KEY, String::class.java)
-    if (lastSelectedComponentNodeId != null) {
+    lastSelectedContentNodeId.get()?.let { lastSelectedComponentNodeId ->
       TreeUtil.promiseVisit(this) {
         val lastPathComponent = it.lastPathComponent
         if (lastPathComponent is ContentNode
-            && lastPathComponent.id == lastSelectedComponentNodeId) {
+          && lastPathComponent.id == lastSelectedComponentNodeId
+        ) {
           INTERRUPT
         }
         else {
@@ -89,7 +88,7 @@ class MainMenuTree(
     else {
       // Select first `DeveloperToolNode`
       TreeUtil.promiseVisit(this) { if (it.lastPathComponent is DeveloperToolNode) INTERRUPT else CONTINUE }
-              .onSuccess { it?.let { TreeUtil.selectNode(this, it.lastPathComponent as DeveloperToolNode) } }
+        .onSuccess { it?.let { TreeUtil.selectNode(this, it.lastPathComponent as DeveloperToolNode) } }
     }
   }
 
@@ -109,13 +108,12 @@ class MainMenuTree(
 
   private fun handleMenuTreeSelection() = TreeSelectionListener { e ->
     e.path?.lastPathComponent
-            ?.safeCastTo<ContentNode>()
-            ?.let {
-              onContentNodeSelection(it)
-              DeveloperToolsPluginService.instance.setSetting(LAST_SELECTED_CONTENT_NODE_ID_PROPERTY_KEY, it.id)
-            }
+      ?.safeCastTo<ContentNode>()
+      ?.let {
+        onContentNodeSelection(it)
+        lastSelectedContentNodeId.set(it.id)
+      }
   }
-
 
   private fun createTreeNodes(project: Project?, parentDisposable: Disposable): Triple<RootNode, List<GroupNode>, ContentNode?> {
     val rootNode = RootNode()
@@ -137,14 +135,16 @@ class MainMenuTree(
       val developerToolFactory: DeveloperToolFactory<*> = developerToolFactoryEp.createInstance(application)
       val developerToolConfiguration = DeveloperToolsPluginService.instance.getOrCreateDeveloperToolConfiguration(developerToolFactoryEp.id)
 
-      developerToolFactory.createDeveloperTool(developerToolConfiguration, project, parentDisposable)?.let { developerTool ->
-        Disposer.register(parentDisposable, developerTool)
-
+      developerToolFactory.getDeveloperToolCreator(developerToolConfiguration, project, parentDisposable)?.let { developerToolCreator ->
         val groupId: String? = developerToolFactoryEp.groupId
-        val parentNode = if (groupId != null) (groupNodes[groupId]?: error("Unknown group: $groupId")) else rootNode
-        val weight: Int = checkNotNull(developerToolFactoryEp.weight) { "No weight set" }
-        val developerToolNode = DeveloperToolNode(developerToolFactoryEp.id, developerTool, weight)
-
+        val parentNode = if (groupId != null) (groupNodes[groupId] ?: error("Unknown group: $groupId")) else rootNode
+        val developerToolNode = DeveloperToolNode(
+          developerToolId = developerToolFactoryEp.id,
+          parentDisposable = parentDisposable,
+          developerToolContext = developerToolFactory.getDeveloperToolContext(),
+          developerToolCreator = developerToolCreator,
+          weight = checkNotNull(developerToolFactoryEp.weight) { "No weight set" }
+        )
         parentNode.add(developerToolNode)
 
         if (developerToolFactoryEp.preferredSelected) {

@@ -11,7 +11,6 @@ import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
@@ -20,11 +19,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter
 import kotlin.properties.Delegates
 
 internal abstract class TextConverter(
-  developerToolContext: DeveloperToolContext,
   protected val textConverterContext: TextConverterContext,
   protected val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
-) : DeveloperTool(developerToolContext, parentDisposable), DeveloperToolConfiguration.ChangeListener {
+) : DeveloperTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)

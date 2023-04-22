@@ -30,13 +30,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.Propert
 class JsonSchemaValidator(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
-) : DeveloperTool(
-  developerToolContext = DeveloperToolContext(
-    menuTitle = "JSON Schema",
-    contentTitle = "JSON Schema Validator"
-  ),
-  parentDisposable = parentDisposable
-) {
+) : DeveloperTool(parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveValidation = configuration.register("liveValidation", true)
@@ -193,11 +187,16 @@ class JsonSchemaValidator(
 
   class Factory : DeveloperToolFactory<JsonSchemaValidator> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "JSON Schema",
+      contentTitle = "JSON Schema Validator"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = JsonSchemaValidator(configuration, parentDisposable)
+    ): () -> JsonSchemaValidator = { JsonSchemaValidator(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

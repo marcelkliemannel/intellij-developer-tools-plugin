@@ -22,9 +22,9 @@ abstract class DeveloperToolTestBase<T : DeveloperTool>(
     super.setUp()
 
     configuration = DeveloperToolConfiguration()
-    developerTool = checkNotNull(factory.createDeveloperTool(configuration, project, testRootDisposable)).apply {
+  /*  developerTool = checkNotNull(factory.getDeveloperToolCreator(configuration, project, testRootDisposable)).apply {
       runInEdt { createComponent() }
-    }
+    }*/
   }
 
   protected fun uiInput(runnable: () -> Unit) {

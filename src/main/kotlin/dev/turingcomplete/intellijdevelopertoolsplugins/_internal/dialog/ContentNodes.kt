@@ -1,8 +1,11 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
 
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.util.Disposer
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup
-import java.util.Vector
+import java.util.*
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.TreeNode
 
@@ -48,8 +51,19 @@ internal class GroupNode(val developerToolGroup: DeveloperToolGroup) :
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class DeveloperToolNode(developerToolId: String, val developerTool: DeveloperTool, weight: Int) :
-  ContentNode(developerToolId, developerTool.developerToolContext.menuTitle, weight) {
+internal class DeveloperToolNode(
+  developerToolId: String,
+  parentDisposable: Disposable,
+  val developerToolContext: DeveloperToolContext,
+  private val developerToolCreator: () -> DeveloperTool,
+  weight: Int
+) : ContentNode(developerToolId, developerToolContext.menuTitle, weight) {
+
+  val developerTool by lazy {
+    val developerTool = developerToolCreator()
+    Disposer.register(parentDisposable, developerTool)
+    developerTool
+  }
 
   override fun selected() {
     developerTool.activated()

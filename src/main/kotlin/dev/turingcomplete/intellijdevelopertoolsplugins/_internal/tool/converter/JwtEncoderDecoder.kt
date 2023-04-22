@@ -76,10 +76,7 @@ import javax.swing.Icon
 
 
 internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
-  DeveloperTool(
-    developerToolContext = DeveloperToolContext("JWT", "JWT Decoder/Encoder"),
-    parentDisposable = parentDisposable
-  ) {
+  DeveloperTool(parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)
@@ -662,11 +659,16 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
 
   class Factory : DeveloperToolFactory<JwtEncoderDecoder> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "JWT",
+      contentTitle = "JWT Decoder/Encoder"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = JwtEncoderDecoder(configuration, parentDisposable)
+    ): () -> JwtEncoderDecoder = { JwtEncoderDecoder(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

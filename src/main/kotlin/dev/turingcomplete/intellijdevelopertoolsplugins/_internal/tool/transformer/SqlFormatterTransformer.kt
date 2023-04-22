@@ -19,11 +19,6 @@ class SqlFormatterTransformer(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextTransformer(
-  developerToolContext = DeveloperToolContext(
-    menuTitle = "SQL Formatter",
-    contentTitle = "SQL Formatter",
-    supportsReset = true
-  ),
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Format",
     sourceTitle = "Plain SQL",
@@ -119,11 +114,17 @@ class SqlFormatterTransformer(
 
   class Factory : DeveloperToolFactory<SqlFormatterTransformer> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "SQL Formatter",
+      contentTitle = "SQL Formatter",
+      supportsReset = true
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = SqlFormatterTransformer(configuration, parentDisposable)
+    ): () -> SqlFormatterTransformer = { SqlFormatterTransformer(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

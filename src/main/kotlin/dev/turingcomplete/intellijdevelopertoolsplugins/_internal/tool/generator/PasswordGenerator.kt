@@ -29,11 +29,6 @@ internal class PasswordGenerator(
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : OneLineTextGenerator(
-  developerToolContext = DeveloperToolContext(
-    menuTitle = "Password Generator",
-    contentTitle = "Password Generator",
-    supportsReset = true
-  ),
   configuration,
   parentDisposable,
   initialGeneratedTextTitle = "Generated password:"
@@ -153,11 +148,17 @@ internal class PasswordGenerator(
 
   class Factory : DeveloperToolFactory<PasswordGenerator> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Password Generator",
+      contentTitle = "Password Generator",
+      supportsReset = true
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = PasswordGenerator(configuration, parentDisposable)
+    ): () -> PasswordGenerator = { PasswordGenerator(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

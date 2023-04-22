@@ -53,10 +53,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
-  DeveloperTool(
-    developerToolContext = DeveloperToolContext("Unix Timestamp", "Unix Timestamp Converter"),
-    parentDisposable = parentDisposable
-  ) {
+  DeveloperTool(parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val currentUnixTimestampUpdateAlarm by lazy { Alarm(parentDisposable) }
@@ -318,11 +315,16 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
 
   class Factory : DeveloperToolFactory<UnixTimestampConverter> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Unix Timestamp",
+      contentTitle = "Unix Timestamp Converter"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = UnixTimestampConverter(configuration, parentDisposable)
+    ): () -> UnixTimestampConverter = { UnixTimestampConverter(configuration, parentDisposable) }
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

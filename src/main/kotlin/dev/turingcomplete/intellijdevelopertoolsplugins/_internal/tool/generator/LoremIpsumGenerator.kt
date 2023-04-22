@@ -30,7 +30,6 @@ import kotlin.math.min
 
 class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   MultiLineTextGenerator(
-    developerToolContext = DeveloperToolContext("Lorem Ipsum", "Lorem Ipsum Generator"),
     generatedTextTitle = "Generated lorem ipsum",
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -237,11 +236,16 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
 
   class Factory : DeveloperToolFactory<LoremIpsumGenerator> {
 
-    override fun createDeveloperTool(
+    override fun getDeveloperToolContext() = DeveloperToolContext(
+      menuTitle = "Lorem Ipsum",
+      contentTitle = "Lorem Ipsum Generator"
+    )
+
+    override fun getDeveloperToolCreator(
       configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ) = LoremIpsumGenerator(configuration, parentDisposable)
+    ): () -> LoremIpsumGenerator = { LoremIpsumGenerator(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
