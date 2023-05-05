@@ -29,9 +29,18 @@ abstract class NamespaceAndNameBasedUuidGenerator(
 ) : SpecificUuidGenerator(supportsBulkGeneration) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var namespaceMode = configuration.register("${version}NamespaceMode", PREDEFINED)
-  private var predefinedNamespace = configuration.register("${version}PredefinedNamespace", PredefinedNamespace.DNS)
-  private var individualNamespace = configuration.register("${version}IndividualNamespace", "")
+  private var namespaceMode = configuration.register(
+    "${version}NamespaceMode",
+    PREDEFINED
+  )
+  private var predefinedNamespace = configuration.register(
+    "${version}PredefinedNamespace",
+    PredefinedNamespace.DNS
+  )
+  private var individualNamespace = configuration.register(
+    "${version}IndividualNamespace",
+    ""
+  )
   private var name = configuration.register("${version}Name", "")
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //

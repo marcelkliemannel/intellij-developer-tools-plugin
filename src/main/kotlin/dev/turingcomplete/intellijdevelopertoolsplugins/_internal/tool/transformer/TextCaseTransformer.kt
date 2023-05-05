@@ -41,10 +41,12 @@ class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDispo
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun transform() {
-    resultText = when (originalParsingMode.get()) {
-      FIXED_TEXT_CASE -> sourceText.toTextCase(outputTextCase.get().textCase, inputTextCase.get().textCase.wordsSplitter())
-      INDIVIDUAL_DELIMITER -> sourceText.toTextCase(outputTextCase.get().textCase, individualDelimiter.get().toWordsSplitter())
-    }
+    resultText.set(
+      when (originalParsingMode.get()) {
+        FIXED_TEXT_CASE -> sourceText.get().toTextCase(outputTextCase.get().textCase, inputTextCase.get().textCase.wordsSplitter())
+        INDIVIDUAL_DELIMITER -> sourceText.get().toTextCase(outputTextCase.get().textCase, individualDelimiter.get().toWordsSplitter())
+      }
+    )
   }
 
   override fun Panel.buildMiddleConfigurationUi() {
@@ -114,10 +116,11 @@ class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDispo
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> TextCaseTransformer = { TextCaseTransformer(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> TextCaseTransformer) = { configuration ->
+      TextCaseTransformer(configuration, parentDisposable)
+    }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

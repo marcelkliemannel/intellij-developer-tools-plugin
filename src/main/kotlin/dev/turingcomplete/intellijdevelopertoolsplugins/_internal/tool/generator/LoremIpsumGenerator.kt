@@ -242,10 +242,11 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> LoremIpsumGenerator = { LoremIpsumGenerator(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> LoremIpsumGenerator) = { configuration ->
+      LoremIpsumGenerator(configuration, parentDisposable)
+    }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

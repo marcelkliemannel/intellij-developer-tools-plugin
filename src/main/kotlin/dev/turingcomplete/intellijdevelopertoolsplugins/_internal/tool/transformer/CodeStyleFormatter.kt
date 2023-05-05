@@ -65,11 +65,11 @@ class CodeStyleFormatter(
   }
 
   override fun transform() {
-    val workingVirtualFile = LightVirtualFile(this.javaClass.canonicalName, getSelectedCodeStyle().language, sourceText)
+    val workingVirtualFile = LightVirtualFile(this.javaClass.canonicalName, getSelectedCodeStyle().language, sourceText.get())
     PsiManager.getInstance(project).findFile(workingVirtualFile)?.let { workingPsiFile ->
       val processor = RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))
       processor.setPostRunnable {
-        resultText = workingPsiFile.text
+        resultText.set(workingPsiFile.text)
       }
       processor.run()
     } ?: error("snh: Can't get PSI file for `LightVirtualFile`")
@@ -96,10 +96,9 @@ class CodeStyleFormatter(
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
-      project: Project?,
-      parentDisposable: Disposable
-    ): (() -> CodeStyleFormatter)? {
+        project: Project?,
+        parentDisposable: Disposable
+    ): ((DeveloperToolConfiguration) -> CodeStyleFormatter)? {
       if (project == null) {
         return null
       }
@@ -112,7 +111,7 @@ class CodeStyleFormatter(
         return null
       }
 
-      return {
+      return { configuration ->
         CodeStyleFormatter(codeStyles, project, configuration, parentDisposable)
       }
     }

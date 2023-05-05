@@ -65,13 +65,13 @@ internal class CodeFormattingConverter(
 
   override fun toTarget(text: String) {
     covert(textConverterContext.sourceErrorHolder!!) {
-      targetText = secondLanguage.get().asString(firstLanguage.get().parse(text))
+      targetText.set(secondLanguage.get().asString(firstLanguage.get().parse(text)))
     }
   }
 
   override fun toSource(text: String) {
     covert(textConverterContext.targetErrorHolder!!) {
-      sourceText = firstLanguage.get().asString(secondLanguage.get().parse(text))
+      sourceText.set(firstLanguage.get().asString(secondLanguage.get().parse(text)))
     }
   }
 
@@ -122,10 +122,9 @@ internal class CodeFormattingConverter(
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
-      project: Project?,
-      parentDisposable: Disposable
-    ): () -> CodeFormattingConverter = {
+        project: Project?,
+        parentDisposable: Disposable
+    ): ((DeveloperToolConfiguration) -> CodeFormattingConverter) = { configuration ->
       CodeFormattingConverter(configuration, parentDisposable)
     }
   }

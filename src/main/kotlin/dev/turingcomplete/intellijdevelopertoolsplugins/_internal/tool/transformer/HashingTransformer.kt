@@ -41,8 +41,8 @@ internal class HashingTransformer(
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun transform() {
-    val hash = selectedAlgorithm.get().toMessageDigest().digest(sourceText.encodeToByteArray())
-    resultText = Hex.encode(hash).decodeToString()
+    val hash = selectedAlgorithm.get().toMessageDigest().digest(sourceText.get().encodeToByteArray())
+    resultText.set(Hex.encode(hash).decodeToString())
   }
 
   override fun Panel.buildTopConfigurationUi() {
@@ -64,15 +64,14 @@ internal class HashingTransformer(
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): (() -> HashingTransformer)? {
+    ): ((DeveloperToolConfiguration) -> HashingTransformer)? {
       if (messageDigestAlgorithms.isEmpty()) {
         return null
       }
 
-      return { HashingTransformer(configuration, parentDisposable) }
+      return { configuration -> HashingTransformer(configuration, parentDisposable) }
     }
   }
 

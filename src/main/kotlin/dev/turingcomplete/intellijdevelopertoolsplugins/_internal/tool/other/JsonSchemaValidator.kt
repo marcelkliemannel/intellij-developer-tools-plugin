@@ -20,6 +20,7 @@ import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersionDetector
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
@@ -34,6 +35,8 @@ class JsonSchemaValidator(
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveValidation = configuration.register("liveValidation", true)
+  private val schemaText = configuration.register("schemaText", "", PropertyType.INPUT, EXAMPLE_SCHEMA)
+  private val dataText = configuration.register("dataText", "", PropertyType.INPUT, EXAMPLE_DATA)
 
   private val schemaEditor by lazy { this.createSchemaEditor() }
   private val schemaErrorHolder = ErrorHolder()
@@ -149,9 +152,9 @@ class JsonSchemaValidator(
       title = "JSON schema",
       editorMode = INPUT,
       parentDisposable = parentDisposable,
-      initialLanguage = JsonLanguage.INSTANCE
+      initialLanguage = JsonLanguage.INSTANCE,
+      textProperty = schemaText,
     ).apply {
-      text = EXAMPLE_SCHEMA
       onTextChangeFromUi {
         if (liveValidation.get()) {
           validateSchema()
@@ -164,9 +167,9 @@ class JsonSchemaValidator(
       title = "JSON data",
       editorMode = INPUT,
       parentDisposable = parentDisposable,
-      initialLanguage = JsonLanguage.INSTANCE
+      initialLanguage = JsonLanguage.INSTANCE,
+      textProperty = dataText,
     ).apply {
-      text = EXAMPLE_DATA
       onTextChangeFromUi {
         if (liveValidation.get()) {
           validateSchema()
@@ -193,10 +196,10 @@ class JsonSchemaValidator(
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> JsonSchemaValidator = { JsonSchemaValidator(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> JsonSchemaValidator) =
+      { configuration -> JsonSchemaValidator(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

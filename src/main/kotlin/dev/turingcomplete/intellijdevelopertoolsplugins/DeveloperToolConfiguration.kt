@@ -3,45 +3,39 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins
 
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.observable.properties.AtomicProperty
-import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.util.Disposer
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.checkStateType
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.assertPersistableType
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.uncheckedCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.reflect.KClass
 
-class DeveloperToolConfiguration {
+class DeveloperToolConfiguration(
+  var name: String,
+  val id: UUID = UUID.randomUUID(),
+  val persistentProperties: Map<String, Any?> = emptyMap()
+) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  internal val properties = ConcurrentHashMap<String, Any?>()
+  internal val properties = ConcurrentHashMap<String, PropertyContainer>()
   private val changeListeners = CopyOnWriteArrayList<ChangeListener>()
-  private val bulkChangeInProgress = AtomicBoolean(false)
+  var isResetting = false
+    internal set
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  fun <T : Any> register(key: String, defaultValue: T): ObservableMutableProperty<T> =
-    register(key, defaultValue, defaultValue::class)
-
-  fun <T : Any?> registerNullable(key: String, defaultValue: T, valueType: KClass<*>): ObservableMutableProperty<T?> {
-    checkStateType(valueType::class)
-
-    val initialValue: T? = initializeProperty(key, defaultValue)
-    return AtomicProperty(initialValue).apply {
-      afterChange { newValue -> handlePropertyChange<T>(key, newValue) }
-    }
-  }
-
-  fun <T : Any> register(key: String, defaultValue: T, valueType: KClass<out T>): ObservableMutableProperty<T> {
-    checkStateType(valueType)
-
-    val initialValue: T = initializeProperty(key, defaultValue)
-    return AtomicProperty(initialValue).apply {
-      afterChange { newValue -> handlePropertyChange(key, newValue) }
-    }
-  }
+  fun <T : Any> register(
+    key: String,
+    defaultValue: T,
+    propertyType: PropertyType = CONFIGURATION,
+    example: T? = null
+  ): ValueProperty<T> =
+    properties[key]?.let { reuseExistingProperty(it) } ?: createNewProperty(defaultValue, propertyType, key, example)
 
   fun addChangeListener(parentDisposable: Disposable, changeListener: ChangeListener) {
     changeListeners.add(changeListener)
@@ -52,39 +46,94 @@ class DeveloperToolConfiguration {
     changeListeners.remove(changeListener)
   }
 
-  fun bulkChange(change: () -> Unit) {
-    synchronized(bulkChangeInProgress) {
-      bulkChangeInProgress.set(true)
-      change()
+  fun reset(
+    type: PropertyType? = null,
+    loadExamples: Boolean = DeveloperToolsPluginService.loadExamples
+  ) {
+    isResetting = true
+    try {
+      properties.filter { type == null || it.value.type == type }
+        .forEach { (_, property) -> property.reset(loadExamples) }
       fireConfigurationChanged()
-      bulkChangeInProgress.set(false)
+    }
+    finally {
+      isResetting = false
     }
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
+  private fun <T : Any> reuseExistingProperty(property: PropertyContainer): ValueProperty<T> {
+    if ((property.type == INPUT && !DeveloperToolsPluginService.saveInputs)
+      || (property.type == CONFIGURATION && !DeveloperToolsPluginService.saveConfiguration)
+    ) {
+      property.reset(DeveloperToolsPluginService.loadExamples)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return property.valueProperty as ValueProperty<T>
+  }
+
+  private fun <T : Any> createNewProperty(
+    defaultValue: T,
+    propertyType: PropertyType,
+    key: String,
+    example: T?
+  ): ValueProperty<T> {
+    val type = assertPersistableType(defaultValue::class, propertyType)
+    val initialValue: T = persistentProperties[key]?.uncheckedCastTo(type) ?: let {
+      if (DeveloperToolsPluginService.loadExamples && example != null) example else defaultValue
+    }
+    val valueProperty = ValueProperty(initialValue).apply {
+      afterChangeConsumeEvent(null, handlePropertyChange(key))
+    }
+    properties[key] = PropertyContainer(key, valueProperty, defaultValue, example, propertyType)
+    return valueProperty
+  }
+
   private fun fireConfigurationChanged() {
     changeListeners.forEach { it.configurationChanged() }
   }
 
-  private fun <T : Any?> initializeProperty(key: String, defaultValue: T): T {
-    @Suppress("UNCHECKED_CAST")
-    val initialValue: T = if (properties.containsKey(key)) (properties[key] as T) else defaultValue
-    properties[key] = initialValue
-    return initialValue
-  }
-
-  private fun <T : Any?> handlePropertyChange(key: String, newValue: T?) {
-    val oldValue = properties[key]
-    properties[key] = newValue
-    if (newValue != oldValue && !bulkChangeInProgress.get()) {
-      fireConfigurationChanged()
+  private fun <T : Any?> handlePropertyChange(key: String): (ValueProperty.ChangeEvent<T>) -> Unit = { event ->
+    if (event.oldValue != event.newValue) {
+      properties[key]?.let { property ->
+        property.valueChanged = event.newValue != property.defaultValue &&
+                (property.example == null || event.newValue != property.example)
+        fireConfigurationChanged()
+      } ?: error("Unknown property: $key")
     }
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  @FunctionalInterface
+  internal data class PropertyContainer(
+    val key: String,
+    val valueProperty: ValueProperty<out Any>,
+    val defaultValue: Any,
+    val example: Any?,
+    val type: PropertyType,
+    var valueChanged: Boolean = false
+  ) {
+
+    fun reset(loadExamples: Boolean) {
+      val value = if (example != null && loadExamples) example else defaultValue
+      valueProperty.setWithUncheckedCast(value)
+      valueChanged = false
+    }
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  enum class PropertyType {
+
+    CONFIGURATION,
+    INPUT,
+    SECRET,
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
   interface ChangeListener {
 
     fun configurationChanged()

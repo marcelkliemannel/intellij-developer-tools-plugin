@@ -19,7 +19,7 @@ class LoremIpsumGeneratorTest(
 
   @Test
   fun `test generation of iconic sentence`() {
-    val actualSentence = LoremIpsumGenerator(DeveloperToolConfiguration()) { }.generateIconicText(atMostWords, true)
+    val actualSentence = LoremIpsumGenerator(DeveloperToolConfiguration("Test")) { }.generateIconicText(atMostWords, true)
     assertThat(actualSentence.joinToString(" ")).isEqualTo(expectedSentence)
   }
 

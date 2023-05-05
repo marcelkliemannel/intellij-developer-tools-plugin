@@ -1,22 +1,31 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal
 
+import com.intellij.credentialStore.CredentialAttributes
+import com.intellij.credentialStore.Credentials
+import com.intellij.credentialStore.generateServiceName
+import com.intellij.ide.passwordSafe.PasswordSafe
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.observable.properties.AtomicProperty
-import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.ui.JBColor
 import com.intellij.util.xmlb.Converter
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.XCollection
 import com.intellij.util.xmlb.annotations.XCollection.Style.v2
-import com.jetbrains.rd.util.getOrCreate
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyContainer
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import io.ktor.util.reflect.*
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
@@ -27,26 +36,38 @@ import kotlin.reflect.cast
 internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperToolsPluginService.State?> {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val developerToolsConfigurations = ConcurrentHashMap<String, DeveloperToolConfiguration>()
-  private val lastSelectedContentNodeId: ObservableMutableProperty<String?> = AtomicProperty(null)
-  private val loadExamples: ObservableMutableProperty<Boolean> = AtomicProperty(LOAD_EXAMPLES_DEFAULT)
-  private val saveInputs: ObservableMutableProperty<Boolean> = AtomicProperty(SAVE_INPUTS_DEFAULT)
-  private val inputs = ConcurrentHashMap<String, String?>()
+  private val developerToolsConfigurations = ConcurrentHashMap<String, CopyOnWriteArrayList<DeveloperToolConfiguration>>()
+  private val lastSelectedContentNodeId: ValueProperty<String?> = ValueProperty(null)
+  val loadExamples: ValueProperty<Boolean> = ValueProperty(LOAD_EXAMPLES_DEFAULT)
+  val saveConfiguration: ValueProperty<Boolean> = ValueProperty(SAVE_CONFIGURATION_DEFAULT)
+  val saveInputs: ValueProperty<Boolean> = ValueProperty(SAVE_INPUTS_DEFAULT)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  fun getOrCreateDeveloperToolConfiguration(id: String) =
-    developerToolsConfigurations.getOrCreate(id) { DeveloperToolConfiguration() }
+  fun getDeveloperToolConfigurations(developerToolId: String): List<DeveloperToolConfiguration> =
+    developerToolsConfigurations[developerToolId]?.toList() ?: emptyList()
+
+  fun createDeveloperToolConfiguration(developerToolId: String): DeveloperToolConfiguration {
+    val newDeveloperToolConfiguration = DeveloperToolConfiguration(name = "Workbench")
+    developerToolsConfigurations.compute(developerToolId) { _, developerToolConfigurations ->
+      (developerToolConfigurations ?: CopyOnWriteArrayList()).also { it.add(newDeveloperToolConfiguration) }
+    }
+    return newDeveloperToolConfiguration
+  }
+
+  fun removeDeveloperToolConfiguration(developerToolId: String, developerToolConfiguration: DeveloperToolConfiguration) {
+    developerToolsConfigurations[developerToolId]?.remove(developerToolConfiguration)
+  }
 
   override fun getState(): State {
     val stateDeveloperToolsConfigurations = developerToolsConfigurations.asSequence()
-      .flatMap { (developerToolId, developerToolConfiguration) ->
-        developerToolConfiguration.properties.map {
-          Property(referenceId = developerToolId, key = it.key, value = it.value)
-        }
+      .flatMap { (developerToolId, developerToolConfigurations) ->
+        developerToolConfigurations
+          .filter { it.properties.any { (_, property) -> property.valueChanged } }
+          .map { createDeveloperToolConfigurationState(developerToolId, it) }
       }.toList()
-    loadExamples.afterChange {  }
+
     return State(
       developerToolsConfigurations = stateDeveloperToolsConfigurations,
       lastSelectedContentNodeId = lastSelectedContentNodeId.get(),
@@ -56,29 +77,106 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   }
 
   override fun loadState(state: State) {
-    developerToolsConfigurations.clear()
-    state.developerToolsConfigurations?.filter { it.referenceId != null && it.key != null && it.value != null }
-      ?.groupBy { it.referenceId!! }
-      ?.forEach { (developerToolId, properties) ->
-        val developerToolConfiguration = DeveloperToolConfiguration().apply {
-          this.properties.putAll(
-            properties.filter { it.key != null && it.value != null }.associate { it.key!! to it.value!! }
-          )
-        }
-        developerToolsConfigurations[developerToolId] = developerToolConfiguration
-      }
-
     lastSelectedContentNodeId.set(state.lastSelectedContentNodeId)
     loadExamples.set(state.loadExamples ?: LOAD_EXAMPLES_DEFAULT)
     saveInputs.set(state.saveInputs ?: SAVE_INPUTS_DEFAULT)
+
+    developerToolsConfigurations.clear()
+    state.developerToolsConfigurations
+      ?.filter { it.developerToolId != null && it.id != null && it.name != null && it.properties != null }
+      ?.forEach { developerToolsConfigurationState ->
+        val developerToolConfiguration = DeveloperToolConfiguration(
+          name = developerToolsConfigurationState.name!!,
+          id = UUID.fromString(developerToolsConfigurationState.id!!),
+          persistentProperties = developerToolsConfigurationState.properties!!
+            .filter { it.key != null && it.type != null }
+            .filter { it.type != INPUT || saveInputs.get() }
+            .filter { it.type != CONFIGURATION || saveConfiguration.get() }
+            .associate {
+              restoreProperty(
+                developerToolId = developerToolsConfigurationState.developerToolId!!,
+                key = it.key!!,
+                value = it.value,
+                type = it.type!!
+              )
+            }
+        )
+
+        developerToolsConfigurations.compute(developerToolsConfigurationState.developerToolId!!) { _, developerToolConfigurations ->
+          (developerToolConfigurations ?: CopyOnWriteArrayList()).also { it.add(developerToolConfiguration) }
+        }
+      }
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun createDeveloperToolConfigurationState(
+    developerToolId: String,
+    developerToolConfiguration: DeveloperToolConfiguration
+  ) = DeveloperToolConfigurationState(
+    developerToolId = developerToolId,
+    id = developerToolConfiguration.id.toString(),
+    name = developerToolConfiguration.name,
+    properties = developerToolConfiguration
+      .properties
+      .filter { (_, property) -> property.valueChanged }
+      .filter { (_, property) -> !(!saveInputs.get() && property.type != INPUT) }
+      .map { (key, property) ->
+        storeProperty(developerToolId = developerToolId, key = key, property = property)
+      }
+  )
+
+  private fun storeProperty(
+    developerToolId: String,
+    key: String,
+    property: PropertyContainer
+  ): DeveloperToolConfigurationProperty {
+    return when (property.type) {
+      CONFIGURATION, INPUT ->
+        DeveloperToolConfigurationProperty(key = key, value = property.valueProperty.get(), type = property.type)
+
+      SECRET -> {
+        val credentialAttribute = createPropertyCredentialAttribute(developerToolId = developerToolId, propertyKey = key)
+        PasswordSafe.instance.set(credentialAttribute, Credentials(null, property.valueProperty.get() as String))
+        DeveloperToolConfigurationProperty(key = key, value = "*******", type = property.type)
+      }
+    }
+  }
+
+  private fun restoreProperty(
+    developerToolId: String,
+    key: String,
+    value: Any?,
+    type: PropertyType
+  ): Pair<String, Any?> {
+    return when (type) {
+      CONFIGURATION, INPUT ->
+        key to value
+
+      SECRET -> {
+        val credentialAttribute = createPropertyCredentialAttribute(developerToolId = developerToolId, propertyKey = key)
+        val secretValue = PasswordSafe.instance.getPassword(credentialAttribute)
+        key to secretValue
+      }
+    }
+  }
+
+  private fun createPropertyCredentialAttribute(
+    developerToolId: String,
+    propertyKey: String
+  ): CredentialAttributes {
+    val credentialKey = "$developerToolId-$propertyKey"
+    return CredentialAttributes(
+      serviceName = generateServiceName("Developer Tools Plugin", credentialKey),
+      userName = credentialKey
+    )
+  }
+
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   data class State(
     @get:XCollection(style = v2, elementName = "developerToolsConfigurations")
-    var developerToolsConfigurations: List<Property>? = null,
+    var developerToolsConfigurations: List<DeveloperToolConfigurationState>? = null,
     @get:Attribute("lastSelectedContentNodeId")
     var lastSelectedContentNodeId: String? = null,
     @get:Attribute("loadExamples")
@@ -89,14 +187,28 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
+  @Tag(value = "developerToolConfiguration")
+  data class DeveloperToolConfigurationState(
+    @get:Attribute("developerToolId")
+    var developerToolId: String? = null,
+    @get:Attribute("id")
+    var id: String? = null,
+    @get:Attribute("name")
+    var name: String? = null,
+    @get:XCollection(style = v2, elementName = "properties")
+    var properties: List<DeveloperToolConfigurationProperty>? = null,
+  )
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
   @Tag(value = "property")
-  data class Property(
-    @get:Attribute("referenceId")
-    var referenceId: String? = null,
+  data class DeveloperToolConfigurationProperty(
     @get:Attribute("key")
     var key: String? = null,
     @get:Attribute("value", converter = StatePropertyValueConverter::class)
-    var value: Any? = null
+    var value: Any? = null,
+    @get:Attribute("type")
+    var type: PropertyType? = null
   )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -179,17 +291,31 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
       JBColor::class
     )
 
-    fun checkStateType(type: KClass<*>) {
-      check(type.java.isEnum || SUPPORTED_TYPES.contains(type)) {
-        "Unsupported configuration property type: ${type.qualifiedName}"
+    fun <T : Any> assertPersistableType(type: KClass<T>, propertyType: PropertyType): KClass<T> {
+      when (propertyType) {
+        CONFIGURATION, INPUT -> {
+          check(type.java.isEnum || SUPPORTED_TYPES.contains(type)) {
+            "Unsupported configuration/input property type: ${type.qualifiedName}"
+          }
+        }
+
+        SECRET -> {
+          check(type::class == String::class) {
+            "Unsupported secret property type: ${type.qualifiedName}"
+          }
+        }
       }
+
+      return type
     }
 
     private const val LOAD_EXAMPLES_DEFAULT = true
     private const val SAVE_INPUTS_DEFAULT = true
+    private const val SAVE_CONFIGURATION_DEFAULT = true
 
-    val lastSelectedContentNodeId = instance.lastSelectedContentNodeId
-    val loadExamples = instance.loadExamples
-    val saveInputs = instance.saveInputs
+    var lastSelectedContentNodeId by instance.lastSelectedContentNodeId
+    var loadExamples by instance.loadExamples
+    var saveConfiguration by instance.saveConfiguration
+    var saveInputs by instance.saveInputs
   }
 }

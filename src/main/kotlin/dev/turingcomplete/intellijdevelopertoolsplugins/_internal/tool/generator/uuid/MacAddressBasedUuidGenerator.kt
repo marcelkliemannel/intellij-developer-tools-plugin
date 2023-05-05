@@ -27,9 +27,18 @@ abstract class MacAddressBasedUuidGenerator(
 ) : SpecificUuidGenerator(supportsBulkGeneration) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var macAddressGenerationMode = configuration.register("${version}MacAddressGenerationMode", RANDOM)
-  private var localInterface by configuration.register("${version}LocalInterface", "")
-  private var individualMacAddress = configuration.register("${version}IndividualMacAddress", "")
+  private var macAddressGenerationMode = configuration.register(
+    "${version}MacAddressGenerationMode",
+    RANDOM
+  )
+  private var localInterface by configuration.register(
+    "${version}LocalInterface",
+    ""
+  )
+  private var individualMacAddress = configuration.register(
+    "${version}IndividualMacAddress",
+    ""
+  )
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -126,11 +135,7 @@ abstract class MacAddressBasedUuidGenerator(
 
       other as LocalInterface
 
-      if (macAddress != other.macAddress) {
-        return false
-      }
-
-      return true
+      return macAddress == other.macAddress
     }
 
     override fun hashCode(): Int = macAddress.hashCode()

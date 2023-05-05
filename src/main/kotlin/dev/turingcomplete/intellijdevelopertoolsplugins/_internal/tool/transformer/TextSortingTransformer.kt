@@ -24,7 +24,8 @@ internal class TextSortingTransformer(configuration: DeveloperToolConfiguration,
     textTransformerContext = TextTransformerContext(
       transformActionTitle = "Sort",
       sourceTitle = "Unsorted",
-      resultTitle = "Sorted"
+      resultTitle = "Sorted",
+      initialSourceExampleText = EXAMPLE_INPUT
     ),
     configuration = configuration,
     parentDisposable = parentDisposable
@@ -53,7 +54,7 @@ internal class TextSortingTransformer(configuration: DeveloperToolConfiguration,
       ?: Regex("${Regex.escape(unsortedIndividualSplitWordsDelimiter.get())}+")
     val sortedJoinWordsDelimiter = sortedJoinWordsDelimiter.get().joinDelimiter
       ?: sortedIndividualJoinWordsDelimiter.get()
-    var unsortedWords = sourceText.split(unsortedSplitWordsDelimiterPattern)
+    var unsortedWords = sourceText.get().split(unsortedSplitWordsDelimiterPattern)
 
     if (trimWords.get()) {
       unsortedWords = unsortedWords.map { it.trim() }
@@ -74,7 +75,7 @@ internal class TextSortingTransformer(configuration: DeveloperToolConfiguration,
     }
     unsortedWords = unsortedWords.sortedWith(comparator)
 
-    resultText = unsortedWords.joinToString(sortedJoinWordsDelimiter)
+    resultText.set(unsortedWords.joinToString(sortedJoinWordsDelimiter))
   }
 
   override fun Panel.buildMiddleConfigurationUi() {
@@ -166,11 +167,21 @@ internal class TextSortingTransformer(configuration: DeveloperToolConfiguration,
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> TextSortingTransformer = { TextSortingTransformer(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> TextSortingTransformer) = { configuration ->
+      TextSortingTransformer(configuration, parentDisposable)
+    }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    private const val EXAMPLE_INPUT = """
+      b
+      c
+      a
+    """
+  }
 }

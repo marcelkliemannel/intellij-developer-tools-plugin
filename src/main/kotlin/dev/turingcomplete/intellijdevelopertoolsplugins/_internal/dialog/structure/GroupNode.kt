@@ -1,21 +1,16 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure
 
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.project.Project
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup
 
-interface DeveloperToolFactory<T : DeveloperTool> {
+internal class GroupNode(val developerToolGroup: DeveloperToolGroup) :
+  ContentNode(
+    id = developerToolGroup.id,
+    title = developerToolGroup.menuTitle,
+    weight = checkNotNull(developerToolGroup.weight) { "No weight set" }
+  ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
-
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
-
-  fun getDeveloperToolContext(): DeveloperToolContext
-
-  fun getDeveloperToolCreator(
-    project: Project?,
-    parentDisposable: Disposable
-  ): ((DeveloperToolConfiguration) -> T)?
-
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //

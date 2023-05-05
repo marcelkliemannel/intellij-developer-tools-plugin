@@ -7,7 +7,6 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.project.Project
-import com.intellij.ui.EditorTextField
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.dsl.builder.*
 import com.jayway.jsonpath.Configuration
@@ -16,6 +15,7 @@ import com.jayway.jsonpath.JsonPathException
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
@@ -28,7 +28,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
     transformActionTitle = "Execute Query",
     sourceTitle = "Original",
     resultTitle = "Result",
-    initialSourceText = ORIGINAL_EXAMPLE,
+    initialSourceExampleText = EXAMPLE_SOURCE,
     initialLanguage = JsonLanguage.INSTANCE
   ),
   configuration = configuration,
@@ -36,7 +36,8 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val queryEditor: EditorTextField by lazy { createQueryInputEditor(project) }
+  private val queryText = configuration.register("contentText", "", INPUT, EXAMPLE_QUERY)
+  private val queryEditor: LanguageTextField by lazy { createQueryInputEditor(project) }
   private var errorHolder = ErrorHolder()
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
@@ -54,16 +55,18 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
   override fun transform() {
     errorHolder.clear()
 
-    if (sourceText.isBlank() || queryEditor.text.isBlank()) {
+    if (sourceText.get().isBlank() || queryEditor.text.isBlank()) {
       return
     }
 
     try {
-      val result = JsonPath.parse(sourceText, jsonPathConfiguration).read<Any>(queryEditor.text)
-      resultText = when (result) {
-        is ArrayNode -> objectMapper.writeValueAsString(result)
-        else -> result.toString()
-      }
+      val result = JsonPath.parse(sourceText.get(), jsonPathConfiguration).read<Any>(queryEditor.text)
+      resultText.set(
+        when (result) {
+          is ArrayNode -> objectMapper.writeValueAsString(result)
+          else -> result.toString()
+        }
+      )
     } catch (e: JsonPathException) {
       errorHolder.add(e)
     }
@@ -75,16 +78,27 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun createQueryInputEditor(project: Project?): EditorTextField =
-    LanguageTextField(JsonPathLanguage.INSTANCE, project, ORIGINAL_JSON_PATH_EXAMPLE, true).apply {
+  private fun createQueryInputEditor(project: Project?): LanguageTextField =
+    LanguageTextField(JsonPathLanguage.INSTANCE, project, EXAMPLE_QUERY, true).apply {
+      text = queryText.get()
+
       addDocumentListener(object : DocumentListener {
         override fun documentChanged(event: DocumentEvent) {
-          if (!isDisposed && liveTransformation.get()) {
-            transform()
+          if (!isDisposed) {
+            queryText.set(event.document.text, "fromQueryInputEditor")
+            if (liveTransformation.get()) {
+              transform()
+            }
           }
         }
       })
       allowUiDslLabel(this.component)
+
+      queryText.afterChangeConsumeEvent(parentDisposable) { event ->
+        if (event.newValue != event.oldValue && event.id != "fromQueryInputEditor") {
+          text = event.newValue
+        }
+      }
     }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -97,10 +111,11 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> JsonPathTransformer = { JsonPathTransformer(configuration, project, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> JsonPathTransformer) = { configuration ->
+      JsonPathTransformer(configuration, project, parentDisposable)
+    }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
@@ -115,7 +130,7 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
     }
 
     @org.intellij.lang.annotations.Language("JSON")
-    private const val ORIGINAL_EXAMPLE = """{
+    private const val EXAMPLE_SOURCE = """{
   "starWars": {
     "characters": [
       {
@@ -150,6 +165,6 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
   }
 }"""
 
-    private const val ORIGINAL_JSON_PATH_EXAMPLE = "\$.starWars.characters..forename"
+    private const val EXAMPLE_QUERY = "\$.starWars.characters..forename"
   }
 }

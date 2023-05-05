@@ -1,21 +1,17 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure
 
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.project.Project
+import com.intellij.icons.AllIcons
 
-interface DeveloperToolFactory<T : DeveloperTool> {
+internal class ConfigurationNode : ContentNode(
+  id = "configuration",
+  title = "Configuration",
+  weight = Int.MAX_VALUE,
+  icon = AllIcons.General.Gear,
+  isSecondaryNode = true
+) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
-
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
-
-  fun getDeveloperToolContext(): DeveloperToolContext
-
-  fun getDeveloperToolCreator(
-    project: Project?,
-    parentDisposable: Disposable
-  ): ((DeveloperToolConfiguration) -> T)?
-
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //

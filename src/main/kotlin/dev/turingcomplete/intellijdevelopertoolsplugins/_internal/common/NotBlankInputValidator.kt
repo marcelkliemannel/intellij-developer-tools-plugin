@@ -1,36 +1,17 @@
-@file:Suppress("UnstableApiUsage")
-
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 
-import com.intellij.openapi.observable.dispatcher.SingleEventDispatcher
-import com.intellij.openapi.observable.properties.ObservableProperty
-import com.intellij.ui.layout.ComponentPredicate
+import com.intellij.openapi.ui.InputValidator
 
-class PropertyComponentPredicate<T>(
-  private val property: ObservableProperty<T>,
-  private val expectedValue: T
-) : ComponentPredicate() {
+class NotBlankInputValidator : InputValidator {
   // -- Properties -------------------------------------------------------------------------------------------------- //
-
-  private val changeDispatcher = SingleEventDispatcher.create<T>()
-
   // -- Initialization ---------------------------------------------------------------------------------------------- //
-
-  init {
-    property.afterChange { value ->
-      changeDispatcher.fireEvent(value)
-    }
-  }
-
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun addListener(listener: (Boolean) -> Unit) {
-    changeDispatcher.whenEventHappened { value ->
-      listener(value?.equals(expectedValue) ?: false)
-    }
-  }
+  override fun checkInput(inputString: String?): Boolean =
+    inputString?.isNotBlank() ?: false
 
-  override fun invoke(): Boolean = property.get()?.equals(expectedValue) ?: false
+  override fun canClose(inputString: String?): Boolean =
+    inputString?.isNotBlank() ?: false
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

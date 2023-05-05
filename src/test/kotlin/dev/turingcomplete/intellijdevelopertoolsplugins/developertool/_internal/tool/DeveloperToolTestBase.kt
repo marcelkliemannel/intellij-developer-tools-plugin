@@ -21,7 +21,7 @@ abstract class DeveloperToolTestBase<T : DeveloperTool>(
   override fun setUp() {
     super.setUp()
 
-    configuration = DeveloperToolConfiguration()
+    configuration = DeveloperToolConfiguration("Test")
   /*  developerTool = checkNotNull(factory.getDeveloperToolCreator(configuration, project, testRootDisposable)).apply {
       runInEdt { createComponent() }
     }*/

@@ -11,12 +11,13 @@ import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.SOURCE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.TARGET
-import kotlin.properties.Delegates
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 
 internal abstract class TextConverter(
   protected val textConverterContext: TextConverterContext,
@@ -26,15 +27,15 @@ internal abstract class TextConverter(
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)
+  protected var sourceText = configuration.register("sourceText", "", INPUT)
+  protected var targetText = configuration.register("targetText", "", INPUT)
+
   private val conversationAlarm by lazy { Alarm(parentDisposable) }
 
   private var lastActiveInput: ActiveInput? = null
 
-  private val sourceEditor by lazy { createEditor(SOURCE, textConverterContext.sourceTitle) { doToTarget(it) } }
-  private val targetEditor by lazy { createEditor(TARGET, textConverterContext.targetTitle) { doToSource(it) } }
-
-  protected var sourceText: String by Delegates.observable("") { _, _, new -> sourceEditor.text = new }
-  protected var targetText: String by Delegates.observable("") { _, _, new -> targetEditor.text = new }
+  private val sourceEditor by lazy { createEditor(SOURCE, textConverterContext.sourceTitle, sourceText) { doToTarget(it) } }
+  private val targetEditor by lazy { createEditor(TARGET, textConverterContext.targetTitle, targetText) { doToSource(it) } }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -136,8 +137,7 @@ internal abstract class TextConverter(
     doConversation {
       try {
         toTarget(text)
-      }
-      catch (ignore: Exception) {
+      } catch (ignore: Exception) {
       }
     }
   }
@@ -146,8 +146,7 @@ internal abstract class TextConverter(
     doConversation {
       try {
         toSource(text)
-      }
-      catch (ignore: Exception) {
+      } catch (ignore: Exception) {
       }
     }
   }
@@ -157,18 +156,22 @@ internal abstract class TextConverter(
     conversationAlarm.addRequest(conversation, 0)
   }
 
-  private fun createEditor(activeInput: ActiveInput, title: String, onTextChange: (String) -> Unit) =
-    DeveloperToolEditor(title = title, editorMode = INPUT_OUTPUT, parentDisposable = parentDisposable).apply {
-      onFocusGained {
+  private fun createEditor(
+    activeInput: ActiveInput,
+    title: String,
+    textProperty: ValueProperty<String>,
+    onTextChange: (String) -> Unit
+  ) = DeveloperToolEditor(title = title, editorMode = INPUT_OUTPUT, parentDisposable, textProperty).apply {
+    onFocusGained {
+      lastActiveInput = activeInput
+    }
+    this.onTextChangeFromUi { text ->
+      if (liveConversion.get()) {
         lastActiveInput = activeInput
-      }
-      this.onTextChangeFromUi { text ->
-        if (liveConversion.get()) {
-          lastActiveInput = activeInput
-          onTextChange(text)
-        }
+        onTextChange(text)
       }
     }
+  }
 
   private fun handleLiveConversionSwitch() {
     if (liveConversion.get()) {

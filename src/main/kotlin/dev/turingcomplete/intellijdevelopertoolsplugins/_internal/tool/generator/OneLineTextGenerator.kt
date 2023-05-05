@@ -68,9 +68,13 @@ abstract class OneLineTextGenerator(
   }
 
   override fun configurationChanged() {
-    if (!isDisposed) {
+    if (!isDisposed && !configuration.isResetting) {
       doGenerate()
     }
+  }
+
+  override fun reset() {
+    doGenerate()
   }
 
   override fun doDispose() {
@@ -107,7 +111,7 @@ abstract class OneLineTextGenerator(
 
   private fun Panel.buildBulkGenerationUi() {
     collapsibleGroup("Bulk Generation", false) {
-      val resultEditor = DeveloperToolEditor(title = null, editorMode = OUTPUT, parentDisposable = parentDisposable)
+      val resultEditor = DeveloperToolEditor(title = null, editorMode = OUTPUT, parentDisposable)
 
       row {
         label("Number of values:").gap(RightGap.SMALL)

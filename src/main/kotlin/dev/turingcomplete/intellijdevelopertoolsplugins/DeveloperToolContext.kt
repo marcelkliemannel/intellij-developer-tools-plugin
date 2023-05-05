@@ -7,9 +7,7 @@ data class DeveloperToolContext(
         val menuTitle: String,
 
         @Nls(capitalization = Nls.Capitalization.Title)
-        val contentTitle: String,
-
-        val supportsReset: Boolean = false,
+        val contentTitle: String
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //

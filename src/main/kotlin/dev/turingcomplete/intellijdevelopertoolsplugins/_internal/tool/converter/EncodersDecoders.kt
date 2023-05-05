@@ -32,11 +32,11 @@ internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, p
   ) {
 
   override fun toTarget(text: String) {
-    targetText = Base32.toBase32String(text.encodeToByteArray())
+    targetText.set(Base32.toBase32String(text.encodeToByteArray()))
   }
 
   override fun toSource(text: String) {
-    sourceText = Base32.decode(text).decodeToString()
+    sourceText.set(Base32.decode(text).decodeToString())
   }
 
   class Factory : DeveloperToolFactory<Base32EncoderDecoder> {
@@ -47,10 +47,10 @@ internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, p
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> Base32EncoderDecoder = { Base32EncoderDecoder(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> Base32EncoderDecoder) =
+      { configuration -> Base32EncoderDecoder(configuration, parentDisposable) }
   }
 }
 
@@ -64,11 +64,11 @@ internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, p
   ) {
 
   override fun toTarget(text: String) {
-    targetText = Base64.getEncoder().encodeToString(text.encodeToByteArray())
+    targetText.set(Base64.getEncoder().encodeToString(text.encodeToByteArray()))
   }
 
   override fun toSource(text: String) {
-    sourceText = Base64.getDecoder().decode(text).decodeToString()
+    sourceText.set(Base64.getDecoder().decode(text).decodeToString())
   }
 
   class Factory : DeveloperToolFactory<Base64EncoderDecoder> {
@@ -79,10 +79,10 @@ internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, p
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> Base64EncoderDecoder = { Base64EncoderDecoder(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> Base64EncoderDecoder) =
+      { configuration -> Base64EncoderDecoder(configuration, parentDisposable) }
   }
 }
 
@@ -96,11 +96,11 @@ internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration
   ) {
 
   override fun toTarget(text: String) {
-    targetText = Base64.getUrlEncoder().encodeToString(text.encodeToByteArray())
+    targetText.set(Base64.getUrlEncoder().encodeToString(text.encodeToByteArray()))
   }
 
   override fun toSource(text: String) {
-    sourceText = Base64.getUrlDecoder().decode(text).decodeToString()
+    sourceText.set(Base64.getUrlDecoder().decode(text).decodeToString())
   }
 
   class Factory : DeveloperToolFactory<UrlBase64EncoderDecoder> {
@@ -111,10 +111,10 @@ internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> UrlBase64EncoderDecoder = { UrlBase64EncoderDecoder(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> UrlBase64EncoderDecoder) =
+      { configuration -> UrlBase64EncoderDecoder(configuration, parentDisposable) }
   }
 }
 
@@ -128,11 +128,11 @@ internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguratio
   ) {
 
   override fun toTarget(text: String) {
-    targetText = Base64.getMimeEncoder().encodeToString(text.encodeToByteArray())
+    targetText.set(Base64.getMimeEncoder().encodeToString(text.encodeToByteArray()))
   }
 
   override fun toSource(text: String) {
-    sourceText = Base64.getMimeDecoder().decode(text).decodeToString()
+    sourceText.set(Base64.getMimeDecoder().decode(text).decodeToString())
   }
 
   class Factory : DeveloperToolFactory<MimeBase64EncoderDecoder> {
@@ -143,10 +143,10 @@ internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguratio
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> MimeBase64EncoderDecoder = { MimeBase64EncoderDecoder(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> MimeBase64EncoderDecoder) =
+      { configuration -> MimeBase64EncoderDecoder(configuration, parentDisposable) }
   }
 }
 
@@ -160,11 +160,11 @@ internal class UrlEncodingEncoderDecoder(configuration: DeveloperToolConfigurati
   ) {
 
   override fun toTarget(text: String) {
-    targetText = URLEncoder.encode(text, StandardCharsets.UTF_8)
+    targetText.set(URLEncoder.encode(text, StandardCharsets.UTF_8))
   }
 
   override fun toSource(text: String) {
-    sourceText = URLDecoder.decode(text, StandardCharsets.UTF_8)
+    sourceText.set(URLDecoder.decode(text, StandardCharsets.UTF_8))
   }
 
   class Factory : DeveloperToolFactory<UrlEncodingEncoderDecoder> {
@@ -175,10 +175,10 @@ internal class UrlEncodingEncoderDecoder(configuration: DeveloperToolConfigurati
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> UrlEncodingEncoderDecoder = { UrlEncodingEncoderDecoder(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> UrlEncodingEncoderDecoder) =
+      { configuration -> UrlEncodingEncoderDecoder(configuration, parentDisposable) }
   }
 }
 

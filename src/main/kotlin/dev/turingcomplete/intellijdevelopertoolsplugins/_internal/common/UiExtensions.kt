@@ -18,6 +18,7 @@ import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.DslComponentProperty
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
+import com.intellij.ui.tabs.TabInfo
 import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.components.BorderLayoutPanel
@@ -38,6 +39,7 @@ import javax.swing.border.CompoundBorder
 /**
  * The UI DSL only verifies the range of an `intTextField` on a user input.
  */
+@Suppress("UnstableApiUsage")
 fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) = this.apply {
   validationInfo {
     if (this@validateLongValue.component.isEnabled) {
@@ -174,6 +176,9 @@ fun EditorEx.setLanguage(language: Language) {
 }
 
 fun Color.toJBColor() = if (this is JBColor) this else JBColor(this, this)
+
+@Suppress("UNCHECKED_CAST")
+fun <T> TabInfo.castedObject(): T = this.`object` as T
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

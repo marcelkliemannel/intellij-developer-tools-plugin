@@ -19,13 +19,13 @@ internal class JwtEncoderDecoderTest : DeveloperToolTestBase<JwtEncoderDecoder>(
       .sign(Algorithm.HMAC256("s3cre!"))
 
     uiInput {
-      developerTool.encodedEditor.text = encodedJwt
+      developerTool.encodedText.set(encodedJwt)
     }
 
-    val actualHeaderJson = developerTool.headerEditor.text
+    val actualHeaderJson = developerTool.headerText.get()
     JSONAssert.assertEquals(JWT.decode(encodedJwt).header.decodeBase64String(), actualHeaderJson, true)
 
-    val actualPayloadJson = developerTool.payloadEditor.text
+    val actualPayloadJson = developerTool.payloadText.get()
     JSONAssert.assertEquals(JWT.decode(encodedJwt).payload.decodeBase64String(), actualPayloadJson, true)
   }
 

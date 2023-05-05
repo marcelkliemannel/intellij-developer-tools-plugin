@@ -10,10 +10,11 @@ import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.layout.not
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
-import kotlin.properties.Delegates
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 
 abstract class TextTransformer(
   private val textTransformerContext: TextTransformerContext,
@@ -23,13 +24,12 @@ abstract class TextTransformer(
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   protected var liveTransformation = configuration.register("liveTransformation", true)
+  protected val sourceText = configuration.register("sourceText", "", PropertyType.INPUT, textTransformerContext.initialSourceExampleText)
+  protected var resultText = ValueProperty("")
 
   private val sourceEditor: DeveloperToolEditor by lazy { createSourceInputEditor() }
   private val resultEditor by lazy { createResultOutputEditor(parentDisposable) }
 
-  protected val sourceText: String
-    get() = sourceEditor.text
-  protected var resultText: String by Delegates.observable("") { _, _, new -> resultEditor.text = new }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -111,11 +111,11 @@ abstract class TextTransformer(
     DeveloperToolEditor(
       title = textTransformerContext.sourceTitle,
       editorMode = INPUT,
-      parentDisposable = parentDisposable
+      parentDisposable = parentDisposable,
+      textProperty = sourceText
     ).apply {
       with(textTransformerContext) {
         initialLanguage?.let { language = it }
-        initialSourceText?.let { text = it }
       }
       onTextChangeFromUi { _ ->
         if (liveTransformation.get()) {
@@ -128,7 +128,8 @@ abstract class TextTransformer(
     DeveloperToolEditor(
       title = textTransformerContext.resultTitle,
       editorMode = OUTPUT,
-      parentDisposable = parentDisposable
+      parentDisposable = parentDisposable,
+      textProperty = resultText
     ).apply {
       getInitialLanguage()?.let { language = it }
     }
@@ -140,6 +141,7 @@ abstract class TextTransformer(
     val sourceTitle: String,
     val resultTitle: String,
     val initialSourceText: String? = null,
+    val initialSourceExampleText: String? = null,
     val initialLanguage: Language? = null
   )
 

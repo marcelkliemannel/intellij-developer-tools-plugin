@@ -9,6 +9,9 @@ import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.UIUtil
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ContentNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.DeveloperToolNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.GroupNode
 import org.jdesktop.swingx.VerticalLayout
 import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants

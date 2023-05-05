@@ -26,7 +26,7 @@ import java.security.SecureRandom
 import javax.swing.JComponent
 
 internal class PasswordGenerator(
-  private val configuration: DeveloperToolConfiguration,
+  configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : OneLineTextGenerator(
   configuration,
@@ -80,16 +80,6 @@ internal class PasswordGenerator(
           .enabledIf(addSymbolsCheckBox.selected)
           .align(Align.FILL)
       }.layout(RowLayout.PARENT_GRID)
-
-      onReset {
-        configuration.bulkChange {
-          length.set(DEFAULT_LENGTH)
-          lettersMode.set(DEFAULT_LETTERS_MODE)
-          addDigits.set(DEFAULT_ADD_DIGITS)
-          addSymbols.set(DEFAULT_ADD_SYMBOLS)
-          symbols.set(DEFAULT_SYMBOLS)
-        }
-      }
     }
   }
 
@@ -150,15 +140,14 @@ internal class PasswordGenerator(
 
     override fun getDeveloperToolContext() = DeveloperToolContext(
       menuTitle = "Password Generator",
-      contentTitle = "Password Generator",
-      supportsReset = true
+      contentTitle = "Password Generator"
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> PasswordGenerator = { PasswordGenerator(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> PasswordGenerator) =
+      { configuration ->  PasswordGenerator(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

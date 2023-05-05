@@ -23,7 +23,7 @@ class SqlFormatterTransformer(
     transformActionTitle = "Format",
     sourceTitle = "Plain SQL",
     resultTitle = "Formatted SQL",
-    initialSourceText = EXAMPLE_SQL
+    initialSourceExampleText = EXAMPLE_SQL
   ),
   configuration = configuration,
   parentDisposable = parentDisposable
@@ -73,16 +73,6 @@ class SqlFormatterTransformer(
       checkBox("Convert keywords to uppercase")
         .bindSelected(uppercase)
     }.layout(RowLayout.PARENT_GRID)
-
-    onReset {
-      configuration.bulkChange {
-        dialect.set(DEFAULT_DIALECT)
-        indentSpaces.set(DEFAULT_INDENT_SPACES)
-        uppercase.set(DEFAULT_UPPERCASE)
-        linesBetweenQueries.set(DEFAULT_LINES_BETWEEN_QUERIES)
-        maxColumnLength.set(DEFAULT_MAX_COLUMN_LENGTH)
-      }
-    }
   }
 
   override fun afterBuildUi() {
@@ -91,7 +81,7 @@ class SqlFormatterTransformer(
   }
 
   override fun transform() {
-    resultText = SqlFormatter.of(dialect.get()).format(sourceText, formatConfig)
+    resultText.set(SqlFormatter.of(dialect.get()).format(sourceText.get(), formatConfig))
   }
 
   override fun configurationChanged() {
@@ -116,15 +106,15 @@ class SqlFormatterTransformer(
 
     override fun getDeveloperToolContext() = DeveloperToolContext(
       menuTitle = "SQL Formatter",
-      contentTitle = "SQL Formatter",
-      supportsReset = true
+      contentTitle = "SQL Formatter"
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> SqlFormatterTransformer = { SqlFormatterTransformer(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> SqlFormatterTransformer) = { configuration ->
+      SqlFormatterTransformer(configuration, parentDisposable)
+    }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

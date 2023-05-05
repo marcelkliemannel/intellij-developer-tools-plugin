@@ -16,9 +16,15 @@ private val prettyPrinter = DefaultPrettyPrinter()
 val objectMapper: ObjectMapper = ObjectMapper()
   .setDefaultPrettyPrinter(prettyPrinter)
 
-fun JsonNode.toPrettyStringWithDefaultObjectMapper(): String = objectMapper
-  .writerWithDefaultPrettyPrinter()
-  .writeValueAsString(this)
+fun JsonNode.toPrettyStringWithDefaultObjectMapper(): String {
+  if (this.isMissingNode) {
+    return ""
+  }
+
+  return objectMapper
+    .writerWithDefaultPrettyPrinter()
+    .writeValueAsString(this)
+}
 
 // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 // -- Private Methods --------------------------------------------------------------------------------------------- //

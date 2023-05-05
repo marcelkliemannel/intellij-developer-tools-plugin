@@ -41,7 +41,7 @@ abstract class DeveloperTool(
     val wrapper = object : BorderLayoutPanel(), DataProvider {
 
       init {
-        border = JBEmptyBorder(4, 16, 16, 16)
+        border = JBEmptyBorder(12, 16, 16, 16)
         addToCenter(panel)
       }
 
@@ -81,8 +81,8 @@ abstract class DeveloperTool(
     // Override if needed
   }
 
-  internal fun reset() {
-    panel.reset()
+  open fun reset() {
+    // Override if needed
   }
 
   fun validate(): List<ValidationInfo> {

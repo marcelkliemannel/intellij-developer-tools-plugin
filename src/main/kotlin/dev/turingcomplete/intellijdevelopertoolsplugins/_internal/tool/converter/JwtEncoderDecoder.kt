@@ -13,8 +13,6 @@ import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.fileTypes.PlainTextLanguage
-import com.intellij.openapi.observable.properties.AtomicProperty
-import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.TextRange
@@ -38,8 +36,10 @@ import com.intellij.util.Alarm
 import com.intellij.util.io.decodeBase64
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
@@ -61,6 +61,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithmKind.ECDSA
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithmKind.HMAC
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithmKind.RSA
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import io.ktor.util.*
 import java.security.KeyFactory
 import java.security.PrivateKey
@@ -75,11 +76,15 @@ import java.util.*
 import javax.swing.Icon
 
 
-internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
-  DeveloperTool(parentDisposable) {
+internal class JwtEncoderDecoder(
+  private val configuration: DeveloperToolConfiguration, parentDisposable: Disposable
+) : DeveloperTool(parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)
+  var encodedText = configuration.register("encodedText", "", INPUT, EXAMPLE_JWT)
+  var headerText = configuration.register("headerText", "", INPUT)
+  var payloadText = configuration.register("payloadText", "", INPUT)
 
   private val highlightEncodedAlarm by lazy { Alarm(parentDisposable) }
   private val highlightHeaderAlarm by lazy { Alarm(parentDisposable) }
@@ -88,20 +93,18 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
 
   private var lastActiveInput: DeveloperToolEditor? = null
 
-  val encodedEditor by lazy { createEditor(ENCODED, "Encoded", PlainTextLanguage.INSTANCE) { highlightDotSeparator() }.apply { textProperty.set(EXAMPLE_JWT) } }
-  val headerEditor by lazy { createEditor(HEADER_PAYLOAD, "Header", JsonLanguage.INSTANCE) { highlightHeaderClaims() } }
-  val payloadEditor by lazy { createEditor(HEADER_PAYLOAD, "Payload", JsonLanguage.INSTANCE) { highlightPayloadClaims() } }
+  private val encodedEditor by lazy { createEncodedEditor() }
+  private val headerEditor by lazy { createHeaderEditor() }
+  private val payloadEditor by lazy { createPayloadEditor() }
 
   private val highlightingAttributes by lazy { EditorColorsManager.getInstance().globalScheme.getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES) }
 
-  private val jwt by lazy { Jwt(configuration, encodedEditor.textProperty, headerEditor.textProperty, payloadEditor.textProperty) }
+  private val jwt by lazy { Jwt(configuration, encodedText, headerText, payloadText) }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
-    liveConversion.afterChange(parentDisposable) {
-      handleLiveConversionSwitch()
-    }
+    liveConversion.afterChange(parentDisposable) { handleLiveConversionSwitch() }
   }
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -193,9 +196,18 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
     convert(ENCODED)
   }
 
+  override fun reset() {
+    jwt.reset()
+    convert(ENCODED)
+  }
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun convert(changeOrigin: ChangeOrigin) {
+    if (configuration.isResetting) {
+      return
+    }
+
     conversationAlarm.cancelAllRequests()
     conversationAlarm.addRequest({ doConvert(changeOrigin) }, 100)
   }
@@ -223,7 +235,7 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
     highlightEncodedAlarm.cancelAllRequests()
     val highlightDotSeparator = {
       encodedEditor.removeTextRangeHighlighters(ENCODED_DOT_SEPARATOR_GROUP_ID)
-      val encoded = encodedEditor.textProperty.get()
+      val encoded = encodedText.get()
       var dotIndex = encoded.indexOf('.')
       var i = 0
       while (dotIndex != -1) {
@@ -275,12 +287,37 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
       }
   }
 
+  private fun createEncodedEditor(): DeveloperToolEditor =
+    createEditor(
+      changeOrigin = ENCODED,
+      title = "Encoded",
+      language = PlainTextLanguage.INSTANCE,
+      textProperty = encodedText
+    ) { highlightDotSeparator() }
+
+  private fun createHeaderEditor(): DeveloperToolEditor =
+    createEditor(
+      changeOrigin = HEADER_PAYLOAD,
+      title = "Header",
+      language = JsonLanguage.INSTANCE,
+      textProperty = headerText
+    ) { highlightHeaderClaims() }
+
+  private fun createPayloadEditor(): DeveloperToolEditor =
+    createEditor(
+      changeOrigin = HEADER_PAYLOAD,
+      title = "Payload",
+      language = JsonLanguage.INSTANCE,
+      textProperty = payloadText
+    ) { highlightPayloadClaims() }
+
   private fun createEditor(
     changeOrigin: ChangeOrigin,
     title: String,
     language: Language,
+    textProperty: ValueProperty<String>,
     onTextChangeFromUi: () -> Unit
-  ) = DeveloperToolEditor(title, INPUT_OUTPUT, parentDisposable, language).apply {
+  ) = DeveloperToolEditor(title, INPUT_OUTPUT, parentDisposable, textProperty, language).apply {
     onFocusGained {
       lastActiveInput = this
     }
@@ -375,9 +412,9 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
 
   private class Jwt(
     configuration: DeveloperToolConfiguration,
-    val encoded: ObservableMutableProperty<String>,
-    val header: ObservableMutableProperty<String>,
-    val payload: ObservableMutableProperty<String>
+    val encoded: ValueProperty<String>,
+    val header: ValueProperty<String>,
+    val payload: ValueProperty<String>
   ) {
 
     val encodedErrorHolder = ErrorHolder()
@@ -465,6 +502,10 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
       }
     }
 
+    fun reset() {
+      signature.reset()
+    }
+
     private fun clearErrorHolders() {
       encodedErrorHolder.clear()
       headerErrorHolder.clear()
@@ -500,20 +541,27 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class Signature(configuration: DeveloperToolConfiguration, private val signatureErrorHolder: ErrorHolder) {
+  private class Signature(
+    configuration: DeveloperToolConfiguration,
+    private val signatureErrorHolder: ErrorHolder
+  ) {
 
-    val algorithm: ObservableMutableProperty<SignatureAlgorithm> = configuration.register("algorithm", DEFAULT_SIGNATURE_ALGORITHM)
+    val algorithm = configuration.register("algorithm", DEFAULT_SIGNATURE_ALGORITHM)
 
-    var secret = AtomicProperty(EXAMPLE_SECRET)
-    var publicKey = AtomicProperty("")
-    var privateKey = AtomicProperty("")
+    var secret = ValueProperty(if (DeveloperToolsPluginService.loadExamples) EXAMPLE_SECRET else "")
+    var publicKey = ValueProperty("")
+    var privateKey = ValueProperty("")
 
     val publicKeyErrorHolder = ErrorHolder()
     val privateKeyErrorHolder = ErrorHolder()
 
     init {
       handleAlgorithmChange()
-      algorithm.afterChange { handleAlgorithmChange() }
+      algorithm.afterChangeConsumeEvent(null) { e ->
+        if (e.valueChanged()) {
+          handleAlgorithmChange()
+        }
+      }
     }
 
     fun calculate(encodedHeader: ByteArray, encodedPayload: ByteArray): String? {
@@ -594,17 +642,54 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
       }
     }
 
+    fun reset() {
+      if (DeveloperToolsPluginService.loadExamples) {
+        secret.set(EXAMPLE_SECRET)
+        when (algorithm.get().kind) {
+          HMAC -> {}
+
+          RSA -> {
+            publicKey.set(EXAMPLE_RSA_PUBLIC_KEY)
+            privateKey.set(EXAMPLE_RSA_PRIVATE_KEY)
+          }
+
+          ECDSA -> {
+            publicKey.set(EXAMPLE_EC_PUBLIC_KEY)
+            privateKey.set(EXAMPLE_EC_PRIVATE_KEY)
+          }
+        }
+      }
+      else {
+        if (publicKey.get() == EXAMPLE_EC_PUBLIC_KEY || publicKey.get() == EXAMPLE_RSA_PUBLIC_KEY) {
+          publicKey.set("")
+        }
+        if (privateKey.get() == EXAMPLE_EC_PRIVATE_KEY || privateKey.get() == EXAMPLE_RSA_PRIVATE_KEY) {
+          privateKey.set("")
+        }
+        if (secret.get() == EXAMPLE_SECRET) {
+          secret.set("")
+        }
+      }
+    }
+
     private fun toRawKey(keyInput: String): ByteArray = keyInput
       .replace(RAW_KEY_REGEX, "")
       .decodeBase64()
 
     private fun handleAlgorithmChange() {
-      val kind = algorithm.get().kind
+      if (DeveloperToolsPluginService.loadExamples) {
+        loadExampleSecrets()
+      }
+    }
+
+    private fun loadExampleSecrets() {
       val publicKeyValue = publicKey.get()
       val privateKeyValue = privateKey.get()
-      when (kind) {
+      when (algorithm.get().kind) {
         HMAC -> {
-          return
+          if (secret.get().isBlank()) {
+            secret.set(EXAMPLE_SECRET)
+          }
         }
 
         RSA -> {
@@ -665,10 +750,10 @@ internal class JwtEncoderDecoder(configuration: DeveloperToolConfiguration, pare
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> JwtEncoderDecoder = { JwtEncoderDecoder(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> JwtEncoderDecoder) =
+      { configuration -> JwtEncoderDecoder(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

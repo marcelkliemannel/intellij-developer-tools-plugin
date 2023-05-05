@@ -18,9 +18,14 @@ import com.intellij.util.ui.tree.TreeUtil
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolFactoryEp
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.lastSelectedContentNodeId
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.safeCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.uncheckedCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ConfigurationNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ContentNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.DeveloperToolNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.GroupNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.RootNode
 import javax.swing.JTree
 import javax.swing.event.TreeSelectionListener
 import javax.swing.plaf.TreeUI
@@ -29,7 +34,7 @@ import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreePath
 import javax.swing.tree.TreeSelectionModel
 
-class MainMenuTree(
+internal class MainMenuTree(
   private val onContentNodeSelection: (ContentNode) -> Unit,
   project: Project?,
   parentDisposable: Disposable
@@ -60,7 +65,7 @@ class MainMenuTree(
 
   private fun selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode: ContentNode?) {
     var lastSelectedContentNodeSelected = false
-    lastSelectedContentNodeId.get()?.let { lastSelectedComponentNodeId ->
+    lastSelectedContentNodeId?.let { lastSelectedComponentNodeId ->
       TreeUtil.promiseVisit(this) {
         val lastPathComponent = it.lastPathComponent
         if (lastPathComponent is ContentNode
@@ -111,7 +116,7 @@ class MainMenuTree(
       ?.safeCastTo<ContentNode>()
       ?.let {
         onContentNodeSelection(it)
-        lastSelectedContentNodeId.set(it.id)
+        lastSelectedContentNodeId = it.id
       }
   }
 
@@ -133,14 +138,14 @@ class MainMenuTree(
     val application = ApplicationManager.getApplication()
     DeveloperToolFactoryEp.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
       val developerToolFactory: DeveloperToolFactory<*> = developerToolFactoryEp.createInstance(application)
-      val developerToolConfiguration = DeveloperToolsPluginService.instance.getOrCreateDeveloperToolConfiguration(developerToolFactoryEp.id)
 
-      developerToolFactory.getDeveloperToolCreator(developerToolConfiguration, project, parentDisposable)?.let { developerToolCreator ->
+      developerToolFactory.getDeveloperToolCreator(project, parentDisposable)?.let { developerToolCreator ->
         val groupId: String? = developerToolFactoryEp.groupId
         val parentNode = if (groupId != null) (groupNodes[groupId] ?: error("Unknown group: $groupId")) else rootNode
         val developerToolNode = DeveloperToolNode(
           developerToolId = developerToolFactoryEp.id,
           parentDisposable = parentDisposable,
+          project = project,
           developerToolContext = developerToolFactory.getDeveloperToolContext(),
           developerToolCreator = developerToolCreator,
           weight = checkNotNull(developerToolFactoryEp.weight) { "No weight set" }
@@ -156,6 +161,8 @@ class MainMenuTree(
 
     rootNode.sortChildren()
 
+    rootNode.add(ConfigurationNode())
+
     return Triple(rootNode, groupNodesToExpand, preferredSelectedDeveloperToolNode)
   }
 
@@ -164,15 +171,25 @@ class MainMenuTree(
   private class MenuTreeNodeRenderer(private val root: DefaultMutableTreeNode) : NodeRenderer() {
 
     override fun customizeCellRenderer(tree: JTree,
-                                       value: Any?,
+                                       value: Any,
                                        selected: Boolean,
                                        expanded: Boolean,
                                        leaf: Boolean,
                                        row: Int,
                                        hasFocus: Boolean) {
-      val isTopLevelNode = value is DefaultMutableTreeNode && value.parent == root
-      val textAttributes = if (isTopLevelNode) REGULAR_BOLD_ATTRIBUTES else REGULAR_ATTRIBUTES
-      append(value.toString(), textAttributes)
+      val contentNode = value.uncheckedCastTo(ContentNode::class)
+
+      val isTopLevelNode = contentNode.parent == root
+      val textAttributes = if (isTopLevelNode && !contentNode.isSecondaryNode) {
+        REGULAR_BOLD_ATTRIBUTES
+      }
+      else {
+        REGULAR_ATTRIBUTES
+      }
+      append(contentNode.title, textAttributes)
+      icon = contentNode.icon
+      isIconOnTheRight = true
+      toolTipText = contentNode.toolTipText
     }
   }
 

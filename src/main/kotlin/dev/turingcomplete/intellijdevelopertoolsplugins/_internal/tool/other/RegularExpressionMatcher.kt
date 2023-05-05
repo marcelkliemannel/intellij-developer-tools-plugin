@@ -47,6 +47,7 @@ import com.intellij.util.ui.UIUtil
 import dev.turingcomplete.intellijbytecodeplugin._ui.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CommonsDataKeys
@@ -76,6 +77,9 @@ class RegularExpressionMatcher(
 
   private var selectedRegexOptionFlag = configuration.register("regexOption", 0)
 
+  private val regexText = configuration.register("regexText", "", INPUT, EXAMPLE_REGEX)
+  private val inputText = configuration.register("inputText", "", INPUT, EXAMPLE_INPUT_TEXT)
+
   private val regexInputEditor: EditorTextField by lazy { createRegexInputEditor(project) }
   private val inputEditor: DeveloperToolEditor by lazy { createInputEditor() }
 
@@ -101,7 +105,7 @@ class RegularExpressionMatcher(
         .resizableColumn()
         .gap(RightGap.SMALL)
       cell(createSelectRegexOptionsButton())
-    }
+    }.topGap(TopGap.NONE)
 
     row {
       cell(inputEditor.createComponent()).align(Align.FILL)
@@ -197,24 +201,33 @@ class RegularExpressionMatcher(
   }
 
   private fun createInputEditor() =
-    DeveloperToolEditor("Text", DeveloperToolEditor.EditorMode.INPUT, parentDisposable)
-      .apply { text = EXAMPLE_INPUT_TEXT }
+    DeveloperToolEditor("Text", DeveloperToolEditor.EditorMode.INPUT, parentDisposable, inputText)
       .onTextChangeFromUi { match() }
 
   private fun createRegexInputEditor(project: Project?): EditorTextField =
     object : LanguageTextField(RegExpLanguage.INSTANCE, project, EXAMPLE_REGEX, true) {
 
       init {
+        text = regexText.get()
         addDocumentListener(object : DocumentListener {
           override fun documentChanged(event: DocumentEvent) {
-            match()
+            if (!isDisposed) {
+              regexText.set(event.document.text, "fromRegexInputEditor")
+              match()
+            }
           }
         })
         allowUiDslLabel(this.component)
+
+        regexText.afterChangeConsumeEvent(parentDisposable) { event ->
+          if (event.newValue != event.oldValue && event.id != "fromRegexInputEditor") {
+            text = event.newValue
+          }
+        }
       }
 
       override fun onEditorAdded(editor: Editor) {
-        editor.putUserData(CheckRegExpForm.CHECK_REG_EXP_EDITOR, TRUE)
+        editor.putUserData(CheckRegExpForm.Keys.CHECK_REG_EXP_EDITOR, TRUE)
       }
     }
 
@@ -440,10 +453,10 @@ class RegularExpressionMatcher(
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> RegularExpressionMatcher = { RegularExpressionMatcher(configuration, project, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> RegularExpressionMatcher) =
+      { configuration -> RegularExpressionMatcher(configuration, project, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

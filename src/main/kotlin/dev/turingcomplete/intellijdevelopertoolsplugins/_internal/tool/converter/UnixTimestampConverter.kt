@@ -3,8 +3,6 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converte
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.DataKey
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.observable.properties.AtomicProperty
-import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.observable.properties.ObservableProperty
 import com.intellij.openapi.observable.util.bind
 import com.intellij.openapi.project.Project
@@ -12,6 +10,7 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.COLUMNS_MEDIUM
+import com.intellij.ui.dsl.builder.COLUMNS_TINY
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
@@ -43,6 +42,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.UNIX_TIMESTAMP_MILLIS
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.UNIX_TIMESTAMP_SECONDS
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UnixTimestampConverter.ConversionOrigin.YEAR
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -58,8 +58,8 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
 
   private val currentUnixTimestampUpdateAlarm by lazy { Alarm(parentDisposable) }
   private val currentUnixTimestampUpdate: Runnable by lazy { createCurrentUnixTimestampUpdate() }
-  private val currentUnixTimestampSeconds: ObservableMutableProperty<String> = AtomicProperty(System.currentTimeMillis().div(1000).toString())
-  private val currentUnixTimestampMillis: ObservableMutableProperty<String> = AtomicProperty(System.currentTimeMillis().toString())
+  private val currentUnixTimestampSeconds = ValueProperty(System.currentTimeMillis().div(1000).toString())
+  private val currentUnixTimestampMillis = ValueProperty(System.currentTimeMillis().toString())
 
   private val convertAlarm by lazy { Alarm(parentDisposable) }
   private var selectedTimeZoneId = configuration.register("timeZoneId", TimeZone.currentSystemDefault().id)
@@ -132,16 +132,19 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
         row {
           yearTextField = textField().label("Year:")
             .text(initialLocalDateTime.year.toString())
+            .columns(COLUMNS_TINY)
             .validateLongValue(LongRange(1970, 9999))
             .whenTextChangedFromUi { convert(YEAR) }
             .component
           monthTextField = textField().label("Month:")
             .text(initialLocalDateTime.monthNumber.toString())
+            .columns(COLUMNS_TINY)
             .validateLongValue(LongRange(1, 12))
             .whenTextChangedFromUi { convert(MONTH) }
             .component
           dayTextField = textField().label("Day:")
             .text(initialLocalDateTime.dayOfMonth.toString())
+            .columns(COLUMNS_TINY)
             .validateLongValue(LongRange(1, 31))
             .whenTextChangedFromUi { convert(DAY) }
             .component
@@ -149,16 +152,19 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
         row {
           hourTextField = textField().label("Hour:")
             .text(initialLocalDateTime.hour.toString())
+            .columns(COLUMNS_TINY)
             .validateLongValue(LongRange(0, 23))
             .whenTextChangedFromUi { convert(HOUR) }
             .component
           minuteTextField = textField().label("Minute:")
             .text(initialLocalDateTime.minute.toString())
+            .columns(COLUMNS_TINY)
             .validateLongValue(LongRange(0, 59))
             .whenTextChangedFromUi { convert(MINUTE) }
             .component
           secondTextField = textField().label("Second:")
             .text(initialLocalDateTime.second.toString())
+            .columns(COLUMNS_TINY)
             .validateLongValue(LongRange(0, 59))
             .whenTextChangedFromUi { convert(SECOND) }
             .component
@@ -188,6 +194,10 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
   }
 
   override fun afterBuildUi() {
+    reset()
+  }
+
+  override fun reset() {
     unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
     convert(UNIX_TIMESTAMP_MILLIS, 0)
   }
@@ -321,10 +331,10 @@ class UnixTimestampConverter(configuration: DeveloperToolConfiguration, parentDi
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
-      project: Project?,
-      parentDisposable: Disposable
-    ): () -> UnixTimestampConverter = { UnixTimestampConverter(configuration, parentDisposable) }
+        project: Project?,
+        parentDisposable: Disposable
+    ): ((DeveloperToolConfiguration) -> UnixTimestampConverter) =
+      { configuration ->  UnixTimestampConverter(configuration, parentDisposable) }
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

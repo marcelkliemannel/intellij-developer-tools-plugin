@@ -28,11 +28,11 @@ internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, par
   ) {
 
   override fun toTarget(text: String) {
-    targetText = StringEscapeUtils.escapeHtml4(text)
+    targetText.set(StringEscapeUtils.escapeHtml4(text))
   }
 
   override fun toSource(text: String) {
-    sourceText = StringEscapeUtils.unescapeHtml4(text)
+    sourceText.set(StringEscapeUtils.unescapeHtml4(text))
   }
 
   class Factory : DeveloperToolFactory<HtmlEntitiesEscape> {
@@ -43,10 +43,10 @@ internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, par
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> HtmlEntitiesEscape = { HtmlEntitiesEscape(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> HtmlEntitiesEscape) =
+      { configuration -> HtmlEntitiesEscape(configuration, parentDisposable) }
   }
 }
 
@@ -60,11 +60,11 @@ internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentD
   ) {
 
   override fun toTarget(text: String) {
-    targetText = StringEscapeUtils.escapeJava(text)
+    targetText.set(StringEscapeUtils.escapeJava(text))
   }
 
   override fun toSource(text: String) {
-    sourceText = StringEscapeUtils.unescapeJava(text)
+    sourceText.set(StringEscapeUtils.unescapeJava(text))
   }
 
   class Factory : DeveloperToolFactory<JavaTextEscape> {
@@ -75,10 +75,10 @@ internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentD
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> JavaTextEscape = { JavaTextEscape(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> JavaTextEscape) =
+      { configuration -> JavaTextEscape(configuration, parentDisposable) }
   }
 }
 
@@ -92,11 +92,11 @@ internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentD
   ) {
 
   override fun toTarget(text: String) {
-    targetText = StringEscapeUtils.escapeJson(text)
+    targetText.set(StringEscapeUtils.escapeJson(text))
   }
 
   override fun toSource(text: String) {
-    sourceText = StringEscapeUtils.unescapeJson(text)
+    sourceText.set(StringEscapeUtils.unescapeJson(text))
   }
 
   class Factory : DeveloperToolFactory<JsonTextEscape> {
@@ -107,10 +107,10 @@ internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentD
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> JsonTextEscape = { JsonTextEscape(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> JsonTextEscape) =
+      { configuration -> JsonTextEscape(configuration, parentDisposable) }
   }
 }
 
@@ -124,11 +124,11 @@ internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDi
   ) {
 
   override fun toTarget(text: String) {
-    targetText = StringEscapeUtils.escapeCsv(text)
+    targetText.set(StringEscapeUtils.escapeCsv(text))
   }
 
   override fun toSource(text: String) {
-    sourceText = StringEscapeUtils.unescapeCsv(text)
+    sourceText.set(StringEscapeUtils.unescapeCsv(text))
   }
 
   class Factory : DeveloperToolFactory<CsvTextEscape> {
@@ -139,10 +139,10 @@ internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDi
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> CsvTextEscape = { CsvTextEscape(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> CsvTextEscape) =
+      { configuration -> CsvTextEscape(configuration, parentDisposable) }
   }
 }
 
@@ -156,11 +156,11 @@ internal class XmlTextEscape(configuration: DeveloperToolConfiguration, parentDi
   ) {
 
   override fun toTarget(text: String) {
-    targetText = StringEscapeUtils.escapeXml11(text)
+    targetText.set(StringEscapeUtils.escapeXml11(text))
   }
 
   override fun toSource(text: String) {
-    sourceText = StringEscapeUtils.unescapeXml(text)
+    sourceText.set(StringEscapeUtils.unescapeXml(text))
   }
 
   class Factory : DeveloperToolFactory<XmlTextEscape> {
@@ -171,9 +171,9 @@ internal class XmlTextEscape(configuration: DeveloperToolConfiguration, parentDi
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> XmlTextEscape = { XmlTextEscape(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> XmlTextEscape) =
+      { configuration -> XmlTextEscape(configuration, parentDisposable) }
   }
 }

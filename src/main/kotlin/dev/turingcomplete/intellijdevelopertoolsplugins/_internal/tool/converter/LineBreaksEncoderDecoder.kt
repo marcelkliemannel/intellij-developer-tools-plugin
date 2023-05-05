@@ -25,18 +25,21 @@ internal class LineBreaksEncoderDecoder(
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun toTarget(text: String) {
-    targetText = when (lineBreakDecoding.get()) {
-      LineBreak.CRLF -> StringUtil.convertLineSeparators(text, "\\r\\n")
-      LineBreak.LF -> StringUtil.convertLineSeparators(text, "\\n")
-    }
+    targetText.set(
+      when (lineBreakDecoding.get()) {
+        LineBreak.CRLF -> StringUtil.convertLineSeparators(text, "\\r\\n")
+        LineBreak.LF -> StringUtil.convertLineSeparators(text, "\\n")
+      }
+    )
   }
 
   override fun toSource(text: String) {
     // The target input is not depending on the selected line break decoding,
     // because the user can put anything into the editor without changing the
     // configuration first.
-    sourceText = text.replace("\\r\\n", System.lineSeparator())
-      .replace("\\n", System.lineSeparator())
+    sourceText.set(
+      text.replace("\\r\\n", System.lineSeparator()).replace("\\n", System.lineSeparator())
+    )
   }
 
   override fun Panel.buildMiddleFirstConfigurationUi() {
@@ -68,10 +71,10 @@ internal class LineBreaksEncoderDecoder(
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> LineBreaksEncoderDecoder = { LineBreaksEncoderDecoder(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> LineBreaksEncoderDecoder) =
+      { configuration -> LineBreaksEncoderDecoder(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

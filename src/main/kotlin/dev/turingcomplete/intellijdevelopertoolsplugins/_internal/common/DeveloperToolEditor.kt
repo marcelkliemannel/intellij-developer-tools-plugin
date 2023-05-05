@@ -28,7 +28,6 @@ import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.ide.CopyPasteManager
-import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.Disposer
@@ -40,7 +39,7 @@ import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import org.jetbrains.annotations.TestOnly
 import java.awt.datatransfer.StringSelection
 import java.nio.file.Files
@@ -54,6 +53,7 @@ internal class DeveloperToolEditor(
   private val title: String?,
   private val editorMode: EditorMode,
   private val parentDisposable: Disposable,
+  private val textProperty: ValueProperty<String> = ValueProperty(""),
   initialLanguage: Language = PlainTextLanguage.INSTANCE
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -64,8 +64,6 @@ internal class DeveloperToolEditor(
   private var rangeHighlighters = mutableMapOf<String, MutableList<RangeHighlighter>>()
 
   private val editor: EditorEx by lazy { createEditor() }
-
-  val textProperty: ObservableMutableProperty<String> by lazy { EditorTextProperty(editor) }
 
   var text: String
     set(value) = textProperty.set(value)
@@ -81,8 +79,16 @@ internal class DeveloperToolEditor(
     }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
+  init {
+    textProperty.afterChangeConsumeEvent(parentDisposable) { event ->
+      if (event.id != TEXT_CHANGE_FROM_DOCUMENT_LISTENER) {
+        runWriteAction { editor.document.setText(event.newValue) }
+      }
+    }
+  }
+
+  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   fun onTextChangeFromUi(changeListener: ((String) -> Unit)): DeveloperToolEditor {
     onTextChangeFromUi.add(changeListener)
@@ -111,6 +117,7 @@ internal class DeveloperToolEditor(
         // This prevents the `Editor` from increasing the size of the dialog if
         // the to display all the text on the screen instead of using scrollbars.
         preferredSize = JBUI.size(0, 120)
+        minimumSize = JBUI.size(0, 50)
       }
 
       override fun getData(dataId: String): Any? = when {
@@ -151,16 +158,6 @@ internal class DeveloperToolEditor(
     rangeHighlighters.computeIfAbsent(groupId) { mutableListOf() }.add(rangeHighlighter)
   }
 
-  fun setConfigurationHandler(
-    id: String,
-    configuration: DeveloperToolConfiguration,
-    defaultText: String = "",
-  ) {
-    val configurationProperty = configuration.register("input-$id", defaultText)
-    textProperty.set(configurationProperty.get())
-    textProperty.afterChange { configurationProperty.set(it) }
-  }
-
   @TestOnly
   fun setTextUnderTest(text: String) {
     try {
@@ -195,7 +192,7 @@ internal class DeveloperToolEditor(
 
   private fun createEditor(): EditorEx {
     val editorFactory = EditorFactory.getInstance()
-    val document = (editorFactory as EditorFactoryImpl).createDocument("", true, false)
+    val document = (editorFactory as EditorFactoryImpl).createDocument(textProperty.get(), true, false)
     val editor = if (editorMode.editable) {
       editorFactory.createEditor(document) as EditorEx
     }
@@ -249,6 +246,9 @@ internal class DeveloperToolEditor(
 
     override fun documentChanged(event: DocumentEvent) {
       val currentText = event.document.text
+
+      textProperty.set(value = currentText, changeId = TEXT_CHANGE_FROM_DOCUMENT_LISTENER)
+
       if (editor.getUserData(editorActiveKey)!!) {
         onTextChangeFromUi.forEach { it(currentText) }
       }
@@ -347,35 +347,11 @@ internal class DeveloperToolEditor(
     INPUT_OUTPUT("input/output", true),
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-
-  private class EditorTextProperty(private val editor: Editor) : ObservableMutableProperty<String> {
-
-    private val listeners: MutableSet<(String) -> Unit> = mutableSetOf()
-
-    override fun set(value: String) {
-      runWriteAction {
-        editor.document.setText(value)
-      }
-    }
-
-    override fun afterChange(listener: (String) -> Unit) {
-      listeners.add(listener)
-    }
-
-    override fun afterChange(parentDisposable: Disposable?, listener: (String) -> Unit) {
-      listeners.add(listener)
-      parentDisposable?.let { Disposer.register(it) { listeners.remove(listener) }  }
-    }
-
-    override fun get(): String = runReadAction {
-      editor.document.text
-    }
-  }
-
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 
   companion object {
+
+    private const val TEXT_CHANGE_FROM_DOCUMENT_LISTENER = "documentChangeListener"
 
     private val editorActiveKey = Key<Boolean>("editorActive")
     private val timestampFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-SS")

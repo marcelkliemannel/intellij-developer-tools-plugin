@@ -11,6 +11,10 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ConfigurationNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ContentNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.DeveloperToolNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.GroupNode
 import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -25,6 +29,7 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
   private val contentPanel = BorderLayoutPanel()
   private val groupsPanels = mutableMapOf<String, GroupContentPanel>()
   private val developerToolsPanels = mutableMapOf<DeveloperToolNode, DeveloperToolContentPanel>()
+  private val configurationPanel = ConfigurationContentPanel()
   private lateinit var menuTree: MainMenuTree
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
@@ -69,21 +74,29 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
 
   private fun handleContentNodeSelection(): (KProperty<*>, ContentNode?, ContentNode?) -> Unit = { _, old, new ->
     if (old != new) {
-      old?.deselected()
+      if (old is DeveloperToolNode) {
+        developerToolsPanels[old]?.deselected()
+      }
 
       if (new != null) {
         val nodePanel: JPanel = when (new) {
-          is GroupNode -> groupsPanels.getOrPut(new.developerToolGroup.id) {
-            GroupContentPanel(new) {
-              selectedContentNode = it
-              TreeUtil.selectNode(menuTree, it)
-            }
-          }.panel
+          is GroupNode -> {
+            groupsPanels.getOrPut(new.developerToolGroup.id) {
+              GroupContentPanel(new) {
+                selectedContentNode = it
+                TreeUtil.selectNode(menuTree, it)
+              }
+            }.panel
+          }
 
-          is DeveloperToolNode -> developerToolsPanels.getOrPut(new) { DeveloperToolContentPanel(new) }.panel
+          is DeveloperToolNode -> {
+            developerToolsPanels.getOrPut(new) { DeveloperToolContentPanel(new) }.also { it.selected() }
+          }
+
+          is ConfigurationNode -> configurationPanel.panel
+
           else -> error("Unexpected menu node: ${new::class}")
         }
-        new.selected()
         contentPanel.apply {
           removeAll()
           addToCenter(nodePanel)

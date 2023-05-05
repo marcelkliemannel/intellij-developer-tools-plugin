@@ -64,9 +64,9 @@ internal class HmacTransformer(
 
     val hmac: ByteArray = Mac.getInstance(selectedAlgorithm.get()).run {
       init(SecretKeySpec(secretKey.get().encodeToByteArray(), selectedAlgorithm.get()))
-      doFinal(sourceText.encodeToByteArray())
+      doFinal(sourceText.get().encodeToByteArray())
     }
-    resultText = Hex.toHexString(hmac)
+    resultText.set(Hex.toHexString(hmac))
   }
 
   @Suppress("UnstableApiUsage")
@@ -107,15 +107,14 @@ internal class HmacTransformer(
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
-      project: Project?,
-      parentDisposable: Disposable
-    ): (() -> HmacTransformer)? {
+        project: Project?,
+        parentDisposable: Disposable
+    ): ((DeveloperToolConfiguration) -> HmacTransformer)? {
       if (algorithms.isEmpty()) {
         return null
       }
 
-      return { HmacTransformer(configuration, parentDisposable) }
+      return { configuration -> HmacTransformer(configuration, parentDisposable) }
     }
   }
 

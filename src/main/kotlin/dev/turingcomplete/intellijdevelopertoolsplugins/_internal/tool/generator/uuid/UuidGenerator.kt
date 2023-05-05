@@ -6,7 +6,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
-import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import com.intellij.ui.layout.ComboBoxPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
@@ -31,16 +30,19 @@ internal class UuidGenerator(configuration: DeveloperToolConfiguration, parentDi
   private val uuidV7Generator by lazy { UuidV7Generator() }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
+
+  init {
+    selectedUuidVersion.afterChange(parentDisposable) { handleVersionSelection() }
+  }
+
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  @Suppress("UnstableApiUsage")
   override fun Panel.buildConfigurationUi() {
     lateinit var selectedVersionComboBox: ComboBox<UuidVersion>
     row {
       selectedVersionComboBox = comboBox(UuidVersion.values().toList())
         .label("Version:")
         .bindItem(selectedUuidVersion)
-        .whenItemSelectedFromUi(parentDisposable) { handleVersionSelection() }
         .component
     }
 
@@ -88,8 +90,9 @@ internal class UuidGenerator(configuration: DeveloperToolConfiguration, parentDi
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class UuidV1Generator(configuration: DeveloperToolConfiguration) :
-    MacAddressBasedUuidGenerator(UuidVersion.V1, configuration, true) {
+  private class UuidV1Generator(
+    configuration: DeveloperToolConfiguration
+  ) : MacAddressBasedUuidGenerator(UuidVersion.V1, configuration, true) {
 
     override fun generate(): String = Generators.timeBasedGenerator(getEthernetAddress()).generate().toString()
   }
@@ -117,8 +120,9 @@ internal class UuidGenerator(configuration: DeveloperToolConfiguration, parentDi
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class UuidV6Generator(configuration: DeveloperToolConfiguration) :
-    MacAddressBasedUuidGenerator(UuidVersion.V6, configuration, true) {
+  private class UuidV6Generator(
+    configuration: DeveloperToolConfiguration
+  ) : MacAddressBasedUuidGenerator(UuidVersion.V6, configuration, true) {
 
     override fun generate(): String = Generators.timeBasedReorderedGenerator(getEthernetAddress()).generate().toString()
   }
@@ -140,10 +144,9 @@ internal class UuidGenerator(configuration: DeveloperToolConfiguration, parentDi
     )
 
     override fun getDeveloperToolCreator(
-      configuration: DeveloperToolConfiguration,
       project: Project?,
       parentDisposable: Disposable
-    ): () -> UuidGenerator = { UuidGenerator(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> UuidGenerator) = { configuration -> UuidGenerator(configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
