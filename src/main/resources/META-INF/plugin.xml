@@ -171,6 +171,10 @@
             id="qr-code-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.BarcodeGenerator$Factory"
             weight="13"/>
+    <developerTool
+            id="rubber-duck"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RubberDuck$Factory"
+            weight="14"/>
 
     <!-- formatter -->
     <developerTool
