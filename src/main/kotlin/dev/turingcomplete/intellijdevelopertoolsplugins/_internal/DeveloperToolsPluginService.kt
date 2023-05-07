@@ -21,6 +21,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import io.ktor.util.reflect.*
 import java.util.*
@@ -228,6 +229,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
         is Boolean, is Int, is Long, is Float, is Double -> value.toString() to value::class.qualifiedName!!
         is String -> value to String::class.qualifiedName!!
         is JBColor -> value.rgb.toString() to JBColor::class.qualifiedName!!
+        is LocaleContainer -> value.locale.toLanguageTag() to LocaleContainer::class.qualifiedName!!
         else -> error("Unsupported configuration property type: ${value::class.qualifiedName}")
       }
       return "${valueType}${PROPERTY_TYPE_VALUE_DELIMITER}$serializedValue"
@@ -251,6 +253,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
         Double::class.qualifiedName -> value.toDouble()
         String::class.qualifiedName -> value
         JBColor::class.qualifiedName -> JBColor(value.toInt(), value.toInt())
+        LocaleContainer::class.qualifiedName -> LocaleContainer(Locale.forLanguageTag(value))
         else -> parseValue(valueType, value)
       }
     }
@@ -288,7 +291,8 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
       Float::class,
       Double::class,
       String::class,
-      JBColor::class
+      JBColor::class,
+      LocaleContainer::class,
     )
 
     fun <T : Any> assertPersistableType(type: KClass<T>, propertyType: PropertyType): KClass<T> {

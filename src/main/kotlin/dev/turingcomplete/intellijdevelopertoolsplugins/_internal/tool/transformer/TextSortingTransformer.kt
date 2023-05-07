@@ -178,10 +178,6 @@ internal class TextSortingTransformer(configuration: DeveloperToolConfiguration,
 
   companion object {
 
-    private const val EXAMPLE_INPUT = """
-      b
-      c
-      a
-    """
+    private const val EXAMPLE_INPUT = "b\nc\na"
   }
 }
