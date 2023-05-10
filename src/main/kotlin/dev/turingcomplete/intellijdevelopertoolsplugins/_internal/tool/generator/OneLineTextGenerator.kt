@@ -2,6 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generato
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.observable.properties.AtomicProperty
@@ -159,6 +160,8 @@ abstract class OneLineTextGenerator(
     override fun actionPerformed(e: AnActionEvent) {
       generateContent()
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
-import org.bouncycastle.util.encoders.Base32
+import org.apache.commons.codec.binary.Base32
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -32,11 +32,11 @@ internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, p
   ) {
 
   override fun toTarget(text: String) {
-    targetText.set(Base32.toBase32String(text.encodeToByteArray()))
+    targetText.set(Base32().encodeToString(text.encodeToByteArray()))
   }
 
   override fun toSource(text: String) {
-    sourceText.set(Base32.decode(text).decodeToString())
+    sourceText.set(Base32().decode(text).decodeToString())
   }
 
   class Factory : DeveloperToolFactory<Base32EncoderDecoder> {

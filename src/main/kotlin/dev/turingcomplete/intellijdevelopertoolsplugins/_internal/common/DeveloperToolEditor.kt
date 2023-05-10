@@ -5,6 +5,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 import com.intellij.icons.AllIcons
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataProvider
@@ -285,6 +286,8 @@ internal class DeveloperToolEditor(
         editor.document.setText("")
       }
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -297,6 +300,8 @@ internal class DeveloperToolEditor(
       val content = runReadAction { editor.document.text }
       CopyPasteManager.getInstance().setContents(StringSelection(content))
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -316,6 +321,8 @@ internal class DeveloperToolEditor(
           Files.writeString(it, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
         }
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -336,6 +343,8 @@ internal class DeveloperToolEditor(
           editor.contentComponent.grabFocus()
         }
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

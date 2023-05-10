@@ -7,8 +7,8 @@ import com.intellij.ui.dsl.builder.bindItem
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toMessageDigest
-import org.bouncycastle.util.encoders.Hex
 import java.security.Security
 
 internal class HashingTransformer(
@@ -42,7 +42,7 @@ internal class HashingTransformer(
 
   override fun transform() {
     val hash = selectedAlgorithm.get().toMessageDigest().digest(sourceText.get().encodeToByteArray())
-    resultText.set(Hex.encode(hash).decodeToString())
+    resultText.set(hash.toHexString())
   }
 
   override fun Panel.buildTopConfigurationUi() {

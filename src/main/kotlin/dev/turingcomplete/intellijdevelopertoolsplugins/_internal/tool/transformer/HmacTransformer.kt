@@ -12,8 +12,8 @@ import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateNonEmpty
-import org.bouncycastle.util.encoders.Hex
 import java.security.Security
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -66,7 +66,7 @@ internal class HmacTransformer(
       init(SecretKeySpec(secretKey.get().encodeToByteArray(), selectedAlgorithm.get()))
       doFinal(sourceText.get().encodeToByteArray())
     }
-    resultText.set(Hex.toHexString(hmac))
+    resultText.set(hmac.toHexString())
   }
 
   @Suppress("UnstableApiUsage")

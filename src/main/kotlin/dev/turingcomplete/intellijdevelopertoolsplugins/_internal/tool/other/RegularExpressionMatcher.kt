@@ -4,6 +4,7 @@ import com.google.code.regexp.Pattern
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -258,6 +259,8 @@ class RegularExpressionMatcher(
           show(RelativePoint.getSouthOf(regexInputEditor), Balloon.Position.below)
         }
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     @Suppress("UnstableApiUsage")
     private fun createRegexOptionPanel() = panel {

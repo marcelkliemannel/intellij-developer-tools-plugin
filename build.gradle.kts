@@ -18,23 +18,21 @@ repositories {
 }
 
 dependencies {
-  val bouncycastleVersion = 1.72
-  implementation("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
-  implementation("org.bouncycastle:bcpkix-jdk18on:$bouncycastleVersion")
   implementation("com.fasterxml.uuid:java-uuid-generator:4.1.0") {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
-  implementation("com.jayway.jsonpath:json-path:2.7.0") {
+  implementation("com.jayway.jsonpath:json-path:2.8.0") {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
   implementation("com.auth0:java-jwt:4.3.0")
-  val jacksonVersion = "2.14.2"
+  val jacksonVersion = "2.15.0"
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-properties:$jacksonVersion")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:$jacksonVersion")
   implementation("com.github.tony19:named-regexp:0.2.8")
   implementation("org.apache.commons:commons-text:1.10.0")
+  implementation("commons-codec:commons-codec:1.15")
   val textCaseConverterVersion = "1.0.0"
   implementation("dev.turingcomplete:text-case-converter:$textCaseConverterVersion")
   implementation("dev.turingcomplete:text-case-converter-kotlin-extension:$textCaseConverterVersion")

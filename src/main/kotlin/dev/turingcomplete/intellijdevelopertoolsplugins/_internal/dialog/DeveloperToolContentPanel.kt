@@ -134,6 +134,8 @@ internal class DeveloperToolContentPanel(
           tabs.selectedInfo?.let { it.text = newName }
         }
       }
+
+      override fun getActionUpdateThread() = ActionUpdateThread.BGT
     }
 
   private fun createDestroyWorkbenchAction(developerTool: DeveloperTool, tabInfo: TabInfo) =
@@ -152,6 +154,8 @@ internal class DeveloperToolContentPanel(
       override fun actionPerformed(e: AnActionEvent) {
         addWorkbench(developerToolNode.createNewDeveloperToolInstance())
       }
+
+      override fun getActionUpdateThread() = ActionUpdateThread.BGT
     }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -169,9 +173,7 @@ internal class DeveloperToolContentPanel(
       }
     }
 
-    override fun getActionUpdateThread(): ActionUpdateThread {
-      return ActionUpdateThread.EDT
-    }
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
     override fun actionPerformed(e: AnActionEvent) {
       removeTab()

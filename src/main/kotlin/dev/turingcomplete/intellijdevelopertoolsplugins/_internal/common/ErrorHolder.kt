@@ -1,6 +1,5 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.observable.properties.ObservableProperty
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ComponentPredicate
@@ -60,10 +59,6 @@ class ErrorHolder {
   fun asObservableNonNullProperty(): ObservableProperty<String> = object : ObservableProperty<String> {
 
     override fun afterChange(listener: (String) -> Unit) {
-      changeListeners.add { listener(formatErrors() ?: "") }
-    }
-
-    override fun afterChange(listener: (String) -> Unit, parentDisposable: Disposable) {
       changeListeners.add { listener(formatErrors() ?: "") }
     }
 
