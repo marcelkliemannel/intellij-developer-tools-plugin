@@ -1,14 +1,25 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer
 
 import com.fasterxml.jackson.databind.node.ArrayNode
+import com.intellij.icons.AllIcons
 import com.intellij.json.JsonLanguage
 import com.intellij.jsonpath.JsonPathLanguage
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.ActionUpdateThread
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.PopupAction
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
+import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.Balloon
+import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.LanguageTextField
+import com.intellij.ui.ScrollPaneFactory
+import com.intellij.ui.awt.RelativePoint
+import com.intellij.ui.components.JBLabel
 import com.intellij.ui.dsl.builder.*
+import com.intellij.util.ui.UIUtil
 import com.jayway.jsonpath.Configuration
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.JsonPathException
@@ -20,7 +31,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.allowUiDslLabel
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.objectMapper
+import javax.swing.JComponent
 
 class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable)
   : TextTransformer(
@@ -49,6 +62,11 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
         .label("JSON path:", LabelPosition.TOP)
         .validationOnApply(errorHolder.asValidation())
         .align(Align.FILL)
+        .resizableColumn()
+        .gap(RightGap.SMALL)
+      lateinit var helpButton: JComponent
+      helpButton = actionButton(ShowOperatorsHelpPopup { helpButton })
+        .component
     }
   }
 
@@ -118,6 +136,28 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
     }
   }
 
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class ShowOperatorsHelpPopup(val helpButton: () -> JComponent) :
+    DumbAwareAction("Operators Help", null, AllIcons.General.ContextHelp), PopupAction {
+
+    override fun actionPerformed(e: AnActionEvent) {
+      JBPopupFactory.getInstance()
+        .createBalloonBuilder(ScrollPaneFactory.createScrollPane(operatorsHelpPanel, true))
+        .setDialogMode(true)
+        .setFillColor(UIUtil.getPanelBackground())
+        .setBlockClicksThroughBalloon(true)
+        .setRequestFocus(true)
+        .createBalloon()
+        .apply {
+          setAnimationEnabled(false)
+          show(RelativePoint.getCenterOf(helpButton()), Balloon.Position.atLeft)
+        }
+    }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+  }
+
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 
   companion object {
@@ -166,5 +206,41 @@ class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Pr
 }"""
 
     private const val EXAMPLE_QUERY = "\$.starWars.characters..forename"
+
+    private val operatorsHelpPanel = JBLabel(
+      """
+          <html>
+          <h2>Operators</h2>
+          <table>
+              <tr><td><b>Operator</b></td><td><b>Description</b></td></tr>
+              <tr><td><code>${'$'}</code></td><td>The root element to query. This starts all path expressions.</td></tr>
+              <tr><td><code>@</code></td><td>The current node being processed by a filter predicate.</td></tr>
+              <tr><td><code>*</code></td><td>Wildcard. Available anywhere a name or numeric are required.</td></tr>
+              <tr><td><code>..</code></td><td>Selects all the descendant elements of the current node.</td></tr>
+              <tr><td><code>.&lt;name&gt;</code></td><td>Selects the child element with the specified name.</td></tr>
+              <tr><td><code>[&#39;&lt;name&gt;&#39; (, &#39;&lt;name&gt;&#39;)]</code></td><td>Bracket-notated child or children.</td></tr>
+              <tr><td><code>[&lt;number&gt; (, &lt;number&gt;)]</code></td><td>Array index or indexes.</td></tr>
+              <tr><td><code>[&lt;start&gt;:&lt;end&gt;]</code></td><td>Selects a range of child elements.</td></tr>
+              <tr><td><code>[&lt;start&gt;:&lt;end&gt;:&lt;step&gt;]</code></td><td>Selects a range of child elements with the specified step.</td></tr>
+              <tr><td><code>[?(&lt;expression&gt;)]</code></td><td>Filter expression. Expression must evaluate to a boolean value.</td></tr>
+          </table>
+          
+          <h2>Examples</h2>
+          <table>
+              <tr><td><b>Example</b></td><td><b>Description</b></td></tr>
+              <tr><td><code>${'$'}</code></td><td>Selects the root.</td></tr>
+              <tr><td><code>${'$'}.movie[0]</code></td><td>Selects the first movie.</td></tr>
+              <tr><td><code>${'$'}.movie[*]</code></td><td>Selects all movies.</td></tr>
+              <tr><td><code>${'$'}.movie[*].director</code></td><td>Selects the directors of all movies.</td></tr>
+              <tr><td><code>${'$'}..movie[0]</code></td><td>Selects the first movie in all sub-objects of the root.</td></tr>
+              <tr><td><code>${'$'}..length</code></td><td>Selects the lengths of all movies, including sub-objects.</td></tr>
+              <tr><td><code>${'$'}.movie[?(@.length&lt;100)]</code></td><td>Selects all length in the store with a length than 100 units.</td></tr>
+              <tr><td><code>${'$'}.movie[?(@.director=='Lucas')]</code></td><td>Selects all movies directed by Lucas.</td></tr>
+              <tr><td><code>${'$'}.movie[2:].title</code></td><td>Selects the title of all movies starting from the third movie.</td></tr>
+              <tr><td><code>${'$'}..movie[-1:].director</code></td><td>Selects the director of the last movie in all sub-objects of the root.</td></tr>
+          </table>
+          </html>
+        """.trimIndent()
+    ).copyable()
   }
 }
