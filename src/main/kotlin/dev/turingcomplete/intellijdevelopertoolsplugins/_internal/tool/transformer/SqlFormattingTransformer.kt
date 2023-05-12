@@ -15,7 +15,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
 
-class SqlFormatterTransformer(
+class SqlFormattingTransformer(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextTransformer(
@@ -102,18 +102,18 @@ class SqlFormatterTransformer(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory<SqlFormatterTransformer> {
+  class Factory : DeveloperToolFactory<SqlFormattingTransformer> {
 
     override fun getDeveloperToolContext() = DeveloperToolContext(
-      menuTitle = "SQL Formatter",
-      contentTitle = "SQL Formatter"
+      menuTitle = "SQL Formatting",
+      contentTitle = "SQL Formatting"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
       parentDisposable: Disposable
-    ): ((DeveloperToolConfiguration) -> SqlFormatterTransformer) = { configuration ->
-      SqlFormatterTransformer(configuration, parentDisposable)
+    ): ((DeveloperToolConfiguration) -> SqlFormattingTransformer) = { configuration ->
+      SqlFormattingTransformer(configuration, parentDisposable)
     }
   }
 

@@ -56,9 +56,9 @@
                         detailTitle="Cryptography"
                         initiallyExpanded="true"
                         weight="3"/>
-    <developerToolGroup id="formatter"
-                        menuTitle="Formatter"
-                        detailTitle="Formatter"
+    <developerToolGroup id="formatting"
+                        menuTitle="Formatting"
+                        detailTitle="Formatting"
                         initiallyExpanded="true"
                         weight="12"/>
 
@@ -176,16 +176,16 @@
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RubberDuck$Factory"
             weight="14"/>
 
-    <!-- formatter -->
+    <!-- formatting -->
     <developerTool
-            id="code-style-formatter"
-            groupId="formatter"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.CodeStyleFormatter$Factory"
+            id="code-style-formatting"
+            groupId="formatting"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.CodeStyleFormatting$Factory"
             weight="1"/>
     <developerTool
-            id="sql-formatter"
-            groupId="formatter"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.SqlFormatterTransformer$Factory"
+            id="sql-formatting"
+            groupId="formatting"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.SqlFormattingTransformer$Factory"
             weight="2"/>
 
   </extensions>

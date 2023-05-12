@@ -14,7 +14,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 
-class CodeStyleFormatter(
+class CodeStyleFormatting(
   private val codeStyles: List<CodeStyle>,
   private val project: Project,
   configuration: DeveloperToolConfiguration,
@@ -88,17 +88,17 @@ class CodeStyleFormatter(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class Factory : DeveloperToolFactory<CodeStyleFormatter> {
+  class Factory : DeveloperToolFactory<CodeStyleFormatting> {
 
     override fun getDeveloperToolContext() = DeveloperToolContext(
       menuTitle = "Code Style Formatting",
-      contentTitle = "Code Style Formatter"
+      contentTitle = "Code Style Formatting"
     )
 
     override fun getDeveloperToolCreator(
         project: Project?,
         parentDisposable: Disposable
-    ): ((DeveloperToolConfiguration) -> CodeStyleFormatter)? {
+    ): ((DeveloperToolConfiguration) -> CodeStyleFormatting)? {
       if (project == null) {
         return null
       }
@@ -112,7 +112,7 @@ class CodeStyleFormatter(
       }
 
       return { configuration ->
-        CodeStyleFormatter(codeStyles, project, configuration, parentDisposable)
+        CodeStyleFormatting(codeStyles, project, configuration, parentDisposable)
       }
     }
   }
