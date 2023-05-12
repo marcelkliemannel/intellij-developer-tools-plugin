@@ -141,7 +141,6 @@ internal class DeveloperToolContentPanel(
   private fun createDestroyWorkbenchAction(developerTool: DeveloperTool, tabInfo: TabInfo) =
     DestroyWorkbenchAction(
       {
-        developerToolNode.createNewDeveloperToolInstance()
         tabs.removeTab(tabInfo)
         developerToolNode.destroyDeveloperToolInstance(developerTool)
       },

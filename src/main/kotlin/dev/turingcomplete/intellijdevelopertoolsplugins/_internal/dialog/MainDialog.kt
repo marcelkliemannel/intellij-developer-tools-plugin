@@ -30,13 +30,13 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
   private val groupsPanels = mutableMapOf<String, GroupContentPanel>()
   private val developerToolsPanels = mutableMapOf<DeveloperToolNode, DeveloperToolContentPanel>()
   private val configurationPanel = ConfigurationContentPanel()
-  private lateinit var menuTree: MainMenuTree
+  private lateinit var mainMenuTree: MainMenuTree
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
     title = "Developer Tools"
-    setSize(900, 700)
+    setSize(950, 750)
     isModal = false
     isAutoAdjustable = false
     init()
@@ -45,12 +45,12 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun createCenterPanel(): JBSplitter {
-    menuTree = MainMenuTree({ selectedContentNode = it }, project, disposable)
+    mainMenuTree = MainMenuTree({ selectedContentNode = it }, project, disposable)
 
     return JBSplitter(0.25f).apply {
       dividerWidth = DIVIDER_WIDTH
 
-      firstComponent = ScrollPaneFactory.createScrollPane(menuTree, true).apply {
+      firstComponent = ScrollPaneFactory.createScrollPane(mainMenuTree, true).apply {
         border = ColoredSideBorder(null, null, null, JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(), 1)
         background = UIUtil.SIDE_PANEL_BACKGROUND
         viewport.background = UIUtil.SIDE_PANEL_BACKGROUND
@@ -84,7 +84,7 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
             groupsPanels.getOrPut(new.developerToolGroup.id) {
               GroupContentPanel(new) {
                 selectedContentNode = it
-                TreeUtil.selectNode(menuTree, it)
+                TreeUtil.selectNode(mainMenuTree, it)
               }
             }.panel
           }

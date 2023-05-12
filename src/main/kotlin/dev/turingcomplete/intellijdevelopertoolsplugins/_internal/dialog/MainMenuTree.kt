@@ -120,7 +120,10 @@ internal class MainMenuTree(
       }
   }
 
-  private fun createTreeNodes(project: Project?, parentDisposable: Disposable): Triple<RootNode, List<GroupNode>, ContentNode?> {
+  private fun createTreeNodes(
+    project: Project?,
+    parentDisposable: Disposable
+  ): Triple<RootNode, List<GroupNode>, ContentNode?> {
     val rootNode = RootNode()
 
     val groupNodesToExpand = mutableListOf<GroupNode>()
@@ -194,9 +197,4 @@ internal class MainMenuTree(
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
-
-  companion object {
-
-    private const val LAST_SELECTED_CONTENT_NODE_ID_PROPERTY_KEY = "mainMenuTree_lastSelectedContentNodeId"
-  }
 }

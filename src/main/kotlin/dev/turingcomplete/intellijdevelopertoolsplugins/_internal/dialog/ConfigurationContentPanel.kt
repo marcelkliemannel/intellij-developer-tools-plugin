@@ -1,5 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
 
+import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
@@ -17,7 +18,13 @@ class ConfigurationContentPanel {
     row {
       checkBox("Remember inputs")
         .bindSelected(DeveloperToolsPluginService.instance.saveInputs)
-        .comment("Secrets will not be stored.")
+    }
+    row {
+      checkBox("Remember secrets")
+        .comment("Secrets are stored in the <a>system keychain</a>.") {
+          BrowserUtil.browse("https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html#storage")
+        }
+        .bindSelected(DeveloperToolsPluginService.instance.saveSecrets)
     }
     row {
       checkBox("Load examples")

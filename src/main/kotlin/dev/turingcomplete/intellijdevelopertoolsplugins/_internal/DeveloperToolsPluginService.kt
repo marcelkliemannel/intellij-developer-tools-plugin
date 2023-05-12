@@ -42,6 +42,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   val loadExamples: ValueProperty<Boolean> = ValueProperty(LOAD_EXAMPLES_DEFAULT)
   val saveConfiguration: ValueProperty<Boolean> = ValueProperty(SAVE_CONFIGURATION_DEFAULT)
   val saveInputs: ValueProperty<Boolean> = ValueProperty(SAVE_INPUTS_DEFAULT)
+  val saveSecrets: ValueProperty<Boolean> = ValueProperty(SAVE_SECRETS_DEFAULT)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -73,7 +74,8 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
       developerToolsConfigurations = stateDeveloperToolsConfigurations,
       lastSelectedContentNodeId = lastSelectedContentNodeId.get(),
       loadExamples = loadExamples.get(),
-      saveInputs = saveInputs.get()
+      saveInputs = saveInputs.get(),
+      saveSecrets = saveSecrets.get()
     )
   }
 
@@ -81,6 +83,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     lastSelectedContentNodeId.set(state.lastSelectedContentNodeId)
     loadExamples.set(state.loadExamples ?: LOAD_EXAMPLES_DEFAULT)
     saveInputs.set(state.saveInputs ?: SAVE_INPUTS_DEFAULT)
+    saveSecrets.set(state.saveInputs ?: SAVE_SECRETS_DEFAULT)
 
     developerToolsConfigurations.clear()
     state.developerToolsConfigurations
@@ -90,17 +93,18 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
           name = developerToolsConfigurationState.name!!,
           id = UUID.fromString(developerToolsConfigurationState.id!!),
           persistentProperties = developerToolsConfigurationState.properties!!
+            .asSequence()
             .filter { it.key != null && it.type != null }
             .filter { it.type != INPUT || saveInputs.get() }
             .filter { it.type != CONFIGURATION || saveConfiguration.get() }
-            .associate {
-              restoreProperty(
+            .mapNotNull { property ->
+              restorePropertyValue(
                 developerToolId = developerToolsConfigurationState.developerToolId!!,
-                key = it.key!!,
-                value = it.value,
-                type = it.type!!
-              )
-            }
+                key = property.key!!,
+                value = property.value,
+                type = property.type!!
+              )?.let { property.key!! to it }
+            }.toMap()
         )
 
         developerToolsConfigurations.compute(developerToolsConfigurationState.developerToolId!!) { _, developerToolConfigurations ->
@@ -122,6 +126,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
       .properties
       .filter { (_, property) -> property.valueChanged }
       .filter { (_, property) -> !(!saveInputs.get() && property.type != INPUT) }
+      .filter { (_, property) -> !(!saveSecrets.get() && property.type != SECRET) }
       .map { (key, property) ->
         storeProperty(developerToolId = developerToolId, key = key, property = property)
       }
@@ -144,20 +149,32 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     }
   }
 
-  private fun restoreProperty(
+  private fun restorePropertyValue(
     developerToolId: String,
     key: String,
     value: Any?,
     type: PropertyType
-  ): Pair<String, Any?> {
+  ): Any? {
     return when (type) {
       CONFIGURATION, INPUT ->
-        key to value
+        value
 
       SECRET -> {
         val credentialAttribute = createPropertyCredentialAttribute(developerToolId = developerToolId, propertyKey = key)
         val secretValue = PasswordSafe.instance.getPassword(credentialAttribute)
-        key to secretValue
+
+        if (!saveSecrets.get()) {
+          if (secretValue != null) {
+            // Remove the secret from the password safe
+            PasswordSafe.instance.set(credentialAttribute, null)
+          }
+          else {
+            null
+          }
+        }
+        else {
+          secretValue
+        }
       }
     }
   }
@@ -184,6 +201,8 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     var loadExamples: Boolean? = null,
     @get:Attribute("saveInputs")
     var saveInputs: Boolean? = null,
+    @get:Attribute("saveSecrets")
+    var saveSecrets: Boolean? = null,
   )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -304,7 +323,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
         }
 
         SECRET -> {
-          check(type::class == String::class) {
+          check(type::class != String::class) {
             "Unsupported secret property type: ${type.qualifiedName}"
           }
         }
@@ -315,11 +334,13 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
 
     private const val LOAD_EXAMPLES_DEFAULT = true
     private const val SAVE_INPUTS_DEFAULT = true
+    private const val SAVE_SECRETS_DEFAULT = true
     private const val SAVE_CONFIGURATION_DEFAULT = true
 
     var lastSelectedContentNodeId by instance.lastSelectedContentNodeId
     var loadExamples by instance.loadExamples
     var saveConfiguration by instance.saveConfiguration
     var saveInputs by instance.saveInputs
+    var saveSecrets by instance.saveSecrets
   }
 }

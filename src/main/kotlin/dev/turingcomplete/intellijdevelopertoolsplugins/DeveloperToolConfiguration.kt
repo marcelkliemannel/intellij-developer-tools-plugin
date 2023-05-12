@@ -6,6 +6,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.assertPersistableType
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.uncheckedCastTo
@@ -17,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 class DeveloperToolConfiguration(
   var name: String,
   val id: UUID = UUID.randomUUID(),
-  val persistentProperties: Map<String, Any?> = emptyMap()
+  val persistentProperties: Map<String, Any> = emptyMap()
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -25,6 +26,8 @@ class DeveloperToolConfiguration(
   private val changeListeners = CopyOnWriteArrayList<ChangeListener>()
   var isResetting = false
     internal set
+  val hasChanges: Boolean
+    get() = properties.values.any { it.valueChanged }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -66,6 +69,7 @@ class DeveloperToolConfiguration(
   private fun <T : Any> reuseExistingProperty(property: PropertyContainer): ValueProperty<T> {
     if ((property.type == INPUT && !DeveloperToolsPluginService.saveInputs)
       || (property.type == CONFIGURATION && !DeveloperToolsPluginService.saveConfiguration)
+      || (property.type == SECRET && !DeveloperToolsPluginService.saveSecrets)
     ) {
       property.reset(DeveloperToolsPluginService.loadExamples)
     }
@@ -81,13 +85,21 @@ class DeveloperToolConfiguration(
     example: T?
   ): ValueProperty<T> {
     val type = assertPersistableType(defaultValue::class, propertyType)
-    val initialValue: T = persistentProperties[key]?.uncheckedCastTo(type) ?: let {
+    val existingProperty = persistentProperties[key]
+    val initialValue: T = existingProperty?.uncheckedCastTo(type) ?: let {
       if (DeveloperToolsPluginService.loadExamples && example != null) example else defaultValue
     }
     val valueProperty = ValueProperty(initialValue).apply {
       afterChangeConsumeEvent(null, handlePropertyChange(key))
     }
-    properties[key] = PropertyContainer(key, valueProperty, defaultValue, example, propertyType)
+    properties[key] = PropertyContainer(
+      key = key,
+      valueProperty = valueProperty,
+      defaultValue = defaultValue,
+      example = example,
+      type = propertyType,
+      valueChanged = existingProperty != null
+    )
     return valueProperty
   }
 
@@ -98,8 +110,7 @@ class DeveloperToolConfiguration(
   private fun <T : Any?> handlePropertyChange(key: String): (ValueProperty.ChangeEvent<T>) -> Unit = { event ->
     if (event.oldValue != event.newValue) {
       properties[key]?.let { property ->
-        property.valueChanged = event.newValue != property.defaultValue &&
-                (property.example == null || event.newValue != property.example)
+        property.valueChanged = true
         fireConfigurationChanged()
       } ?: error("Unknown property: $key")
     }
@@ -113,7 +124,7 @@ class DeveloperToolConfiguration(
     val defaultValue: Any,
     val example: Any?,
     val type: PropertyType,
-    var valueChanged: Boolean = false
+    var valueChanged: Boolean
   ) {
 
     fun reset(loadExamples: Boolean) {

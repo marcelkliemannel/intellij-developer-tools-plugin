@@ -37,6 +37,7 @@ import com.intellij.util.io.decodeBase64
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
@@ -193,7 +194,12 @@ internal class JwtEncoderDecoder(
   }
 
   override fun afterBuildUi() {
-    convert(ENCODED)
+    jwt.validate()
+    validate()
+
+    if (!configuration.hasChanges && DeveloperToolsPluginService.loadExamples) {
+      convert(ENCODED)
+    }
   }
 
   override fun reset() {
@@ -434,7 +440,8 @@ internal class JwtEncoderDecoder(
       if (numOfJwtParts >= 1) {
         val handleError: (Exception) -> Unit = { error -> header.set(jwtParts[0]); headerErrorHolder.add(error) }
         parseAsJson(jwtParts[0].decodeBase64String(), handleError) {
-          parseHeader(it); header.set(it.toPrettyStringWithDefaultObjectMapper())
+          parseHeader(it)
+          header.set(it.toPrettyStringWithDefaultObjectMapper())
         }
       }
       else {
@@ -506,6 +513,10 @@ internal class JwtEncoderDecoder(
       signature.reset()
     }
 
+    fun validate() {
+      signature.validate()
+    }
+
     private fun clearErrorHolders() {
       encodedErrorHolder.clear()
       headerErrorHolder.clear()
@@ -548,9 +559,9 @@ internal class JwtEncoderDecoder(
 
     val algorithm = configuration.register("algorithm", DEFAULT_SIGNATURE_ALGORITHM)
 
-    var secret = ValueProperty(if (DeveloperToolsPluginService.loadExamples) EXAMPLE_SECRET else "")
-    var publicKey = ValueProperty("")
-    var privateKey = ValueProperty("")
+    var secret = configuration.register("secret", "", SECRET, EXAMPLE_SECRET)
+    var publicKey = configuration.register("publicKey", "", SECRET, if (algorithm.get().kind == RSA) EXAMPLE_RSA_PUBLIC_KEY else EXAMPLE_EC_PUBLIC_KEY)
+    var privateKey = configuration.register("privateKey", "", SECRET, if (algorithm.get().kind == RSA) EXAMPLE_RSA_PRIVATE_KEY else EXAMPLE_EC_PRIVATE_KEY)
 
     val publicKeyErrorHolder = ErrorHolder()
     val privateKeyErrorHolder = ErrorHolder()
@@ -580,47 +591,7 @@ internal class JwtEncoderDecoder(
         }
 
         RSA, ECDSA -> {
-          val keyFactory = when (signatureAlgorithm.kind) {
-            RSA -> rsaKeyFactory
-            ECDSA -> ecKeyFactory
-            else -> error("Unexpected key-based algorithm: $signatureAlgorithm")
-          }
-
-          val publicKey: PublicKey? = try {
-            val publicKeyValue = publicKey.get()
-            if (publicKeyValue.isBlank()) {
-              publicKeyErrorHolder.add("A public key must be provided")
-              null
-            }
-            else {
-              keyFactory.generatePublic(X509EncodedKeySpec(toRawKey(publicKeyValue)))
-            }
-          } catch (e: Exception) {
-            publicKeyErrorHolder.add(e)
-            null
-          }
-          assert(publicKey != null || publicKeyErrorHolder.isSet())
-
-          val privateKey: PrivateKey? = try {
-            val privateKeyValue = privateKey.get()
-            if (privateKeyValue.isBlank()) {
-              privateKeyErrorHolder.add("A private key must be provided")
-              null
-            }
-            else {
-              keyFactory.generatePrivate(PKCS8EncodedKeySpec(toRawKey(privateKey.get())))
-            }
-          } catch (e: Exception) {
-            privateKeyErrorHolder.add(e)
-            null
-          }
-          assert(privateKey != null || privateKeyErrorHolder.isSet())
-
-          if (publicKeyErrorHolder.isSet() || privateKeyErrorHolder.isSet()) {
-            signatureErrorHolder.add("Invalid signature algorithm configuration")
-            return null
-          }
-
+          val (publicKey, privateKey) = readPublicPrivateKey() ?: return null
           when (signatureAlgorithm) {
             RSA256 -> Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey)
             RSA384 -> Algorithm.RSA384(publicKey as RSAPublicKey, privateKey as RSAPrivateKey)
@@ -670,6 +641,61 @@ internal class JwtEncoderDecoder(
           secret.set("")
         }
       }
+    }
+
+    fun validate() {
+      if (algorithm.get().kind != HMAC) {
+        readPublicPrivateKey()
+      }
+    }
+
+    fun readPublicPrivateKey(): Pair<PublicKey, PrivateKey>? {
+      val keyFactory = when (algorithm.get().kind) {
+        RSA -> rsaKeyFactory
+        ECDSA -> ecKeyFactory
+        else -> error("Unexpected key-based algorithm: ${algorithm.get()}")
+      }
+
+      val publicKey: PublicKey? = readPublicKey(keyFactory)
+      assert(publicKey != null || publicKeyErrorHolder.isSet())
+
+      val privateKey: PrivateKey? = readPrivateKey(keyFactory)
+      assert(privateKey != null || privateKeyErrorHolder.isSet())
+
+      if (publicKeyErrorHolder.isSet() || privateKeyErrorHolder.isSet()) {
+        signatureErrorHolder.add("Invalid signature algorithm configuration")
+        return null
+      }
+
+      return publicKey!! to privateKey!!
+    }
+
+    private fun readPrivateKey(keyFactory: KeyFactory) = try {
+      val privateKeyValue = privateKey.get()
+      if (privateKeyValue.isBlank()) {
+        privateKeyErrorHolder.add("A private key must be provided")
+        null
+      }
+      else {
+        keyFactory.generatePrivate(PKCS8EncodedKeySpec(toRawKey(privateKey.get())))
+      }
+    } catch (e: Exception) {
+      privateKeyErrorHolder.add(e)
+      null
+    }
+
+    private fun readPublicKey(keyFactory: KeyFactory) = try {
+      val publicKeyValue = publicKey.get()
+      if (publicKeyValue.isBlank()) {
+        publicKeyErrorHolder.add("A public key must be provided")
+        null
+      }
+      else {
+        keyFactory.generatePublic(X509EncodedKeySpec(toRawKey(publicKeyValue)))
+      }
+    } catch (e: Exception) {
+      publicKeyErrorHolder.add(e)
+      null
     }
 
     private fun toRawKey(keyInput: String): ByteArray = keyInput
