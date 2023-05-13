@@ -108,9 +108,11 @@ class DeveloperToolConfiguration(
   }
 
   private fun <T : Any?> handlePropertyChange(key: String): (ValueProperty.ChangeEvent<T>) -> Unit = { event ->
-    if (event.oldValue != event.newValue) {
+    val newValue = event.newValue
+    if (event.oldValue != newValue) {
       properties[key]?.let { property ->
-        property.valueChanged = true
+        property.valueChanged = property.defaultValue != newValue && property.example != newValue
+        println("Property '$key' changed to '$newValue' (default: '${property.defaultValue}', example: '${property.example}')")
         fireConfigurationChanged()
       } ?: error("Unknown property: $key")
     }

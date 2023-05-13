@@ -84,8 +84,8 @@ internal class JwtEncoderDecoder(
 
   private var liveConversion = configuration.register("liveConversion", true)
   var encodedText = configuration.register("encodedText", "", INPUT, EXAMPLE_JWT)
-  var headerText = configuration.register("headerText", "", INPUT)
-  var payloadText = configuration.register("payloadText", "", INPUT)
+  var headerText = configuration.register("headerText", "", INPUT, EXAMPLE_HEADER)
+  var payloadText = configuration.register("payloadText", "", INPUT, EXAMPLE_PAYLOAD)
 
   private val highlightEncodedAlarm by lazy { Alarm(parentDisposable) }
   private val highlightHeaderAlarm by lazy { Alarm(parentDisposable) }
@@ -196,10 +196,6 @@ internal class JwtEncoderDecoder(
   override fun afterBuildUi() {
     jwt.validate()
     validate()
-
-    if (!configuration.hasChanges && DeveloperToolsPluginService.loadExamples) {
-      convert(ENCODED)
-    }
   }
 
   override fun reset() {
@@ -799,8 +795,22 @@ internal class JwtEncoderDecoder(
 
     private val DEFAULT_SIGNATURE_ALGORITHM = HMAC256
     private const val EXAMPLE_JWT =
-      "ewogICJ0eXAiOiJKV1QiLAogICJhbGciOiJIUzI1NiIKfQ.ewogICJqdGkiOiAiOTY0OTJkNTktMGFkNS00YzAwLTg5MmQtNTkwYWQ1YWMwMGYzIiwKICAic3ViIjoiMDEyMzQ1Njc4OSIsCiAgIm5hbWUiOiJKb2huIERvZSIsCiAgImlhdCI6MTY4MTA0MDUxNQp9.xLAXegMLC1DAstovUxWo_hqmjXqE0Qd7g0USLtaCVbo"
+      "ewogICJ0eXAiOiJKV1QiLAogICJhbGciOiJIUzI1NiIKfQ.ewogICJqdGkiOiI5NjQ5MmQ1OS0wYWQ1LTRjMDAtODkyZC01OTBhZDVhYzAwZjMiLAogICJzdWIiOiIwMTIzNDU2Nzg5IiwKICAibmFtZSI6IkpvaG4gRG9lIiwKICAiaWF0IjoxNjgxMDQwNTE1Cn0.IqeNl3lHSUfPfEYmttvlQp1sH9LpAoPJlUiSv4XPDSE"
     private const val EXAMPLE_SECRET = "s3cre!"
+    private val EXAMPLE_HEADER = """
+          {
+            "typ":"JWT",
+            "alg":"HS256"
+          }
+          """.trimIndent()
+    private val EXAMPLE_PAYLOAD = """
+          {
+            "jti":"96492d59-0ad5-4c00-892d-590ad5ac00f3",
+            "sub":"0123456789",
+            "name":"John Doe",
+            "iat":1681040515
+          }
+          """.trimIndent()
 
     private val rsaKeyFactory = KeyFactory.getInstance("RSA")
     private val ecKeyFactory = KeyFactory.getInstance("EC")
