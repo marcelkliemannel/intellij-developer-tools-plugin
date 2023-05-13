@@ -22,7 +22,7 @@
             class="dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.OpenMainDialogAction"
             text="Developer Tools"
             description="Provides various developer tools"
-            icon="AllIcons.General.ExternalTools">
+            icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg">
       <add-to-group group-id="MainToolBar" anchor="last"/>
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
