@@ -33,7 +33,7 @@ internal class HmacTransformer(
 
   private var selectedAlgorithm = configuration.register("algorithm", DEFAULT_ALGORITHM)
 
-  private val secretKey = configuration.register("secretKey", "", SECRET)
+  private val secretKey = configuration.register("secretKey", "", SECRET, EXAMPLE_SECRET)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -133,5 +133,7 @@ internal class HmacTransformer(
         .sortedBy { it.title }
         .toList()
     }
+
+    private const val EXAMPLE_SECRET = "s3cre!"
   }
 }

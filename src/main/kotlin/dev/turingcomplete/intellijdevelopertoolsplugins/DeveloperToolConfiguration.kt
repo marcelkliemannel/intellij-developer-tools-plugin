@@ -112,7 +112,6 @@ class DeveloperToolConfiguration(
     if (event.oldValue != newValue) {
       properties[key]?.let { property ->
         property.valueChanged = property.defaultValue != newValue && property.example != newValue
-        println("Property '$key' changed to '$newValue' (default: '${property.defaultValue}', example: '${property.example}')")
         fireConfigurationChanged()
       } ?: error("Unknown property: $key")
     }
