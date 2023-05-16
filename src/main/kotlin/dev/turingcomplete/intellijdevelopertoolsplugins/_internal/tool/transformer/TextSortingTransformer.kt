@@ -65,13 +65,13 @@ internal class TextSortingTransformer(configuration: DeveloperToolConfiguration,
     if (removeBlankWords.get()) {
       unsortedWords = unsortedWords.filter { it.isNotBlank() }
     }
-    if (reverseOrder.get()) {
-      unsortedWords = unsortedWords.reversed()
-    }
 
     var comparator = sortingOrder.get().comparator
     if (caseInsensitive.get()) {
       comparator = comparator.makeCaseInsensitive()
+    }
+    if (reverseOrder.get()) {
+      comparator = comparator.reversed()
     }
     unsortedWords = unsortedWords.sortedWith(comparator)
 
