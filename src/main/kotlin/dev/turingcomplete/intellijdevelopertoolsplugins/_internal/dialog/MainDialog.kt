@@ -36,7 +36,7 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
 
   init {
     title = "Developer Tools"
-    setSize(950, 750)
+    setSize(950, 705)
     isModal = false
     isAutoAdjustable = false
     init()
