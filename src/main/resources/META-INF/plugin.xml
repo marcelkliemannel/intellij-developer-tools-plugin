@@ -176,9 +176,13 @@
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.BarcodeGenerator$Factory"
             weight="13"/>
     <developerTool
+            id="notes"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.Notes$Factory"
+            weight="14"/>
+    <developerTool
             id="rubber-duck"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RubberDuck$Factory"
-            weight="14"/>
+            weight="15"/>
 
     <!-- formatting -->
     <developerTool

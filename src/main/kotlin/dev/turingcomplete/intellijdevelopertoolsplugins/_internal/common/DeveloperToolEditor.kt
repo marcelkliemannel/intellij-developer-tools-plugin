@@ -186,17 +186,19 @@ internal class DeveloperToolEditor(
         add(OpenContentFromFile())
       }
     }
-    add(actionsPopup(
-      title = "Additional Actions",
-      icon = AllIcons.General.ExternalTools,
-      actions = additionalActions
-    ))
+    add(
+      actionsPopup(
+        title = "Additional Actions",
+        icon = AllIcons.General.ExternalTools,
+        actions = additionalActions
+      )
+    )
   }
 
   private fun createDiffAction(): List<AnAction> {
     val actions = mutableListOf<AnAction>()
 
-    val firstTitle = "$title ${editorMode.title}"
+    val firstTitle = title ?: "Content"
 
     actions.add(dumbAwareAction("Show Diff with Clipboard", AllIcons.Actions.DiffWithClipboard) { e ->
       val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
