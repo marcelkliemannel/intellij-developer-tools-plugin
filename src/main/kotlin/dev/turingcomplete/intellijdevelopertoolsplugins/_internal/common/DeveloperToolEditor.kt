@@ -6,10 +6,13 @@ import com.intellij.icons.AllIcons
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionUpdateThread
+import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.Separator
+import com.intellij.openapi.application.ex.ClipboardUtil
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
@@ -40,8 +43,9 @@ import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.UiUtils.actionsPopup
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.UiUtils.dumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
-import org.jetbrains.annotations.TestOnly
 import java.awt.datatransfer.StringSelection
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
@@ -51,11 +55,12 @@ import javax.swing.JComponent
 import javax.swing.ScrollPaneConstants
 
 internal class DeveloperToolEditor(
-  private val title: String?,
+  private val title: String? = null,
   private val editorMode: EditorMode,
   private val parentDisposable: Disposable,
   private val textProperty: ValueProperty<String> = ValueProperty(""),
-  initialLanguage: Language = PlainTextLanguage.INSTANCE
+  initialLanguage: Language = PlainTextLanguage.INSTANCE,
+  private val diffSupport: DiffSupport? = null
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -109,9 +114,8 @@ internal class DeveloperToolEditor(
   fun createComponent(): JComponent =
     object : BorderLayoutPanel(0, UIUtil.DEFAULT_VGAP), DataProvider {
       init {
-        title?.let {
-          addToTop(JBLabel("$it ${editorMode.title}:"))
-        }
+        title?.let { addToTop(JBLabel("$it ${editorMode.title}:")) }
+
         editor.component.border = ValidationResultBorder(editor.component, editor.contentComponent)
         val editorComponent = editor.component.wrapWithToolBar(DeveloperToolEditor::class.java.simpleName, createActions(), ToolBarPlace.RIGHT)
         addToCenter(editorComponent)
@@ -159,17 +163,6 @@ internal class DeveloperToolEditor(
     rangeHighlighters.computeIfAbsent(groupId) { mutableListOf() }.add(rangeHighlighter)
   }
 
-  @TestOnly
-  fun setTextUnderTest(text: String) {
-    try {
-      editor.putUserData(editorActiveKey, true)
-      this@DeveloperToolEditor.text = text
-    }
-    finally {
-      editor.putUserData(editorActiveKey, false)
-    }
-  }
-
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun createActions() = DefaultActionGroup().apply {
@@ -185,10 +178,51 @@ internal class DeveloperToolEditor(
       setSelected = { editor.settings.isUseSoftWraps = it }
     ))
     addSeparator()
-    add(SaveContentToFile())
-    if (editorMode.editable) {
-      add(OpenContentFromFile())
+    val additionalActions = mutableListOf<AnAction>().apply {
+      addAll(createDiffAction())
+      add(Separator.getInstance())
+      add(SaveContentToFile())
+      if (editorMode.editable) {
+        add(OpenContentFromFile())
+      }
     }
+    add(actionsPopup(
+      title = "Additional Actions",
+      icon = AllIcons.General.ExternalTools,
+      actions = additionalActions
+    ))
+  }
+
+  private fun createDiffAction(): List<AnAction> {
+    val actions = mutableListOf<AnAction>()
+
+    val firstTitle = "$title ${editorMode.title}"
+
+    actions.add(dumbAwareAction("Show Diff with Clipboard", AllIcons.Actions.DiffWithClipboard) { e ->
+      val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
+      UiUtils.showDiffDialog(
+        title = "Show Diff with Clipboard",
+        firstTitle = firstTitle,
+        secondTitle = "Clipboard",
+        firstText = editor.document.text,
+        secondText = ClipboardUtil.getTextInClipboard() ?: ""
+      )
+    })
+
+    diffSupport?.let {
+      actions.add(dumbAwareAction("Show Diff with ${it.secondTitle}", AllIcons.Actions.Diff) { e ->
+        val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
+        UiUtils.showDiffDialog(
+          title = "Show Diff with ${it.secondTitle}",
+          firstTitle = firstTitle,
+          secondTitle = it.secondTitle,
+          firstText = editor.document.text,
+          secondText = it.secondText()
+        )
+      })
+    }
+
+    return actions
   }
 
   private fun createEditor(): EditorEx {
@@ -328,7 +362,7 @@ internal class DeveloperToolEditor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class OpenContentFromFile
-    : DumbAwareAction("Copy to Clipboard", "Copy the text into the system clipboard", AllIcons.Actions.MenuOpen) {
+    : DumbAwareAction("Open from File", "Replaces the text with the content of a file", AllIcons.Actions.MenuOpen) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
@@ -346,6 +380,14 @@ internal class DeveloperToolEditor(
 
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  data class DiffSupport(
+    val title: String,
+    val secondTitle: String,
+    val secondText: () -> String
+  )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 

@@ -35,8 +35,11 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.copyabl
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.objectMapper
 import javax.swing.JComponent
 
-class JsonPathTransformer(configuration: DeveloperToolConfiguration, project: Project?, parentDisposable: Disposable)
-  : TextTransformer(
+class JsonPathTransformer(
+  configuration: DeveloperToolConfiguration,
+  project: Project?,
+  parentDisposable: Disposable
+) : TextTransformer(
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Execute Query",
     sourceTitle = "Original",

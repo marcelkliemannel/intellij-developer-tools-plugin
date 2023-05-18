@@ -27,7 +27,7 @@ abstract class TextTransformer(
   protected val sourceText = configuration.register("sourceText", "", PropertyType.INPUT, textTransformerContext.initialSourceExampleText)
   protected var resultText = ValueProperty("")
 
-  private val sourceEditor: DeveloperToolEditor by lazy { createSourceInputEditor() }
+  private val sourceEditor by lazy { createSourceInputEditor() }
   private val resultEditor by lazy { createResultOutputEditor(parentDisposable) }
 
 
@@ -112,7 +112,14 @@ abstract class TextTransformer(
       title = textTransformerContext.sourceTitle,
       editorMode = INPUT,
       parentDisposable = parentDisposable,
-      textProperty = sourceText
+      textProperty = sourceText,
+      diffSupport = textTransformerContext.diffSupport?.let { diffSupport ->
+        DeveloperToolEditor.DiffSupport(
+          title = diffSupport.title,
+          secondTitle = textTransformerContext.resultTitle,
+          secondText = { resultText.get() },
+        )
+      }
     ).apply {
       with(textTransformerContext) {
         initialLanguage?.let { language = it }
@@ -129,7 +136,14 @@ abstract class TextTransformer(
       title = textTransformerContext.resultTitle,
       editorMode = OUTPUT,
       parentDisposable = parentDisposable,
-      textProperty = resultText
+      textProperty = resultText,
+      diffSupport = textTransformerContext.diffSupport?.let { diffSupport ->
+        DeveloperToolEditor.DiffSupport(
+          title = diffSupport.title,
+          secondTitle = textTransformerContext.sourceTitle,
+          secondText = { sourceText.get() },
+        )
+      }
     ).apply {
       getInitialLanguage()?.let { language = it }
     }
@@ -142,7 +156,12 @@ abstract class TextTransformer(
     val resultTitle: String,
     val initialSourceText: String? = null,
     val initialSourceExampleText: String? = null,
-    val initialLanguage: Language? = null
+    val initialLanguage: Language? = null,
+    val diffSupport: DiffSupport? = null
+  )
+
+  data class DiffSupport(
+    val title: String
   )
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

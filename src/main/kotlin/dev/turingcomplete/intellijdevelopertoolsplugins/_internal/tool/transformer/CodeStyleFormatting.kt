@@ -23,7 +23,10 @@ class CodeStyleFormatting(
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Format",
     sourceTitle = "Original",
-    resultTitle = "Formatted"
+    resultTitle = "Formatted",
+    diffSupport = DiffSupport(
+      title = "Code Style Formatting"
+    )
   ),
   configuration = configuration,
   parentDisposable = parentDisposable

@@ -17,7 +17,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.Develop
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.SOURCE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.TARGET
-import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 
 internal abstract class TextConverter(
   protected val textConverterContext: TextConverterContext,
@@ -34,8 +33,8 @@ internal abstract class TextConverter(
 
   private var lastActiveInput: ActiveInput? = null
 
-  private val sourceEditor by lazy { createEditor(SOURCE, textConverterContext.sourceTitle, sourceText) { doToTarget(it) } }
-  private val targetEditor by lazy { createEditor(TARGET, textConverterContext.targetTitle, targetText) { doToSource(it) } }
+  private val sourceEditor by lazy { createSourceEditor() }
+  private val targetEditor by lazy { createTargetEditor() }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -156,19 +155,53 @@ internal abstract class TextConverter(
     conversationAlarm.addRequest(conversation, 0)
   }
 
-  private fun createEditor(
-    activeInput: ActiveInput,
-    title: String,
-    textProperty: ValueProperty<String>,
-    onTextChange: (String) -> Unit
-  ) = DeveloperToolEditor(title = title, editorMode = INPUT_OUTPUT, parentDisposable, textProperty).apply {
-    onFocusGained {
-      lastActiveInput = activeInput
+  private fun createSourceEditor() =
+    DeveloperToolEditor(
+      title = textConverterContext.sourceTitle,
+      editorMode = INPUT_OUTPUT,
+      parentDisposable = parentDisposable,
+      textProperty = sourceText,
+      diffSupport = textConverterContext.diffSupport?.let { diffSupport ->
+        DeveloperToolEditor.DiffSupport(
+          title = diffSupport.title,
+          secondTitle = textConverterContext.targetTitle,
+          secondText = { targetText.get() },
+        )
+      }
+    ).apply {
+      onFocusGained {
+        lastActiveInput = SOURCE
+      }
+      this.onTextChangeFromUi { text ->
+        if (liveConversion.get()) {
+          lastActiveInput = SOURCE
+          doToTarget(text)
+        }
+      }
     }
-    this.onTextChangeFromUi { text ->
-      if (liveConversion.get()) {
-        lastActiveInput = activeInput
-        onTextChange(text)
+
+  private fun createTargetEditor(): DeveloperToolEditor {
+    return DeveloperToolEditor(
+      title = textConverterContext.targetTitle,
+      editorMode = INPUT_OUTPUT,
+      parentDisposable = parentDisposable,
+      textProperty = targetText,
+      diffSupport = textConverterContext.diffSupport?.let { diffSupport ->
+        DeveloperToolEditor.DiffSupport(
+          title = diffSupport.title,
+          secondTitle = textConverterContext.sourceTitle,
+          secondText = { sourceText.get() },
+        )
+      }
+    ).apply {
+      onFocusGained {
+        lastActiveInput = TARGET
+      }
+      this.onTextChangeFromUi { text ->
+        if (liveConversion.get()) {
+          lastActiveInput = TARGET
+          doToSource(text)
+        }
       }
     }
   }
@@ -201,7 +234,12 @@ internal abstract class TextConverter(
     val sourceTitle: String,
     val targetTitle: String,
     val sourceErrorHolder: ErrorHolder? = null,
-    val targetErrorHolder: ErrorHolder? = null
+    val targetErrorHolder: ErrorHolder? = null,
+    val diffSupport: DiffSupport? = null
+  )
+
+  data class DiffSupport(
+    val title: String
   )
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

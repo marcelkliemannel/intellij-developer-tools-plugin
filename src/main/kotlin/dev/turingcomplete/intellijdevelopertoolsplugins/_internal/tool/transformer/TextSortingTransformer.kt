@@ -19,17 +19,22 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.makeCas
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer.WordsDelimiter.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer.WordsDelimiter.LINE_BREAK
 
-internal class TextSortingTransformer(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
-  TextTransformer(
-    textTransformerContext = TextTransformerContext(
-      transformActionTitle = "Sort",
-      sourceTitle = "Unsorted",
-      resultTitle = "Sorted",
-      initialSourceExampleText = EXAMPLE_INPUT
-    ),
-    configuration = configuration,
-    parentDisposable = parentDisposable
-  ) {
+internal class TextSortingTransformer(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) : TextTransformer(
+  textTransformerContext = TextTransformerContext(
+    transformActionTitle = "Sort",
+    sourceTitle = "Unsorted",
+    resultTitle = "Sorted",
+    initialSourceExampleText = EXAMPLE_INPUT,
+    diffSupport = DiffSupport(
+      title = "Text Sorting"
+    )
+  ),
+  configuration = configuration,
+  parentDisposable = parentDisposable
+) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var unsortedSplitWordsDelimiter = configuration.register("unsortedPredefinedDelimiter", LINE_BREAK)

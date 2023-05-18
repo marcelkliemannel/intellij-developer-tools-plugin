@@ -27,7 +27,10 @@ internal class CodeFormattingConverter(
     sourceTitle = "First",
     targetTitle = "Second",
     sourceErrorHolder = ErrorHolder(),
-    targetErrorHolder = ErrorHolder()
+    targetErrorHolder = ErrorHolder(),
+    diffSupport = DiffSupport(
+      title = "Code Formatting Converter"
+    )
   ),
   configuration = configuration,
   parentDisposable = parentDisposable

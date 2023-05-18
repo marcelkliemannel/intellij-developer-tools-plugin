@@ -23,7 +23,10 @@ class SqlFormattingTransformer(
     transformActionTitle = "Format",
     sourceTitle = "Plain SQL",
     resultTitle = "Formatted SQL",
-    initialSourceExampleText = EXAMPLE_SQL
+    initialSourceExampleText = EXAMPLE_SQL,
+    diffSupport = DiffSupport(
+      title = "SQL Formatting"
+    )
   ),
   configuration = configuration,
   parentDisposable = parentDisposable

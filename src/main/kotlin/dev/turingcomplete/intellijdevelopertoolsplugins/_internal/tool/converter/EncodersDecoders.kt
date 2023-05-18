@@ -24,7 +24,10 @@ internal val encoderDecoderTextConverterContext = TextConverter.TextConverterCon
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+internal class Base32EncoderDecoder(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) :
   TextConverter(
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
@@ -56,7 +59,10 @@ internal class Base32EncoderDecoder(configuration: DeveloperToolConfiguration, p
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+internal class Base64EncoderDecoder(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) :
   TextConverter(
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
@@ -88,7 +94,10 @@ internal class Base64EncoderDecoder(configuration: DeveloperToolConfiguration, p
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+internal class UrlBase64EncoderDecoder(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) :
   TextConverter(
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
@@ -120,7 +129,10 @@ internal class UrlBase64EncoderDecoder(configuration: DeveloperToolConfiguration
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+internal class MimeBase64EncoderDecoder(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) :
   TextConverter(
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
@@ -152,7 +164,10 @@ internal class MimeBase64EncoderDecoder(configuration: DeveloperToolConfiguratio
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class UrlEncodingEncoderDecoder(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+internal class UrlEncodingEncoderDecoder(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) :
   TextConverter(
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,

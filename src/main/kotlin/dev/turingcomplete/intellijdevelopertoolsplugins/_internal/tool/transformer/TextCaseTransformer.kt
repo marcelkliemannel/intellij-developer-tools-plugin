@@ -20,16 +20,21 @@ import dev.turingcomplete.textcaseconverter.toTextCase
 import dev.turingcomplete.textcaseconverter.toWordsSplitter
 import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 
-class TextCaseTransformer(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
-  TextTransformer(
-    textTransformerContext = TextTransformerContext(
-      transformActionTitle = "Transform",
-      sourceTitle = "Original",
-      resultTitle = "Target"
-    ),
-    configuration = configuration,
-    parentDisposable = parentDisposable
-  ) {
+class TextCaseTransformer(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) : TextTransformer(
+  textTransformerContext = TextTransformerContext(
+    transformActionTitle = "Transform",
+    sourceTitle = "Original",
+    resultTitle = "Target",
+    diffSupport = DiffSupport(
+      title = "Text Case Transformer"
+    )
+  ),
+  configuration = configuration,
+  parentDisposable = parentDisposable
+) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var originalParsingMode = configuration.register("originalParsingMode", FIXED_TEXT_CASE)

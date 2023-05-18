@@ -5,24 +5,31 @@ import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.TextConverterContext
 import org.apache.commons.text.StringEscapeUtils
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
+// -- Exposed Methods ----------------------------------------------------------------------------------------------- //
 
-private val escapeUnescapeContext = TextConverter.TextConverterContext(
+internal fun createEscapeUnescapeContext(title: String) = TextConverterContext(
   convertActionTitle = "Escape",
   revertActionTitle = "Unescape",
   sourceTitle = "Unescaped",
-  targetTitle = "Escaped"
+  targetTitle = "Escaped",
+  diffSupport = TextConverter.DiffSupport(
+    title = title
+  )
 )
 
-// -- Exposed Methods ----------------------------------------------------------------------------------------------- //
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+internal class HtmlEntitiesEscape(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) :
   TextConverter(
-    textConverterContext = escapeUnescapeContext,
+    textConverterContext = createEscapeUnescapeContext("HTML Entities Escape/Unescape"),
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
@@ -52,9 +59,12 @@ internal class HtmlEntitiesEscape(configuration: DeveloperToolConfiguration, par
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+internal class JavaTextEscape(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) :
   TextConverter(
-    textConverterContext = escapeUnescapeContext,
+    textConverterContext = createEscapeUnescapeContext("Java Text Escape/Unescape"),
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
@@ -84,9 +94,12 @@ internal class JavaTextEscape(configuration: DeveloperToolConfiguration, parentD
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+internal class JsonTextEscape(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) :
   TextConverter(
-    textConverterContext = escapeUnescapeContext,
+    textConverterContext = createEscapeUnescapeContext("JSON Text Escape/Unescape"),
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
@@ -116,9 +129,12 @@ internal class JsonTextEscape(configuration: DeveloperToolConfiguration, parentD
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+internal class CsvTextEscape(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) :
   TextConverter(
-    textConverterContext = escapeUnescapeContext,
+    textConverterContext = createEscapeUnescapeContext("CSV Text Escape/Unescape"),
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
@@ -148,9 +164,12 @@ internal class CsvTextEscape(configuration: DeveloperToolConfiguration, parentDi
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class XmlTextEscape(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+internal class XmlTextEscape(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) :
   TextConverter(
-    textConverterContext = escapeUnescapeContext,
+    textConverterContext = createEscapeUnescapeContext("XML Text Escape/Unescape"),
     configuration = configuration,
     parentDisposable = parentDisposable
   ) {
