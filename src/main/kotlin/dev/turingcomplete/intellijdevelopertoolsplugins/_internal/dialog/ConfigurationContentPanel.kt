@@ -29,6 +29,7 @@ class ConfigurationContentPanel {
     row {
       checkBox("Load examples")
         .bindSelected(DeveloperToolsPluginService.instance.loadExamples)
+        .comment("Changes to the load examples behaviour only take effect the next time the dialog is opened.")
     }
   }.apply { border = JBEmptyBorder(0, 8, 0, 8) }
 
