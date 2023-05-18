@@ -332,10 +332,10 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
       return type
     }
 
-    private const val LOAD_EXAMPLES_DEFAULT = true
-    private const val SAVE_INPUTS_DEFAULT = true
-    private const val SAVE_SECRETS_DEFAULT = true
-    private const val SAVE_CONFIGURATION_DEFAULT = true
+    const val LOAD_EXAMPLES_DEFAULT = true
+    const val SAVE_INPUTS_DEFAULT = true
+    const val SAVE_SECRETS_DEFAULT = true
+    const val SAVE_CONFIGURATION_DEFAULT = true
 
     var lastSelectedContentNodeId by instance.lastSelectedContentNodeId
     var loadExamples by instance.loadExamples
