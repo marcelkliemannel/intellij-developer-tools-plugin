@@ -152,6 +152,10 @@
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$Factory"
             weight="7"/>
     <developerTool
+            id="asdsd"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.TextDiffViewer$Factory"
+            weight="8"/>
+    <developerTool
             id="date-time-converter"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.DatetimeConverter$Factory"
             weight="9"/>

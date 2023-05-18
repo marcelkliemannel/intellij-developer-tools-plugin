@@ -147,8 +147,8 @@ internal class MainMenuTree(
         val parentNode = if (groupId != null) (groupNodes[groupId] ?: error("Unknown group: $groupId")) else rootNode
         val developerToolNode = DeveloperToolNode(
           developerToolId = developerToolFactoryEp.id,
-          parentDisposable = parentDisposable,
           project = project,
+          parentDisposable = parentDisposable,
           developerToolContext = developerToolFactory.getDeveloperToolContext(),
           developerToolCreator = developerToolCreator,
           weight = checkNotNull(developerToolFactoryEp.weight) { "No weight set" }

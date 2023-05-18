@@ -96,7 +96,9 @@ internal class DeveloperToolContentPanel(
   }
 
   private fun addWorkbench(developerToolContainer: DeveloperToolContainer) {
-    val developerToolComponent = createScrollPane(developerToolContainer.instance.createComponent(), true)
+    val developerToolComponent = developerToolContainer.instance.createComponent().run {
+      createScrollPane(this, true)
+    }
     val tabInfo = TabInfo(developerToolComponent).apply {
       text = developerToolContainer.configuration.name
       `object` = developerToolContainer

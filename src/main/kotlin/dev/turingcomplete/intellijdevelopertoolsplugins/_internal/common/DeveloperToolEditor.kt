@@ -200,11 +200,12 @@ internal class DeveloperToolEditor(
 
     actions.add(dumbAwareAction("Show Diff with Clipboard", AllIcons.Actions.DiffWithClipboard) { e ->
       val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
+      val firstText = runReadAction { editor.document.text }
       UiUtils.showDiffDialog(
         title = "Show Diff with Clipboard",
         firstTitle = firstTitle,
         secondTitle = "Clipboard",
-        firstText = editor.document.text,
+        firstText = firstText,
         secondText = ClipboardUtil.getTextInClipboard() ?: ""
       )
     })
@@ -212,11 +213,12 @@ internal class DeveloperToolEditor(
     diffSupport?.let {
       actions.add(dumbAwareAction("Show Diff with ${it.secondTitle}", AllIcons.Actions.Diff) { e ->
         val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
+        val firstText = runReadAction { editor.document.text }
         UiUtils.showDiffDialog(
           title = "Show Diff with ${it.secondTitle}",
           firstTitle = firstTitle,
           secondTitle = it.secondTitle,
-          firstText = editor.document.text,
+          firstText = firstText,
           secondText = it.secondText()
         )
       })
