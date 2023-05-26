@@ -3,11 +3,13 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.UiUtils.createLink
 
 class ConfigurationContentPanel {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -38,8 +40,8 @@ class ConfigurationContentPanel {
       }
       row {
         checkBox("Remember secrets")
-          .comment("Secrets are stored in the <a>system keychain</a>.") {
-            BrowserUtil.browse("https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html#storage")
+          .comment("Secrets are stored in the <a href='https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html#storage'>system keychain</a>.") {
+            BrowserUtil.browse(it.url)
           }
           .bindSelected(DeveloperToolsPluginService.instance.saveSecrets)
       }
@@ -48,6 +50,15 @@ class ConfigurationContentPanel {
           .bindSelected(DeveloperToolsPluginService.instance.loadExamples)
           .comment("Changes to the load examples behaviour only take effect the next time the dialog is opened.")
       }
+
+      row {
+        cell(
+          createLink(
+            title = "Make a feature request or report an issue",
+            url = "https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues"
+          )
+        )
+      }.topGap(TopGap.MEDIUM)
     }
   }.apply { border = JBEmptyBorder(0, 8, 0, 8) }
 

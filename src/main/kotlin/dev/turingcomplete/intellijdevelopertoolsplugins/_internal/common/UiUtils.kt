@@ -11,6 +11,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.util.PopupUtil
+import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.popup.PopupState
 import javax.swing.Icon
 
@@ -73,6 +74,12 @@ object UiUtils {
         )
       popupState.prepareToShow(popup)
       PopupUtil.showForActionButtonEvent(popup, e)
+    }
+  }
+
+  fun createLink(title: String, url: String): HyperlinkLabel {
+    return HyperlinkLabel(title).apply {
+      setHyperlinkTarget(url)
     }
   }
 
