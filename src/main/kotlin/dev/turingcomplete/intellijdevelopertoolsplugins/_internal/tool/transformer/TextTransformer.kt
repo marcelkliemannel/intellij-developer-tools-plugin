@@ -1,13 +1,24 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer
 
+import com.intellij.icons.AllIcons
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.ui.popup.Balloon
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.ui.ScrollPaneFactory.createScrollPane
+import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.layout.not
+import com.intellij.ui.util.preferredWidth
+import com.intellij.util.ui.UIUtil
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType
@@ -15,6 +26,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.Develop
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
+import javax.swing.JComponent
 
 abstract class TextTransformer(
   private val textTransformerContext: TextTransformerContext,
@@ -63,6 +75,10 @@ abstract class TextTransformer(
     // Override if needed
   }
 
+  protected open fun Panel.buildDebugComponent() {
+    throw NotImplementedError("Debug component not implemented")
+  }
+
   protected open fun getInitialLanguage(): Language? {
     // Override if needed
     return null
@@ -102,7 +118,40 @@ abstract class TextTransformer(
 
         button("▼ ${textTransformerContext.transformActionTitle}") { transform() }
           .enabledIf(liveTransformationCheckBox.selected.not())
+          .gap(RightGap.SMALL)
           .component
+
+        if (textTransformerContext.supportsDebug) {
+          lateinit var debugButton: JComponent
+          debugButton = actionButton(
+            createDebugAction { debugButton },
+            actionPlace = this::class.java.name
+          ).component
+        }
+      }
+    }
+  }
+
+  private fun createDebugAction(debugButton: () -> JComponent): AnAction {
+    return object : DumbAwareAction("Debug", null, AllIcons.Toolwindows.ToolWindowDebugger) {
+
+      override fun actionPerformed(e: AnActionEvent) {
+        val debugComponent = panel {
+          buildDebugComponent()
+        }.apply {
+          preferredWidth = 300
+        }
+        JBPopupFactory.getInstance()
+          .createBalloonBuilder(createScrollPane(debugComponent, true))
+          .setDialogMode(true)
+          .setFillColor(UIUtil.getPanelBackground())
+          .setBlockClicksThroughBalloon(true)
+          .setRequestFocus(true)
+          .createBalloon()
+          .apply {
+            setAnimationEnabled(false)
+            show(RelativePoint.getCenterOf(debugButton()), Balloon.Position.atLeft)
+          }
       }
     }
   }
@@ -157,7 +206,8 @@ abstract class TextTransformer(
     val initialSourceText: String? = null,
     val initialSourceExampleText: String? = null,
     val initialLanguage: Language? = null,
-    val diffSupport: DiffSupport? = null
+    val diffSupport: DiffSupport? = null,
+    val supportsDebug: Boolean = false,
   )
 
   data class DiffSupport(

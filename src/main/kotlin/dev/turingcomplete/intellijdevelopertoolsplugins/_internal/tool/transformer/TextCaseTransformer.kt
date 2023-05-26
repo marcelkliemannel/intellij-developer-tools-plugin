@@ -13,8 +13,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer.OriginalParsingMode.FIXED_TEXT_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer.OriginalParsingMode.INDIVIDUAL_DELIMITER
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer.TextCase.CAMEL_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer.TextCase.COBOL_CASE
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer.TextCase.STRICT_CAMEL_CASE
 import dev.turingcomplete.textcaseconverter.StandardTextCases
 import dev.turingcomplete.textcaseconverter.toTextCase
 import dev.turingcomplete.textcaseconverter.toWordsSplitter
@@ -28,9 +28,11 @@ class TextCaseTransformer(
     transformActionTitle = "Transform",
     sourceTitle = "Original",
     resultTitle = "Target",
+    initialSourceExampleText = EXAMPLE_INPUT_TEXT,
     diffSupport = DiffSupport(
       title = "Text Case Transformer"
-    )
+    ),
+    supportsDebug = true
   ),
   configuration = configuration,
   parentDisposable = parentDisposable
@@ -39,19 +41,14 @@ class TextCaseTransformer(
 
   private var originalParsingMode = configuration.register("originalParsingMode", FIXED_TEXT_CASE)
   private var individualDelimiter = configuration.register("individualDelimiter", " ")
-  private var inputTextCase = configuration.register("inputTextCase", CAMEL_CASE)
+  private var inputTextCase = configuration.register("inputTextCase", STRICT_CAMEL_CASE)
   private var outputTextCase = configuration.register("outputTextCase", COBOL_CASE)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun transform() {
-    resultText.set(
-      when (originalParsingMode.get()) {
-        FIXED_TEXT_CASE -> sourceText.get().toTextCase(outputTextCase.get().textCase, inputTextCase.get().textCase.wordsSplitter())
-        INDIVIDUAL_DELIMITER -> sourceText.get().toTextCase(outputTextCase.get().textCase, individualDelimiter.get().toWordsSplitter())
-      }
-    )
+    resultText.set(sourceText.get().toTextCase(outputTextCase.get().textCase, getInputWordsSplitter()))
   }
 
   override fun Panel.buildMiddleConfigurationUi() {
@@ -81,12 +78,36 @@ class TextCaseTransformer(
     }
   }
 
+  override fun Panel.buildDebugComponent() {
+    group("Input Words") {
+      row {
+        val inputWords = getInputWordsSplitter().split(sourceText.get())
+        if (inputWords.isEmpty()) {
+          label("<html><i>None</i></html>")
+        }
+        else {
+          val wordsList = inputWords.joinToString(separator = "", prefix = "<ol>", postfix = "</ol>") { "<li>$it</li>" }
+          label("<html>$wordsList</html>")
+        }
+      }
+    }
+  }
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun getInputWordsSplitter() =
+    when (originalParsingMode.get()) {
+      FIXED_TEXT_CASE -> inputTextCase.get().textCase.wordsSplitter()
+      INDIVIDUAL_DELIMITER -> individualDelimiter.get().toWordsSplitter()
+    }
+
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
+  @Suppress("unused")
   private enum class TextCase(val textCase: StandardTextCase) {
 
-    CAMEL_CASE(StandardTextCases.CAMEL_CASE),
+    STRICT_CAMEL_CASE(StandardTextCases.STRICT_CAMEL_CASE),
+    SOFT_CAMEL_CASE(StandardTextCases.SOFT_CAMEL_CASE),
     KEBAB_CASE(StandardTextCases.KEBAB_CASE),
     SNAKE_CASE(StandardTextCases.SNAKE_CASE),
     TRAIN_CASE(StandardTextCases.TRAIN_CASE),
@@ -129,4 +150,9 @@ class TextCaseTransformer(
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    const val EXAMPLE_INPUT_TEXT = "thisIsAnExampleText"
+  }
 }
