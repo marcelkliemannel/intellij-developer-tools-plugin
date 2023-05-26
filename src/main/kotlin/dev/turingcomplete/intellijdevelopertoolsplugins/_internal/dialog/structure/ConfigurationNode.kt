@@ -5,7 +5,6 @@ import com.intellij.icons.AllIcons
 internal class ConfigurationNode : ContentNode(
   id = "configuration",
   title = "Configuration",
-  weight = Int.MAX_VALUE,
   icon = AllIcons.General.Gear,
   isSecondaryNode = true
 ) {

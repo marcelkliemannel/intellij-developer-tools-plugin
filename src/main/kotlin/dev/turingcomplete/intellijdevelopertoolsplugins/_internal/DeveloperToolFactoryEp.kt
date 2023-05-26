@@ -20,9 +20,6 @@ class DeveloperToolFactoryEp<T : DeveloperToolFactory<*>> : CustomLoadingExtensi
   @Attribute("preferredSelected")
   var preferredSelected: Boolean = false
 
-  @Attribute("weight")
-  var weight: Int? = Int.MAX_VALUE
-
   @Attribute("groupId")
   var groupId: String? = null
 

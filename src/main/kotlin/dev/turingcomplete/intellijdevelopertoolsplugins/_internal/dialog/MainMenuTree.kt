@@ -150,8 +150,7 @@ internal class MainMenuTree(
           project = project,
           parentDisposable = parentDisposable,
           developerToolContext = developerToolFactory.getDeveloperToolContext(),
-          developerToolCreator = developerToolCreator,
-          weight = checkNotNull(developerToolFactoryEp.weight) { "No weight set" }
+          developerToolCreator = developerToolCreator
         )
         parentNode.add(developerToolNode)
 
@@ -161,8 +160,6 @@ internal class MainMenuTree(
         }
       }
     }
-
-    rootNode.sortChildren()
 
     rootNode.add(ConfigurationNode())
 

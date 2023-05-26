@@ -5,8 +5,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup
 internal class GroupNode(val developerToolGroup: DeveloperToolGroup) :
   ContentNode(
     id = developerToolGroup.id,
-    title = developerToolGroup.menuTitle,
-    weight = checkNotNull(developerToolGroup.weight) { "No weight set" }
+    title = developerToolGroup.menuTitle
   ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //

@@ -66,7 +66,6 @@
     <developerTool
             id="jwt-encoder-decoder"
             groupId="encoder-decoder"
-            weight="1"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder$Factory"/>
     <developerTool
             id="base32-encoder-decoder"
@@ -130,71 +129,56 @@
             groupId="cryptography"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator$Factory"/>
 
-    <!-- root level -->
-    <developerTool
-            id="regular-expression-matcher"
-            weight="1"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RegularExpressionMatcher$Factory"/>
-    <developerTool
-            id="text-format-converter"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.CodeFormattingConverter$Factory"
-            weight="2"/>
-    <developerTool
-            id="uuid-generator"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.UuidGenerator$Factory"
-            weight="2"/>
-    <developerTool
-            id="text-sorting-transformer"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$Factory"
-            weight="6"/>
-    <developerTool
-            id="text-case-transformer"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$Factory"
-            weight="7"/>
-    <developerTool
-            id="asdsd"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.TextDiffViewer$Factory"
-            weight="8"/>
-    <developerTool
-            id="date-time-converter"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.DatetimeConverter$Factory"
-            weight="9"/>
-    <developerTool
-            id="json-path"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.JsonPathTransformer$Factory"
-            weight="10"/>
-    <developerTool
-            id="json-schema-code-generator"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.JsonSchemaValidator$Factory"
-            weight="11"/>
-    <developerTool
-            id="lorem-ipsum-generator"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$Factory"
-            weight="12"/>
-    <developerTool
-            id="qr-code-generator"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.BarcodeGenerator$Factory"
-            weight="13"/>
-    <developerTool
-            id="notes"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.Notes$Factory"
-            weight="14"/>
-    <developerTool
-            id="rubber-duck"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RubberDuck$Factory"
-            weight="15"/>
-
     <!-- formatting -->
     <developerTool
             id="code-style-formatting"
             groupId="formatting"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.CodeStyleFormatting$Factory"
-            weight="1"/>
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.CodeStyleFormatting$Factory"/>
     <developerTool
             id="sql-formatting"
             groupId="formatting"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.SqlFormattingTransformer$Factory"
-            weight="2"/>
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.SqlFormattingTransformer$Factory"/>
+
+    <!-- root level -->
+    <developerTool
+            id="regular-expression-matcher"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RegularExpressionMatcher$Factory"/>
+    <developerTool
+            id="text-format-converter"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.CodeFormattingConverter$Factory"/>
+    <developerTool
+            id="uuid-generator"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.UuidGenerator$Factory"/>
+    <developerTool
+            id="text-sorting-transformer"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$Factory"/>
+    <developerTool
+            id="text-case-transformer"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$Factory"/>
+    <developerTool
+            id="asdsd"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.TextDiffViewer$Factory"/>
+    <developerTool
+            id="date-time-converter"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.DatetimeConverter$Factory"/>
+    <developerTool
+            id="json-path"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.JsonPathTransformer$Factory"/>
+    <developerTool
+            id="json-schema-code-generator"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.JsonSchemaValidator$Factory"/>
+    <developerTool
+            id="lorem-ipsum-generator"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$Factory"/>
+    <developerTool
+            id="qr-code-generator"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.BarcodeGenerator$Factory"/>
+    <developerTool
+            id="notes"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.Notes$Factory"/>
+    <developerTool
+            id="rubber-duck"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RubberDuck$Factory"/>
 
   </extensions>
 </idea-plugin>

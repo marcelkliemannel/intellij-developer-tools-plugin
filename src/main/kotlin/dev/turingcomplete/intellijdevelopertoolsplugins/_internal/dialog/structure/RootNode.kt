@@ -2,8 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.struct
 
 internal class RootNode : ContentNode(
   id = "root",
-  title = "Root",
-  weight = Int.MIN_VALUE
+  title = "Root"
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //

@@ -13,13 +13,11 @@ internal class DeveloperToolNode(
   val parentDisposable: Disposable,
   val project: Project?,
   val developerToolContext: DeveloperToolContext,
-  private val developerToolCreator: (DeveloperToolConfiguration) -> DeveloperTool,
-  weight: Int
+  private val developerToolCreator: (DeveloperToolConfiguration) -> DeveloperTool
 ) : ContentNode(
   id = developerToolId,
   title = developerToolContext.menuTitle,
-  toolTipText = developerToolContext.contentTitle,
-  weight = weight
+  toolTipText = developerToolContext.contentTitle
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
