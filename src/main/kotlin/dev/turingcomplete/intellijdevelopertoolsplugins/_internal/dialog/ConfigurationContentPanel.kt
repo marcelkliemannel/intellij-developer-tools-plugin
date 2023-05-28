@@ -48,7 +48,15 @@ class ConfigurationContentPanel {
       row {
         checkBox("Load examples")
           .bindSelected(DeveloperToolsPluginService.instance.loadExamples)
-          .comment("Changes to the load examples behaviour only take effect the next time the dialog is opened.")
+          .comment("Changes will take effect the next time the dialog is opened.")
+      }
+
+      groupRowsRange("Advanced") {
+        row {
+          checkBox("Dialog is modal")
+            .bindSelected(DeveloperToolsPluginService.instance.dialogIsModal)
+            .comment("Changes will take effect the next time the dialog is opened.")
+        }
       }
 
       row {

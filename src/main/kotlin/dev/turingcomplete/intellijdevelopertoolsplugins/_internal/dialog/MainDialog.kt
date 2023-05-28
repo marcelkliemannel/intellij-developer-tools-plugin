@@ -11,6 +11,7 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ConfigurationNode
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ContentNode
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.DeveloperToolNode
@@ -19,10 +20,19 @@ import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants
+import kotlin.concurrent.withLock
 import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
 
-internal class MainDialog(private val project: Project?) : DialogWrapper(project), Place.Navigator {
+/**
+ * Note regarding modality:
+ * It seems that, as of IntelliJ 2023.1 and at least on macOS, a non-modal
+ * dialog is always shown in front of the IDE window. This can also be seen
+ * in IntelliJ's "UI DSL Showcase" dialog.
+ */
+internal class MainDialog(private val project: Project?)
+  : DialogWrapper(project, null, true, IdeModalityType.MODELESS, false),
+    Place.Navigator {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var selectedContentNode: ContentNode? by Delegates.observable(null, handleContentNodeSelection())
@@ -37,8 +47,7 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
   init {
     title = "Developer Tools"
     setSize(950, 705)
-    isModal = false
-    isAutoAdjustable = false
+    isModal = DeveloperToolsPluginService.dialogIsModal
     init()
   }
 
@@ -69,6 +78,24 @@ internal class MainDialog(private val project: Project?) : DialogWrapper(project
   override fun createActions() = emptyArray<Action>()
 
   override fun createSouthPanel(): JComponent? = null
+
+  override fun getDimensionServiceKey(): String? = MainDialog::class.java.name
+
+  override fun getPreferredFocusedComponent(): JComponent = mainMenuTree
+
+  override fun doOKAction() {
+    DeveloperToolsPluginService.instance.dialogLock.withLock {
+      DeveloperToolsPluginService.instance.currentDialog.set(null)
+      super.doOKAction()
+    }
+  }
+
+  override fun doCancelAction() {
+    DeveloperToolsPluginService.instance.dialogLock.withLock {
+      DeveloperToolsPluginService.instance.currentDialog.set(null)
+      super.doCancelAction()
+    }
+  }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 

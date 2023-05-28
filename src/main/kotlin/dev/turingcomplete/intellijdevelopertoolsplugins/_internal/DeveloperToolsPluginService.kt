@@ -22,11 +22,16 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.MainDialog
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import io.ktor.util.reflect.*
+import java.security.Provider
+import java.security.Security
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
@@ -43,8 +48,24 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   val saveConfiguration: ValueProperty<Boolean> = ValueProperty(SAVE_CONFIGURATION_DEFAULT)
   val saveInputs: ValueProperty<Boolean> = ValueProperty(SAVE_INPUTS_DEFAULT)
   val saveSecrets: ValueProperty<Boolean> = ValueProperty(SAVE_SECRETS_DEFAULT)
+  val dialogIsModal: ValueProperty<Boolean> = ValueProperty(DIALOG_IS_MODAL_DEFAULT)
+
+  val dialogLock = ReentrantLock()
+  val currentDialog = AtomicReference<MainDialog?>()
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
+
+  init {
+    try {
+      val bouncyCastleProviderClass = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider")
+      val bouncyCastleProvider = bouncyCastleProviderClass.getConstructor().newInstance()
+      Security.addProvider(bouncyCastleProvider as Provider)
+    }
+    catch (e: Exception) {
+      log.debug("Can't load BouncyCastleProvider", e)
+    }
+  }
+
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   fun getDeveloperToolConfigurations(developerToolId: String): List<DeveloperToolConfiguration> =
@@ -84,6 +105,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     loadExamples.set(state.loadExamples ?: LOAD_EXAMPLES_DEFAULT)
     saveInputs.set(state.saveInputs ?: SAVE_INPUTS_DEFAULT)
     saveSecrets.set(state.saveInputs ?: SAVE_SECRETS_DEFAULT)
+    dialogIsModal.set(state.dialogIsModal ?: DIALOG_IS_MODAL_DEFAULT)
 
     developerToolsConfigurations.clear()
     state.developerToolsConfigurations
@@ -203,6 +225,8 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     var saveInputs: Boolean? = null,
     @get:Attribute("saveSecrets")
     var saveSecrets: Boolean? = null,
+    @get:Attribute("dialogIsModal")
+    var dialogIsModal: Boolean? = null,
   )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -333,6 +357,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     }
 
     const val LOAD_EXAMPLES_DEFAULT = true
+    const val DIALOG_IS_MODAL_DEFAULT = false
     const val SAVE_INPUTS_DEFAULT = true
     const val SAVE_SECRETS_DEFAULT = true
     const val SAVE_CONFIGURATION_DEFAULT = true
@@ -342,5 +367,6 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     var saveConfiguration by instance.saveConfiguration
     var saveInputs by instance.saveInputs
     var saveSecrets by instance.saveSecrets
+    val dialogIsModal by instance.dialogIsModal
   }
 }
