@@ -3,8 +3,4 @@
 ## [Unreleased]
 ### Added
 
-### Changed
-
-### Fixed
-
-### Deleted
+Initial release

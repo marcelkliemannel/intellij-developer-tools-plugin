@@ -6,7 +6,47 @@
   </vendor>
 
   <description><![CDATA[
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam finibus massa enim. Maecenas fringilla egestas tristique. Cras sed elementum arcu, eu iaculis neque. Suspendisse mollis, diam tristique bibendum maximus, tortor tortor tincidunt sapien, ac mollis lacus metus scelerisque velit. Curabitur consequat dapibus leo, eu egestas leo eleifend at. Phasellus luctus, lorem eget suscipit vehicula, risus nisl feugiat dui, tempor imperdiet est metus sit amet ipsum. Maecenas aliquam vehicula dolor, at aliquam ante. Etiam semper eget arcu nec ultricies. Aenean at pretium ex. Maecenas efficitur condimentum erat, vitae placerat neque mattis vel. Suspendisse sollicitudin ipsum in turpis laoreet interdum. Duis interdum tincidunt nibh, at accumsan magna ullamcorper vitae. Integer sodales ultrices pulvinar. Donec vitae mattis ligula, condimentum egestas est. Mauris id consectetur massa.</p>
+<p>This plugin is a powerful and versatile set of tools designed to enhance the development experience for software engineers. With its extensive collection of features, developers can increase their productivity and simplify complex operations without leaving their coding environment.</p>
+
+<h2>Key Features</h2>
+<ul>
+    <li>
+        <b>Encoding and Decoding:</b>
+        <ul>
+            <li>JWT (JSON Web Tokens)</li>
+            <li>Base32</li>
+            <li>Base64</li>
+            <li>URL Base64</li>
+            <li>MIME Base64</li>
+            <li>URL Encoding</li>
+            <li>Line breaks</li>
+        </ul>
+    </li>
+
+    <li><b>Regular Expression Matcher</b></li>
+    <li><b>UUID Generator</b></li>
+    <li><b>Text Sorting</b></li>
+    <li><b>Text Case Transformation</b></li>
+    <li><b>Text Diff Viewer</b></li>
+    <li><b>Text Escape:</b> Various escaping options for different contexts, including HTML entities, Java Strings, JSON, CSV, and XML.</li>
+    <li><b>JSON Path Parser</b></li>
+    <li><b>JSON Schema Validator</b></li>
+    <li><b>Hashing</b></li>
+    <li><b>Code Style Formatting</b></li>
+    <li><b>SQL Formatting</b></li>
+    <li><b>Password Generator</b></li>
+    <li><b>QR Code/Barcode Generator</b></li>
+    <li><b>Lorem Ipsum Generator</b></li>
+</ul>
+
+<h2>Integration</h2>
+
+The main dialog with all tools is available through:
+<ul>
+  <li>The menu under <b>Tools | Developer Tools</b>;</li>
+  <li>in the toolbar of the old UI, if enabled via <b>View | Toolbar</b>;</li>
+  <li>and in the new UI in the left main toolbar.</li>
+</ul>
     ]]></description>
 
   <depends>com.intellij.modules.platform</depends>

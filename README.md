@@ -1,8 +1,41 @@
 # IntelliJ Developer Tools Plugin
 
-Bugs:
-- Undo action in text field causes an exception
-- Enter in text fields triggers dialog close
+This plugin is a powerful and versatile set of tools designed to enhance the development experience for software engineers. With its extensive collection of features, developers can increase their productivity and simplify complex operations without leaving their coding environment.
+
+<img src="screenshots/main-dialog.png" alt="Main Dialog" width="932px"/>
+
+## Key Features
+
+- Encoding and Decoding:
+  - JWT (JSON Web Tokens)
+  - Base32
+  - Base64
+  - URL Base64
+  - MIME Base64
+  - URL Encoding
+  - Line breaks
+- Regular Expression Matcher
+- UUID Generator
+- Text Sorting
+- Text Case Transformation
+- Text Diff Viewer
+- Text Escape:</b> Various escaping options for different contexts, including HTML entities, Java Strings, JSON, CSV, and XML.
+- JSON Path Parser
+- JSON Schema Validator
+- Hashing
+- Code Style Formatting
+- SQL Formatting
+- Password Generator
+- QR Code/Barcode Generator
+- Lorem Ipsum Generator
+
+## Integration
+
+The main dialog with all tools is available through:
+ - IntelliJ's main menu under **Tools | Developer Tools**;
+ - in the toolbar of the old UI if enabled via **View | Toolbar**;
+ - and in the new UI in the left main toolbar.
+
 
 ## Development
 
