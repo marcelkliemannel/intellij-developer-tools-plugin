@@ -28,7 +28,7 @@
     <li><b>Text Sorting</b></li>
     <li><b>Text Case Transformation</b></li>
     <li><b>Text Diff Viewer</b></li>
-    <li><b>Text Escape:</b> Various escaping options for different contexts, including HTML entities, Java Strings, JSON, CSV, and XML.</li>
+    <li><b>Text Escaping:</b> HTML entities, Java Strings, JSON, CSV, and XML</li>
     <li><b>JSON Path Parser</b></li>
     <li><b>JSON Schema Validator</b></li>
     <li><b>Hashing</b></li>
@@ -45,7 +45,7 @@ The main dialog with all tools is available through:
 <ul>
   <li>The menu under <b>Tools | Developer Tools</b>;</li>
   <li>in the toolbar of the old UI, if enabled via <b>View | Toolbar</b>;</li>
-  <li>and in the new UI in the left main toolbar.</li>
+  <li>and in the new UI in the right main toolbar.</li>
 </ul>
     ]]></description>
 

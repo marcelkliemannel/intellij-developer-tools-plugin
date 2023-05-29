@@ -1,5 +1,7 @@
 # IntelliJ Developer Tools Plugin
 
+<img src="src/main/resources/META-INF/pluginIcon.svg" alt="Plugin Logo" width="120px"/>
+
 This plugin is a powerful and versatile set of tools designed to enhance the development experience for software engineers. With its extensive collection of features, developers can increase their productivity and simplify complex operations without leaving their coding environment.
 
 <img src="screenshots/main-dialog.png" alt="Main Dialog" width="932px"/>
@@ -19,7 +21,7 @@ This plugin is a powerful and versatile set of tools designed to enhance the dev
 - Text Sorting
 - Text Case Transformation
 - Text Diff Viewer
-- Text Escape:</b> Various escaping options for different contexts, including HTML entities, Java Strings, JSON, CSV, and XML.
+- Text Escaping:  HTML entities, Java Strings, JSON, CSV, and XML
 - JSON Path Parser
 - JSON Schema Validator
 - Hashing
@@ -34,7 +36,7 @@ This plugin is a powerful and versatile set of tools designed to enhance the dev
 The main dialog with all tools is available through:
  - IntelliJ's main menu under **Tools | Developer Tools**;
  - in the toolbar of the old UI if enabled via **View | Toolbar**;
- - and in the new UI in the left main toolbar.
+ - and in the new UI in the right main toolbar.
 
 
 ## Development
