@@ -18,6 +18,7 @@ import com.intellij.util.ui.tree.TreeUtil
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolFactoryEp
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.lastSelectedContentNodeId
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.uncheckedCastTo
@@ -43,7 +44,7 @@ internal class MainMenuTree(
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
-    val (rootNode, groupNodesToExpand, preferredSelectedDeveloperToolNode) = createTreeNodes(project, parentDisposable)
+    val (rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode) = createTreeNodes(project, parentDisposable)
 
     model = DefaultTreeModel(rootNode)
     setCellRenderer(MenuTreeNodeRenderer(rootNode))
@@ -58,9 +59,21 @@ internal class MainMenuTree(
     setExpandableItemsEnabled(false)
     RelativeFont.BOLD.install<SimpleTree>(this)
 
-    groupNodesToExpand.forEach { TreeUtil.promiseExpand(this, TreeUtil.getPath(rootNode, it)) }
+    expandNodes(defaultGroupNodesToExpand)
 
     selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode)
+  }
+
+  private fun expandNodes(defaultGroupNodesToExpand: List<GroupNode>) {
+    val expandedGroupNodeIds = DeveloperToolsPluginService.instance.expandedGroupNodeIds ?: defaultGroupNodesToExpand.map { it.id }.toSet()
+
+    TreeUtil.promiseVisit(this) {
+      val lastPathComponent = it.lastPathComponent
+      if (lastPathComponent is GroupNode && expandedGroupNodeIds.contains(lastPathComponent.id)) {
+        TreeUtil.promiseExpand(this, it)
+      }
+      CONTINUE
+    }
   }
 
   private fun selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode: ContentNode?) {
@@ -68,9 +81,7 @@ internal class MainMenuTree(
     lastSelectedContentNodeId?.let { lastSelectedComponentNodeId ->
       TreeUtil.promiseVisit(this) {
         val lastPathComponent = it.lastPathComponent
-        if (lastPathComponent is ContentNode
-          && lastPathComponent.id == lastSelectedComponentNodeId
-        ) {
+        if (lastPathComponent is ContentNode && lastPathComponent.id == lastSelectedComponentNodeId) {
           INTERRUPT
         }
         else {
@@ -126,13 +137,13 @@ internal class MainMenuTree(
   ): Triple<RootNode, List<GroupNode>, ContentNode?> {
     val rootNode = RootNode()
 
-    val groupNodesToExpand = mutableListOf<GroupNode>()
+    val defaultGroupNodesToExpand = mutableListOf<GroupNode>()
     val groupNodes = mutableMapOf<String, GroupNode>()
     DeveloperToolGroup.EP_NAME.extensions.forEach { developerToolGroup ->
       val groupNode = GroupNode(developerToolGroup)
       groupNodes[developerToolGroup.id] = groupNode
       if (developerToolGroup.initiallyExpanded == true) {
-        groupNodesToExpand.add(groupNode)
+        defaultGroupNodesToExpand.add(groupNode)
       }
       rootNode.add(groupNode)
     }
@@ -163,7 +174,16 @@ internal class MainMenuTree(
 
     rootNode.add(ConfigurationNode())
 
-    return Triple(rootNode, groupNodesToExpand, preferredSelectedDeveloperToolNode)
+    return Triple(rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode)
+  }
+
+  fun saveState() {
+    val expandedGroupNodeIds = TreeUtil.collectExpandedPaths(this)
+      .map { it.lastPathComponent }
+      .filterIsInstance<GroupNode>()
+      .map { it.id }
+      .toSet()
+    DeveloperToolsPluginService.instance.setExpandedGroupNodeIds(expandedGroupNodeIds)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

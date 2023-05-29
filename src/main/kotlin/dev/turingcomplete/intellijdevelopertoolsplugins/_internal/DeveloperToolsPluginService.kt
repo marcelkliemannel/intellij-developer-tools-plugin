@@ -49,6 +49,8 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   val saveInputs: ValueProperty<Boolean> = ValueProperty(SAVE_INPUTS_DEFAULT)
   val saveSecrets: ValueProperty<Boolean> = ValueProperty(SAVE_SECRETS_DEFAULT)
   val dialogIsModal: ValueProperty<Boolean> = ValueProperty(DIALOG_IS_MODAL_DEFAULT)
+  var expandedGroupNodeIds: MutableSet<String>? = null
+    private set
 
   val dialogLock = ReentrantLock()
   val currentDialog = AtomicReference<MainDialog?>()
@@ -60,13 +62,16 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
       val bouncyCastleProviderClass = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider")
       val bouncyCastleProvider = bouncyCastleProviderClass.getConstructor().newInstance()
       Security.addProvider(bouncyCastleProvider as Provider)
-    }
-    catch (e: Exception) {
+    } catch (e: Exception) {
       log.debug("Can't load BouncyCastleProvider", e)
     }
   }
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+
+  fun setExpandedGroupNodeIds(expandedGroupNodeIds: Set<String>) {
+    this.expandedGroupNodeIds = expandedGroupNodeIds.toMutableSet()
+  }
 
   fun getDeveloperToolConfigurations(developerToolId: String): List<DeveloperToolConfiguration> =
     developerToolsConfigurations[developerToolId]?.toList() ?: emptyList()
@@ -96,7 +101,9 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
       lastSelectedContentNodeId = lastSelectedContentNodeId.get(),
       loadExamples = loadExamples.get(),
       saveInputs = saveInputs.get(),
-      saveSecrets = saveSecrets.get()
+      saveSecrets = saveSecrets.get(),
+      dialogIsModal = dialogIsModal.get(),
+      expandedGroupNodeIds = expandedGroupNodeIds?.toList()
     )
   }
 
@@ -106,6 +113,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     saveInputs.set(state.saveInputs ?: SAVE_INPUTS_DEFAULT)
     saveSecrets.set(state.saveInputs ?: SAVE_SECRETS_DEFAULT)
     dialogIsModal.set(state.dialogIsModal ?: DIALOG_IS_MODAL_DEFAULT)
+    setExpandedGroupNodeIds(state.expandedGroupNodeIds?.toSet() ?: emptySet())
 
     developerToolsConfigurations.clear()
     state.developerToolsConfigurations
@@ -227,6 +235,8 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     var saveSecrets: Boolean? = null,
     @get:Attribute("dialogIsModal")
     var dialogIsModal: Boolean? = null,
+    @get:XCollection(style = v2, elementName = "expandedGroupNodeId")
+    var expandedGroupNodeIds: List<String>? = null,
   )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

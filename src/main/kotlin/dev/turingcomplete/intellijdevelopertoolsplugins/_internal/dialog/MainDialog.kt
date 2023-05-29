@@ -84,6 +84,7 @@ internal class MainDialog(private val project: Project?)
   override fun getPreferredFocusedComponent(): JComponent = mainMenuTree
 
   override fun doOKAction() {
+    closeDialog()
     DeveloperToolsPluginService.instance.dialogLock.withLock {
       DeveloperToolsPluginService.instance.currentDialog.set(null)
       super.doOKAction()
@@ -91,6 +92,7 @@ internal class MainDialog(private val project: Project?)
   }
 
   override fun doCancelAction() {
+    closeDialog()
     DeveloperToolsPluginService.instance.dialogLock.withLock {
       DeveloperToolsPluginService.instance.currentDialog.set(null)
       super.doCancelAction()
@@ -98,6 +100,10 @@ internal class MainDialog(private val project: Project?)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun closeDialog() {
+    mainMenuTree.saveState()
+  }
 
   private fun handleContentNodeSelection(): (KProperty<*>, ContentNode?, ContentNode?) -> Unit = { _, old, new ->
     if (old != new) {
