@@ -10,20 +10,13 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 
 ## Key Features
 
-- Encoding and Decoding:
-  - JWT (JSON Web Tokens)
-  - Base32
-  - Base64
-  - URL Base64
-  - MIME Base64
-  - URL Encoding
-  - Line breaks
+- Encoding and Decoding: JWT (JSON Web Tokens), Base32, Base64, URL Base64, MIME Base64, URL encoding and line breaks
 - Regular Expression Matcher
 - UUID Generator
 - Text Sorting
 - Text Case Transformation
 - Text Diff Viewer
-- Text Escaping:  HTML entities, Java Strings, JSON, CSV, and XML
+- Text Escaping: HTML entities, Java Strings, JSON, CSV, and XML
 - JSON Path Parser
 - JSON Schema Validator
 - Hashing

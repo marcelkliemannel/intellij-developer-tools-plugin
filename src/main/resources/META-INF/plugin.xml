@@ -8,35 +8,25 @@
   <description><![CDATA[
 <p>This plugin is a powerful and versatile set of tools designed to enhance the development experience for software engineers. With its extensive collection of features, developers can increase their productivity and simplify complex operations without leaving their coding environment.</p>
 
+<p>Plugin icon by <a href="https://www.svgrepo.com/svg/489187/toolbox">Gabriele Malaspina</a>.</p>
+
 <h2>Key Features</h2>
 <ul>
-    <li>
-        <b>Encoding and Decoding:</b>
-        <ul>
-            <li>JWT (JSON Web Tokens)</li>
-            <li>Base32</li>
-            <li>Base64</li>
-            <li>URL Base64</li>
-            <li>MIME Base64</li>
-            <li>URL Encoding</li>
-            <li>Line breaks</li>
-        </ul>
-    </li>
-
-    <li><b>Regular Expression Matcher</b></li>
-    <li><b>UUID Generator</b></li>
-    <li><b>Text Sorting</b></li>
-    <li><b>Text Case Transformation</b></li>
-    <li><b>Text Diff Viewer</b></li>
-    <li><b>Text Escaping:</b> HTML entities, Java Strings, JSON, CSV, and XML</li>
-    <li><b>JSON Path Parser</b></li>
-    <li><b>JSON Schema Validator</b></li>
-    <li><b>Hashing</b></li>
-    <li><b>Code Style Formatting</b></li>
-    <li><b>SQL Formatting</b></li>
-    <li><b>Password Generator</b></li>
-    <li><b>QR Code/Barcode Generator</b></li>
-    <li><b>Lorem Ipsum Generator</b></li>
+    <li>Encoding and Decoding: JWT (JSON Web Tokens), Base32, Base64, URL Base64, MIME Base64, URL encoding, line breaks</li>
+    <li>Regular Expression Matcher</li>
+    <li>UUID Generator</li>
+    <li>Text Sorting</li>
+    <li>Text Case Transformation</li>
+    <li>Text Diff Viewer</li>
+    <li>Text Escaping:</b> HTML entities, Java Strings, JSON, CSV, and XML</li>
+    <li>JSON Path Parser</li>
+    <li>JSON Schema Validator</li>
+    <li>Hashing</li>
+    <li>Code Style Formatting</li>
+    <li>SQL Formatting</li>
+    <li>Password Generator</li>
+    <li>QR Code/Barcode Generator</li>
+    <li>Lorem Ipsum Generator</li>
 </ul>
 
 <h2>Integration</h2>
@@ -47,8 +37,6 @@ The main dialog with all tools is available through:
   <li>in the toolbar of the old UI, if enabled via <b>View | Toolbar</b>;</li>
   <li>and in the new UI in the right main toolbar.</li>
 </ul>
-
-<p>Plugin icon by <a href="https://www.svgrepo.com/svg/489187/toolbox">Gabriele Malaspina</a>.</p>
     ]]></description>
 
   <depends>com.intellij.modules.platform</depends>
