@@ -6,6 +6,8 @@ This plugin is a powerful and versatile set of tools designed to enhance the dev
 
 <img src="screenshots/main-dialog.png" alt="Main Dialog" width="932px"/>
 
+Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
+
 ## Key Features
 
 - Encoding and Decoding:

@@ -47,6 +47,8 @@ The main dialog with all tools is available through:
   <li>in the toolbar of the old UI, if enabled via <b>View | Toolbar</b>;</li>
   <li>and in the new UI in the right main toolbar.</li>
 </ul>
+
+<p>Plugin icon by <a href="https://www.svgrepo.com/svg/489187/toolbox">Gabriele Malaspina</a>.</p>
     ]]></description>
 
   <depends>com.intellij.modules.platform</depends>
