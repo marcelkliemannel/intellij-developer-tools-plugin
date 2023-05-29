@@ -189,7 +189,7 @@ internal class DeveloperToolEditor(
     add(
       actionsPopup(
         title = "Additional Actions",
-        icon = AllIcons.Actions.More,
+        icon = AllIcons.Actions.MoreHorizontal,
         actions = additionalActions
       )
     )

@@ -8,8 +8,6 @@ import com.intellij.openapi.observable.properties.AtomicProperty
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.Messages.InputDialog
-import com.intellij.ui.ExperimentalUI
-import com.intellij.ui.IconManager
 import com.intellij.ui.ScrollPaneFactory.createScrollPane
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
@@ -164,7 +162,7 @@ internal class DeveloperToolContentPanel(
   private class DestroyWorkbenchAction(
     private val removeTab: () -> Unit,
     private val visible: () -> Boolean,
-  ) : DumbAwareAction("Close Tab") {
+  ) : DumbAwareAction("Close Workbench") {
 
     override fun update(e: AnActionEvent) {
       e.presentation.apply {
@@ -183,27 +181,9 @@ internal class DeveloperToolContentPanel(
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 
-  @Suppress("UnstableApiUsage")
   companion object {
 
-    private val CLOSE_ICON: Icon
-      get() {
-        return if (ExperimentalUI.isNewUI()) {
-          IconManager.getInstance().getIcon("expui/general/closeSmall.svg", AllIcons::class.java)
-        }
-        else {
-          AllIcons.Actions.Close
-        }
-      }
-
-    private val CLOSE_HOVERED_ICON: Icon
-      get() {
-        return if (ExperimentalUI.isNewUI()) {
-          IconManager.getInstance().getIcon("expui/general/closeSmallHovered.svg", AllIcons::class.java)
-        }
-        else {
-          AllIcons.Actions.CloseHovered
-        }
-      }
+    private val CLOSE_ICON: Icon = AllIcons.Actions.Close
+    private val CLOSE_HOVERED_ICON: Icon = AllIcons.Actions.CloseHovered
   }
 }
