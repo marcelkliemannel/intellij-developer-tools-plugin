@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.ComponentUtil.findComponentsOfType
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBEmptyBorder
@@ -86,7 +87,9 @@ abstract class DeveloperTool(
   }
 
   fun validate(): List<ValidationInfo> {
-    val result = panel.validateAll()
+    val result = findComponentsOfType(panel, DialogPanel::class.java).flatMap {
+      it.validateAll()
+    }.toList()
     validationListeners.forEach { it(result) }
     return result
   }

@@ -83,9 +83,9 @@ internal class JwtEncoderDecoder(
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)
-  var encodedText = configuration.register("encodedText", "", INPUT, EXAMPLE_JWT)
-  var headerText = configuration.register("headerText", "", INPUT, EXAMPLE_HEADER)
-  var payloadText = configuration.register("payloadText", "", INPUT, EXAMPLE_PAYLOAD)
+  private var encodedText = configuration.register("encodedText", "", INPUT, EXAMPLE_JWT)
+  private var headerText = configuration.register("headerText", "", INPUT, EXAMPLE_HEADER)
+  private var payloadText = configuration.register("payloadText", "", INPUT, EXAMPLE_PAYLOAD)
 
   private val highlightEncodedAlarm by lazy { Alarm(parentDisposable) }
   private val highlightHeaderAlarm by lazy { Alarm(parentDisposable) }
@@ -116,6 +116,7 @@ internal class JwtEncoderDecoder(
       cell(encodedEditor.createComponent())
         .validationOnApply(encodedEditor.bindValidator(jwt.encodedErrorHolder.asValidation()))
         .align(Align.FILL)
+        .resizableColumn()
     }.bottomGap(BottomGap.NONE)
     row {
       val signatureInvalid = jwt.signatureErrorHolder.asComponentPredicate()
