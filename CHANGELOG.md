@@ -10,7 +10,11 @@
 
 ### Fixed
 
-- Wrong naming of encoders/decodes input/output text areas ([Github Issue #4](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/4))
+- Wrong naming of encoders/decodes input/output text areas ([GitHub Issue #4](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/4))
+
+### Changed
+
+- Remove dependency on the JsonPath plugin
 
 ## [1.0.1] - 2023-05-29
 

@@ -1,24 +1,27 @@
+@file:Suppress("UnstableApiUsage")
+
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer
 
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.intellij.icons.AllIcons
 import com.intellij.json.JsonLanguage
-import com.intellij.jsonpath.JsonPathLanguage
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PopupAction
-import com.intellij.openapi.editor.event.DocumentEvent
-import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.ui.LanguageTextField
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBLabel
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.LabelPosition
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.util.ui.UIUtil
 import com.jayway.jsonpath.Configuration
 import com.jayway.jsonpath.JsonPath
@@ -30,14 +33,12 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.allowUiDslLabel
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.objectMapper
 import javax.swing.JComponent
 
 class JsonPathTransformer(
   configuration: DeveloperToolConfiguration,
-  project: Project?,
   parentDisposable: Disposable
 ) : TextTransformer(
   textTransformerContext = TextTransformerContext(
@@ -53,7 +54,6 @@ class JsonPathTransformer(
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val queryText = configuration.register("contentText", "", INPUT, EXAMPLE_QUERY)
-  private val queryEditor: LanguageTextField by lazy { createQueryInputEditor(project) }
   private var errorHolder = ErrorHolder()
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
@@ -61,12 +61,14 @@ class JsonPathTransformer(
 
   override fun Panel.buildMiddleConfigurationUi() {
     row {
-      cell(queryEditor)
+      textField()
+        .bindText(queryText)
         .label("JSON path:", LabelPosition.TOP)
         .validationOnApply(errorHolder.asValidation())
         .align(Align.FILL)
         .resizableColumn()
         .gap(RightGap.SMALL)
+        .whenTextChangedFromUi { configurationChanged() }
       lateinit var helpButton: JComponent
       helpButton = actionButton(ShowOperatorsHelpPopup { helpButton })
         .component
@@ -76,12 +78,13 @@ class JsonPathTransformer(
   override fun transform() {
     errorHolder.clear()
 
-    if (sourceText.get().isBlank() || queryEditor.text.isBlank()) {
+    val query = queryText.get()
+    if (sourceText.get().isBlank() || query.isBlank()) {
       return
     }
 
     try {
-      val result = JsonPath.parse(sourceText.get(), jsonPathConfiguration).read<Any>(queryEditor.text)
+      val result = JsonPath.parse(sourceText.get(), jsonPathConfiguration).read<Any>(query)
       resultText.set(
         when (result) {
           is ArrayNode -> objectMapper.writeValueAsString(result)
@@ -98,30 +101,6 @@ class JsonPathTransformer(
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
-
-  private fun createQueryInputEditor(project: Project?): LanguageTextField =
-    LanguageTextField(JsonPathLanguage.INSTANCE, project, EXAMPLE_QUERY, true).apply {
-      text = queryText.get()
-
-      addDocumentListener(object : DocumentListener {
-        override fun documentChanged(event: DocumentEvent) {
-          if (!isDisposed) {
-            queryText.set(event.document.text, "fromQueryInputEditor")
-            if (liveTransformation.get()) {
-              transform()
-            }
-          }
-        }
-      })
-      allowUiDslLabel(this.component)
-
-      queryText.afterChangeConsumeEvent(parentDisposable) { event ->
-        if (event.newValue != event.oldValue && event.id != "fromQueryInputEditor") {
-          text = event.newValue
-        }
-      }
-    }
-
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   class Factory : DeveloperToolFactory<JsonPathTransformer> {
@@ -135,7 +114,7 @@ class JsonPathTransformer(
       project: Project?,
       parentDisposable: Disposable
     ): ((DeveloperToolConfiguration) -> JsonPathTransformer) = { configuration ->
-      JsonPathTransformer(configuration, project, parentDisposable)
+      JsonPathTransformer(configuration, parentDisposable)
     }
   }
 
