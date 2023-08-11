@@ -11,6 +11,7 @@
 
 ### Changed
 
+- Improve sizes of the editors in the JWT Encoder/Decoder
 - Remove dependency on code from the JsonPath plugin
 
 ## [1.0.1] - 2023-05-29

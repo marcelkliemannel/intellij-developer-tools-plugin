@@ -35,7 +35,7 @@ abstract class DeveloperTool(
     // to the preferred size. But the preferred size gets calculated as if the
     // whole text gets displayed on the screen.
     panel.minimumSize = Dimension(0, 0)
-    panel.preferredSize = Dimension(0, 500)
+    panel.withPreferredWidth(0)
 
     panel.registerValidators(parentDisposable)
 

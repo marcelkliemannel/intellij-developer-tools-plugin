@@ -57,6 +57,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.swing.JComponent
 import javax.swing.ScrollPaneConstants
+import kotlin.math.max
 
 internal class DeveloperToolEditor(
   private val title: String? = null,
@@ -65,7 +66,8 @@ internal class DeveloperToolEditor(
   private val textProperty: ValueProperty<String> = ValueProperty(""),
   private val initialLanguage: Language = PlainTextLanguage.INSTANCE,
   private val diffSupport: DiffSupport? = null,
-  private val supportsExpand: Boolean = true
+  private val supportsExpand: Boolean = true,
+  private val minimumSizeHeight: Int = DEFAULT_MINIMUM_SIZE_HEIGHT,
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -127,9 +129,10 @@ internal class DeveloperToolEditor(
         val editorComponent = editor.component.wrapWithToolBar(DeveloperToolEditor::class.java.simpleName, createActions(), ToolBarPlace.RIGHT)
         addToCenter(editorComponent)
         // This prevents the `Editor` from increasing the size of the dialog if
-        // the to display all the text on the screen instead of using scrollbars.
-        preferredSize = JBUI.size(0, 120)
-        minimumSize = JBUI.size(0, 50)
+        // the text in the editor is larger than the preferred height on the
+        // screen.
+        preferredSize = JBUI.size(0, max(minimumSizeHeight, DEFAULT_PREFFERED_SIZE_HEIGHT))
+        minimumSize = JBUI.size(0, minimumSizeHeight)
       }
 
       override fun getData(dataId: String): Any? = when {
@@ -465,6 +468,9 @@ internal class DeveloperToolEditor(
   companion object {
 
     private const val TEXT_CHANGE_FROM_DOCUMENT_LISTENER = "documentChangeListener"
+
+    private const val DEFAULT_PREFFERED_SIZE_HEIGHT = 120
+    private const val DEFAULT_MINIMUM_SIZE_HEIGHT = 50
 
     private val editorActiveKey = Key<Boolean>("editorActive")
     private val timestampFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-SS")

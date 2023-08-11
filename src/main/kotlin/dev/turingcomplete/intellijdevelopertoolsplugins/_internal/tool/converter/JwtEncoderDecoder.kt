@@ -153,7 +153,7 @@ internal class JwtEncoderDecoder(
         .resizableColumn()
     }.resizableRow().topGap(TopGap.SMALL).bottomGap(BottomGap.NONE)
 
-    groupRowsRange("Signature Algorithm") {
+    collapsibleGroup("Signature Algorithm Configuration") {
       lateinit var signatureAlgorithmComboBox: ComboBox<SignatureAlgorithm>
       row {
         signatureAlgorithmComboBox = comboBox(values().toList())
@@ -172,18 +172,17 @@ internal class JwtEncoderDecoder(
 
       row {
         textArea()
-          .rows(2)
-          .resizableColumn()
+          .rows(5)
           .align(Align.FILL)
           .label(label = "Public key:", position = LabelPosition.TOP)
           .bindText(jwt.signature.publicKey)
           .setValidationResultBorder()
           .whenTextChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
           .validationInfo(jwt.signature.publicKeyErrorHolder.asValidation())
-
+      }
+      row {
         textArea()
-          .rows(2)
-          .resizableColumn()
+          .rows(5)
           .align(Align.FILL)
           .label(label = "Private key:", position = LabelPosition.TOP)
           .bindText(jwt.signature.privateKey)
@@ -197,6 +196,9 @@ internal class JwtEncoderDecoder(
   override fun afterBuildUi() {
     jwt.validate()
     validate()
+    highlightDotSeparator()
+    highlightHeaderClaims()
+    highlightPayloadClaims()
   }
 
   override fun reset() {
@@ -295,7 +297,8 @@ internal class JwtEncoderDecoder(
       changeOrigin = ENCODED,
       title = "Encoded",
       language = PlainTextLanguage.INSTANCE,
-      textProperty = encodedText
+      textProperty = encodedText,
+      minimumSizeHeight = 140
     ) { highlightDotSeparator() }
 
   private fun createHeaderEditor(): DeveloperToolEditor =
@@ -303,7 +306,8 @@ internal class JwtEncoderDecoder(
       changeOrigin = HEADER_PAYLOAD,
       title = "Header",
       language = JsonLanguage.INSTANCE,
-      textProperty = headerText
+      textProperty = headerText,
+      minimumSizeHeight = 340
     ) { highlightHeaderClaims() }
 
   private fun createPayloadEditor(): DeveloperToolEditor =
@@ -311,7 +315,8 @@ internal class JwtEncoderDecoder(
       changeOrigin = HEADER_PAYLOAD,
       title = "Payload",
       language = JsonLanguage.INSTANCE,
-      textProperty = payloadText
+      textProperty = payloadText,
+      minimumSizeHeight = 240
     ) { highlightPayloadClaims() }
 
   private fun createEditor(
@@ -319,13 +324,15 @@ internal class JwtEncoderDecoder(
     title: String,
     language: Language,
     textProperty: ValueProperty<String>,
-    onTextChangeFromUi: () -> Unit,
+    minimumSizeHeight: Int,
+    onTextChangeFromUi: () -> Unit
   ) = DeveloperToolEditor(
     title = title,
     editorMode = INPUT_OUTPUT,
     parentDisposable = parentDisposable,
     textProperty = textProperty,
-    initialLanguage = language
+    initialLanguage = language,
+    minimumSizeHeight = minimumSizeHeight
   ).apply {
     onFocusGained {
       lastActiveInput = this
