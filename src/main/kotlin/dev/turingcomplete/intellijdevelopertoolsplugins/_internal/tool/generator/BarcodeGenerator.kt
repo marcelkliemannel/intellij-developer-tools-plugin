@@ -107,7 +107,7 @@ internal class BarcodeGenerator private constructor(
     }
 
     row {
-      cell(contentEditor.createComponent())
+      cell(contentEditor.component)
         .validationOnApply(contentEditor.bindValidator(contentErrorHolder.asValidation()))
         .align(Align.FILL)
     }.layout(RowLayout.INDEPENDENT)

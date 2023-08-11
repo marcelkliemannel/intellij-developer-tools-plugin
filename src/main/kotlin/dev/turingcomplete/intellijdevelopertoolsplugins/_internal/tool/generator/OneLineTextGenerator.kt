@@ -131,7 +131,7 @@ abstract class OneLineTextGenerator(
       }
 
       row {
-        cell(resultEditor.createComponent()).align(Align.FILL)
+        cell(resultEditor.component).align(Align.FILL)
       }.resizableRow()
     }.resizableRow().bottomGap(BottomGap.MEDIUM).visibleIf(supportsBulkGeneration)
   }

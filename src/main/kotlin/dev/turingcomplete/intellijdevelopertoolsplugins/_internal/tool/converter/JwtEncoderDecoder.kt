@@ -113,7 +113,7 @@ internal class JwtEncoderDecoder(
   @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
     row {
-      cell(encodedEditor.createComponent())
+      cell(encodedEditor.component)
         .validationOnApply(encodedEditor.bindValidator(jwt.encodedErrorHolder.asValidation()))
         .align(Align.FILL)
         .resizableColumn()
@@ -142,12 +142,12 @@ internal class JwtEncoderDecoder(
     }
 
     row {
-      cell(headerEditor.createComponent())
+      cell(headerEditor.component)
         .validationOnApply(headerEditor.bindValidator(jwt.headerErrorHolder.asValidation()))
         .align(Align.FILL)
         .resizableColumn()
 
-      cell(payloadEditor.createComponent())
+      cell(payloadEditor.component)
         .validationOnApply(payloadEditor.bindValidator(jwt.payloadErrorHolder.asValidation()))
         .align(Align.FILL)
         .resizableColumn()
@@ -319,8 +319,14 @@ internal class JwtEncoderDecoder(
     title: String,
     language: Language,
     textProperty: ValueProperty<String>,
-    onTextChangeFromUi: () -> Unit
-  ) = DeveloperToolEditor(title, INPUT_OUTPUT, parentDisposable, textProperty, language).apply {
+    onTextChangeFromUi: () -> Unit,
+  ) = DeveloperToolEditor(
+    title = title,
+    editorMode = INPUT_OUTPUT,
+    parentDisposable = parentDisposable,
+    textProperty = textProperty,
+    initialLanguage = language
+  ).apply {
     onFocusGained {
       lastActiveInput = this
     }

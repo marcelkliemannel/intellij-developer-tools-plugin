@@ -109,7 +109,7 @@ class RegularExpressionMatcher(
     }.topGap(TopGap.NONE)
 
     row {
-      cell(inputEditor.createComponent()).align(Align.FILL)
+      cell(inputEditor.component).align(Align.FILL)
     }.resizableRow().topGap(TopGap.SMALL)
 
     row {

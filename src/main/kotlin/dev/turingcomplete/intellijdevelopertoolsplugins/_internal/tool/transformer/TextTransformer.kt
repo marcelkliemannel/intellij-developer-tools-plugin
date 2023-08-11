@@ -52,14 +52,14 @@ abstract class TextTransformer(
     buildTopConfigurationUi()
 
     row {
-      cell(sourceEditor.createComponent()).align(Align.FILL)
+      cell(sourceEditor.component).align(Align.FILL)
     }.resizableRow()
 
     buildMiddleConfigurationUi()
     buildActionsUi()
 
     row {
-      cell(resultEditor.createComponent()).align(Align.FILL)
+      cell(resultEditor.component).align(Align.FILL)
     }.resizableRow()
   }
 

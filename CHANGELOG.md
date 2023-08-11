@@ -1,20 +1,17 @@
 # Changelog
 
 ## [Unreleased]
-
 ### Added
 
-### Changed
-
-### Removed
+- Add "Expand Editor" action to editors
 
 ### Fixed
 
-- Wrong naming of encoders/decodes input/output text areas ([GitHub Issue #4](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/4))
+- Fix wrong naming of encoders/decodes input/output text areas ([GitHub Issue #4](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/4))
 
 ### Changed
 
-- Remove dependency on the JsonPath plugin
+- Remove dependency on code from the JsonPath plugin
 
 ## [1.0.1] - 2023-05-29
 

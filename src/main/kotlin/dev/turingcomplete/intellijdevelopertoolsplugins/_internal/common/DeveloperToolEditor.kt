@@ -5,6 +5,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 import com.intellij.icons.AllIcons
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -32,11 +33,14 @@ import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.ide.CopyPasteManager
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.TextRange
+import com.intellij.ui.AnActionButton
 import com.intellij.ui.ColorUtil
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.layout.ValidationInfoBuilder
@@ -59,8 +63,9 @@ internal class DeveloperToolEditor(
   private val editorMode: EditorMode,
   private val parentDisposable: Disposable,
   private val textProperty: ValueProperty<String> = ValueProperty(""),
-  initialLanguage: Language = PlainTextLanguage.INSTANCE,
-  private val diffSupport: DiffSupport? = null
+  private val initialLanguage: Language = PlainTextLanguage.INSTANCE,
+  private val diffSupport: DiffSupport? = null,
+  private val supportsExpand: Boolean = true
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -83,6 +88,8 @@ internal class DeveloperToolEditor(
     set(value) {
       editor.setLanguage(value)
     }
+
+  val component: JComponent by lazy { createComponent() }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -111,7 +118,7 @@ internal class DeveloperToolEditor(
     return this
   }
 
-  fun createComponent(): JComponent =
+  private fun createComponent(): JComponent =
     object : BorderLayoutPanel(0, UIUtil.DEFAULT_VGAP), DataProvider {
       init {
         title?.let { addToTop(JBLabel("$it ${editorMode.title}:")) }
@@ -165,25 +172,33 @@ internal class DeveloperToolEditor(
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun createActions() = DefaultActionGroup().apply {
+  private fun createActions(): ActionGroup = DefaultActionGroup().apply {
     add(CopyContentAction())
     if (editorMode.editable) {
       add(ClearContentAction())
     }
+
     addSeparator()
+
     add(SimpleToggleAction(
       text = "Soft-Wrap",
       icon = AllIcons.Actions.ToggleSoftWrap,
       isSelected = { editor.settings.isUseSoftWraps },
       setSelected = { editor.settings.isUseSoftWraps = it }
     ))
+
     addSeparator()
+
     val additionalActions = mutableListOf<AnAction>().apply {
       addAll(createDiffAction())
       add(Separator.getInstance())
-      add(SaveContentToFile())
+      add(SaveContentToFileAction())
       if (editorMode.editable) {
-        add(OpenContentFromFile())
+        add(OpenContentFromFileAction())
+      }
+      if (supportsExpand) {
+        add(Separator.getInstance())
+        add(ExpandEditorAction(this@DeveloperToolEditor))
       }
     }
     add(
@@ -344,7 +359,7 @@ internal class DeveloperToolEditor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class SaveContentToFile
+  private class SaveContentToFileAction
     : DumbAwareAction("Save to File", "Save the text into a file", AllIcons.Actions.MenuSaveall) {
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -365,7 +380,7 @@ internal class DeveloperToolEditor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class OpenContentFromFile
+  private class OpenContentFromFileAction
     : DumbAwareAction("Open from File", "Replaces the text with the content of a file", AllIcons.Actions.MenuOpen) {
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -373,7 +388,7 @@ internal class DeveloperToolEditor(
       val fileChooserDescriptor = FileChooserDescriptor(true, true, false, false, false, false)
       FileChooserFactory.getInstance()
         .createFileChooser(fileChooserDescriptor, e.project, editor.component)
-        .choose(e.project).first()?.let {
+        .choose(e.project).firstOrNull()?.let {
           runWriteAction {
             editor.putUserData(editorActiveKey, true)
             editor.document.setText(Files.readString(it.toNioPath()))
@@ -385,6 +400,49 @@ internal class DeveloperToolEditor(
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class ExpandEditorAction(private val originalEditor: DeveloperToolEditor) :
+    AnActionButton("Expand Editor", null, AllIcons.Actions.MoveToWindow), DumbAware {
+
+    override fun actionPerformed(e: AnActionEvent) {
+      val clonedEditorText = ValueProperty(originalEditor.text)
+      val clonedEditor = cloneEditor(originalEditor, clonedEditorText)
+      val apply = object: DialogWrapper(originalEditor.component, true) {
+
+        init {
+          setSize(700, 550)
+          init()
+
+          setOKButtonText("Apply")
+        }
+
+        override fun createCenterPanel(): JComponent = clonedEditor.component
+
+        override fun getDimensionServiceKey(): String? = ExpandEditorAction::class.java.name
+      }.showAndGet()
+
+      if (apply) {
+        runWriteAction {
+          originalEditor.editor.putUserData(editorActiveKey, true)
+          originalEditor.editor.document.setText(clonedEditorText.get())
+        }
+      }
+    }
+
+    private fun cloneEditor(originalEditor: DeveloperToolEditor, textProperty: ValueProperty<String>) =
+      DeveloperToolEditor(
+        title = originalEditor.title,
+        editorMode = originalEditor.editorMode,
+        parentDisposable = originalEditor.parentDisposable,
+        textProperty = textProperty,
+        initialLanguage = originalEditor.initialLanguage,
+        diffSupport = originalEditor.diffSupport,
+        supportsExpand = false
+      )
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+  }
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   data class DiffSupport(
