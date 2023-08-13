@@ -28,6 +28,7 @@ import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.ComboBoxPredicate
 import com.intellij.util.Alarm
+import com.intellij.util.text.OrdinalFormat.formatEnglish
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
@@ -60,7 +61,10 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle.FULL_STANDALONE
+import java.time.temporal.ChronoField
+import java.time.temporal.IsoFields
 import java.util.*
+
 
 class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   DeveloperTool(parentDisposable) {
@@ -76,7 +80,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
   private var formattedStandardFormatPattern = ValueProperty("")
   private var formattedText = ValueProperty("No result")
-  private var dayOfWeek = ValueProperty("")
+  private var dateDetails = ValueProperty("")
 
   private val currentUnixTimestampUpdateAlarm by lazy { Alarm(parentDisposable) }
   private val currentUnixTimestampUpdate: Runnable by lazy { createCurrentUnixTimestampUpdate() }
@@ -167,8 +171,6 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
             .whenTextChangedFromUi { convert(DAY) }
             .gap(RightGap.SMALL)
             .component
-          comment("")
-            .bindText(dayOfWeek)
         }.layout(RowLayout.PARENT_GRID)
         row {
           hourTextField = textField().label("Hour:")
@@ -190,7 +192,11 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
             .whenTextChangedFromUi { convert(SECOND) }
             .component
         }.layout(RowLayout.PARENT_GRID)
-      }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE)
+        row {
+          comment("")
+            .bindText(dateDetails)
+        }
+      }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
       group("Formatted") {
         buttonsGroup {
@@ -374,7 +380,6 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     if (conversionOrigin != DAY) {
       dayTextField.text = localDateTime.dayOfMonth.toString()
     }
-    dayOfWeek.set(localDateTime.dayOfWeek.getDisplayName(FULL_STANDALONE, Locale.getDefault()))
     if (conversionOrigin != HOUR) {
       hourTextField.text = localDateTime.hour.toString()
     }
@@ -384,6 +389,13 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     if (conversionOrigin != SECOND) {
       secondTextField.text = localDateTime.second.toString()
     }
+
+    val dayOfYear = localDateTime.get(ChronoField.DAY_OF_YEAR).toLong()
+    val weekNumber = localDateTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR).toLong()
+    val quarterOfYear = localDateTime.get(IsoFields.QUARTER_OF_YEAR).toLong()
+    val dayName = localDateTime.dayOfWeek.getDisplayName(FULL_STANDALONE, Locale.getDefault())
+    dateDetails.set("A $dayName, the ${formatEnglish(dayOfYear)} day of the year, in the ${formatEnglish(weekNumber)} week, within the ${formatEnglish(quarterOfYear)} quarter.")
+
     formattedText.set(formatDateTime(localDateTime).ifBlank { "No result" })
   }
 
@@ -454,6 +466,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
+  @Suppress("unused")
   private enum class StandardFormat(
     private val title: String,
     private val pattern: String,

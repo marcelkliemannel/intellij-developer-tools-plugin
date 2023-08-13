@@ -4,6 +4,7 @@
 ### Added
 
 - Add "Expand Editor" action to editors
+- Add more details of a date in the date time convert
 
 ### Fixed
 
