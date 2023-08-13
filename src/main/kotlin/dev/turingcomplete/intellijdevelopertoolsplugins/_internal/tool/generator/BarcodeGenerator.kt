@@ -20,7 +20,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ValidationInfo
-import com.intellij.ui.ColorChooser
+import com.intellij.ui.ColorChooserService
 import com.intellij.ui.JBColor
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.components.JBCheckBox
@@ -125,7 +125,7 @@ internal class BarcodeGenerator private constructor(
       cell(ColorPanel(drawPanel.backgroundColor)).gap(RightGap.SMALL)
       lateinit var backgroundColorButton: JButton
       backgroundColorButton = button("Change") {
-        ColorChooser.chooseColor(backgroundColorButton, "Select Background Color", drawPanel.backgroundColor.get())?.let {
+        ColorChooserService.instance.showDialog(project, backgroundColorButton, "Select Background Color", drawPanel.backgroundColor.get())?.let {
           drawPanel.backgroundColor.set(it.toJBColor())
           generate()
         }
@@ -135,7 +135,7 @@ internal class BarcodeGenerator private constructor(
       cell(ColorPanel(drawPanel.foregroundColor)).gap(RightGap.SMALL)
       lateinit var foregroundColorButton: JButton
       foregroundColorButton = button("Change") {
-        ColorChooser.chooseColor(foregroundColorButton, "Select Foreground Color", drawPanel.foregroundColor.get())?.let {
+        ColorChooserService.instance.showDialog(project, foregroundColorButton, "Select Foreground Color", drawPanel.foregroundColor.get())?.let {
           drawPanel.foregroundColor.set(it.toJBColor())
           generate()
         }
