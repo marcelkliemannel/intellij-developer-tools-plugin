@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.DataKey
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.observable.properties.ObservableProperty
 import com.intellij.openapi.observable.util.bind
-import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.naturalSorted
@@ -37,8 +36,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ToolBarPlace
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.copyable
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.not
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toMonospace
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.wrapWithToolBar
@@ -197,7 +196,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
         buttonsGroup {
           row {
             radioButton("Standard format:")
-              .bind(formattedIndividual, false)
+              .bindSelected(formattedIndividual.not())
               .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
               .gap(RightGap.SMALL)
             val formattedStandardFormatComboBox = comboBox(StandardFormat.values().toList())
@@ -227,7 +226,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
           row {
             radioButton("Individual format:")
-              .bind(formattedIndividual, true)
+              .bindSelected(formattedIndividual)
               .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
               .gap(RightGap.SMALL)
             textField()
@@ -235,10 +234,12 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
               .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
               .validationInfo {
                 try {
-                  DateTimeFormatter.ofPattern(it.text)
+                  if (formattedIndividual.get()) {
+                    DateTimeFormatter.ofPattern(it.text)
+                  }
                   return@validationInfo null
                 } catch (e: Exception) {
-                  return@validationInfo ValidationInfo("Invalid format", it)
+                  return@validationInfo ValidationInfo("Invalid individual format", it)
                 }
               }
               .enabledIf(formattedIndividual)

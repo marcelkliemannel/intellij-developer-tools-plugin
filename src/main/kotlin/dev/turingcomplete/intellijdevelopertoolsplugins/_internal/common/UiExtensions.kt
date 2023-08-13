@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
+import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.JBColor
 import com.intellij.ui.UIBundle
@@ -179,6 +180,9 @@ fun Color.toJBColor() = if (this is JBColor) this else JBColor(this, this)
 
 @Suppress("UNCHECKED_CAST")
 fun <T> TabInfo.castedObject(): T = this.`object` as T
+
+operator fun ObservableMutableProperty<Boolean>.not(): ObservableMutableProperty<Boolean> =
+  transform({ !it }) { !it }
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

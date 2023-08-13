@@ -8,6 +8,7 @@
 ### Fixed
 
 - Fix wrong naming of encoders/decodes input/output text areas ([GitHub Issue #4](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/4))
+- Fix invalid date time format prevents usage of a standard format
 
 ### Changed
 
