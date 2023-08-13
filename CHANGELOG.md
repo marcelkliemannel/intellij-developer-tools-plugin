@@ -4,12 +4,13 @@
 ### Added
 
 - Add "Expand Editor" action to editors
-- Add more details of a date in the date time convert
+- Add more details of a date in the date time converter
 
 ### Fixed
 
 - Fix wrong naming of encoders/decodes input/output text areas ([GitHub Issue #4](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/4))
-- Fix invalid date time format prevents usage of a standard format
+- Fix invalid date time format prevents usage of a standard format in the date time converter
+- Fix individual date time format is not restored in the date time converter
 
 ### Changed
 

@@ -271,7 +271,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
   }
 
   override fun afterBuildUi() {
-    reset()
+    init()
   }
 
   override fun reset() {
@@ -280,10 +280,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     formattedStandardFormat.set(DEFAULT_FORMATTED_STANDARD_FORMAT)
     formattedStandardFormatAddOffset.set(DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_OFFSET)
     formattedStandardFormatAddTimeZone.set(DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_TIME_ZONE)
-    syncFormattedStandardFormatPattern()
-
-    unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
-    convert(UNIX_TIMESTAMP_MILLIS, 0)
+    init()
   }
 
   override fun getData(dataId: String): Any? = when {
@@ -302,6 +299,13 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun init() {
+    syncFormattedStandardFormatPattern()
+
+    unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
+    convert(UNIX_TIMESTAMP_MILLIS, 0)
+  }
 
   private fun syncFormattedStandardFormatPattern() {
     val pattern = formattedStandardFormat.get().buildPattern(
@@ -359,8 +363,10 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
       // Trigger validation again to show errors from `ErrorHolder`s
       validate()
     }
-    convertAlarm.cancelAllRequests()
-    convertAlarm.addRequest(convert, delayMillis)
+    if (!isDisposed && !convertAlarm.isDisposed) {
+      convertAlarm.cancelAllRequests()
+      convertAlarm.addRequest(convert, delayMillis)
+    }
   }
 
   private fun setConvertedValues(localDateTime: LocalDateTime, conversionOrigin: ConversionOrigin) {

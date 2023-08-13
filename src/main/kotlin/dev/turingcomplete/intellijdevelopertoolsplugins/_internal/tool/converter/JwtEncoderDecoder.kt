@@ -213,8 +213,10 @@ internal class JwtEncoderDecoder(
       return
     }
 
-    conversationAlarm.cancelAllRequests()
-    conversationAlarm.addRequest({ doConvert(changeOrigin) }, 100)
+    if (!isDisposed && !conversationAlarm.isDisposed) {
+      conversationAlarm.cancelAllRequests()
+      conversationAlarm.addRequest({ doConvert(changeOrigin) }, 100)
+    }
   }
 
   private fun doConvert(changeOrigin: ChangeOrigin) {
@@ -237,7 +239,6 @@ internal class JwtEncoderDecoder(
   }
 
   private fun highlightDotSeparator() {
-    highlightEncodedAlarm.cancelAllRequests()
     val highlightDotSeparator = {
       encodedEditor.removeTextRangeHighlighters(ENCODED_DOT_SEPARATOR_GROUP_ID)
       val encoded = encodedText.get()
@@ -254,17 +255,24 @@ internal class JwtEncoderDecoder(
         i++
       }
     }
-    highlightEncodedAlarm.addRequest(highlightDotSeparator, 100)
+    if (!isDisposed && !highlightEncodedAlarm.isDisposed) {
+      highlightEncodedAlarm.cancelAllRequests()
+      highlightEncodedAlarm.addRequest(highlightDotSeparator, 100)
+    }
   }
 
   private fun highlightHeaderClaims() {
-    highlightHeaderAlarm.cancelAllRequests()
-    highlightHeaderAlarm.addRequest({ doHighlightClaims(headerEditor) }, 100)
+    if (!isDisposed && !highlightHeaderAlarm.isDisposed) {
+      highlightHeaderAlarm.cancelAllRequests()
+      highlightHeaderAlarm.addRequest({ doHighlightClaims(headerEditor) }, 100)
+    }
   }
 
   private fun highlightPayloadClaims() {
-    highlightPayloadAlarm.cancelAllRequests()
-    highlightPayloadAlarm.addRequest({ doHighlightClaims(payloadEditor) }, 100)
+    if (!isDisposed && !highlightPayloadAlarm.isDisposed) {
+      highlightPayloadAlarm.cancelAllRequests()
+      highlightPayloadAlarm.addRequest({ doHighlightClaims(payloadEditor) }, 100)
+    }
   }
 
   private fun doHighlightClaims(editor: DeveloperToolEditor) {

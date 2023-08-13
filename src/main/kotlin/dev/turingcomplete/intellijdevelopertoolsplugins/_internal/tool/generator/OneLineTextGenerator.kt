@@ -90,7 +90,6 @@ abstract class OneLineTextGenerator(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun doGenerate() {
-    generationAlarm.cancelAllRequests()
     val generate: () -> Unit = {
       if (validate().isEmpty()) {
         generatedTextLabel.apply {
@@ -107,7 +106,10 @@ abstract class OneLineTextGenerator(
         }
       }
     }
-    generationAlarm.addRequest(generate, 0)
+    if (!isDisposed && !generationAlarm.isDisposed) {
+      generationAlarm.cancelAllRequests()
+      generationAlarm.addRequest(generate, 0)
+    }
   }
 
   private fun Panel.buildBulkGenerationUi() {

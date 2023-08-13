@@ -190,8 +190,10 @@ internal class BarcodeGenerator private constructor(
       return
     }
 
-    generateAlarm.cancelAllRequests()
-    generateAlarm.addRequest({ doGenerate() }, 100)
+    if (!isDisposed && !generateAlarm.isDisposed) {
+      generateAlarm.cancelAllRequests()
+      generateAlarm.addRequest({ doGenerate() }, 100)
+    }
   }
 
   private fun doGenerate(): List<ValidationInfo> {
@@ -232,6 +234,7 @@ internal class BarcodeGenerator private constructor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
+  @Suppress("unused")
   private enum class Format(
     val title: String,
     val createConfiguration: (DeveloperToolConfiguration, Disposable) -> FormatConfiguration
@@ -771,6 +774,7 @@ internal class BarcodeGenerator private constructor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
+  @Suppress("unused")
   private enum class ErrorCorrection(val level: ErrorCorrectionLevel, val title: String) {
 
     L(ErrorCorrectionLevel.L, "~7%"),

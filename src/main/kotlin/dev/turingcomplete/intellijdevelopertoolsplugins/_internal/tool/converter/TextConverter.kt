@@ -151,8 +151,10 @@ internal abstract class TextConverter(
   }
 
   private fun doConversation(conversation: () -> Unit) {
-    conversationAlarm.cancelAllRequests()
-    conversationAlarm.addRequest(conversation, 0)
+    if (!isDisposed && !conversationAlarm.isDisposed) {
+      conversationAlarm.cancelAllRequests()
+      conversationAlarm.addRequest(conversation, 0)
+    }
   }
 
   private fun createSourceEditor() =
