@@ -4,15 +4,18 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateNonEmpty
+import io.ktor.util.*
 import java.security.Security
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -33,7 +36,8 @@ internal class HmacTransformer(
 
   private var selectedAlgorithm = configuration.register("algorithm", DEFAULT_ALGORITHM)
 
-  private val secretKey = configuration.register("secretKey", "", SECRET, EXAMPLE_SECRET)
+  private val secretKey = configuration.register("secretKey", SECRET_KEY_DEFAULT, SECRET, EXAMPLE_SECRET)
+  private val secretKeyBase64Encoded = configuration.register("secretKeyBase64Encoded", SECRET_KEY_BASE64_ENCODED_DEFAULT, CONFIGURATION)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -61,7 +65,14 @@ internal class HmacTransformer(
     }
 
     val hmac: ByteArray = Mac.getInstance(selectedAlgorithm.get()).run {
-      init(SecretKeySpec(secretKey.get().encodeToByteArray(), selectedAlgorithm.get()))
+      val secretKey = if (secretKeyBase64Encoded.get()) {
+        secretKey.get().decodeBase64String()
+      }
+      else {
+        secretKey.get()
+      }
+
+      init(SecretKeySpec(secretKey.encodeToByteArray(), selectedAlgorithm.get()))
       doFinal(sourceText.get().encodeToByteArray())
     }
     resultText.set(hmac.toHexString())
@@ -84,6 +95,9 @@ internal class HmacTransformer(
         .bindText(secretKey)
         .columns(COLUMNS_LARGE)
         .validateNonEmpty("A secret key must be provided")
+
+      checkBox("Secret key is Base64 encoded")
+        .bindSelected(secretKeyBase64Encoded)
     }
   }
 
@@ -105,8 +119,8 @@ internal class HmacTransformer(
     )
 
     override fun getDeveloperToolCreator(
-        project: Project?,
-        parentDisposable: Disposable
+      project: Project?,
+      parentDisposable: Disposable
     ): ((DeveloperToolConfiguration) -> HmacTransformer)? {
       if (algorithms.isEmpty()) {
         return null
@@ -121,6 +135,9 @@ internal class HmacTransformer(
   companion object {
 
     private const val DEFAULT_ALGORITHM = "HMACSHA256"
+    private const val SECRET_KEY_DEFAULT = ""
+    private const val SECRET_KEY_BASE64_ENCODED_DEFAULT = false
+
     private val algorithms: List<HmacAlgorithm> by lazy {
       Security.getAlgorithms("Mac")
         .asSequence()
