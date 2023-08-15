@@ -109,7 +109,7 @@ class RegularExpressionMatcher(
     }.topGap(TopGap.NONE)
 
     row {
-      cell(inputEditor.createComponent()).align(Align.FILL)
+      cell(inputEditor.component).align(Align.FILL)
     }.resizableRow().topGap(TopGap.SMALL)
 
     row {
@@ -306,7 +306,7 @@ class RegularExpressionMatcher(
       selectionModel.addListSelectionListener(createSelectionListener())
       setContextMenu(this::class.java.name, DefaultActionGroup(CopyValuesAction()))
       setEmptyState("No matches")
-      TableSpeedSearch(this) { value, cell ->
+      TableSpeedSearch.installOn(this) { value, cell ->
         if (cell.column == 0 || cell.column == 1) value as String else null
       }
     }

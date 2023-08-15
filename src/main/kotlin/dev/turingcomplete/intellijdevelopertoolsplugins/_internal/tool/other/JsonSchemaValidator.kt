@@ -60,7 +60,7 @@ class JsonSchemaValidator(
 
   override fun Panel.buildUi() {
     row {
-      cell(schemaEditor.createComponent()).align(Align.FILL)
+      cell(schemaEditor.component).align(Align.FILL)
         .validationOnApply(schemaEditor.bindValidator(schemaErrorHolder.asValidation()))
     }.resizableRow()
 
@@ -75,7 +75,7 @@ class JsonSchemaValidator(
     }
 
     row {
-      cell(dataEditor.createComponent()).align(Align.FILL)
+      cell(dataEditor.component).align(Align.FILL)
         .validationOnApply(dataEditor.bindValidator(dataErrorHolder.asValidation()))
     }.resizableRow()
 

@@ -29,7 +29,7 @@ class Notes(
           editorMode = DeveloperToolEditor.EditorMode.INPUT,
           parentDisposable = parentDisposable,
           textProperty = text
-        ).createComponent()
+        ).component
       ).align(Align.FILL).resizableColumn()
     }.resizableRow()
   }

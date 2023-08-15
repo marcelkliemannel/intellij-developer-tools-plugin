@@ -27,7 +27,7 @@ abstract class MultiLineTextGenerator(
     }
 
     row {
-      cell(generatedTextEditor.createComponent()).align(Align.FILL)
+      cell(generatedTextEditor.component).align(Align.FILL)
     }.resizableRow()
   }
 

@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.DataKey
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.observable.properties.ObservableProperty
 import com.intellij.openapi.observable.util.bind
-import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.naturalSorted
@@ -29,6 +28,7 @@ import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.ComboBoxPredicate
 import com.intellij.util.Alarm
+import com.intellij.util.text.OrdinalFormat.formatEnglish
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
@@ -37,8 +37,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ToolBarPlace
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.copyable
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.not
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toMonospace
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.wrapWithToolBar
@@ -61,7 +61,10 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle.FULL_STANDALONE
+import java.time.temporal.ChronoField
+import java.time.temporal.IsoFields
 import java.util.*
+
 
 class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   DeveloperTool(parentDisposable) {
@@ -77,7 +80,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
   private var formattedStandardFormatPattern = ValueProperty("")
   private var formattedText = ValueProperty("No result")
-  private var dayOfWeek = ValueProperty("")
+  private var dateDetails = ValueProperty("")
 
   private val currentUnixTimestampUpdateAlarm by lazy { Alarm(parentDisposable) }
   private val currentUnixTimestampUpdate: Runnable by lazy { createCurrentUnixTimestampUpdate() }
@@ -168,8 +171,6 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
             .whenTextChangedFromUi { convert(DAY) }
             .gap(RightGap.SMALL)
             .component
-          comment("")
-            .bindText(dayOfWeek)
         }.layout(RowLayout.PARENT_GRID)
         row {
           hourTextField = textField().label("Hour:")
@@ -191,13 +192,17 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
             .whenTextChangedFromUi { convert(SECOND) }
             .component
         }.layout(RowLayout.PARENT_GRID)
-      }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE)
+        row {
+          comment("")
+            .bindText(dateDetails)
+        }
+      }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
       group("Formatted") {
         buttonsGroup {
           row {
             radioButton("Standard format:")
-              .bind(formattedIndividual, false)
+              .bindSelected(formattedIndividual.not())
               .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
               .gap(RightGap.SMALL)
             val formattedStandardFormatComboBox = comboBox(StandardFormat.values().toList())
@@ -227,7 +232,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
           row {
             radioButton("Individual format:")
-              .bind(formattedIndividual, true)
+              .bindSelected(formattedIndividual)
               .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
               .gap(RightGap.SMALL)
             textField()
@@ -235,10 +240,12 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
               .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
               .validationInfo {
                 try {
-                  DateTimeFormatter.ofPattern(it.text)
+                  if (formattedIndividual.get()) {
+                    DateTimeFormatter.ofPattern(it.text)
+                  }
                   return@validationInfo null
                 } catch (e: Exception) {
-                  return@validationInfo ValidationInfo("Invalid format", it)
+                  return@validationInfo ValidationInfo("Invalid individual format", it)
                 }
               }
               .enabledIf(formattedIndividual)
@@ -264,7 +271,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
   }
 
   override fun afterBuildUi() {
-    reset()
+    init()
   }
 
   override fun reset() {
@@ -273,10 +280,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     formattedStandardFormat.set(DEFAULT_FORMATTED_STANDARD_FORMAT)
     formattedStandardFormatAddOffset.set(DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_OFFSET)
     formattedStandardFormatAddTimeZone.set(DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_TIME_ZONE)
-    syncFormattedStandardFormatPattern()
-
-    unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
-    convert(UNIX_TIMESTAMP_MILLIS, 0)
+    init()
   }
 
   override fun getData(dataId: String): Any? = when {
@@ -295,6 +299,13 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun init() {
+    syncFormattedStandardFormatPattern()
+
+    unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
+    convert(UNIX_TIMESTAMP_MILLIS, 0)
+  }
 
   private fun syncFormattedStandardFormatPattern() {
     val pattern = formattedStandardFormat.get().buildPattern(
@@ -352,8 +363,10 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
       // Trigger validation again to show errors from `ErrorHolder`s
       validate()
     }
-    convertAlarm.cancelAllRequests()
-    convertAlarm.addRequest(convert, delayMillis)
+    if (!isDisposed && !convertAlarm.isDisposed) {
+      convertAlarm.cancelAllRequests()
+      convertAlarm.addRequest(convert, delayMillis)
+    }
   }
 
   private fun setConvertedValues(localDateTime: LocalDateTime, conversionOrigin: ConversionOrigin) {
@@ -373,7 +386,6 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     if (conversionOrigin != DAY) {
       dayTextField.text = localDateTime.dayOfMonth.toString()
     }
-    dayOfWeek.set(localDateTime.dayOfWeek.getDisplayName(FULL_STANDALONE, Locale.getDefault()))
     if (conversionOrigin != HOUR) {
       hourTextField.text = localDateTime.hour.toString()
     }
@@ -383,6 +395,13 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     if (conversionOrigin != SECOND) {
       secondTextField.text = localDateTime.second.toString()
     }
+
+    val dayOfYear = localDateTime.get(ChronoField.DAY_OF_YEAR).toLong()
+    val weekNumber = localDateTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR).toLong()
+    val quarterOfYear = localDateTime.get(IsoFields.QUARTER_OF_YEAR).toLong()
+    val dayName = localDateTime.dayOfWeek.getDisplayName(FULL_STANDALONE, Locale.getDefault())
+    dateDetails.set("A $dayName, the ${formatEnglish(dayOfYear)} day of the year, in the ${formatEnglish(weekNumber)} week, within the ${formatEnglish(quarterOfYear)} quarter.")
+
     formattedText.set(formatDateTime(localDateTime).ifBlank { "No result" })
   }
 
@@ -453,6 +472,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
+  @Suppress("unused")
   private enum class StandardFormat(
     private val title: String,
     private val pattern: String,

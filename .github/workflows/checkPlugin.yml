@@ -26,3 +26,6 @@ jobs:
       - name: Verify Plugin
         run: ./gradlew verifyPlugin --stacktrace
 
+      - name: Run Plugin Verifier
+        run: ./gradlew runPluginVerifier --stacktrace
+

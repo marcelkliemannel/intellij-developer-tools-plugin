@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.ComponentUtil.findComponentsOfType
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBEmptyBorder
@@ -34,7 +35,7 @@ abstract class DeveloperTool(
     // to the preferred size. But the preferred size gets calculated as if the
     // whole text gets displayed on the screen.
     panel.minimumSize = Dimension(0, 0)
-    panel.preferredSize = Dimension(0, 500)
+    panel.withPreferredWidth(0)
 
     panel.registerValidators(parentDisposable)
 
@@ -86,7 +87,9 @@ abstract class DeveloperTool(
   }
 
   fun validate(): List<ValidationInfo> {
-    val result = panel.validateAll()
+    val result = findComponentsOfType(panel, DialogPanel::class.java).flatMap {
+      it.validateAll()
+    }.toList()
     validationListeners.forEach { it(result) }
     return result
   }

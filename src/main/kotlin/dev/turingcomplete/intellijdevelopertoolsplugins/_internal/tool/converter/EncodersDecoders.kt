@@ -16,8 +16,8 @@ import java.util.*
 internal val encoderDecoderTextConverterContext = TextConverter.TextConverterContext(
   convertActionTitle = "Encode",
   revertActionTitle = "Decode",
-  sourceTitle = "Encoded",
-  targetTitle = "Decoded"
+  sourceTitle = "Decoded",
+  targetTitle = "Encoded"
 )
 
 // -- Exposed Methods ----------------------------------------------------------------------------------------------- //

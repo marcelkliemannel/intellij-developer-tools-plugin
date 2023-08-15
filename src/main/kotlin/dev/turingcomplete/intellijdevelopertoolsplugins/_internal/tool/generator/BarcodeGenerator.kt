@@ -20,7 +20,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ValidationInfo
-import com.intellij.ui.ColorChooser
+import com.intellij.ui.ColorChooserService
 import com.intellij.ui.JBColor
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.components.JBCheckBox
@@ -107,7 +107,7 @@ internal class BarcodeGenerator private constructor(
     }
 
     row {
-      cell(contentEditor.createComponent())
+      cell(contentEditor.component)
         .validationOnApply(contentEditor.bindValidator(contentErrorHolder.asValidation()))
         .align(Align.FILL)
     }.layout(RowLayout.INDEPENDENT)
@@ -125,7 +125,7 @@ internal class BarcodeGenerator private constructor(
       cell(ColorPanel(drawPanel.backgroundColor)).gap(RightGap.SMALL)
       lateinit var backgroundColorButton: JButton
       backgroundColorButton = button("Change") {
-        ColorChooser.chooseColor(backgroundColorButton, "Select Background Color", drawPanel.backgroundColor.get())?.let {
+        ColorChooserService.instance.showDialog(project, backgroundColorButton, "Select Background Color", drawPanel.backgroundColor.get())?.let {
           drawPanel.backgroundColor.set(it.toJBColor())
           generate()
         }
@@ -135,7 +135,7 @@ internal class BarcodeGenerator private constructor(
       cell(ColorPanel(drawPanel.foregroundColor)).gap(RightGap.SMALL)
       lateinit var foregroundColorButton: JButton
       foregroundColorButton = button("Change") {
-        ColorChooser.chooseColor(foregroundColorButton, "Select Foreground Color", drawPanel.foregroundColor.get())?.let {
+        ColorChooserService.instance.showDialog(project, foregroundColorButton, "Select Foreground Color", drawPanel.foregroundColor.get())?.let {
           drawPanel.foregroundColor.set(it.toJBColor())
           generate()
         }
@@ -190,8 +190,10 @@ internal class BarcodeGenerator private constructor(
       return
     }
 
-    generateAlarm.cancelAllRequests()
-    generateAlarm.addRequest({ doGenerate() }, 100)
+    if (!isDisposed && !generateAlarm.isDisposed) {
+      generateAlarm.cancelAllRequests()
+      generateAlarm.addRequest({ doGenerate() }, 100)
+    }
   }
 
   private fun doGenerate(): List<ValidationInfo> {
@@ -232,6 +234,7 @@ internal class BarcodeGenerator private constructor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
+  @Suppress("unused")
   private enum class Format(
     val title: String,
     val createConfiguration: (DeveloperToolConfiguration, Disposable) -> FormatConfiguration
@@ -771,6 +774,7 @@ internal class BarcodeGenerator private constructor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
+  @Suppress("unused")
   private enum class ErrorCorrection(val level: ErrorCorrectionLevel, val title: String) {
 
     L(ErrorCorrectionLevel.L, "~7%"),

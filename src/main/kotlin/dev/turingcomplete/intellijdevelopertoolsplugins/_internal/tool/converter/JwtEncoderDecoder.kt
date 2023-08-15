@@ -83,9 +83,9 @@ internal class JwtEncoderDecoder(
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)
-  var encodedText = configuration.register("encodedText", "", INPUT, EXAMPLE_JWT)
-  var headerText = configuration.register("headerText", "", INPUT, EXAMPLE_HEADER)
-  var payloadText = configuration.register("payloadText", "", INPUT, EXAMPLE_PAYLOAD)
+  private var encodedText = configuration.register("encodedText", "", INPUT, EXAMPLE_JWT)
+  private var headerText = configuration.register("headerText", "", INPUT, EXAMPLE_HEADER)
+  private var payloadText = configuration.register("payloadText", "", INPUT, EXAMPLE_PAYLOAD)
 
   private val highlightEncodedAlarm by lazy { Alarm(parentDisposable) }
   private val highlightHeaderAlarm by lazy { Alarm(parentDisposable) }
@@ -113,9 +113,10 @@ internal class JwtEncoderDecoder(
   @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
     row {
-      cell(encodedEditor.createComponent())
+      cell(encodedEditor.component)
         .validationOnApply(encodedEditor.bindValidator(jwt.encodedErrorHolder.asValidation()))
         .align(Align.FILL)
+        .resizableColumn()
     }.bottomGap(BottomGap.NONE)
     row {
       val signatureInvalid = jwt.signatureErrorHolder.asComponentPredicate()
@@ -141,18 +142,18 @@ internal class JwtEncoderDecoder(
     }
 
     row {
-      cell(headerEditor.createComponent())
+      cell(headerEditor.component)
         .validationOnApply(headerEditor.bindValidator(jwt.headerErrorHolder.asValidation()))
         .align(Align.FILL)
         .resizableColumn()
 
-      cell(payloadEditor.createComponent())
+      cell(payloadEditor.component)
         .validationOnApply(payloadEditor.bindValidator(jwt.payloadErrorHolder.asValidation()))
         .align(Align.FILL)
         .resizableColumn()
     }.resizableRow().topGap(TopGap.SMALL).bottomGap(BottomGap.NONE)
 
-    groupRowsRange("Signature Algorithm") {
+    collapsibleGroup("Signature Algorithm Configuration") {
       lateinit var signatureAlgorithmComboBox: ComboBox<SignatureAlgorithm>
       row {
         signatureAlgorithmComboBox = comboBox(values().toList())
@@ -171,18 +172,17 @@ internal class JwtEncoderDecoder(
 
       row {
         textArea()
-          .rows(2)
-          .resizableColumn()
+          .rows(5)
           .align(Align.FILL)
           .label(label = "Public key:", position = LabelPosition.TOP)
           .bindText(jwt.signature.publicKey)
           .setValidationResultBorder()
           .whenTextChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
           .validationInfo(jwt.signature.publicKeyErrorHolder.asValidation())
-
+      }
+      row {
         textArea()
-          .rows(2)
-          .resizableColumn()
+          .rows(5)
           .align(Align.FILL)
           .label(label = "Private key:", position = LabelPosition.TOP)
           .bindText(jwt.signature.privateKey)
@@ -196,6 +196,9 @@ internal class JwtEncoderDecoder(
   override fun afterBuildUi() {
     jwt.validate()
     validate()
+    highlightDotSeparator()
+    highlightHeaderClaims()
+    highlightPayloadClaims()
   }
 
   override fun reset() {
@@ -210,8 +213,10 @@ internal class JwtEncoderDecoder(
       return
     }
 
-    conversationAlarm.cancelAllRequests()
-    conversationAlarm.addRequest({ doConvert(changeOrigin) }, 100)
+    if (!isDisposed && !conversationAlarm.isDisposed) {
+      conversationAlarm.cancelAllRequests()
+      conversationAlarm.addRequest({ doConvert(changeOrigin) }, 100)
+    }
   }
 
   private fun doConvert(changeOrigin: ChangeOrigin) {
@@ -234,7 +239,6 @@ internal class JwtEncoderDecoder(
   }
 
   private fun highlightDotSeparator() {
-    highlightEncodedAlarm.cancelAllRequests()
     val highlightDotSeparator = {
       encodedEditor.removeTextRangeHighlighters(ENCODED_DOT_SEPARATOR_GROUP_ID)
       val encoded = encodedText.get()
@@ -251,17 +255,24 @@ internal class JwtEncoderDecoder(
         i++
       }
     }
-    highlightEncodedAlarm.addRequest(highlightDotSeparator, 100)
+    if (!isDisposed && !highlightEncodedAlarm.isDisposed) {
+      highlightEncodedAlarm.cancelAllRequests()
+      highlightEncodedAlarm.addRequest(highlightDotSeparator, 100)
+    }
   }
 
   private fun highlightHeaderClaims() {
-    highlightHeaderAlarm.cancelAllRequests()
-    highlightHeaderAlarm.addRequest({ doHighlightClaims(headerEditor) }, 100)
+    if (!isDisposed && !highlightHeaderAlarm.isDisposed) {
+      highlightHeaderAlarm.cancelAllRequests()
+      highlightHeaderAlarm.addRequest({ doHighlightClaims(headerEditor) }, 100)
+    }
   }
 
   private fun highlightPayloadClaims() {
-    highlightPayloadAlarm.cancelAllRequests()
-    highlightPayloadAlarm.addRequest({ doHighlightClaims(payloadEditor) }, 100)
+    if (!isDisposed && !highlightPayloadAlarm.isDisposed) {
+      highlightPayloadAlarm.cancelAllRequests()
+      highlightPayloadAlarm.addRequest({ doHighlightClaims(payloadEditor) }, 100)
+    }
   }
 
   private fun doHighlightClaims(editor: DeveloperToolEditor) {
@@ -294,7 +305,8 @@ internal class JwtEncoderDecoder(
       changeOrigin = ENCODED,
       title = "Encoded",
       language = PlainTextLanguage.INSTANCE,
-      textProperty = encodedText
+      textProperty = encodedText,
+      minimumSizeHeight = 140
     ) { highlightDotSeparator() }
 
   private fun createHeaderEditor(): DeveloperToolEditor =
@@ -302,7 +314,8 @@ internal class JwtEncoderDecoder(
       changeOrigin = HEADER_PAYLOAD,
       title = "Header",
       language = JsonLanguage.INSTANCE,
-      textProperty = headerText
+      textProperty = headerText,
+      minimumSizeHeight = 340
     ) { highlightHeaderClaims() }
 
   private fun createPayloadEditor(): DeveloperToolEditor =
@@ -310,7 +323,8 @@ internal class JwtEncoderDecoder(
       changeOrigin = HEADER_PAYLOAD,
       title = "Payload",
       language = JsonLanguage.INSTANCE,
-      textProperty = payloadText
+      textProperty = payloadText,
+      minimumSizeHeight = 240
     ) { highlightPayloadClaims() }
 
   private fun createEditor(
@@ -318,8 +332,16 @@ internal class JwtEncoderDecoder(
     title: String,
     language: Language,
     textProperty: ValueProperty<String>,
+    minimumSizeHeight: Int,
     onTextChangeFromUi: () -> Unit
-  ) = DeveloperToolEditor(title, INPUT_OUTPUT, parentDisposable, textProperty, language).apply {
+  ) = DeveloperToolEditor(
+    title = title,
+    editorMode = INPUT_OUTPUT,
+    parentDisposable = parentDisposable,
+    textProperty = textProperty,
+    initialLanguage = language,
+    minimumSizeHeight = minimumSizeHeight
+  ).apply {
     onFocusGained {
       lastActiveInput = this
     }
