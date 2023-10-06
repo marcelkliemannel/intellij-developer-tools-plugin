@@ -14,6 +14,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 
 class SqlFormattingTransformer(
   configuration: DeveloperToolConfiguration,
@@ -87,9 +88,9 @@ class SqlFormattingTransformer(
     resultText.set(SqlFormatter.of(dialect.get()).format(sourceText.get(), formatConfig))
   }
 
-  override fun configurationChanged() {
+  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
     updateFormatConfig()
-    super.configurationChanged()
+    super.configurationChanged(key, property)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //

@@ -29,6 +29,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ToolBar
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toMonospace
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.wrapWithToolBar
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import org.apache.commons.text.StringEscapeUtils
 
 abstract class OneLineTextGenerator(
@@ -68,7 +69,7 @@ abstract class OneLineTextGenerator(
     configuration.removeChangeListener(this)
   }
 
-  override fun configurationChanged() {
+  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
     if (!isDisposed && !configuration.isResetting) {
       doGenerate()
     }

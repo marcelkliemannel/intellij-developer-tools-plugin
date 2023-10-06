@@ -68,7 +68,7 @@ class JsonPathTransformer(
         .align(Align.FILL)
         .resizableColumn()
         .gap(RightGap.SMALL)
-        .whenTextChangedFromUi { configurationChanged() }
+        .whenTextChangedFromUi { configurationChanged(QUERY_TEXT_PROPERTY_KEY, queryText) }
       lateinit var helpButton: JComponent
       helpButton = actionButton(ShowOperatorsHelpPopup { helpButton })
         .component
@@ -188,6 +188,7 @@ class JsonPathTransformer(
 }"""
 
     private const val EXAMPLE_QUERY = "\$.starWars.characters..forename"
+    private const val QUERY_TEXT_PROPERTY_KEY = "contentText"
 
     private val operatorsHelpPanel = JBLabel(
       """

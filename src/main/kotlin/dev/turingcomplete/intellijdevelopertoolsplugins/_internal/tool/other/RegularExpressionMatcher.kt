@@ -58,6 +58,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.allowUi
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.setContextMenu
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RegularExpressionMatcher.MatchResultType.MATCH
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RegularExpressionMatcher.MatchResultType.NAMED_GROUP
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import org.intellij.lang.regexp.RegExpLanguage
 import org.intellij.lang.regexp.intention.CheckRegExpForm
 import java.awt.Dimension
@@ -93,7 +94,7 @@ class RegularExpressionMatcher(
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun configurationChanged() {
+  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
     match()
   }
 

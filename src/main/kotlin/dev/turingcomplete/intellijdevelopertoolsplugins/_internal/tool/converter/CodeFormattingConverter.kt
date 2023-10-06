@@ -16,6 +16,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toPrettyStringWithDefaultObjectMapper
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 
 internal class CodeFormattingConverter(
   configuration: DeveloperToolConfiguration,
@@ -45,9 +46,8 @@ internal class CodeFormattingConverter(
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun configurationChanged() {
+  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
     setLanguages()
-    super.configurationChanged()
   }
 
   override fun Panel.buildTopConfigurationUi() {

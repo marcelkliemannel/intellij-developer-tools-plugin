@@ -50,6 +50,10 @@ dependencies {
   testImplementation("org.assertj:assertj-core:3.24.2")
   testImplementation("org.xmlunit:xmlunit-assertj:2.9.1")
   testImplementation("org.skyscreamer:jsonassert:1.5.0")
+  val junitVersion = "5.10.0"
+  testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+  testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
 }
 
 intellij {
@@ -101,6 +105,6 @@ tasks {
   }
 
   withType<Test> {
-    systemProperty("idea.test.execution.policy", "dev.turingcomplete.intellijdevelopertoolsplugins.developertool._internal.tool.DeveloperToolTestPolicy")
+    useJUnitPlatform()
   }
 }

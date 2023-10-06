@@ -1,48 +1,40 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins.developertool.generator
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import com.intellij.testFramework.junit5.TestApplication
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 
-@RunWith(Parameterized::class)
-class LoremIpsumGeneratorTest(
-  private val atMostWords: Int,
-  private val expectedSentence: String
-) : BasePlatformTestCase() {
+@TestApplication
+class LoremIpsumGeneratorTest : BasePlatformTestCase() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  @Test
-  fun `test generation of iconic sentence`() {
+  @ParameterizedTest
+  @CsvSource(
+    delimiter = '|',
+    value = [
+      "0|",
+      "1|Lorem.",
+      "2|Lorem ipsum.",
+      "3|Lorem ipsum dolor.",
+      "4|Lorem ipsum dolor sit.",
+      "5|Lorem ipsum dolor sit amet.",
+      "6|Lorem ipsum dolor sit amet, consectetur.",
+      "7|Lorem ipsum dolor sit amet, consectetur adipiscing.",
+      "8|Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    ]
+  )
+  fun `test generation of iconic sentence`(atMostWords: Int, expectedSentence: String?) {
     val actualSentence = LoremIpsumGenerator(DeveloperToolConfiguration("Test")) { }.generateIconicText(atMostWords, true)
-    assertThat(actualSentence.joinToString(" ")).isEqualTo(expectedSentence)
+    assertThat(actualSentence.joinToString(" ")).isEqualTo(expectedSentence ?: "")
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //
-
-  companion object {
-
-    @Parameterized.Parameters(name = "{0}, {1}")
-    @JvmStatic
-    fun parameters(): List<Array<Any>> {
-      return listOf(
-              arrayOf(0, ""),
-              arrayOf(1, "Lorem."),
-              arrayOf(2, "Lorem ipsum."),
-              arrayOf(3, "Lorem ipsum dolor."),
-              arrayOf(4, "Lorem ipsum dolor sit."),
-              arrayOf(5, "Lorem ipsum dolor sit amet."),
-              arrayOf(6, "Lorem ipsum dolor sit amet, consectetur."),
-              arrayOf(7, "Lorem ipsum dolor sit amet, consectetur adipiscing."),
-              arrayOf(8, "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-      )
-    }
-  }
 }

@@ -89,7 +89,7 @@ abstract class TextTransformer(
     resultEditor.language = language
   }
 
-  override fun configurationChanged() {
+  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
     if (!isDisposed && liveTransformation.get()) {
       transform()
     }

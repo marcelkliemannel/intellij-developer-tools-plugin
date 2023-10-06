@@ -56,8 +56,10 @@ class DeveloperToolConfiguration(
     isResetting = true
     try {
       properties.filter { type == null || it.value.type == type }
-        .forEach { (_, property) -> property.reset(loadExamples) }
-      fireConfigurationChanged()
+        .forEach { (_, property) ->
+          property.reset(loadExamples)
+          fireConfigurationChanged(property.key, property.reference)
+        }
     }
     finally {
       isResetting = false
@@ -75,7 +77,7 @@ class DeveloperToolConfiguration(
     }
 
     @Suppress("UNCHECKED_CAST")
-    return property.valueProperty as ValueProperty<T>
+    return property.reference as ValueProperty<T>
   }
 
   private fun <T : Any> createNewProperty(
@@ -94,7 +96,7 @@ class DeveloperToolConfiguration(
     }
     properties[key] = PropertyContainer(
       key = key,
-      valueProperty = valueProperty,
+      reference = valueProperty,
       defaultValue = defaultValue,
       example = example,
       type = propertyType,
@@ -103,8 +105,8 @@ class DeveloperToolConfiguration(
     return valueProperty
   }
 
-  private fun fireConfigurationChanged() {
-    changeListeners.forEach { it.configurationChanged() }
+  private fun fireConfigurationChanged(key: String, property: ValueProperty<out Any>) {
+    changeListeners.forEach { it.configurationChanged(key, property) }
   }
 
   private fun <T : Any?> handlePropertyChange(key: String): (ValueProperty.ChangeEvent<T>) -> Unit = { event ->
@@ -112,7 +114,7 @@ class DeveloperToolConfiguration(
     if (event.oldValue != newValue) {
       properties[key]?.let { property ->
         property.valueChanged = property.defaultValue != newValue && property.example != newValue
-        fireConfigurationChanged()
+        fireConfigurationChanged(property.key, property.reference)
       } ?: error("Unknown property: $key")
     }
   }
@@ -121,7 +123,7 @@ class DeveloperToolConfiguration(
 
   internal data class PropertyContainer(
     val key: String,
-    val valueProperty: ValueProperty<out Any>,
+    val reference: ValueProperty<out Any>,
     val defaultValue: Any,
     val example: Any?,
     val type: PropertyType,
@@ -130,7 +132,7 @@ class DeveloperToolConfiguration(
 
     fun reset(loadExamples: Boolean) {
       val value = if (example != null && loadExamples) example else defaultValue
-      valueProperty.setWithUncheckedCast(value)
+      reference.setWithUncheckedCast(value)
       valueChanged = false
     }
   }
@@ -148,7 +150,7 @@ class DeveloperToolConfiguration(
 
   interface ChangeListener {
 
-    fun configurationChanged()
+    fun configurationChanged(key: String, property: ValueProperty<out Any>)
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

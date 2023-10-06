@@ -17,6 +17,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.Develop
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.SOURCE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.TARGET
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 
 internal abstract class TextConverter(
   protected val textConverterContext: TextConverterContext,
@@ -26,7 +27,7 @@ internal abstract class TextConverter(
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)
-  protected var sourceText = configuration.register("sourceText", "", INPUT)
+  protected var sourceText = configuration.register("sourceText", textConverterContext.defaultSourceText, INPUT)
   protected var targetText = configuration.register("targetText", "", INPUT)
 
   private val conversationAlarm by lazy { Alarm(parentDisposable) }
@@ -94,7 +95,15 @@ internal abstract class TextConverter(
 
   abstract fun toSource(text: String)
 
-  override fun configurationChanged() {
+  fun targetText(): String = targetText.get()
+
+  fun sourceText(): String = sourceText.get()
+
+  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
+    if (property !== targetText) {
+      return
+    }
+
     transformToTarget()
   }
 
@@ -237,7 +246,8 @@ internal abstract class TextConverter(
     val targetTitle: String,
     val sourceErrorHolder: ErrorHolder? = null,
     val targetErrorHolder: ErrorHolder? = null,
-    val diffSupport: DiffSupport? = null
+    val diffSupport: DiffSupport? = null,
+    val defaultSourceText: String = ""
   )
 
   data class DiffSupport(

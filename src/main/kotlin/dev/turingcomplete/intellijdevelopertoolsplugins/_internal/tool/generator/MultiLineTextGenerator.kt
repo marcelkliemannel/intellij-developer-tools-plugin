@@ -6,6 +6,7 @@ import com.intellij.ui.dsl.builder.Panel
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 
 abstract class MultiLineTextGenerator(
   private val generatedTextTitle: String,
@@ -37,7 +38,7 @@ abstract class MultiLineTextGenerator(
     // Override if needed
   }
 
-  override fun configurationChanged() {
+  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
     if (!isDisposed) {
       doGenerate()
     }

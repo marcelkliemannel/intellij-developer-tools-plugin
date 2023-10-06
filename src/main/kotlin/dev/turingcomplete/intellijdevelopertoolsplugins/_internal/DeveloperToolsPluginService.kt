@@ -24,7 +24,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.MainDialog
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
-import io.ktor.util.reflect.*
 import java.security.Provider
 import java.security.Security
 import java.util.*
@@ -169,11 +168,11 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   ): DeveloperToolConfigurationProperty {
     return when (property.type) {
       CONFIGURATION, INPUT ->
-        DeveloperToolConfigurationProperty(key = key, value = property.valueProperty.get(), type = property.type)
+        DeveloperToolConfigurationProperty(key = key, value = property.reference.get(), type = property.type)
 
       SECRET -> {
         val credentialAttribute = createPropertyCredentialAttribute(developerToolId = developerToolId, propertyKey = key)
-        PasswordSafe.instance.set(credentialAttribute, Credentials(null, property.valueProperty.get() as String))
+        PasswordSafe.instance.set(credentialAttribute, Credentials(null, property.reference.get() as String))
         DeveloperToolConfigurationProperty(key = key, value = "*******", type = property.type)
       }
     }

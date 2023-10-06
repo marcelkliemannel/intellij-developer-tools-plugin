@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add CLI Command line breaks converter
+
 ### Changed
 
 ### Removed
