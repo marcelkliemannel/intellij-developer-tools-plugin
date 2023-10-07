@@ -11,7 +11,6 @@ import com.intellij.openapi.ui.naturalSorted
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.BottomGap
-import com.intellij.ui.dsl.builder.COLUMNS_SHORT
 import com.intellij.ui.dsl.builder.COLUMNS_TINY
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
@@ -126,16 +125,22 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
           unixTimeStampSecondsTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
             .label("Seconds:")
             .text(initialInstant.epochSecond.toString())
-            .columns(COLUMNS_SHORT)
+            .columns(12)
             .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_SECONDS) }
             .component
 
           unixTimeStampMillisTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
             .label("Milliseconds:")
+            .gap(RightGap.SMALL)
             .text(initialInstant.toEpochMilli().toString())
-            .columns(COLUMNS_SHORT)
+            .columns(12)
             .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
             .component
+
+          button("Set to Now") {
+            unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
+            convert(UNIX_TIMESTAMP_MILLIS, 0)
+          }
         }
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 

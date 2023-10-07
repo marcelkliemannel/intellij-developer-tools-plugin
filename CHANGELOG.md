@@ -4,13 +4,14 @@
 
 ### Added
 - Add CLI Command line breaks converter
+- Add a "Set to Now" button to the date time converter
 
 ### Changed
 
 ### Removed
 
 ### Fixed
-- Date time converter ignores selected time zone ([GitHub Issue #11](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/11))
+- Fix date time converter ignores selected time zone ([GitHub Issue #11](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/11))
 
 ## 1.1.0 - 2023-08-14
 
