@@ -3,7 +3,6 @@
 ## Unreleased
 
 ### Added
-
 - Add CLI Command line breaks converter
 
 ### Changed
@@ -11,6 +10,7 @@
 ### Removed
 
 ### Fixed
+- Date time converter ignores selected time zone ([GitHub Issue #11](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/11))
 
 ## 1.1.0 - 2023-08-14
 
