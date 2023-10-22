@@ -2,6 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converte
 
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
@@ -12,6 +13,7 @@ import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
@@ -22,6 +24,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 internal abstract class TextConverter(
   protected val textConverterContext: TextConverterContext,
   protected val configuration: DeveloperToolConfiguration,
+  protected val context: DeveloperToolContext,
+  protected val project: Project?,
   parentDisposable: Disposable
 ) : DeveloperTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -168,9 +172,13 @@ internal abstract class TextConverter(
 
   private fun createSourceEditor() =
     DeveloperToolEditor(
+      id = "source",
       title = textConverterContext.sourceTitle,
       editorMode = INPUT_OUTPUT,
       parentDisposable = parentDisposable,
+      configuration = configuration,
+      context = context,
+      project = project,
       textProperty = sourceText,
       diffSupport = textConverterContext.diffSupport?.let { diffSupport ->
         DeveloperToolEditor.DiffSupport(
@@ -193,9 +201,13 @@ internal abstract class TextConverter(
 
   private fun createTargetEditor(): DeveloperToolEditor {
     return DeveloperToolEditor(
+      id = "target",
       title = textConverterContext.targetTitle,
       editorMode = INPUT_OUTPUT,
       parentDisposable = parentDisposable,
+      configuration = configuration,
+      context = context,
+      project = project,
       textProperty = targetText,
       diffSupport = textConverterContext.diffSupport?.let { diffSupport ->
         DeveloperToolEditor.DiffSupport(

@@ -6,6 +6,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.ScrollPaneFactory.createScrollPane
@@ -22,6 +23,7 @@ import com.intellij.util.ui.UIUtil
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
@@ -30,8 +32,10 @@ import javax.swing.JComponent
 
 abstract class TextTransformer(
   private val textTransformerContext: TextTransformerContext,
+  protected val context: DeveloperToolContext,
   protected val configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  protected val project: Project?
 ) : DeveloperTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -158,6 +162,10 @@ abstract class TextTransformer(
 
   private fun createSourceInputEditor(): DeveloperToolEditor =
     DeveloperToolEditor(
+      id = "source-input",
+      context = context,
+      configuration = configuration,
+      project = project,
       title = textTransformerContext.sourceTitle,
       editorMode = INPUT,
       parentDisposable = parentDisposable,
@@ -182,6 +190,10 @@ abstract class TextTransformer(
 
   private fun createResultOutputEditor(parentDisposable: Disposable) =
     DeveloperToolEditor(
+      id = "result-output",
+      context = context,
+      configuration = configuration,
+      project = project,
       title = textTransformerContext.resultTitle,
       editorMode = OUTPUT,
       parentDisposable = parentDisposable,

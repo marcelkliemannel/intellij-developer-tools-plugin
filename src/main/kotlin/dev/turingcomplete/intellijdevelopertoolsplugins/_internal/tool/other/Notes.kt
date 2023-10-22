@@ -9,11 +9,14 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 
 class Notes(
-  configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  private val context: DeveloperToolContext,
+  private val configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable,
+  private val project: Project?
 ) : DeveloperTool(parentDisposable = parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -26,6 +29,10 @@ class Notes(
     row {
       cell(
         DeveloperToolEditor(
+          id = "content",
+          context = context,
+          configuration = configuration,
+          project = project,
           editorMode = DeveloperToolEditor.EditorMode.INPUT,
           parentDisposable = parentDisposable,
           textProperty = text
@@ -39,15 +46,16 @@ class Notes(
 
   class Factory : DeveloperToolFactory<Notes> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Notes",
       contentTitle = "Notes"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
-    ): ((DeveloperToolConfiguration) -> Notes) = { configuration -> Notes(configuration, parentDisposable) }
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
+    ): ((DeveloperToolConfiguration) -> Notes) = { configuration -> Notes(context, configuration, parentDisposable, project) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

@@ -40,6 +40,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
@@ -78,7 +79,10 @@ import javax.swing.Icon
 
 
 internal class JwtEncoderDecoder(
-  private val configuration: DeveloperToolConfiguration, parentDisposable: Disposable
+  private val context: DeveloperToolContext,
+  private val configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable,
+  private val project: Project?,
 ) : DeveloperTool(parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -302,6 +306,7 @@ internal class JwtEncoderDecoder(
 
   private fun createEncodedEditor(): DeveloperToolEditor =
     createEditor(
+      id = "jwt-encoder-decoder-encoded",
       changeOrigin = ENCODED,
       title = "Encoded",
       language = PlainTextLanguage.INSTANCE,
@@ -311,6 +316,7 @@ internal class JwtEncoderDecoder(
 
   private fun createHeaderEditor(): DeveloperToolEditor =
     createEditor(
+      id = "jwt-encoder-decoder-header",
       changeOrigin = HEADER_PAYLOAD,
       title = "Header",
       language = JsonLanguage.INSTANCE,
@@ -320,6 +326,7 @@ internal class JwtEncoderDecoder(
 
   private fun createPayloadEditor(): DeveloperToolEditor =
     createEditor(
+      id = "jwt-encoder-decoder-payload",
       changeOrigin = HEADER_PAYLOAD,
       title = "Payload",
       language = JsonLanguage.INSTANCE,
@@ -328,6 +335,7 @@ internal class JwtEncoderDecoder(
     ) { highlightPayloadClaims() }
 
   private fun createEditor(
+    id: String,
     changeOrigin: ChangeOrigin,
     title: String,
     language: Language,
@@ -335,6 +343,10 @@ internal class JwtEncoderDecoder(
     minimumSizeHeight: Int,
     onTextChangeFromUi: () -> Unit
   ) = DeveloperToolEditor(
+    id = id,
+    context = context,
+    configuration = configuration,
+    project = project,
     title = title,
     editorMode = INPUT_OUTPUT,
     parentDisposable = parentDisposable,
@@ -788,16 +800,17 @@ internal class JwtEncoderDecoder(
 
   class Factory : DeveloperToolFactory<JwtEncoderDecoder> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "JWT",
       contentTitle = "JWT Decoder/Encoder"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> JwtEncoderDecoder) =
-      { configuration -> JwtEncoderDecoder(configuration, parentDisposable) }
+      { configuration -> JwtEncoderDecoder(context, configuration, parentDisposable, project) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

@@ -51,6 +51,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CommonsDataKeys
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
@@ -71,8 +72,9 @@ import javax.swing.table.AbstractTableModel
 import java.util.regex.Pattern as JavaPattern
 
 class RegularExpressionMatcher(
+  private val context: DeveloperToolContext,
   private val configuration: DeveloperToolConfiguration,
-  project: Project?,
+  private val project: Project?,
   parentDisposable: Disposable
 ) : DeveloperTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -203,7 +205,7 @@ class RegularExpressionMatcher(
   }
 
   private fun createInputEditor() =
-    DeveloperToolEditor("Text", DeveloperToolEditor.EditorMode.INPUT, parentDisposable, inputText)
+    DeveloperToolEditor("input", context, configuration, project, "Text", DeveloperToolEditor.EditorMode.INPUT, parentDisposable, inputText)
       .onTextChangeFromUi { match() }
 
   private fun createRegexInputEditor(project: Project?): EditorTextField =
@@ -451,16 +453,17 @@ class RegularExpressionMatcher(
 
   class Factory : DeveloperToolFactory<RegularExpressionMatcher> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Regular Expression",
       contentTitle = "Regular Expression Matcher"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> RegularExpressionMatcher) =
-      { configuration -> RegularExpressionMatcher(configuration, project, parentDisposable) }
+      { configuration -> RegularExpressionMatcher(context, configuration, project, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

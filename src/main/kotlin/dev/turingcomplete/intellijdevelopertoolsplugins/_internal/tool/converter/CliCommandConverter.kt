@@ -8,11 +8,14 @@ import com.intellij.util.system.OS
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import java.lang.System.lineSeparator
 
 internal class CliCommandConverter(
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  context: DeveloperToolContext,
+  project: Project?
 ) : TextConverter(
   textConverterContext = TextConverterContext(
     convertActionTitle = "Add line breaks",
@@ -25,7 +28,9 @@ internal class CliCommandConverter(
     defaultSourceText = "python script.py --input-file=input.txt --output-file=output.txt --verbose"
   ),
   configuration = configuration,
-  parentDisposable = parentDisposable
+  parentDisposable = parentDisposable,
+  context = context,
+  project = project
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -95,16 +100,17 @@ internal class CliCommandConverter(
 
   class Factory : DeveloperToolFactory<CliCommandConverter> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "CLI Command",
       contentTitle = "CLI Command Line Breaks"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> CliCommandConverter) =
-      { configuration -> CliCommandConverter(configuration, parentDisposable) }
+      { configuration -> CliCommandConverter(configuration, parentDisposable, context, project) }
   }
 
 

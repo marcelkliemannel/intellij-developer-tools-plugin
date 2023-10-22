@@ -15,6 +15,7 @@ import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.layout.ComboBoxPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ValidateMinIntValueSide.MAX
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ValidateMinIntValueSide.MIN
@@ -236,14 +237,15 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
 
   class Factory : DeveloperToolFactory<LoremIpsumGenerator> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Lorem Ipsum",
       contentTitle = "Lorem Ipsum Generator"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> LoremIpsumGenerator) = { configuration ->
       LoremIpsumGenerator(configuration, parentDisposable)
     }

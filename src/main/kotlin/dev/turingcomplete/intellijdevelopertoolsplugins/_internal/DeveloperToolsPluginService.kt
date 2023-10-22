@@ -91,7 +91,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     val stateDeveloperToolsConfigurations = developerToolsConfigurations.asSequence()
       .flatMap { (developerToolId, developerToolConfigurations) ->
         developerToolConfigurations
-          .filter { it.properties.any { (_, property) -> property.valueChanged } }
+          .filter { it.properties.any { (_, property) -> property.valueChanged() } }
           .map { createDeveloperToolConfigurationState(developerToolId, it) }
       }.toList()
 
@@ -153,7 +153,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     name = developerToolConfiguration.name,
     properties = developerToolConfiguration
       .properties
-      .filter { (_, property) -> property.valueChanged }
+      .filter { (_, property) -> property.valueChanged() }
       .filter { (_, property) -> !(!saveInputs.get() && property.type != INPUT) }
       .filter { (_, property) -> !(!saveSecrets.get() && property.type != SECRET) }
       .map { (key, property) ->

@@ -13,6 +13,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateNonEmpty
 import io.ktor.util.*
@@ -21,16 +22,20 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 internal class HmacTransformer(
+  context: DeveloperToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  project: Project?
 ) : TextTransformer(
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Generate",
     sourceTitle = "Data",
     resultTitle = "Hash"
   ),
+  context = context,
   configuration = configuration,
-  parentDisposable = parentDisposable
+  parentDisposable = parentDisposable,
+  project = project
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -113,20 +118,21 @@ internal class HmacTransformer(
 
   class Factory : DeveloperToolFactory<HmacTransformer> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "HMAC",
       contentTitle = "HMAC Transformer"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> HmacTransformer)? {
       if (algorithms.isEmpty()) {
         return null
       }
 
-      return { configuration -> HmacTransformer(configuration, parentDisposable) }
+      return { configuration -> HmacTransformer(context, configuration, parentDisposable, project) }
     }
   }
 

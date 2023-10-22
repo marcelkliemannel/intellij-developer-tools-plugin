@@ -10,6 +10,7 @@ import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import java.awt.Image.SCALE_SMOOTH
 import javax.imageio.ImageIO
@@ -57,14 +58,15 @@ class RubberDuck(parentDisposable: Disposable) : DeveloperTool(parentDisposable)
 
   class Factory : DeveloperToolFactory<RubberDuck> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Rubber Duck",
       contentTitle = "Rubber Duck Debugging"
     )
 
     override fun getDeveloperToolCreator(
-        project: Project?,
-        parentDisposable: Disposable
+      project: Project?,
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> RubberDuck) = { RubberDuck(parentDisposable) }
   }
 

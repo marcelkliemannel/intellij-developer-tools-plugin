@@ -5,6 +5,9 @@
 ### Added
 - Add CLI Command line breaks converter
 - Add a "Set to Now" button to the date time converter
+- Add capability to remember editor settings
+- Add "Show Special Characters" setting to the editor
+- Add "Show Whitespaces" setting to the editor
 
 ### Changed
 

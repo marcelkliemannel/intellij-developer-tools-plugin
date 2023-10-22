@@ -32,6 +32,7 @@ import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
@@ -451,14 +452,15 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
   class Factory : DeveloperToolFactory<DatetimeConverter> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Date Time",
       contentTitle = "Date Time Converter"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> DatetimeConverter) =
       { configuration -> DatetimeConverter(configuration, parentDisposable) }
   }

@@ -13,6 +13,7 @@ import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.selected
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
@@ -138,14 +139,15 @@ internal class PasswordGenerator(
 
   class Factory : DeveloperToolFactory<PasswordGenerator> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Password Generator",
       contentTitle = "Password Generator"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> PasswordGenerator) =
       { configuration ->  PasswordGenerator(configuration, parentDisposable) }
   }

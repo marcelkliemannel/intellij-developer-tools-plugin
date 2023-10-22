@@ -56,7 +56,7 @@ internal class DeveloperToolContentPanel(
   @Suppress("DialogTitleCapitalization")
   private fun createTitleBar(): JComponent = panel {
     row {
-      label(developerToolNode.developerToolContext.contentTitle)
+      label(developerToolNode.developerToolPresentation.contentTitle)
         .applyToComponent { font = JBFont.label().asBold() }
         .align(Align.FILL)
         .resizableColumn()

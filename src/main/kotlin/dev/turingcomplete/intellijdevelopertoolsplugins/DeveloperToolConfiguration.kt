@@ -27,7 +27,7 @@ class DeveloperToolConfiguration(
   var isResetting = false
     internal set
   val hasChanges: Boolean
-    get() = properties.values.any { it.valueChanged }
+    get() = properties.values.any { it.valueChanged() }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -99,8 +99,7 @@ class DeveloperToolConfiguration(
       reference = valueProperty,
       defaultValue = defaultValue,
       example = example,
-      type = propertyType,
-      valueChanged = existingProperty != null
+      type = propertyType
     )
     return valueProperty
   }
@@ -113,7 +112,6 @@ class DeveloperToolConfiguration(
     val newValue = event.newValue
     if (event.oldValue != newValue) {
       properties[key]?.let { property ->
-        property.valueChanged = property.defaultValue != newValue && property.example != newValue
         fireConfigurationChanged(property.key, property.reference)
       } ?: error("Unknown property: $key")
     }
@@ -126,14 +124,17 @@ class DeveloperToolConfiguration(
     val reference: ValueProperty<out Any>,
     val defaultValue: Any,
     val example: Any?,
-    val type: PropertyType,
-    var valueChanged: Boolean
+    val type: PropertyType
   ) {
 
     fun reset(loadExamples: Boolean) {
       val value = if (example != null && loadExamples) example else defaultValue
       reference.setWithUncheckedCast(value)
-      valueChanged = false
+    }
+
+    fun valueChanged(): Boolean {
+      val value = reference.get()
+      return defaultValue != value && example != value
     }
   }
 

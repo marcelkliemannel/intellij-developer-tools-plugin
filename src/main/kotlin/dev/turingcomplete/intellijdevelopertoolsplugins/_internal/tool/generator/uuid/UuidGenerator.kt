@@ -9,6 +9,7 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.layout.ComboBoxPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toMessageDigest
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.OneLineTextGenerator
@@ -138,14 +139,15 @@ internal class UuidGenerator(configuration: DeveloperToolConfiguration, parentDi
 
   class Factory : DeveloperToolFactory<UuidGenerator> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "UUID",
       contentTitle = "UUID Generator"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> UuidGenerator) = { configuration -> UuidGenerator(configuration, parentDisposable) }
   }
 

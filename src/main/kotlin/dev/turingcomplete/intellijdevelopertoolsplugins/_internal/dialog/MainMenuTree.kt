@@ -15,6 +15,7 @@ import com.intellij.ui.treeStructure.SimpleTree
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.tree.TreeUtil
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolFactoryEp
@@ -152,15 +153,15 @@ internal class MainMenuTree(
     val application = ApplicationManager.getApplication()
     DeveloperToolFactoryEp.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
       val developerToolFactory: DeveloperToolFactory<*> = developerToolFactoryEp.createInstance(application)
-
-      developerToolFactory.getDeveloperToolCreator(project, parentDisposable)?.let { developerToolCreator ->
+      val context = DeveloperToolContext(developerToolFactoryEp.id)
+      developerToolFactory.getDeveloperToolCreator(project, parentDisposable, context)?.let { developerToolCreator ->
         val groupId: String? = developerToolFactoryEp.groupId
         val parentNode = if (groupId != null) (groupNodes[groupId] ?: error("Unknown group: $groupId")) else rootNode
         val developerToolNode = DeveloperToolNode(
           developerToolId = developerToolFactoryEp.id,
           project = project,
           parentDisposable = parentDisposable,
-          developerToolContext = developerToolFactory.getDeveloperToolContext(),
+          developerToolPresentation = developerToolFactory.getDeveloperToolPresentation(),
           developerToolCreator = developerToolCreator
         )
         parentNode.add(developerToolNode)

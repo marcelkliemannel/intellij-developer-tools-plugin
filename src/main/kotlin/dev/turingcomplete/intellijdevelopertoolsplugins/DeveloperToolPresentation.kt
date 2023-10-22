@@ -1,22 +1,17 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins
 
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.project.Project
+import org.jetbrains.annotations.Nls
 
-interface DeveloperToolFactory<T : DeveloperTool> {
+data class DeveloperToolPresentation(
+  @Nls(capitalization = Nls.Capitalization.Title)
+  val menuTitle: String,
+
+  @Nls(capitalization = Nls.Capitalization.Title)
+  val contentTitle: String
+) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
-
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
-
-  fun getDeveloperToolPresentation(): DeveloperToolPresentation
-
-  fun getDeveloperToolCreator(
-    project: Project?,
-    parentDisposable: Disposable,
-    context: DeveloperToolContext
-  ): ((DeveloperToolConfiguration) -> T)?
-
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //

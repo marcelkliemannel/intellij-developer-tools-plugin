@@ -32,14 +32,17 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.objectMapper
 import javax.swing.JComponent
 
 class JsonPathTransformer(
+  context: DeveloperToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  project: Project?
 ) : TextTransformer(
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Execute Query",
@@ -48,8 +51,10 @@ class JsonPathTransformer(
     initialSourceExampleText = EXAMPLE_SOURCE,
     initialLanguage = JsonLanguage.INSTANCE
   ),
+  context = context,
   configuration = configuration,
-  parentDisposable = parentDisposable
+  parentDisposable = parentDisposable,
+  project = project
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -105,16 +110,17 @@ class JsonPathTransformer(
 
   class Factory : DeveloperToolFactory<JsonPathTransformer> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "JSON Path",
       contentTitle = "JSON Path Transformer"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> JsonPathTransformer) = { configuration ->
-      JsonPathTransformer(configuration, parentDisposable)
+      JsonPathTransformer(context, configuration, parentDisposable, project)
     }
   }
 

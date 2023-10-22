@@ -10,6 +10,7 @@ import com.intellij.ui.dsl.builder.selected
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer.OriginalParsingMode.FIXED_TEXT_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer.OriginalParsingMode.INDIVIDUAL_DELIMITER
@@ -21,8 +22,10 @@ import dev.turingcomplete.textcaseconverter.toWordsSplitter
 import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 
 class TextCaseTransformer(
+  context : DeveloperToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  project: Project?
 ) : TextTransformer(
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Transform",
@@ -34,8 +37,10 @@ class TextCaseTransformer(
     ),
     supportsDebug = true
   ),
+  context = context,
   configuration = configuration,
-  parentDisposable = parentDisposable
+  parentDisposable = parentDisposable,
+  project = project
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -136,16 +141,17 @@ class TextCaseTransformer(
 
   class Factory : DeveloperToolFactory<TextCaseTransformer> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Text Case",
       contentTitle = "Text Case Transformer"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> TextCaseTransformer) = { configuration ->
-      TextCaseTransformer(configuration, parentDisposable)
+      TextCaseTransformer(context, configuration, parentDisposable, project)
     }
   }
 

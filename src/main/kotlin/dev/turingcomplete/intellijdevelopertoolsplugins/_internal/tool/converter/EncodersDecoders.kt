@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import org.apache.commons.codec.binary.Base32
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -26,12 +27,16 @@ internal val encoderDecoderTextConverterContext = TextConverter.TextConverterCon
 
 internal class Base32EncoderDecoder(
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  context: DeveloperToolContext,
+  project: Project?
 ) :
   TextConverter(
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
-    parentDisposable = parentDisposable
+    parentDisposable = parentDisposable,
+    context = context,
+    project = project
   ) {
 
   override fun toTarget(text: String) {
@@ -44,16 +49,17 @@ internal class Base32EncoderDecoder(
 
   class Factory : DeveloperToolFactory<Base32EncoderDecoder> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Base32",
       contentTitle = "Base32 Encoder/Decoder"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> Base32EncoderDecoder) =
-      { configuration -> Base32EncoderDecoder(configuration, parentDisposable) }
+      { configuration -> Base32EncoderDecoder(configuration, parentDisposable, context, project) }
   }
 }
 
@@ -61,12 +67,16 @@ internal class Base32EncoderDecoder(
 
 internal class Base64EncoderDecoder(
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  context: DeveloperToolContext,
+  project: Project?
 ) :
   TextConverter(
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
-    parentDisposable = parentDisposable
+    parentDisposable = parentDisposable,
+    context = context,
+    project = project
   ) {
 
   override fun toTarget(text: String) {
@@ -79,16 +89,17 @@ internal class Base64EncoderDecoder(
 
   class Factory : DeveloperToolFactory<Base64EncoderDecoder> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Base64",
       contentTitle = "Base64 Encoder/Decoder"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> Base64EncoderDecoder) =
-      { configuration -> Base64EncoderDecoder(configuration, parentDisposable) }
+      { configuration -> Base64EncoderDecoder(configuration, parentDisposable, context, project) }
   }
 }
 
@@ -96,12 +107,16 @@ internal class Base64EncoderDecoder(
 
 internal class UrlBase64EncoderDecoder(
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  context: DeveloperToolContext,
+  project: Project?
 ) :
   TextConverter(
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
-    parentDisposable = parentDisposable
+    parentDisposable = parentDisposable,
+    context = context,
+    project = project
   ) {
 
   override fun toTarget(text: String) {
@@ -114,16 +129,17 @@ internal class UrlBase64EncoderDecoder(
 
   class Factory : DeveloperToolFactory<UrlBase64EncoderDecoder> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "URL Base64",
       contentTitle = "URL Base64 Encoder/Decoder"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> UrlBase64EncoderDecoder) =
-      { configuration -> UrlBase64EncoderDecoder(configuration, parentDisposable) }
+      { configuration -> UrlBase64EncoderDecoder(configuration, parentDisposable, context, project) }
   }
 }
 
@@ -131,12 +147,16 @@ internal class UrlBase64EncoderDecoder(
 
 internal class MimeBase64EncoderDecoder(
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  context: DeveloperToolContext,
+  project: Project?
 ) :
   TextConverter(
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
-    parentDisposable = parentDisposable
+    parentDisposable = parentDisposable,
+    context = context,
+    project = project
   ) {
 
   override fun toTarget(text: String) {
@@ -149,16 +169,17 @@ internal class MimeBase64EncoderDecoder(
 
   class Factory : DeveloperToolFactory<MimeBase64EncoderDecoder> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "MIME Base64",
       contentTitle = "MIME Base64 Encoder/Decoder"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> MimeBase64EncoderDecoder) =
-      { configuration -> MimeBase64EncoderDecoder(configuration, parentDisposable) }
+      { configuration -> MimeBase64EncoderDecoder(configuration, parentDisposable, context, project) }
   }
 }
 
@@ -166,12 +187,16 @@ internal class MimeBase64EncoderDecoder(
 
 internal class UrlEncodingEncoderDecoder(
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  context: DeveloperToolContext,
+  project: Project?
 ) :
   TextConverter(
     textConverterContext = encoderDecoderTextConverterContext,
     configuration = configuration,
-    parentDisposable = parentDisposable
+    parentDisposable = parentDisposable,
+    context = context,
+    project = project
   ) {
 
   override fun toTarget(text: String) {
@@ -184,16 +209,17 @@ internal class UrlEncodingEncoderDecoder(
 
   class Factory : DeveloperToolFactory<UrlEncodingEncoderDecoder> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "URL Encoding",
       contentTitle = "URL Encoding Encoder/Decoder"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> UrlEncodingEncoderDecoder) =
-      { configuration -> UrlEncodingEncoderDecoder(configuration, parentDisposable) }
+      { configuration -> UrlEncodingEncoderDecoder(configuration, parentDisposable, context, project) }
   }
 }
 
