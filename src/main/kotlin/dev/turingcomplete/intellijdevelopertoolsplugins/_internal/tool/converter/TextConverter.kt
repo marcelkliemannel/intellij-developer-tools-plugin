@@ -32,11 +32,11 @@ internal abstract class TextConverter(
 
   private var liveConversion = configuration.register("liveConversion", true)
   protected var sourceText = configuration.register("sourceText", textConverterContext.defaultSourceText, INPUT)
-  protected var targetText = configuration.register("targetText", "", INPUT)
+  protected var targetText = configuration.register("targetText", textConverterContext.defaultTargetText, INPUT)
 
   private val conversationAlarm by lazy { Alarm(parentDisposable) }
 
-  private var lastActiveInput: ActiveInput? = null
+  private var lastActiveInput: ActiveInput = SOURCE
 
   private val sourceEditor by lazy { createSourceEditor() }
   private val targetEditor by lazy { createTargetEditor() }
@@ -45,7 +45,7 @@ internal abstract class TextConverter(
 
   init {
     liveConversion.afterChange(parentDisposable) {
-      handleLiveConversionSwitch()
+      liveTransformToLastActiveInput()
     }
   }
 
@@ -104,11 +104,7 @@ internal abstract class TextConverter(
   fun sourceText(): String = sourceText.get()
 
   override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
-    if (property !== targetText) {
-      return
-    }
-
-    transformToTarget()
+    liveTransformToLastActiveInput()
   }
 
   override fun activated() {
@@ -229,14 +225,13 @@ internal abstract class TextConverter(
     }
   }
 
-  private fun handleLiveConversionSwitch() {
+  private fun liveTransformToLastActiveInput() {
     if (liveConversion.get()) {
       // Trigger a text change. So if the text was changed in manual mode, it
       // will now be converted once during the switch to live mode.
       when (lastActiveInput) {
         SOURCE -> transformToTarget()
         TARGET -> transformToSource()
-        null -> {}
       }
     }
   }
@@ -259,7 +254,8 @@ internal abstract class TextConverter(
     val sourceErrorHolder: ErrorHolder? = null,
     val targetErrorHolder: ErrorHolder? = null,
     val diffSupport: DiffSupport? = null,
-    val defaultSourceText: String = ""
+    val defaultSourceText: String = "",
+    val defaultTargetText: String = ""
   )
 
   data class DiffSupport(

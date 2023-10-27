@@ -25,7 +25,8 @@ internal class CliCommandConverter(
     diffSupport = DiffSupport(
       title = "CLI Command Formatting"
     ),
-    defaultSourceText = "python script.py --input-file=input.txt --output-file=output.txt --verbose"
+    defaultSourceText = DEFAULT_SOURCE_TEXT,
+    defaultTargetText = defaultTargetText
   ),
   configuration = configuration,
   parentDisposable = parentDisposable,
@@ -48,49 +49,17 @@ internal class CliCommandConverter(
   }
 
   override fun toTarget(text: String) {
-    val lines = mutableListOf<String>()
-
-    var currentLine = ""
-    cliCommandAllArgumentsSplitRegex
-      .findAll(text)
-      .mapNotNull { matchResult ->
-        matchResult.groups[1]?.let { "\"${it.value}\"" } ?: matchResult.groups[2]?.let { "'${it.value}'" } ?: matchResult.groups[0]?.value
-      }
-      .map { it.trim() }
-      .forEach { token ->
-        currentLine = if (token.startsWith("-")) {
-          lines.add(currentLine)
-
-          if (lines.size >= 1) {
-            "$CLI_COMMAND_INDENT$token"
-          }
-          else {
-            token
-          }
-        }
-        else if (currentLine.isBlank()) {
-          token
-        }
-        else {
-          "$currentLine $token"
-        }
-      }
-    lines.add(currentLine)
-
-    val result = lines.filter { it.isNotBlank() }
-      .joinToString(" ${lineBreakDelimiter.get()}${lineSeparator()}")
-    targetText.set(result)
+    targetText.set(doToTarget(text, lineBreakDelimiter.get()))
   }
 
   override fun toSource(text: String) {
-    val lineBreakDelimiterValue = lineBreakDelimiter.get()
     val result = cliCommandAllArgumentsSplitRegex
       .findAll(text)
       .mapNotNull { matchResult ->
         matchResult.groups[1]?.let { "\"${it.value}\"" } ?: matchResult.groups[2]?.let { "'${it.value}'" } ?: matchResult.groups[0]?.value
       }
       .map { it.trim() }
-      .filter { it != lineBreakDelimiterValue }
+      .filter { it != lineBreakDelimiter.get() }
       .joinToString(" ")
     sourceText.set(result)
   }
@@ -121,5 +90,42 @@ internal class CliCommandConverter(
     private const val CLI_COMMAND_INDENT = "  "
     private val defaultLineBreakDelimiter = if (OS.CURRENT == OS.Windows) "^" else "\\"
     private val cliCommandAllArgumentsSplitRegex = Regex("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'")
+
+    private const val DEFAULT_SOURCE_TEXT = "python script.py --input-file=input.txt --output-file=output.txt --verbose"
+    private val defaultTargetText = doToTarget(DEFAULT_SOURCE_TEXT, defaultLineBreakDelimiter)
+
+    private fun doToTarget(text: String, lineBreakDelimiter: String): String {
+      val lines = mutableListOf<String>()
+
+      var currentLine = ""
+      cliCommandAllArgumentsSplitRegex
+        .findAll(text)
+        .mapNotNull { matchResult ->
+          matchResult.groups[1]?.let { "\"${it.value}\"" } ?: matchResult.groups[2]?.let { "'${it.value}'" } ?: matchResult.groups[0]?.value
+        }
+        .map { it.trim() }
+        .forEach { token ->
+          currentLine = if (token.startsWith("-")) {
+            lines.add(currentLine)
+
+            if (lines.size >= 1) {
+              "$CLI_COMMAND_INDENT$token"
+            }
+            else {
+              token
+            }
+          }
+          else if (currentLine.isBlank()) {
+            token
+          }
+          else {
+            "$currentLine $token"
+          }
+        }
+      lines.add(currentLine)
+
+      return lines.filter { it.isNotBlank() }
+        .joinToString(" ${lineBreakDelimiter}${lineSeparator()}")
+    }
   }
 }
