@@ -8,6 +8,7 @@
 - Add capability to remember editor settings
 - Add "Show Special Characters" setting to the editor
 - Add "Show Whitespaces" setting to the editor
+- Add an icon to indicate the current live conversion in text converters
 
 ### Changed
 

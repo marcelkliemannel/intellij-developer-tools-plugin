@@ -1,7 +1,9 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter
 
+import com.intellij.icons.AllIcons
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.observable.properties.AtomicProperty
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
@@ -17,6 +19,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.PropertyComponentPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.SOURCE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.TARGET
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
@@ -36,7 +39,8 @@ internal abstract class TextConverter(
 
   private val conversationAlarm by lazy { Alarm(parentDisposable) }
 
-  private var lastActiveInput: ActiveInput = SOURCE
+  private var lastActiveInput = AtomicProperty(SOURCE)
+  private val toSourceActive = PropertyComponentPredicate(lastActiveInput, TARGET)
 
   private val sourceEditor by lazy { createSourceEditor() }
   private val targetEditor by lazy { createTargetEditor() }
@@ -123,6 +127,12 @@ internal abstract class TextConverter(
         val liveConversionCheckBox = checkBox("Live conversion")
           .bindSelected(liveConversion)
           .gap(RightGap.SMALL)
+        icon(AllIcons.General.ArrowUp)
+          .visibleIf(toSourceActive)
+          .enabledIf(liveConversion)
+        icon(AllIcons.General.ArrowDown)
+          .visibleIf(toSourceActive.not())
+          .enabledIf(liveConversion)
 
         button("▼ ${textConverterContext.convertActionTitle}") { transformToTarget() }
           .enabledIf(liveConversionCheckBox.selected.not())
@@ -185,11 +195,11 @@ internal abstract class TextConverter(
       }
     ).apply {
       onFocusGained {
-        lastActiveInput = SOURCE
+        lastActiveInput.set(SOURCE)
       }
       this.onTextChangeFromUi { text ->
         if (liveConversion.get()) {
-          lastActiveInput = SOURCE
+          lastActiveInput.set(SOURCE)
           doToTarget(text)
         }
       }
@@ -214,11 +224,11 @@ internal abstract class TextConverter(
       }
     ).apply {
       onFocusGained {
-        lastActiveInput = TARGET
+        lastActiveInput.set(TARGET)
       }
       this.onTextChangeFromUi { text ->
         if (liveConversion.get()) {
-          lastActiveInput = TARGET
+          lastActiveInput.set(TARGET)
           doToSource(text)
         }
       }
@@ -229,7 +239,7 @@ internal abstract class TextConverter(
     if (liveConversion.get()) {
       // Trigger a text change. So if the text was changed in manual mode, it
       // will now be converted once during the switch to live mode.
-      when (lastActiveInput) {
+      when (lastActiveInput.get()) {
         SOURCE -> transformToTarget()
         TARGET -> transformToSource()
       }
