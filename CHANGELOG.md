@@ -10,6 +10,7 @@
 - Add "Show Whitespaces" setting to the editor
 - Add default editor settings to the configuration
 - Add an icon to indicate the current live conversion in text converters
+- Add Base32/Base64 encoding capability for HMAC and JWT secrets
 
 ### Changed
 

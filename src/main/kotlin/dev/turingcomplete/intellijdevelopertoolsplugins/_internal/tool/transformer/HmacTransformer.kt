@@ -1,12 +1,13 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer
 
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.project.Project
-import com.intellij.ui.dsl.builder.COLUMNS_LARGE
+import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindText
-import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
@@ -14,9 +15,15 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.SimpleToggleAction
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.UiUtils
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateNonEmpty
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.HmacTransformer.SecretKeyEncodingMode.BASE32
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.HmacTransformer.SecretKeyEncodingMode.BASE64
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.HmacTransformer.SecretKeyEncodingMode.RAW
 import io.ktor.util.*
+import org.apache.commons.codec.binary.Base32
 import java.security.Security
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -42,7 +49,7 @@ internal class HmacTransformer(
   private var selectedAlgorithm = configuration.register("algorithm", DEFAULT_ALGORITHM)
 
   private val secretKey = configuration.register("secretKey", SECRET_KEY_DEFAULT, SECRET, EXAMPLE_SECRET)
-  private val secretKeyBase64Encoded = configuration.register("secretKeyBase64Encoded", SECRET_KEY_BASE64_ENCODED_DEFAULT, CONFIGURATION)
+  private val secretKeyEncodingMode = configuration.register("secretKeyEncodingMode", RAW, CONFIGURATION)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -50,6 +57,12 @@ internal class HmacTransformer(
     check(algorithms.isNotEmpty())
 
     secretKey.afterChange {
+      if (!isDisposed && liveTransformation.get()) {
+        transform()
+      }
+    }
+
+    secretKeyEncodingMode.afterChange {
       if (!isDisposed && liveTransformation.get()) {
         transform()
       }
@@ -70,13 +83,11 @@ internal class HmacTransformer(
     }
 
     val hmac: ByteArray = Mac.getInstance(selectedAlgorithm.get()).run {
-      val secretKey = if (secretKeyBase64Encoded.get()) {
-        secretKey.get().decodeBase64String()
+      val secretKey = when (secretKeyEncodingMode.get()) {
+        RAW -> secretKey.get()
+        BASE32 -> Base32().decode(secretKey.get()).decodeToString()
+        BASE64 -> secretKey.get().decodeBase64String()
       }
-      else {
-        secretKey.get()
-      }
-
       init(SecretKeySpec(secretKey.encodeToByteArray(), selectedAlgorithm.get()))
       doFinal(sourceText.get().encodeToByteArray())
     }
@@ -95,14 +106,31 @@ internal class HmacTransformer(
 
   override fun Panel.buildMiddleConfigurationUi() {
     row {
-      textField()
+      expandableTextField()
         .label("Secret key:")
+        .align(AlignX.FILL)
         .bindText(secretKey)
-        .columns(COLUMNS_LARGE)
         .validateNonEmpty("A secret key must be provided")
+        .gap(RightGap.SMALL)
+        .resizableColumn()
 
-      checkBox("Secret key is Base64 encoded")
-        .bindSelected(secretKeyBase64Encoded)
+      val encodingActions = mutableListOf<AnAction>().apply {
+        SecretKeyEncodingMode.values().forEach { secretKeyEncodingModeValue ->
+          add(SimpleToggleAction(
+            text = secretKeyEncodingModeValue.title,
+            icon = AllIcons.Actions.ToggleSoftWrap,
+            isSelected = { secretKeyEncodingMode.get() == secretKeyEncodingModeValue },
+            setSelected = {
+              secretKeyEncodingMode.set(secretKeyEncodingModeValue)
+            }
+          ))
+        }
+      }
+      actionButton(UiUtils.actionsPopup(
+        title = "Encoding",
+        icon = AllIcons.General.Settings,
+        actions = encodingActions
+      ))
     }
   }
 
@@ -112,6 +140,15 @@ internal class HmacTransformer(
   private data class HmacAlgorithm(val title: String, val algorithm: String) {
 
     override fun toString(): String = title
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  enum class SecretKeyEncodingMode(val title: String) {
+
+    RAW("Raw"),
+    BASE32("Base32 Encoded"),
+    BASE64("Base64 Encoded")
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -142,7 +179,6 @@ internal class HmacTransformer(
 
     private const val DEFAULT_ALGORITHM = "HMACSHA256"
     private const val SECRET_KEY_DEFAULT = ""
-    private const val SECRET_KEY_BASE64_ENCODED_DEFAULT = false
 
     private val algorithms: List<HmacAlgorithm> by lazy {
       Security.getAlgorithms("Mac")

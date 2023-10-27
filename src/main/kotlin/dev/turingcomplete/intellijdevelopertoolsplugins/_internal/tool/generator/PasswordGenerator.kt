@@ -13,8 +13,8 @@ import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.selected
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET
@@ -27,11 +27,15 @@ import java.security.SecureRandom
 import javax.swing.JComponent
 
 internal class PasswordGenerator(
+  project: Project?,
+  context: DeveloperToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : OneLineTextGenerator(
-  configuration,
-  parentDisposable,
+  context = context,
+  project = project,
+  configuration = configuration,
+  parentDisposable = parentDisposable,
   initialGeneratedTextTitle = "Generated password:"
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -148,8 +152,9 @@ internal class PasswordGenerator(
       project: Project?,
       parentDisposable: Disposable,
       context: DeveloperToolContext
-    ): ((DeveloperToolConfiguration) -> PasswordGenerator) =
-      { configuration ->  PasswordGenerator(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> PasswordGenerator) = { configuration ->
+      PasswordGenerator(project, context, configuration, parentDisposable)
+    }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

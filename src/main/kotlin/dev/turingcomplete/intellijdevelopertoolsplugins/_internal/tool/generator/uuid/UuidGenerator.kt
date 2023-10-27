@@ -9,16 +9,22 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.layout.ComboBoxPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toMessageDigest
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.OneLineTextGenerator
 
-internal class UuidGenerator(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
-  OneLineTextGenerator(
-    configuration = configuration,
-    parentDisposable = parentDisposable
-  ) {
+internal class UuidGenerator(
+  project: Project?,
+  context: DeveloperToolContext,
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) : OneLineTextGenerator(
+  context = context,
+  configuration = configuration,
+  parentDisposable = parentDisposable,
+  project = project
+) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var selectedUuidVersion = configuration.register("version", UuidVersion.V4)
@@ -148,7 +154,9 @@ internal class UuidGenerator(configuration: DeveloperToolConfiguration, parentDi
       project: Project?,
       parentDisposable: Disposable,
       context: DeveloperToolContext
-    ): ((DeveloperToolConfiguration) -> UuidGenerator) = { configuration -> UuidGenerator(configuration, parentDisposable) }
+    ): ((DeveloperToolConfiguration) -> UuidGenerator) = { configuration ->
+      UuidGenerator(project, context, configuration, parentDisposable)
+    }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
