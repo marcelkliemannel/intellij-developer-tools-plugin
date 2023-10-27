@@ -26,6 +26,9 @@ class ConfigurationContentPanel {
         DeveloperToolsPluginService.saveInputs = DeveloperToolsPluginService.SAVE_INPUTS_DEFAULT
         DeveloperToolsPluginService.saveSecrets = DeveloperToolsPluginService.SAVE_SECRETS_DEFAULT
         DeveloperToolsPluginService.loadExamples = DeveloperToolsPluginService.LOAD_EXAMPLES_DEFAULT
+        DeveloperToolsPluginService.loadExamples = DeveloperToolsPluginService.LOAD_EXAMPLES_DEFAULT
+        DeveloperToolsPluginService.loadExamples = DeveloperToolsPluginService.LOAD_EXAMPLES_DEFAULT
+        DeveloperToolsPluginService.loadExamples = DeveloperToolsPluginService.LOAD_EXAMPLES_DEFAULT
       }
     }
 
@@ -40,23 +43,38 @@ class ConfigurationContentPanel {
       }
       row {
         checkBox("Remember secrets")
-          .comment("Secrets are stored in the <a href='https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html#storage'>system keychain</a>.") {
-            BrowserUtil.browse(it.url)
-          }
           .bindSelected(DeveloperToolsPluginService.instance.saveSecrets)
+      }.comment("Secrets are stored in the <a href='https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html#storage'>system keychain</a>.") {
+        BrowserUtil.browse(it.url)
       }
       row {
         checkBox("Load examples")
           .bindSelected(DeveloperToolsPluginService.instance.loadExamples)
-          .comment("Changes will take effect the next time the dialog is opened.")
+      }.comment("Changes will take effect the next time the dialog is opened.")
+
+      groupRowsRange("Default Editor Settings") {
+        row {
+          checkBox("Soft-wrap")
+            .bindSelected(DeveloperToolsPluginService.instance.editorSoftWraps)
+        }
+        row {
+          checkBox("Show special characters")
+            .bindSelected(DeveloperToolsPluginService.instance.editorShowSpecialCharacters)
+        }
+        row {
+          checkBox("Show whitespaces")
+            .bindSelected(DeveloperToolsPluginService.instance.editorShowWhitespaces)
+        }
+        row {
+          comment("Some changes will take effect the next time the dialog is opened.")
+        }
       }
 
       groupRowsRange("Advanced") {
         row {
           checkBox("Dialog is modal")
             .bindSelected(DeveloperToolsPluginService.instance.dialogIsModal)
-            .comment("Changes will take effect the next time the dialog is opened.")
-        }
+        }.comment("Changes will take effect the next time the dialog is opened.")
       }
 
       row {
