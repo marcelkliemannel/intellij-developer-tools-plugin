@@ -31,7 +31,7 @@ class LoremIpsumGeneratorTest : BasePlatformTestCase() {
     ]
   )
   fun `test generation of iconic sentence`(atMostWords: Int, expectedSentence: String?) {
-    val actualSentence = LoremIpsumGenerator(project, DeveloperToolContext("lorem-ipsum-generator"), DeveloperToolConfiguration("Test")) { }
+    val actualSentence = LoremIpsumGenerator(null, DeveloperToolContext("lorem-ipsum-generator"), DeveloperToolConfiguration("Test")) { }
       .generateIconicText(atMostWords, true)
     assertThat(actualSentence.joinToString(" ")).isEqualTo(expectedSentence ?: "")
   }
