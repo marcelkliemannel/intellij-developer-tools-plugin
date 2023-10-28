@@ -1,15 +1,19 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 
 abstract class MultiLineTextGenerator(
   private val generatedTextTitle: String,
+  private val context: DeveloperToolContext,
+  private val project: Project?,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : DeveloperTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
@@ -38,7 +42,7 @@ abstract class MultiLineTextGenerator(
     // Override if needed
   }
 
-  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
+  override fun configurationChanged(property: ValueProperty<out Any>) {
     if (!isDisposed) {
       doGenerate()
     }
@@ -68,9 +72,13 @@ abstract class MultiLineTextGenerator(
   }
 
   private fun createGeneratedTextEditor() = DeveloperToolEditor(
+    id = "generated-text",
     title = generatedTextTitle,
     editorMode = DeveloperToolEditor.EditorMode.OUTPUT,
-    parentDisposable = parentDisposable
+    parentDisposable = parentDisposable,
+    project = project,
+    context = context,
+    configuration = configuration
   )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

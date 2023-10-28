@@ -5,6 +5,7 @@ import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.Balloon
@@ -14,6 +15,7 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.selected
@@ -83,9 +85,8 @@ abstract class TextTransformer(
     throw NotImplementedError("Debug component not implemented")
   }
 
-  protected open fun getInitialLanguage(): Language? {
+  protected open fun Row.buildAdditionalActionsUi() {
     // Override if needed
-    return null
   }
 
   protected fun setLanguage(language: Language) {
@@ -93,7 +94,7 @@ abstract class TextTransformer(
     resultEditor.language = language
   }
 
-  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
+  override fun configurationChanged(property: ValueProperty<out Any>) {
     if (!isDisposed && liveTransformation.get()) {
       transform()
     }
@@ -114,25 +115,24 @@ abstract class TextTransformer(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun Panel.buildActionsUi() {
-    buttonsGroup {
-      row {
-        val liveTransformationCheckBox = checkBox("Live transformation")
-          .bindSelected(liveTransformation)
-          .gap(RightGap.SMALL)
+    row {
+      val liveTransformationCheckBox = checkBox("Live transformation")
+        .bindSelected(liveTransformation)
+        .gap(RightGap.SMALL)
 
-        button("▼ ${textTransformerContext.transformActionTitle}") { transform() }
-          .enabledIf(liveTransformationCheckBox.selected.not())
-          .gap(RightGap.SMALL)
-          .component
+      button("▼ ${textTransformerContext.transformActionTitle}") { transform() }
+        .enabledIf(liveTransformationCheckBox.selected.not())
+        .component
 
-        if (textTransformerContext.supportsDebug) {
-          lateinit var debugButton: JComponent
-          debugButton = actionButton(
-            createDebugAction { debugButton },
-            actionPlace = this::class.java.name
-          ).component
-        }
+      if (textTransformerContext.supportsDebug) {
+        lateinit var debugButton: JComponent
+        debugButton = actionButton(
+          createDebugAction { debugButton },
+          actionPlace = this::class.java.name
+        ).component
       }
+
+      buildAdditionalActionsUi()
     }
   }
 
@@ -176,11 +176,9 @@ abstract class TextTransformer(
           secondTitle = textTransformerContext.resultTitle,
           secondText = { resultText.get() },
         )
-      }
+      },
+      initialLanguage = textTransformerContext.inputInitialLanguage ?: PlainTextLanguage.INSTANCE
     ).apply {
-      with(textTransformerContext) {
-        initialLanguage?.let { language = it }
-      }
       onTextChangeFromUi { _ ->
         if (liveTransformation.get()) {
           transform()
@@ -204,10 +202,9 @@ abstract class TextTransformer(
           secondTitle = textTransformerContext.sourceTitle,
           secondText = { sourceText.get() },
         )
-      }
-    ).apply {
-      getInitialLanguage()?.let { language = it }
-    }
+      },
+      initialLanguage = textTransformerContext.outputInitialLanguage ?: PlainTextLanguage.INSTANCE
+    )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
@@ -217,7 +214,8 @@ abstract class TextTransformer(
     val resultTitle: String,
     val initialSourceText: String? = null,
     val initialSourceExampleText: String? = null,
-    val initialLanguage: Language? = null,
+    val inputInitialLanguage: Language? = null,
+    val outputInitialLanguage: Language? = null,
     val diffSupport: DiffSupport? = null,
     val supportsDebug: Boolean = false,
   )

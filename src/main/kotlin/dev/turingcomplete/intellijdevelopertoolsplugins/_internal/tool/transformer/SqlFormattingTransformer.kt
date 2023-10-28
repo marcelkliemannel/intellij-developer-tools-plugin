@@ -93,9 +93,9 @@ class SqlFormattingTransformer(
     resultText.set(SqlFormatter.of(dialect.get()).format(sourceText.get(), formatConfig))
   }
 
-  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
+  override fun configurationChanged(property: ValueProperty<out Any>) {
     updateFormatConfig()
-    super.configurationChanged(key, property)
+    super.configurationChanged(property)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //

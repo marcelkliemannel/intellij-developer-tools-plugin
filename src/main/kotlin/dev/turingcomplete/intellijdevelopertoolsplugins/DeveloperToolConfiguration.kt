@@ -26,8 +26,6 @@ class DeveloperToolConfiguration(
   private val changeListeners = CopyOnWriteArrayList<ChangeListener>()
   var isResetting = false
     internal set
-  val hasChanges: Boolean
-    get() = properties.values.any { it.valueChanged() }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -58,7 +56,7 @@ class DeveloperToolConfiguration(
       properties.filter { type == null || it.value.type == type }
         .forEach { (_, property) ->
           property.reset(loadExamples)
-          fireConfigurationChanged(property.key, property.reference)
+          fireConfigurationChanged(property.reference)
         }
     }
     finally {
@@ -104,15 +102,15 @@ class DeveloperToolConfiguration(
     return valueProperty
   }
 
-  private fun fireConfigurationChanged(key: String, property: ValueProperty<out Any>) {
-    changeListeners.forEach { it.configurationChanged(key, property) }
+  private fun fireConfigurationChanged(property: ValueProperty<out Any>) {
+    changeListeners.forEach { it.configurationChanged(property) }
   }
 
   private fun <T : Any?> handlePropertyChange(key: String): (ValueProperty.ChangeEvent<T>) -> Unit = { event ->
     val newValue = event.newValue
     if (event.oldValue != newValue) {
       properties[key]?.let { property ->
-        fireConfigurationChanged(property.key, property.reference)
+        fireConfigurationChanged(property.reference)
       } ?: error("Unknown property: $key")
     }
   }
@@ -151,7 +149,7 @@ class DeveloperToolConfiguration(
 
   interface ChangeListener {
 
-    fun configurationChanged(key: String, property: ValueProperty<out Any>)
+    fun configurationChanged(property: ValueProperty<out Any>)
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

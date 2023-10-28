@@ -107,7 +107,7 @@ internal abstract class TextConverter(
 
   fun sourceText(): String = sourceText.get()
 
-  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
+  override fun configurationChanged(property: ValueProperty<out Any>) {
     liveTransformToLastActiveInput()
   }
 
@@ -133,6 +133,7 @@ internal abstract class TextConverter(
         icon(AllIcons.General.ArrowDown)
           .visibleIf(toSourceActive.not())
           .enabledIf(liveConversion)
+          .gap(RightGap.SMALL)
 
         button("▼ ${textConverterContext.convertActionTitle}") { transformToTarget() }
           .enabledIf(liveConversionCheckBox.selected.not())

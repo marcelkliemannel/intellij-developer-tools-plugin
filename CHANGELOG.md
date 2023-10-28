@@ -11,6 +11,7 @@
 - Add default editor settings to the configuration
 - Add an icon to indicate the current live conversion in text converters
 - Add Base32/Base64 encoding capability for HMAC and JWT secrets
+- Add formatting option for the JSON patch result ([GitHub Issue #15](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/15))
 
 ### Changed
 

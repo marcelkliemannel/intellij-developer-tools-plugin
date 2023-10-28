@@ -73,7 +73,7 @@ abstract class OneLineTextGenerator(
     configuration.removeChangeListener(this)
   }
 
-  override fun configurationChanged(key: String, property: ValueProperty<out Any>) {
+  override fun configurationChanged(property: ValueProperty<out Any>) {
     if (!isDisposed && !configuration.isResetting) {
       doGenerate()
     }
