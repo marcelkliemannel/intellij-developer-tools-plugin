@@ -32,8 +32,8 @@ import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ToolBarPlace
@@ -238,7 +238,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
               .bindSelected(formattedIndividual)
               .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
               .gap(RightGap.SMALL)
-            textField()
+            expandableTextField()
               .bindText(formattedIndividualFormat)
               .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
               .validationInfo {

@@ -55,7 +55,7 @@ abstract class MacAddressBasedUuidGenerator(
         val individualRadioButton = radioButton("Individual:")
           .bind(macAddressGenerationMode, INDIVIDUAL)
           .gap(RightGap.SMALL)
-        textField()
+        expandableTextField()
           .bindText(individualMacAddress)
           .validationInfo(validateIndividualMacAddress())
           .enabledIf(individualRadioButton.selected).component

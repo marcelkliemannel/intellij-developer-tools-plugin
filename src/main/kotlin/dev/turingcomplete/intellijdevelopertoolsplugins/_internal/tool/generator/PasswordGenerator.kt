@@ -57,7 +57,6 @@ internal class PasswordGenerator(
           .label("Length:")
           .validateLongValue(LongRange(1, 100))
           .bindIntTextImproved(length)
-          .align(Align.FILL)
       }.layout(RowLayout.PARENT_GRID)
 
       row {
@@ -80,7 +79,7 @@ internal class PasswordGenerator(
           .bindSelected(addSymbols)
           .validationInfo(validateAtLeastOneCharacter())
           .component
-        textField()
+        expandableTextField()
           .bindText(symbols)
           .enabledIf(addSymbolsCheckBox.selected)
           .align(Align.FILL)

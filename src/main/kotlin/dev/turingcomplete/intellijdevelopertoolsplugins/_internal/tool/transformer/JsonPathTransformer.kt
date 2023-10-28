@@ -76,7 +76,7 @@ class JsonPathTransformer(
 
   override fun Panel.buildMiddleConfigurationUi() {
     row {
-      textField()
+      expandableTextField()
         .bindText(queryText)
         .label("JSON path:", LabelPosition.TOP)
         .validationOnApply(errorHolder.asValidation())

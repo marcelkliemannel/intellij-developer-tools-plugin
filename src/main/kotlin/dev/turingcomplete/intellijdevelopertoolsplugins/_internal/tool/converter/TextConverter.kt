@@ -130,6 +130,7 @@ internal abstract class TextConverter(
         icon(AllIcons.General.ArrowUp)
           .visibleIf(toSourceActive)
           .enabledIf(liveConversion)
+          .gap(RightGap.SMALL)
         icon(AllIcons.General.ArrowDown)
           .visibleIf(toSourceActive.not())
           .enabledIf(liveConversion)
