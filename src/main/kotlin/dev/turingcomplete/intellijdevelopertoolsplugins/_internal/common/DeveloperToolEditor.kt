@@ -2,6 +2,7 @@
 
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 
+import com.intellij.application.options.CodeStyle
 import com.intellij.icons.AllIcons
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
@@ -35,6 +36,7 @@ import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.Disposer
@@ -47,6 +49,10 @@ import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.UiUtils.actionsPopup
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.UiUtils.dumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
@@ -60,6 +66,10 @@ import javax.swing.ScrollPaneConstants
 import kotlin.math.max
 
 internal class DeveloperToolEditor(
+  private val id: String,
+  private val context: DeveloperToolContext,
+  private val configuration: DeveloperToolConfiguration,
+  private val project: Project?,
   private val title: String? = null,
   private val editorMode: EditorMode,
   private val parentDisposable: Disposable,
@@ -70,6 +80,10 @@ internal class DeveloperToolEditor(
   private val minimumSizeHeight: Int = DEFAULT_MINIMUM_SIZE_HEIGHT,
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
+
+  private var softWraps = configuration.register("${context.id}-${id}-softWraps", DeveloperToolsPluginService.editorSoftWraps, CONFIGURATION)
+  private var showSpecialCharacters = configuration.register("${context.id}-${id}-showSpecialCharacters", DeveloperToolsPluginService.editorShowSpecialCharacters, CONFIGURATION)
+  private var showWhitespaces = configuration.register("${context.id}-${id}-showWhitespaces", DeveloperToolsPluginService.editorShowWhitespaces, CONFIGURATION)
 
   private var onTextChangeFromUi = mutableListOf<((String) -> Unit)>()
   private var onFocusGained: (() -> Unit)? = null
@@ -99,6 +113,34 @@ internal class DeveloperToolEditor(
     textProperty.afterChangeConsumeEvent(parentDisposable) { event ->
       if (event.id != TEXT_CHANGE_FROM_DOCUMENT_LISTENER) {
         runWriteAction { editor.document.setText(event.newValue) }
+      }
+    }
+
+    softWraps.afterChangeConsumeEvent(parentDisposable) {
+      if (it.oldValue != it.newValue) {
+        editor.settings.apply {
+          isUseSoftWraps = it.newValue
+          isPaintSoftWraps = it.newValue
+          editor.component.repaint()
+        }
+      }
+    }
+
+    showSpecialCharacters.afterChangeConsumeEvent(parentDisposable) {
+      if (it.oldValue != it.newValue) {
+        editor.settings.apply {
+          isShowingSpecialChars = it.newValue
+          editor.component.repaint()
+        }
+      }
+    }
+
+    showWhitespaces.afterChangeConsumeEvent(parentDisposable) {
+      if (it.oldValue != it.newValue) {
+        editor.settings.apply {
+          isWhitespacesShown = it.newValue
+          editor.component.repaint()
+        }
       }
     }
   }
@@ -183,12 +225,33 @@ internal class DeveloperToolEditor(
 
     addSeparator()
 
-    add(SimpleToggleAction(
-      text = "Soft-Wrap",
-      icon = AllIcons.Actions.ToggleSoftWrap,
-      isSelected = { editor.settings.isUseSoftWraps },
-      setSelected = { editor.settings.isUseSoftWraps = it }
-    ))
+    val settingsActions = mutableListOf<AnAction>().apply {
+      add(SimpleToggleAction(
+        text = "Soft-Wrap",
+        icon = AllIcons.Actions.ToggleSoftWrap,
+        isSelected = { softWraps.get() },
+        setSelected = { softWraps.set(it) }
+      ))
+      add(SimpleToggleAction(
+        text = "Show Special Characters",
+        icon = null,
+        isSelected = { showSpecialCharacters.get() },
+        setSelected = { showSpecialCharacters.set(it) }
+      ))
+      add(SimpleToggleAction(
+        text = "Show Whitespaces",
+        icon = null,
+        isSelected = { showWhitespaces.get() },
+        setSelected = { showWhitespaces.set(it) }
+      ))
+    }
+    add(
+      actionsPopup(
+        title = "Settings",
+        icon = AllIcons.General.Settings,
+        actions = settingsActions
+      )
+    )
 
     addSeparator()
 
@@ -251,10 +314,10 @@ internal class DeveloperToolEditor(
     val editorFactory = EditorFactory.getInstance()
     val document = (editorFactory as EditorFactoryImpl).createDocument(textProperty.get(), true, false)
     val editor = if (editorMode.editable) {
-      editorFactory.createEditor(document) as EditorEx
+      editorFactory.createEditor(document, project) as EditorEx
     }
     else {
-      editorFactory.createViewer(document) as EditorEx
+      editorFactory.createViewer(document, project) as EditorEx
     }
     editor.putUserData(editorActiveKey, UIUtil.hasFocus(editor.contentComponent))
     Disposer.register(parentDisposable) { EditorFactory.getInstance().releaseEditor(editor) }
@@ -277,9 +340,15 @@ internal class DeveloperToolEditor(
         isIndentGuidesShown = true
         isLineNumbersShown = true
         isFoldingOutlineShown = false
-        isUseSoftWraps = true
+        isUseSoftWraps = softWraps.get()
+        isPaintSoftWraps = softWraps.get()
+        isShowingSpecialChars = showSpecialCharacters.get()
+        isWhitespacesShown = showWhitespaces.get()
         isBlinkCaret = editorMode.editable
         additionalLinesCount = 0
+        project?.let {
+          setTabSize(CodeStyle.getIndentOptions(it, document).TAB_SIZE)
+        }
       }
     }
   }
@@ -409,8 +478,8 @@ internal class DeveloperToolEditor(
     AnActionButton("Expand Editor", null, AllIcons.Actions.MoveToWindow), DumbAware {
 
     override fun actionPerformed(e: AnActionEvent) {
-      val clonedEditorText = ValueProperty(originalEditor.text)
-      val clonedEditor = cloneEditor(originalEditor, clonedEditorText)
+      val expandedText = ValueProperty(originalEditor.text)
+      val expandedEditor = createExpandedEditor(originalEditor, expandedText)
       val apply = object: DialogWrapper(originalEditor.component, true) {
 
         init {
@@ -420,7 +489,7 @@ internal class DeveloperToolEditor(
           setOKButtonText("Apply")
         }
 
-        override fun createCenterPanel(): JComponent = clonedEditor.component
+        override fun createCenterPanel(): JComponent = expandedEditor.component
 
         override fun getDimensionServiceKey(): String? = ExpandEditorAction::class.java.name
       }.showAndGet()
@@ -428,13 +497,17 @@ internal class DeveloperToolEditor(
       if (apply) {
         runWriteAction {
           originalEditor.editor.putUserData(editorActiveKey, true)
-          originalEditor.editor.document.setText(clonedEditorText.get())
+          originalEditor.editor.document.setText(expandedText.get())
         }
       }
     }
 
-    private fun cloneEditor(originalEditor: DeveloperToolEditor, textProperty: ValueProperty<String>) =
+    private fun createExpandedEditor(originalEditor: DeveloperToolEditor, textProperty: ValueProperty<String>) =
       DeveloperToolEditor(
+        id = "${originalEditor.id}-expanded",
+        context = originalEditor.context,
+        configuration = originalEditor.configuration,
+        project = originalEditor.project,
         title = originalEditor.title,
         editorMode = originalEditor.editorMode,
         parentDisposable = originalEditor.parentDisposable,

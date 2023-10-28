@@ -8,14 +8,19 @@ import com.intellij.ui.dsl.builder.bindItem
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 
 internal class LineBreaksEncoderDecoder(
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  context: DeveloperToolContext,
+  project: Project?
 ) : TextConverter(
   textConverterContext = encoderDecoderTextConverterContext,
   configuration = configuration,
-  parentDisposable = parentDisposable
+  parentDisposable = parentDisposable,
+  context = context,
+  project = project
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -65,16 +70,17 @@ internal class LineBreaksEncoderDecoder(
 
   class Factory : DeveloperToolFactory<LineBreaksEncoderDecoder> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Line Breaks",
       contentTitle = "Line Breaks Encoder/Decoder"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> LineBreaksEncoderDecoder) =
-      { configuration -> LineBreaksEncoderDecoder(configuration, parentDisposable) }
+      { configuration -> LineBreaksEncoderDecoder(configuration, parentDisposable, context, project) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

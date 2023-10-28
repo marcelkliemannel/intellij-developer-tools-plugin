@@ -5,19 +5,19 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
 
 internal class DeveloperToolNode(
   private val developerToolId: String,
   val parentDisposable: Disposable,
   val project: Project?,
-  val developerToolContext: DeveloperToolContext,
+  val developerToolPresentation: DeveloperToolPresentation,
   private val developerToolCreator: (DeveloperToolConfiguration) -> DeveloperTool
 ) : ContentNode(
   id = developerToolId,
-  title = developerToolContext.menuTitle,
-  toolTipText = developerToolContext.contentTitle
+  title = developerToolPresentation.menuTitle,
+  toolTipText = developerToolPresentation.contentTitle
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -58,7 +58,7 @@ internal class DeveloperToolNode(
   ): DeveloperToolContainer {
     val developerTool = developerToolCreator(developerToolConfiguration)
     Disposer.register(parentDisposable, developerTool)
-    return DeveloperToolContainer(developerTool, developerToolConfiguration, developerToolContext)
+    return DeveloperToolContainer(developerTool, developerToolConfiguration, developerToolPresentation)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -66,7 +66,7 @@ internal class DeveloperToolNode(
   data class DeveloperToolContainer(
     val instance: DeveloperTool,
     val configuration: DeveloperToolConfiguration,
-    val context: DeveloperToolContext
+    val context: DeveloperToolPresentation
   )
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

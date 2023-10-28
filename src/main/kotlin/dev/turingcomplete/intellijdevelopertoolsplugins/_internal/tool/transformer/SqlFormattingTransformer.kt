@@ -12,12 +12,16 @@ import com.intellij.ui.dsl.builder.bindSelected
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 
 class SqlFormattingTransformer(
+  context: DeveloperToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  project: Project?
 ) : TextTransformer(
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Format",
@@ -28,8 +32,10 @@ class SqlFormattingTransformer(
       title = "SQL Formatting"
     )
   ),
+  context = context,
   configuration = configuration,
-  parentDisposable = parentDisposable
+  parentDisposable = parentDisposable,
+  project = project
 ), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -87,9 +93,9 @@ class SqlFormattingTransformer(
     resultText.set(SqlFormatter.of(dialect.get()).format(sourceText.get(), formatConfig))
   }
 
-  override fun configurationChanged() {
+  override fun configurationChanged(property: ValueProperty<out Any>) {
     updateFormatConfig()
-    super.configurationChanged()
+    super.configurationChanged(property)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
@@ -107,16 +113,17 @@ class SqlFormattingTransformer(
 
   class Factory : DeveloperToolFactory<SqlFormattingTransformer> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "SQL Formatting",
       contentTitle = "SQL Formatting"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> SqlFormattingTransformer) = { configuration ->
-      SqlFormattingTransformer(configuration, parentDisposable)
+      SqlFormattingTransformer(context, configuration, parentDisposable, project)
     }
   }
 

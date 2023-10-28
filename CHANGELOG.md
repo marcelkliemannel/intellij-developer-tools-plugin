@@ -10,6 +10,23 @@
 
 ### Fixed
 
+## 2.0.0 - 2023-10-28
+
+### Added
+- Add CLI Command line breaks converter
+- Add a "Set to Now" button to the date time converter
+- Add capability to remember editor settings
+- Add "Show Special Characters" setting to the editor
+- Add "Show Whitespaces" setting to the editor
+- Add default editor settings to the configuration
+- Add an icon to indicate the current live conversion in text converters
+- Add Base32/Base64 encoding capability for HMAC and JWT secrets ([GitHub Issue #16](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/16))
+- Add automatic formatting option for the JSON patch result ([GitHub Issue #15](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/15))
+- Add expand option to some text fields
+
+### Fixed
+- Fix date time converter ignores selected time zone ([GitHub Issue #11](https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues/11))
+
 ## 1.1.0 - 2023-08-14
 
 ### Added

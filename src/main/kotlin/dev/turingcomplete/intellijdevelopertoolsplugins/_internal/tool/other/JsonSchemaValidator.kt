@@ -23,14 +23,17 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.PropertyComponentPredicate
 
 class JsonSchemaValidator(
-  configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  private val context: DeveloperToolContext,
+  private val configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable,
+  private val project: Project?
 ) : DeveloperTool(parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -149,6 +152,10 @@ class JsonSchemaValidator(
 
   private fun createSchemaEditor() =
     DeveloperToolEditor(
+      id = "schema",
+      context = context,
+      configuration = configuration,
+      project = project,
       title = "JSON schema",
       editorMode = INPUT,
       parentDisposable = parentDisposable,
@@ -164,6 +171,10 @@ class JsonSchemaValidator(
 
   private fun createDataEditor() =
     DeveloperToolEditor(
+      id = "data",
+      context = context,
+      configuration = configuration,
+      project = project,
       title = "JSON data",
       editorMode = INPUT,
       parentDisposable = parentDisposable,
@@ -190,16 +201,17 @@ class JsonSchemaValidator(
 
   class Factory : DeveloperToolFactory<JsonSchemaValidator> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "JSON Schema",
       contentTitle = "JSON Schema Validator"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> JsonSchemaValidator) =
-      { configuration -> JsonSchemaValidator(configuration, parentDisposable) }
+      { configuration -> JsonSchemaValidator(context, configuration, parentDisposable, project) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

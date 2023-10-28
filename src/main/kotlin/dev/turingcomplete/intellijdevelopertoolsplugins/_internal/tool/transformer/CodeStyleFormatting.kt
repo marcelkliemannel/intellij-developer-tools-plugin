@@ -13,10 +13,12 @@ import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 
 class CodeStyleFormatting(
   private val codeStyles: List<CodeStyle>,
-  private val project: Project,
+  project: Project,
+  context: DeveloperToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextTransformer(
@@ -28,8 +30,10 @@ class CodeStyleFormatting(
       title = "Code Style Formatting"
     )
   ),
+  context = context,
   configuration = configuration,
-  parentDisposable = parentDisposable
+  parentDisposable = parentDisposable,
+  project = project
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -69,7 +73,7 @@ class CodeStyleFormatting(
 
   override fun transform() {
     val workingVirtualFile = LightVirtualFile(this.javaClass.canonicalName, getSelectedCodeStyle().language, sourceText.get())
-    PsiManager.getInstance(project).findFile(workingVirtualFile)?.let { workingPsiFile ->
+    PsiManager.getInstance(project!!).findFile(workingVirtualFile)?.let { workingPsiFile ->
       val processor = RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))
       processor.setPostRunnable {
         resultText.set(workingPsiFile.text)
@@ -93,14 +97,15 @@ class CodeStyleFormatting(
 
   class Factory : DeveloperToolFactory<CodeStyleFormatting> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Code Style Formatting",
       contentTitle = "Code Style Formatting"
     )
 
     override fun getDeveloperToolCreator(
-        project: Project?,
-        parentDisposable: Disposable
+      project: Project?,
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> CodeStyleFormatting)? {
       if (project == null) {
         return null
@@ -115,7 +120,7 @@ class CodeStyleFormatting(
       }
 
       return { configuration ->
-        CodeStyleFormatting(codeStyles, project, configuration, parentDisposable)
+        CodeStyleFormatting(codeStyles, project, context, configuration, parentDisposable)
       }
     }
   }

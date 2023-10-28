@@ -11,7 +11,6 @@ import com.intellij.openapi.ui.naturalSorted
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.BottomGap
-import com.intellij.ui.dsl.builder.COLUMNS_SHORT
 import com.intellij.ui.dsl.builder.COLUMNS_TINY
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
@@ -34,6 +33,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ToolBarPlace
@@ -52,10 +52,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.DatetimeConverter.ConversionOrigin.UNIX_TIMESTAMP_SECONDS
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.DatetimeConverter.ConversionOrigin.YEAR
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -65,12 +63,11 @@ import java.time.temporal.ChronoField
 import java.time.temporal.IsoFields
 import java.util.*
 
-
 class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
   DeveloperTool(parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var selectedTimeZoneId = configuration.register("timeZoneId", TimeZone.currentSystemDefault().id)
+  private var selectedTimeZoneId = configuration.register("timeZoneId", ZoneId.systemDefault().id)
   private var formattedStandardFormat = configuration.register("formattedStandardFormat", DEFAULT_FORMATTED_STANDARD_FORMAT)
   private var formattedStandardFormatAddOffset = configuration.register("formattedStandardFormatAddOffset", DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_OFFSET)
   private var formattedStandardFormatAddTimeZone = configuration.register("formattedStandardFormatAddTimeZone", DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_OFFSET)
@@ -102,7 +99,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
   init {
     // Validate if selected time zone and formatted local  is still available
     if (!ZoneId.getAvailableZoneIds().contains(selectedTimeZoneId.get())) {
-      selectedTimeZoneId.set(TimeZone.currentSystemDefault().id)
+      selectedTimeZoneId.set(ZoneId.systemDefault().id)
     }
     if (!LOCALES.contains(formattedLocale.get())) {
       formattedLocale.set(DEFAULT_FORMATTED_LOCALE)
@@ -121,24 +118,30 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     }
 
     group("Convert") {
-      val initialInstant = Instant.fromEpochMilliseconds(System.currentTimeMillis())
-      val initialLocalDateTime = initialInstant.toLocalDateTime(TimeZone.of(selectedTimeZoneId.get()))
+      val initialInstant = Instant.ofEpochMilli(System.currentTimeMillis())
+      val initialLocalDateTime = LocalDateTime.ofInstant(initialInstant, selectedTimeZoneId())
 
       group("Unix Timestamp as Seconds") {
         row {
           unixTimeStampSecondsTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
             .label("Seconds:")
-            .text(initialInstant.epochSeconds.toString())
-            .columns(COLUMNS_SHORT)
+            .text(initialInstant.epochSecond.toString())
+            .columns(12)
             .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_SECONDS) }
             .component
 
           unixTimeStampMillisTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
             .label("Milliseconds:")
-            .text(initialInstant.toEpochMilliseconds().toString())
-            .columns(COLUMNS_SHORT)
+            .gap(RightGap.SMALL)
+            .text(initialInstant.toEpochMilli().toString())
+            .columns(12)
             .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
             .component
+
+          button("Set to Now") {
+            unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
+            convert(UNIX_TIMESTAMP_MILLIS, 0)
+          }
         }
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
@@ -159,7 +162,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
             .whenTextChangedFromUi { convert(YEAR) }
             .component
           monthTextField = textField().label("Month:")
-            .text(initialLocalDateTime.monthNumber.toString())
+            .text(initialLocalDateTime.monthValue.toString())
             .columns(COLUMNS_TINY)
             .validateLongValue(LongRange(1, 12))
             .whenTextChangedFromUi { convert(MONTH) }
@@ -235,7 +238,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
               .bindSelected(formattedIndividual)
               .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
               .gap(RightGap.SMALL)
-            textField()
+            expandableTextField()
               .bindText(formattedIndividualFormat)
               .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
               .validationInfo {
@@ -338,13 +341,17 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     val convert: () -> Unit = {
       when (conversionOrigin) {
         UNIX_TIMESTAMP_SECONDS -> {
-          val localDateTime = LocalDateTime.ofInstant(java.time.Instant.ofEpochSecond(unixTimeStampSeconds), ZoneId.of(selectedTimeZoneId.get()))
-          setConvertedValues(localDateTime, conversionOrigin)
+          val timestampAtSelectedTimeZone = Instant.ofEpochSecond(unixTimeStampSeconds)
+            .atZone(selectedTimeZoneId())
+            .toLocalDateTime()
+          setConvertedValues(timestampAtSelectedTimeZone, conversionOrigin)
         }
 
         TIME_ZONE, UNIX_TIMESTAMP_MILLIS -> {
-          val localDateTime = LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(unixTimeStampMillis), ZoneId.of(selectedTimeZoneId.get()))
-          setConvertedValues(localDateTime, conversionOrigin)
+          val timestampAtSelectedTimeZone = Instant.ofEpochMilli(unixTimeStampMillis)
+            .atZone(selectedTimeZoneId())
+            .toLocalDateTime()
+          setConvertedValues(timestampAtSelectedTimeZone, conversionOrigin)
         }
 
         DAY, MONTH, YEAR, HOUR, MINUTE, SECOND -> {
@@ -410,17 +417,19 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
       val formatter = if (formattedIndividual.get()) {
         DateTimeFormatter.ofPattern(formattedIndividualFormat.get())
           .withLocale(formattedLocale.get().locale)
-          ?.withZone(ZoneId.of(selectedTimeZoneId.get()))
+          ?.withZone(selectedTimeZoneId())
       }
       else {
         DateTimeFormatter.ofPattern(formattedStandardFormatPattern.get())
           .withLocale(formattedLocale.get().locale)
-          .withZone(formattedStandardFormat.get().fixedTimeZone ?: ZoneId.of(selectedTimeZoneId.get()))
+          .withZone(formattedStandardFormat.get().fixedTimeZone ?: selectedTimeZoneId())
       }
-      localDateTime.atZone(ZoneId.of(selectedTimeZoneId.get())).format(formatter)
+      localDateTime.atZone(selectedTimeZoneId()).format(formatter)
     } catch (e: Exception) {
       "Error: ${e.message}"
     }
+
+  private fun selectedTimeZoneId(): ZoneId = ZoneId.of(selectedTimeZoneId.get())
 
   private fun Row.buildTimestampLabelUi(
     title: String,
@@ -443,14 +452,15 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
   class Factory : DeveloperToolFactory<DatetimeConverter> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Date Time",
       contentTitle = "Date Time Converter"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> DatetimeConverter) =
       { configuration -> DatetimeConverter(configuration, parentDisposable) }
   }

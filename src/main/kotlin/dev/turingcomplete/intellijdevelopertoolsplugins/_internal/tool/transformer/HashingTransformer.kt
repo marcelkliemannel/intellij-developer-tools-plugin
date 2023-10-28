@@ -7,21 +7,26 @@ import com.intellij.ui.dsl.builder.bindItem
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toMessageDigest
 import java.security.Security
 
 internal class HashingTransformer(
+  context: DeveloperToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  project: Project?
 ) : TextTransformer(
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Hash",
     sourceTitle = "Plain",
     resultTitle = "Hashed"
   ),
+  context = context,
   configuration = configuration,
-  parentDisposable = parentDisposable
+  parentDisposable = parentDisposable,
+  project = project
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -58,20 +63,21 @@ internal class HashingTransformer(
 
   class Factory : DeveloperToolFactory<HashingTransformer> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Hashing",
       contentTitle = "Hashing Transformer"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> HashingTransformer)? {
       if (messageDigestAlgorithms.isEmpty()) {
         return null
       }
 
-      return { configuration -> HashingTransformer(configuration, parentDisposable) }
+      return { configuration -> HashingTransformer(context, configuration, parentDisposable, project) }
     }
   }
 

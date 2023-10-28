@@ -15,6 +15,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 
@@ -66,15 +67,16 @@ class TextDiffViewer(
 
   class Factory : DeveloperToolFactory<TextDiffViewer> {
 
-    override fun getDeveloperToolContext() =
-      DeveloperToolContext(
+    override fun getDeveloperToolPresentation() =
+      DeveloperToolPresentation(
         menuTitle = "Text Diff",
         "Text Diff Viewer"
       )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> TextDiffViewer) =
       { configuration ->
         TextDiffViewer(

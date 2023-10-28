@@ -41,7 +41,7 @@ internal class GroupContentPanel(groupNode: GroupNode, private val onContentNode
   private fun createDeveloperToolLinksPanel(groupNode: GroupNode) = object : JPanel(VerticalLayout(UIUtil.DEFAULT_VGAP)) {
     init {
       groupNode.children().asSequence().filterIsInstance(DeveloperToolNode::class.java).forEach { developerToolNode ->
-        add(ActionLink(developerToolNode.developerToolContext.menuTitle) { onContentNodeSelection(developerToolNode) })
+        add(ActionLink(developerToolNode.developerToolPresentation.menuTitle) { onContentNodeSelection(developerToolNode) })
       }
     }
   }

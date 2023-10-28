@@ -1,17 +1,17 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins.developertool._internal.tool
+package dev.turingcomplete.intellijdevelopertoolsplugins
 
-import com.intellij.testFramework.fixtures.IdeaTestExecutionPolicy
+import org.jetbrains.annotations.Nls
 
-@Suppress("unused") // Referenced in build.gradle.kts
-class DeveloperToolTestPolicy  : IdeaTestExecutionPolicy() {
+data class DeveloperToolPresentation(
+  @Nls(capitalization = Nls.Capitalization.Title)
+  val menuTitle: String,
+
+  @Nls(capitalization = Nls.Capitalization.Title)
+  val contentTitle: String
+) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
-
-  override fun getName(): String = "developer-tool-test"
-
-  override fun runInDispatchThread(): Boolean = false
-
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //

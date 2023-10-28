@@ -9,11 +9,12 @@ interface DeveloperToolFactory<T : DeveloperTool> {
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  fun getDeveloperToolContext(): DeveloperToolContext
+  fun getDeveloperToolPresentation(): DeveloperToolPresentation
 
   fun getDeveloperToolCreator(
     project: Project?,
-    parentDisposable: Disposable
+    parentDisposable: Disposable,
+    context: DeveloperToolContext
   ): ((DeveloperToolConfiguration) -> T)?
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //

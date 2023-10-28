@@ -72,7 +72,8 @@ abstract class NamespaceAndNameBasedUuidGenerator(
       }
 
       row {
-        textField().label("Name:")
+        expandableTextField()
+          .label("Name:")
           .bindText(name)
       }
     }.visibleIf(visible)

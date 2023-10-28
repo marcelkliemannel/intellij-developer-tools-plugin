@@ -8,6 +8,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.json.JsonLanguage
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.markup.GutterIconRenderer
@@ -17,6 +18,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.TextRange
 import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.LabelPosition
 import com.intellij.ui.dsl.builder.Panel
@@ -36,19 +38,26 @@ import com.intellij.util.Alarm
 import com.intellij.util.io.decodeBase64
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.SimpleToggleAction
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.UiUtils
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.setValidationResultBorder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toPrettyStringWithDefaultObjectMapper
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.ChangeOrigin.ENCODED
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.ChangeOrigin.HEADER_PAYLOAD
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.ChangeOrigin.SIGNATURE_CONFIGURATION
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SecretKeyEncodingMode.BASE32
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SecretKeyEncodingMode.BASE64
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SecretKeyEncodingMode.RAW
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithm.ECDSA256
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithm.ECDSA384
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithm.ECDSA512
@@ -64,6 +73,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithmKind.RSA
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import io.ktor.util.*
+import org.apache.commons.codec.binary.Base32
 import java.security.KeyFactory
 import java.security.PrivateKey
 import java.security.PublicKey
@@ -76,9 +86,11 @@ import java.security.spec.X509EncodedKeySpec
 import java.util.*
 import javax.swing.Icon
 
-
 internal class JwtEncoderDecoder(
-  private val configuration: DeveloperToolConfiguration, parentDisposable: Disposable
+  private val context: DeveloperToolContext,
+  private val configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable,
+  private val project: Project?,
 ) : DeveloperTool(parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -100,12 +112,18 @@ internal class JwtEncoderDecoder(
 
   private val highlightingAttributes by lazy { EditorColorsManager.getInstance().globalScheme.getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES) }
 
-  private val jwt by lazy { Jwt(configuration, encodedText, headerText, payloadText) }
+  private val jwt = Jwt(configuration, encodedText, headerText, payloadText)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
     liveConversion.afterChange(parentDisposable) { handleLiveConversionSwitch() }
+
+    jwt.signature.secretEncodingMode.afterChangeConsumeEvent(null) { e ->
+      if (e.valueChanged()) {
+        convert(SIGNATURE_CONFIGURATION)
+      }
+    }
   }
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -164,10 +182,32 @@ internal class JwtEncoderDecoder(
       }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE)
 
       row {
-        label("Secret key:").gap(RightGap.SMALL)
-        textField()
+        // Bug: The label from `expandableTextField().label(...)` disappears
+        // if the encoding selection gets changed
+        label("Secret key:")
+        expandableTextField()
+          .align(AlignX.FILL)
           .bindText(jwt.signature.secret)
           .whenTextChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
+          .gap(RightGap.SMALL)
+          .resizableColumn()
+
+        val encodingActions = mutableListOf<AnAction>().apply {
+          SecretKeyEncodingMode.values().forEach { secretKeyEncodingModeValue ->
+            add(SimpleToggleAction(
+              text = secretKeyEncodingModeValue.title,
+              icon = AllIcons.Actions.ToggleSoftWrap,
+              isSelected = { jwt.signature.secretEncodingMode.get() == secretKeyEncodingModeValue },
+              setSelected = { jwt.signature.secretEncodingMode.set(secretKeyEncodingModeValue) }
+            ))
+          }
+        }
+        actionButton(
+          UiUtils.actionsPopup(
+          title = "Encoding",
+          icon = AllIcons.General.Settings,
+          actions = encodingActions
+        ))
       }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind == HMAC }).layout(RowLayout.PARENT_GRID)
 
       row {
@@ -302,6 +342,7 @@ internal class JwtEncoderDecoder(
 
   private fun createEncodedEditor(): DeveloperToolEditor =
     createEditor(
+      id = "jwt-encoder-decoder-encoded",
       changeOrigin = ENCODED,
       title = "Encoded",
       language = PlainTextLanguage.INSTANCE,
@@ -311,6 +352,7 @@ internal class JwtEncoderDecoder(
 
   private fun createHeaderEditor(): DeveloperToolEditor =
     createEditor(
+      id = "jwt-encoder-decoder-header",
       changeOrigin = HEADER_PAYLOAD,
       title = "Header",
       language = JsonLanguage.INSTANCE,
@@ -320,6 +362,7 @@ internal class JwtEncoderDecoder(
 
   private fun createPayloadEditor(): DeveloperToolEditor =
     createEditor(
+      id = "jwt-encoder-decoder-payload",
       changeOrigin = HEADER_PAYLOAD,
       title = "Payload",
       language = JsonLanguage.INSTANCE,
@@ -328,6 +371,7 @@ internal class JwtEncoderDecoder(
     ) { highlightPayloadClaims() }
 
   private fun createEditor(
+    id: String,
     changeOrigin: ChangeOrigin,
     title: String,
     language: Language,
@@ -335,6 +379,10 @@ internal class JwtEncoderDecoder(
     minimumSizeHeight: Int,
     onTextChangeFromUi: () -> Unit
   ) = DeveloperToolEditor(
+    id = id,
+    context = context,
+    configuration = configuration,
+    project = project,
     title = title,
     editorMode = INPUT_OUTPUT,
     parentDisposable = parentDisposable,
@@ -577,9 +625,10 @@ internal class JwtEncoderDecoder(
 
     val algorithm = configuration.register("algorithm", DEFAULT_SIGNATURE_ALGORITHM)
 
-    var secret = configuration.register("secret", "", SECRET, EXAMPLE_SECRET)
-    var publicKey = configuration.register("publicKey", "", SECRET, if (algorithm.get().kind == RSA) EXAMPLE_RSA_PUBLIC_KEY else EXAMPLE_EC_PUBLIC_KEY)
-    var privateKey = configuration.register("privateKey", "", SECRET, if (algorithm.get().kind == RSA) EXAMPLE_RSA_PRIVATE_KEY else EXAMPLE_EC_PRIVATE_KEY)
+    val secret = configuration.register("secret", "", SECRET, EXAMPLE_SECRET)
+    val publicKey = configuration.register("publicKey", "", SECRET, if (algorithm.get().kind == RSA) EXAMPLE_RSA_PUBLIC_KEY else EXAMPLE_EC_PUBLIC_KEY)
+    val privateKey = configuration.register("privateKey", "", SECRET, if (algorithm.get().kind == RSA) EXAMPLE_RSA_PRIVATE_KEY else EXAMPLE_EC_PRIVATE_KEY)
+    val secretEncodingMode = configuration.register("secretKeyEncodingMode", RAW, CONFIGURATION)
 
     val publicKeyErrorHolder = ErrorHolder()
     val privateKeyErrorHolder = ErrorHolder()
@@ -600,10 +649,15 @@ internal class JwtEncoderDecoder(
       val signatureAlgorithm = algorithm.get()
       val algorithm: Algorithm = when (signatureAlgorithm.kind) {
         HMAC -> {
+          val secretKey = when (secretEncodingMode.get()) {
+            RAW -> secret.get()
+            BASE32 -> Base32().decode(secret.get()).decodeToString()
+            BASE64 -> secret.get().decodeBase64String()
+          }
           when (signatureAlgorithm) {
-            HMAC256 -> Algorithm.HMAC256(secret.get())
-            HMAC384 -> Algorithm.HMAC384(secret.get())
-            HMAC512 -> Algorithm.HMAC512(secret.get())
+            HMAC256 -> Algorithm.HMAC256(secretKey)
+            HMAC384 -> Algorithm.HMAC384(secretKey)
+            HMAC512 -> Algorithm.HMAC512(secretKey)
             else -> error("Unexpected secret-based algorithm: $signatureAlgorithm")
           }
         }
@@ -788,16 +842,26 @@ internal class JwtEncoderDecoder(
 
   class Factory : DeveloperToolFactory<JwtEncoderDecoder> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "JWT",
       contentTitle = "JWT Decoder/Encoder"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> JwtEncoderDecoder) =
-      { configuration -> JwtEncoderDecoder(configuration, parentDisposable) }
+      { configuration -> JwtEncoderDecoder(context, configuration, parentDisposable, project) }
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  enum class SecretKeyEncodingMode(val title: String) {
+
+    RAW("Raw"),
+    BASE32("Base32 Encoded"),
+    BASE64("Base64 Encoded")
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

@@ -15,13 +15,16 @@ import com.intellij.ui.layout.ComboBoxPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.makeCaseInsensitive
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer.WordsDelimiter.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer.WordsDelimiter.LINE_BREAK
 
 internal class TextSortingTransformer(
+  context: DeveloperToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  project: Project?
 ) : TextTransformer(
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Sort",
@@ -32,8 +35,10 @@ internal class TextSortingTransformer(
       title = "Text Sorting"
     )
   ),
+  context = context,
   configuration = configuration,
-  parentDisposable = parentDisposable
+  parentDisposable = parentDisposable,
+  project = project
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -166,16 +171,17 @@ internal class TextSortingTransformer(
 
   class Factory : DeveloperToolFactory<TextSortingTransformer> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Text Sorting",
       contentTitle = "Text Sorting"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> TextSortingTransformer) = { configuration ->
-      TextSortingTransformer(configuration, parentDisposable)
+      TextSortingTransformer(context, configuration, parentDisposable, project)
     }
   }
 

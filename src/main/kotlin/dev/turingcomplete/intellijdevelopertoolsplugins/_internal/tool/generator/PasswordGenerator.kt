@@ -14,6 +14,7 @@ import com.intellij.ui.layout.selected
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET
@@ -26,11 +27,15 @@ import java.security.SecureRandom
 import javax.swing.JComponent
 
 internal class PasswordGenerator(
+  project: Project?,
+  context: DeveloperToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : OneLineTextGenerator(
-  configuration,
-  parentDisposable,
+  context = context,
+  project = project,
+  configuration = configuration,
+  parentDisposable = parentDisposable,
   initialGeneratedTextTitle = "Generated password:"
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -52,7 +57,6 @@ internal class PasswordGenerator(
           .label("Length:")
           .validateLongValue(LongRange(1, 100))
           .bindIntTextImproved(length)
-          .align(Align.FILL)
       }.layout(RowLayout.PARENT_GRID)
 
       row {
@@ -75,7 +79,7 @@ internal class PasswordGenerator(
           .bindSelected(addSymbols)
           .validationInfo(validateAtLeastOneCharacter())
           .component
-        textField()
+        expandableTextField()
           .bindText(symbols)
           .enabledIf(addSymbolsCheckBox.selected)
           .align(Align.FILL)
@@ -138,16 +142,18 @@ internal class PasswordGenerator(
 
   class Factory : DeveloperToolFactory<PasswordGenerator> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Password Generator",
       contentTitle = "Password Generator"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
-    ): ((DeveloperToolConfiguration) -> PasswordGenerator) =
-      { configuration ->  PasswordGenerator(configuration, parentDisposable) }
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
+    ): ((DeveloperToolConfiguration) -> PasswordGenerator) = { configuration ->
+      PasswordGenerator(project, context, configuration, parentDisposable)
+    }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

@@ -51,6 +51,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ValidateMinIntValueSide
@@ -75,6 +76,7 @@ import javax.swing.border.LineBorder
 
 internal class BarcodeGenerator private constructor(
   private val formats: Map<Format, FormatConfiguration>,
+  private val context: DeveloperToolContext,
   private val configuration: DeveloperToolConfiguration,
   private val project: Project?,
   parentDisposable: Disposable
@@ -218,7 +220,7 @@ internal class BarcodeGenerator private constructor(
   }
 
   private fun createContentEditor(parentDisposable: Disposable) =
-    DeveloperToolEditor("Content", DeveloperToolEditor.EditorMode.INPUT, parentDisposable, contentText)
+    DeveloperToolEditor("content", context, configuration, project,"Content", DeveloperToolEditor.EditorMode.INPUT, parentDisposable, contentText)
       .onTextChangeFromUi { generate() }
 
   private fun exportToFile(fileFormat: String) {
@@ -237,157 +239,147 @@ internal class BarcodeGenerator private constructor(
   @Suppress("unused")
   private enum class Format(
     val title: String,
-    val createConfiguration: (DeveloperToolConfiguration, Disposable) -> FormatConfiguration
+    val createConfiguration: (DeveloperToolConfiguration) -> FormatConfiguration
   ) {
 
-    AZTEC("Aztec 2D", { configuration, parentDisposable ->
-      AztecCodeConfiguration(configuration, parentDisposable)
+    AZTEC("Aztec 2D", { configuration ->
+      AztecCodeConfiguration(configuration)
     }),
 
-    QR_CODE("QR Code 2D", { configuration, parentDisposable ->
-      QrCodeConfiguration(configuration, parentDisposable)
+    QR_CODE("QR Code 2D", { configuration ->
+      QrCodeConfiguration(configuration)
     }),
 
     DATA_MATRIX(
-      "Data Matrix 2D", { configuration, parentDisposable ->
-        DataMatrixConfiguration(configuration, parentDisposable)
+      "Data Matrix 2D", { configuration ->
+        DataMatrixConfiguration(configuration)
       }
     ),
 
-    PDF_417("PDF417", { configuration, parentDisposable ->
-      Pdf417FormatConfiguration(configuration, parentDisposable)
+    PDF_417("PDF417", { configuration ->
+      Pdf417FormatConfiguration(configuration)
     }),
 
     CODE_39(
-      "Code 39 1D", { configuration, parentDisposable ->
+      "Code 39 1D", { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODE_39,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10,
-          parentDisposable = parentDisposable
+          defaultMargin = 10
         )
       }
     ),
 
     CODE_93(
-      "Code 93 1D", { configuration, parentDisposable ->
+      "Code 93 1D", { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODE_93,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10,
-          parentDisposable = parentDisposable
+          defaultMargin = 10
         )
       }
     ),
 
     CODE_128(
-      "Code 128 1D", { configuration, parentDisposable ->
+      "Code 128 1D", { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODE_128,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10,
-          parentDisposable = parentDisposable
+          defaultMargin = 10
         )
       }
     ),
 
     EAN_8(
-      "EAN-8 1D", { configuration, parentDisposable ->
+      "EAN-8 1D", { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.EAN_8,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10,
-          parentDisposable = parentDisposable
+          defaultMargin = 10
         )
       }
     ),
 
     EAN_13(
-      "EAN-13 1D", { configuration, parentDisposable ->
+      "EAN-13 1D", { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.EAN_13,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10,
-          parentDisposable = parentDisposable
+          defaultMargin = 10
         )
       }
     ),
 
     ITF(
-      "ITF (Interleaved Two of Five) 1D", { configuration, parentDisposable ->
+      "ITF (Interleaved Two of Five) 1D", { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.ITF,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10,
-          parentDisposable = parentDisposable
+          defaultMargin = 10
         )
       }
     ),
 
     CODABAR(
-      "CODABAR 1D", { configuration, parentDisposable ->
+      "CODABAR 1D", { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODABAR,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10,
-          parentDisposable = parentDisposable
+          defaultMargin = 10
         )
       }
     ),
 
     UPC_A(
-      "UPC-A 1D", { configuration, parentDisposable ->
+      "UPC-A 1D", { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.UPC_A,
           configuration = configuration,
           supportsHeight = true,
-          defaultHeight = 50,
-          parentDisposable = parentDisposable
+          defaultHeight = 50
         )
       }
     ),
 
     UPC_E(
-      "UPC-E 1D", { configuration, parentDisposable ->
+      "UPC-E 1D", { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.UPC_E,
           configuration = configuration,
           supportsHeight = true,
-          defaultHeight = 50,
-          parentDisposable = parentDisposable
+          defaultHeight = 50
         )
       }
     ),
 
     UPC_EAN_EXTENSION(
-      "UPC/EAN extension", { configuration, parentDisposable ->
+      "UPC/EAN extension", { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.UPC_EAN_EXTENSION,
           configuration = configuration,
           supportsHeight = true,
-          defaultHeight = 50,
-          parentDisposable = parentDisposable
+          defaultHeight = 50
         )
       }
     );
@@ -401,7 +393,6 @@ internal class BarcodeGenerator private constructor(
   private open class FormatConfiguration(
     val barcodeFormat: BarcodeFormat,
     configuration: DeveloperToolConfiguration,
-    private val parentDisposable: Disposable,
     private val supportsWidth: Boolean = false,
     defaultWidth: Int = 250,
     private val supportsHeight: Boolean = false,
@@ -470,7 +461,7 @@ internal class BarcodeGenerator private constructor(
 
     open fun createHints(): Map<EncodeHintType, Any> {
       val hints = mutableMapOf<EncodeHintType, Any>()
-
+      hints[EncodeHintType.CHARACTER_SET] = "utf-8"
       if (supportsErrorCorrection == LEVEL_ENUM_NAME) {
         hints[EncodeHintType.ERROR_CORRECTION] = errorCorrection.get().level.name
       }
@@ -496,20 +487,18 @@ internal class BarcodeGenerator private constructor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class Pdf417FormatConfiguration(
-    configuration: DeveloperToolConfiguration,
-    parentDisposable: Disposable
+    configuration: DeveloperToolConfiguration
   ) : FormatConfiguration(
     barcodeFormat = BarcodeFormat.PDF_417,
     configuration = configuration,
-    supportsHeight = true,
-    defaultHeight = 50,
     supportsWidth = true,
     defaultWidth = 250,
+    supportsHeight = true,
+    defaultHeight = 50,
     supportsMargin = true,
     defaultMargin = 5,
     supportsErrorCorrection = LEVEL_BITS,
-    comment = "The actual size will be calculated on a scale factor which is based on the relationship between the width and height value. Use a larger height than width value to rotate the barcode.",
-    parentDisposable = parentDisposable
+    comment = "The actual size will be calculated on a scale factor which is based on the relationship between the width and height value. Use a larger height than width value to rotate the barcode."
   ) {
 
     private val useCompactMode = configuration.register("${BarcodeFormat.PDF_417}-compactMode", false)
@@ -601,8 +590,7 @@ internal class BarcodeGenerator private constructor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class AztecCodeConfiguration(
-    configuration: DeveloperToolConfiguration,
-    parentDisposable: Disposable
+    configuration: DeveloperToolConfiguration
   ) :
     FormatConfiguration(
       barcodeFormat = BarcodeFormat.AZTEC,
@@ -611,8 +599,7 @@ internal class BarcodeGenerator private constructor(
       defaultWidth = 250,
       supportsHeight = true,
       defaultHeight = 250,
-      supportsErrorCorrection = LEVEL_BITS,
-      parentDisposable = parentDisposable
+      supportsErrorCorrection = LEVEL_BITS
     ) {
 
     private val layers = configuration.register("${BarcodeFormat.AZTEC}-layers", 0)
@@ -641,8 +628,7 @@ internal class BarcodeGenerator private constructor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class QrCodeConfiguration(
-    configuration: DeveloperToolConfiguration,
-    parentDisposable: Disposable
+    configuration: DeveloperToolConfiguration
   ) : FormatConfiguration(
     barcodeFormat = BarcodeFormat.QR_CODE,
     configuration = configuration,
@@ -652,8 +638,7 @@ internal class BarcodeGenerator private constructor(
     defaultHeight = 200,
     supportsMargin = true,
     defaultMargin = 0,
-    supportsErrorCorrection = LEVEL_ENUM_NAME,
-    parentDisposable = parentDisposable
+    supportsErrorCorrection = LEVEL_ENUM_NAME
   ) {
 
     private val version = configuration.register("${BarcodeFormat.QR_CODE}-version", 0)
@@ -709,16 +694,14 @@ internal class BarcodeGenerator private constructor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class DataMatrixConfiguration(
-    configuration: DeveloperToolConfiguration,
-    parentDisposable: Disposable
+    configuration: DeveloperToolConfiguration
   ) : FormatConfiguration(
     barcodeFormat = BarcodeFormat.DATA_MATRIX,
     configuration = configuration,
     supportsWidth = true,
     defaultWidth = 250,
     supportsHeight = true,
-    defaultHeight = 250,
-    parentDisposable = parentDisposable
+    defaultHeight = 250
   ) {
 
     private val compactMode = configuration.register("${BarcodeFormat.DATA_MATRIX}-compactMode", false)
@@ -871,19 +854,20 @@ internal class BarcodeGenerator private constructor(
 
   class Factory : DeveloperToolFactory<BarcodeGenerator> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "QR Code/Barcode",
       contentTitle = "QR Code/Barcode Generator"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> BarcodeGenerator) = { configuration ->
       val formats: Map<Format, FormatConfiguration> = Format.values().associateWith {
-        it.createConfiguration(configuration, parentDisposable)
+        it.createConfiguration(configuration)
       }
-      BarcodeGenerator(formats, configuration, project, parentDisposable)
+      BarcodeGenerator(formats, context, configuration, project, parentDisposable)
     }
   }
 

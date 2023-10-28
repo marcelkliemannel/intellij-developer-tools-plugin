@@ -26,8 +26,6 @@ class DeveloperToolConfiguration(
   private val changeListeners = CopyOnWriteArrayList<ChangeListener>()
   var isResetting = false
     internal set
-  val hasChanges: Boolean
-    get() = properties.values.any { it.valueChanged }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
@@ -56,8 +54,10 @@ class DeveloperToolConfiguration(
     isResetting = true
     try {
       properties.filter { type == null || it.value.type == type }
-        .forEach { (_, property) -> property.reset(loadExamples) }
-      fireConfigurationChanged()
+        .forEach { (_, property) ->
+          property.reset(loadExamples)
+          fireConfigurationChanged(property.reference)
+        }
     }
     finally {
       isResetting = false
@@ -75,7 +75,7 @@ class DeveloperToolConfiguration(
     }
 
     @Suppress("UNCHECKED_CAST")
-    return property.valueProperty as ValueProperty<T>
+    return property.reference as ValueProperty<T>
   }
 
   private fun <T : Any> createNewProperty(
@@ -94,25 +94,23 @@ class DeveloperToolConfiguration(
     }
     properties[key] = PropertyContainer(
       key = key,
-      valueProperty = valueProperty,
+      reference = valueProperty,
       defaultValue = defaultValue,
       example = example,
-      type = propertyType,
-      valueChanged = existingProperty != null
+      type = propertyType
     )
     return valueProperty
   }
 
-  private fun fireConfigurationChanged() {
-    changeListeners.forEach { it.configurationChanged() }
+  private fun fireConfigurationChanged(property: ValueProperty<out Any>) {
+    changeListeners.forEach { it.configurationChanged(property) }
   }
 
   private fun <T : Any?> handlePropertyChange(key: String): (ValueProperty.ChangeEvent<T>) -> Unit = { event ->
     val newValue = event.newValue
     if (event.oldValue != newValue) {
       properties[key]?.let { property ->
-        property.valueChanged = property.defaultValue != newValue && property.example != newValue
-        fireConfigurationChanged()
+        fireConfigurationChanged(property.reference)
       } ?: error("Unknown property: $key")
     }
   }
@@ -121,17 +119,20 @@ class DeveloperToolConfiguration(
 
   internal data class PropertyContainer(
     val key: String,
-    val valueProperty: ValueProperty<out Any>,
+    val reference: ValueProperty<out Any>,
     val defaultValue: Any,
     val example: Any?,
-    val type: PropertyType,
-    var valueChanged: Boolean
+    val type: PropertyType
   ) {
 
     fun reset(loadExamples: Boolean) {
       val value = if (example != null && loadExamples) example else defaultValue
-      valueProperty.setWithUncheckedCast(value)
-      valueChanged = false
+      reference.setWithUncheckedCast(value)
+    }
+
+    fun valueChanged(): Boolean {
+      val value = reference.get()
+      return defaultValue != value && example != value
     }
   }
 
@@ -148,7 +149,7 @@ class DeveloperToolConfiguration(
 
   interface ChangeListener {
 
-    fun configurationChanged()
+    fun configurationChanged(property: ValueProperty<out Any>)
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

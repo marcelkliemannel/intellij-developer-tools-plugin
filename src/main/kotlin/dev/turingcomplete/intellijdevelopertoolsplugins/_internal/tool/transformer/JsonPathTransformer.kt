@@ -3,6 +3,8 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer
 
 import com.fasterxml.jackson.databind.node.ArrayNode
+import com.intellij.codeInsight.actions.RearrangeCodeProcessor
+import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.icons.AllIcons
 import com.intellij.json.JsonLanguage
 import com.intellij.openapi.Disposable
@@ -13,6 +15,8 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.psi.PsiManager
+import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBLabel
@@ -20,7 +24,10 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.LabelPosition
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.util.ui.UIUtil
 import com.jayway.jsonpath.Configuration
@@ -29,31 +36,39 @@ import com.jayway.jsonpath.JsonPathException
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.objectMapper
 import javax.swing.JComponent
 
 class JsonPathTransformer(
+  context: DeveloperToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
+  project: Project?
 ) : TextTransformer(
   textTransformerContext = TextTransformerContext(
     transformActionTitle = "Execute Query",
     sourceTitle = "Original",
     resultTitle = "Result",
     initialSourceExampleText = EXAMPLE_SOURCE,
-    initialLanguage = JsonLanguage.INSTANCE
+    inputInitialLanguage = JsonLanguage.INSTANCE,
+    outputInitialLanguage = JsonLanguage.INSTANCE
   ),
+  context = context,
   configuration = configuration,
-  parentDisposable = parentDisposable
+  parentDisposable = parentDisposable,
+  project = project
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val queryText = configuration.register("contentText", "", INPUT, EXAMPLE_QUERY)
+  private val formatResult = configuration.register("formatResult", true, CONFIGURATION)
   private var errorHolder = ErrorHolder()
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
@@ -61,18 +76,24 @@ class JsonPathTransformer(
 
   override fun Panel.buildMiddleConfigurationUi() {
     row {
-      textField()
+      expandableTextField()
         .bindText(queryText)
         .label("JSON path:", LabelPosition.TOP)
         .validationOnApply(errorHolder.asValidation())
         .align(Align.FILL)
         .resizableColumn()
         .gap(RightGap.SMALL)
-        .whenTextChangedFromUi { configurationChanged() }
+        .whenTextChangedFromUi { configurationChanged(queryText) }
       lateinit var helpButton: JComponent
       helpButton = actionButton(ShowOperatorsHelpPopup { helpButton })
         .component
     }
+  }
+
+  override fun Row.buildAdditionalActionsUi() {
+    checkBox("Format result")
+      .bindSelected(formatResult)
+      .whenStateChangedFromUi { configurationChanged(queryText) }
   }
 
   override fun transform() {
@@ -84,13 +105,23 @@ class JsonPathTransformer(
     }
 
     try {
-      val result = JsonPath.parse(sourceText.get(), jsonPathConfiguration).read<Any>(query)
-      resultText.set(
-        when (result) {
-          is ArrayNode -> objectMapper.writeValueAsString(result)
-          else -> result.toString()
-        }
-      )
+      val resultJsonText = when (val resultJsonNode = JsonPath.parse(sourceText.get(), jsonPathConfiguration).read<Any>(query)) {
+        is ArrayNode -> objectMapper.writeValueAsString(resultJsonNode)
+        else -> resultJsonNode.toString()
+      }
+      if (formatResult.get()) {
+        val workingVirtualFile = LightVirtualFile(this.javaClass.canonicalName, JsonLanguage.INSTANCE, resultJsonText)
+        PsiManager.getInstance(project!!).findFile(workingVirtualFile)?.let { workingPsiFile ->
+          val processor = RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))
+          processor.setPostRunnable {
+            resultText.set(workingPsiFile.text)
+          }
+          processor.run()
+        } ?: error("snh: Can't get PSI file for `LightVirtualFile`")
+      }
+      else {
+        resultText.set(resultJsonText)
+      }
     } catch (e: JsonPathException) {
       errorHolder.add(e)
     }
@@ -105,16 +136,17 @@ class JsonPathTransformer(
 
   class Factory : DeveloperToolFactory<JsonPathTransformer> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "JSON Path",
       contentTitle = "JSON Path Transformer"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> JsonPathTransformer) = { configuration ->
-      JsonPathTransformer(configuration, parentDisposable)
+      JsonPathTransformer(context, configuration, parentDisposable, project)
     }
   }
 

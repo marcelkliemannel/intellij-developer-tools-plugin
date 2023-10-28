@@ -16,6 +16,7 @@ import com.intellij.ui.layout.ComboBoxPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ValidateMinIntValueSide.MAX
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ValidateMinIntValueSide.MIN
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.bindIntTextImproved
@@ -28,11 +29,17 @@ import java.security.SecureRandom
 import kotlin.math.max
 import kotlin.math.min
 
-class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
-  MultiLineTextGenerator(
+class LoremIpsumGenerator(
+  project: Project?,
+  context: DeveloperToolContext,
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) : MultiLineTextGenerator(
     generatedTextTitle = "Generated lorem ipsum",
     configuration = configuration,
-    parentDisposable = parentDisposable
+    parentDisposable = parentDisposable,
+    context = context,
+    project = project
   ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -236,16 +243,17 @@ class LoremIpsumGenerator(configuration: DeveloperToolConfiguration, parentDispo
 
   class Factory : DeveloperToolFactory<LoremIpsumGenerator> {
 
-    override fun getDeveloperToolContext() = DeveloperToolContext(
+    override fun getDeveloperToolPresentation() = DeveloperToolPresentation(
       menuTitle = "Lorem Ipsum",
       contentTitle = "Lorem Ipsum Generator"
     )
 
     override fun getDeveloperToolCreator(
       project: Project?,
-      parentDisposable: Disposable
+      parentDisposable: Disposable,
+      context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> LoremIpsumGenerator) = { configuration ->
-      LoremIpsumGenerator(configuration, parentDisposable)
+      LoremIpsumGenerator(project, context, configuration, parentDisposable)
     }
   }
 

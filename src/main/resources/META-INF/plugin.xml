@@ -169,6 +169,11 @@ The main dialog with all tools is available through:
             id="sql-formatting"
             groupId="formatting"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.SqlFormattingTransformer$Factory"/>
+    <developerTool
+            id="cli-command-converter"
+            groupId="formatting"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.CliCommandConverter$Factory"/>
+
 
     <!-- root level -->
     <developerTool

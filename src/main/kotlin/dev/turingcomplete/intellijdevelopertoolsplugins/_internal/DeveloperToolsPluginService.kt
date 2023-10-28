@@ -24,7 +24,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.MainDialog
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
-import io.ktor.util.reflect.*
 import java.security.Provider
 import java.security.Security
 import java.util.*
@@ -49,6 +48,10 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   val saveInputs: ValueProperty<Boolean> = ValueProperty(SAVE_INPUTS_DEFAULT)
   val saveSecrets: ValueProperty<Boolean> = ValueProperty(SAVE_SECRETS_DEFAULT)
   val dialogIsModal: ValueProperty<Boolean> = ValueProperty(DIALOG_IS_MODAL_DEFAULT)
+  val editorSoftWraps: ValueProperty<Boolean> = ValueProperty(EDITOR_SOFT_WRAPS_DEFAULT)
+  val editorShowSpecialCharacters: ValueProperty<Boolean> = ValueProperty(EDITOR_SHOW_SPECIA_CHARACTERS_DEFAULT)
+  val editorShowWhitespaces: ValueProperty<Boolean> = ValueProperty(EDITOR_SHOW_WHITESPACES_DEFAULT)
+
   var expandedGroupNodeIds: MutableSet<String>? = null
     private set
 
@@ -92,7 +95,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     val stateDeveloperToolsConfigurations = developerToolsConfigurations.asSequence()
       .flatMap { (developerToolId, developerToolConfigurations) ->
         developerToolConfigurations
-          .filter { it.properties.any { (_, property) -> property.valueChanged } }
+          .filter { it.properties.any { (_, property) -> property.valueChanged() } }
           .map { createDeveloperToolConfigurationState(developerToolId, it) }
       }.toList()
 
@@ -103,6 +106,9 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
       saveInputs = saveInputs.get(),
       saveSecrets = saveSecrets.get(),
       dialogIsModal = dialogIsModal.get(),
+      editorSoftWraps = editorSoftWraps.get(),
+      editorShowSpecialCharacters = editorShowSpecialCharacters.get(),
+      editorShowWhitespaces = editorShowWhitespaces.get(),
       expandedGroupNodeIds = expandedGroupNodeIds?.toList()
     )
   }
@@ -113,6 +119,9 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     saveInputs.set(state.saveInputs ?: SAVE_INPUTS_DEFAULT)
     saveSecrets.set(state.saveInputs ?: SAVE_SECRETS_DEFAULT)
     dialogIsModal.set(state.dialogIsModal ?: DIALOG_IS_MODAL_DEFAULT)
+    editorSoftWraps.set(state.editorSoftWraps ?: EDITOR_SOFT_WRAPS_DEFAULT)
+    editorShowSpecialCharacters.set(state.editorShowSpecialCharacters ?: EDITOR_SHOW_SPECIA_CHARACTERS_DEFAULT)
+    editorShowWhitespaces.set(state.editorShowWhitespaces ?: EDITOR_SHOW_WHITESPACES_DEFAULT)
     setExpandedGroupNodeIds(state.expandedGroupNodeIds?.toSet() ?: emptySet())
 
     developerToolsConfigurations.clear()
@@ -154,7 +163,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     name = developerToolConfiguration.name,
     properties = developerToolConfiguration
       .properties
-      .filter { (_, property) -> property.valueChanged }
+      .filter { (_, property) -> property.valueChanged() }
       .filter { (_, property) -> !(!saveInputs.get() && property.type != INPUT) }
       .filter { (_, property) -> !(!saveSecrets.get() && property.type != SECRET) }
       .map { (key, property) ->
@@ -169,11 +178,11 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
   ): DeveloperToolConfigurationProperty {
     return when (property.type) {
       CONFIGURATION, INPUT ->
-        DeveloperToolConfigurationProperty(key = key, value = property.valueProperty.get(), type = property.type)
+        DeveloperToolConfigurationProperty(key = key, value = property.reference.get(), type = property.type)
 
       SECRET -> {
         val credentialAttribute = createPropertyCredentialAttribute(developerToolId = developerToolId, propertyKey = key)
-        PasswordSafe.instance.set(credentialAttribute, Credentials(null, property.valueProperty.get() as String))
+        PasswordSafe.instance.set(credentialAttribute, Credentials(null, property.reference.get() as String))
         DeveloperToolConfigurationProperty(key = key, value = "*******", type = property.type)
       }
     }
@@ -235,6 +244,12 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     var saveSecrets: Boolean? = null,
     @get:Attribute("dialogIsModal")
     var dialogIsModal: Boolean? = null,
+    @get:Attribute("editorSoftWraps")
+    var editorSoftWraps: Boolean? = null,
+    @get:Attribute("editorShowSpecialCharacters")
+    var editorShowSpecialCharacters: Boolean? = null,
+    @get:Attribute("editorShowWhitespaces")
+    var editorShowWhitespaces: Boolean? = null,
     @get:XCollection(style = v2, elementName = "expandedGroupNodeId")
     var expandedGroupNodeIds: List<String>? = null,
   )
@@ -371,6 +386,9 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     const val SAVE_INPUTS_DEFAULT = true
     const val SAVE_SECRETS_DEFAULT = true
     const val SAVE_CONFIGURATION_DEFAULT = true
+    const val EDITOR_SOFT_WRAPS_DEFAULT = true
+    const val EDITOR_SHOW_SPECIA_CHARACTERS_DEFAULT = false
+    const val EDITOR_SHOW_WHITESPACES_DEFAULT = false
 
     var lastSelectedContentNodeId by instance.lastSelectedContentNodeId
     var loadExamples by instance.loadExamples
@@ -378,5 +396,8 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     var saveInputs by instance.saveInputs
     var saveSecrets by instance.saveSecrets
     val dialogIsModal by instance.dialogIsModal
+    val editorSoftWraps by instance.editorSoftWraps
+    val editorShowSpecialCharacters by instance.editorShowSpecialCharacters
+    val editorShowWhitespaces by instance.editorShowWhitespaces
   }
 }

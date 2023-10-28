@@ -1,7 +1,10 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter
 
+import com.intellij.icons.AllIcons
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.observable.properties.AtomicProperty
+import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
@@ -12,26 +15,32 @@ import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.PropertyComponentPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.SOURCE
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.TextConverter.ActiveInput.TARGET
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 
 internal abstract class TextConverter(
   protected val textConverterContext: TextConverterContext,
   protected val configuration: DeveloperToolConfiguration,
+  protected val context: DeveloperToolContext,
+  protected val project: Project?,
   parentDisposable: Disposable
 ) : DeveloperTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)
-  protected var sourceText = configuration.register("sourceText", "", INPUT)
-  protected var targetText = configuration.register("targetText", "", INPUT)
+  protected var sourceText = configuration.register("sourceText", textConverterContext.defaultSourceText, INPUT)
+  protected var targetText = configuration.register("targetText", textConverterContext.defaultTargetText, INPUT)
 
   private val conversationAlarm by lazy { Alarm(parentDisposable) }
 
-  private var lastActiveInput: ActiveInput? = null
+  private var lastActiveInput = AtomicProperty(SOURCE)
+  private val toSourceActive = PropertyComponentPredicate(lastActiveInput, TARGET)
 
   private val sourceEditor by lazy { createSourceEditor() }
   private val targetEditor by lazy { createTargetEditor() }
@@ -40,7 +49,7 @@ internal abstract class TextConverter(
 
   init {
     liveConversion.afterChange(parentDisposable) {
-      handleLiveConversionSwitch()
+      liveTransformToLastActiveInput()
     }
   }
 
@@ -94,8 +103,12 @@ internal abstract class TextConverter(
 
   abstract fun toSource(text: String)
 
-  override fun configurationChanged() {
-    transformToTarget()
+  fun targetText(): String = targetText.get()
+
+  fun sourceText(): String = sourceText.get()
+
+  override fun configurationChanged(property: ValueProperty<out Any>) {
+    liveTransformToLastActiveInput()
   }
 
   override fun activated() {
@@ -113,6 +126,14 @@ internal abstract class TextConverter(
       row {
         val liveConversionCheckBox = checkBox("Live conversion")
           .bindSelected(liveConversion)
+          .gap(RightGap.SMALL)
+        icon(AllIcons.General.ArrowUp)
+          .visibleIf(toSourceActive)
+          .enabledIf(liveConversion)
+          .gap(RightGap.SMALL)
+        icon(AllIcons.General.ArrowDown)
+          .visibleIf(toSourceActive.not())
+          .enabledIf(liveConversion)
           .gap(RightGap.SMALL)
 
         button("▼ ${textConverterContext.convertActionTitle}") { transformToTarget() }
@@ -159,9 +180,13 @@ internal abstract class TextConverter(
 
   private fun createSourceEditor() =
     DeveloperToolEditor(
+      id = "source",
       title = textConverterContext.sourceTitle,
       editorMode = INPUT_OUTPUT,
       parentDisposable = parentDisposable,
+      configuration = configuration,
+      context = context,
+      project = project,
       textProperty = sourceText,
       diffSupport = textConverterContext.diffSupport?.let { diffSupport ->
         DeveloperToolEditor.DiffSupport(
@@ -172,11 +197,11 @@ internal abstract class TextConverter(
       }
     ).apply {
       onFocusGained {
-        lastActiveInput = SOURCE
+        lastActiveInput.set(SOURCE)
       }
       this.onTextChangeFromUi { text ->
         if (liveConversion.get()) {
-          lastActiveInput = SOURCE
+          lastActiveInput.set(SOURCE)
           doToTarget(text)
         }
       }
@@ -184,9 +209,13 @@ internal abstract class TextConverter(
 
   private fun createTargetEditor(): DeveloperToolEditor {
     return DeveloperToolEditor(
+      id = "target",
       title = textConverterContext.targetTitle,
       editorMode = INPUT_OUTPUT,
       parentDisposable = parentDisposable,
+      configuration = configuration,
+      context = context,
+      project = project,
       textProperty = targetText,
       diffSupport = textConverterContext.diffSupport?.let { diffSupport ->
         DeveloperToolEditor.DiffSupport(
@@ -197,25 +226,24 @@ internal abstract class TextConverter(
       }
     ).apply {
       onFocusGained {
-        lastActiveInput = TARGET
+        lastActiveInput.set(TARGET)
       }
       this.onTextChangeFromUi { text ->
         if (liveConversion.get()) {
-          lastActiveInput = TARGET
+          lastActiveInput.set(TARGET)
           doToSource(text)
         }
       }
     }
   }
 
-  private fun handleLiveConversionSwitch() {
+  private fun liveTransformToLastActiveInput() {
     if (liveConversion.get()) {
       // Trigger a text change. So if the text was changed in manual mode, it
       // will now be converted once during the switch to live mode.
-      when (lastActiveInput) {
+      when (lastActiveInput.get()) {
         SOURCE -> transformToTarget()
         TARGET -> transformToSource()
-        null -> {}
       }
     }
   }
@@ -237,7 +265,9 @@ internal abstract class TextConverter(
     val targetTitle: String,
     val sourceErrorHolder: ErrorHolder? = null,
     val targetErrorHolder: ErrorHolder? = null,
-    val diffSupport: DiffSupport? = null
+    val diffSupport: DiffSupport? = null,
+    val defaultSourceText: String = "",
+    val defaultTargetText: String = ""
   )
 
   data class DiffSupport(

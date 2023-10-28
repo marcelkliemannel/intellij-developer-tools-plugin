@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.observable.properties.AtomicProperty
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.BottomGap
@@ -20,6 +21,7 @@ import com.intellij.util.Alarm
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.BooleanComponentPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyAction.Companion.CONTENT_DATA_KEY
@@ -29,9 +31,12 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ToolBar
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toMonospace
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.wrapWithToolBar
+import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import org.apache.commons.text.StringEscapeUtils
 
 abstract class OneLineTextGenerator(
+  private val project: Project?,
+  private val context: DeveloperToolContext,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   initialGeneratedTextTitle: String = "Generated text:"
@@ -68,7 +73,7 @@ abstract class OneLineTextGenerator(
     configuration.removeChangeListener(this)
   }
 
-  override fun configurationChanged() {
+  override fun configurationChanged(property: ValueProperty<out Any>) {
     if (!isDisposed && !configuration.isResetting) {
       doGenerate()
     }
@@ -114,7 +119,9 @@ abstract class OneLineTextGenerator(
 
   private fun Panel.buildBulkGenerationUi() {
     collapsibleGroup("Bulk Generation", false) {
-      val resultEditor = DeveloperToolEditor(title = null, editorMode = OUTPUT, parentDisposable)
+      val resultEditor = DeveloperToolEditor(id = "bulk-generation", title = null, editorMode = OUTPUT,
+                                             configuration = configuration, project = project, context = context,
+                                             parentDisposable = parentDisposable)
 
       row {
         label("Number of values:").gap(RightGap.SMALL)
