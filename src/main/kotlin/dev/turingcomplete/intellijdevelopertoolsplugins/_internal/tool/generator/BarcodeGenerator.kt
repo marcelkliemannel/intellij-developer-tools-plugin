@@ -461,7 +461,7 @@ internal class BarcodeGenerator private constructor(
 
     open fun createHints(): Map<EncodeHintType, Any> {
       val hints = mutableMapOf<EncodeHintType, Any>()
-
+      hints[EncodeHintType.CHARACTER_SET] = "utf-8"
       if (supportsErrorCorrection == LEVEL_ENUM_NAME) {
         hints[EncodeHintType.ERROR_CORRECTION] = errorCorrection.get().level.name
       }
