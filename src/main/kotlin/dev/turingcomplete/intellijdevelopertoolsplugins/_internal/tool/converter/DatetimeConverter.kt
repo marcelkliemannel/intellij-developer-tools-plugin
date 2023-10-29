@@ -57,6 +57,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle.FULL_STANDALONE
 import java.time.temporal.ChronoField
@@ -343,14 +344,12 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
         UNIX_TIMESTAMP_SECONDS -> {
           val timestampAtSelectedTimeZone = Instant.ofEpochSecond(unixTimeStampSeconds)
             .atZone(selectedTimeZoneId())
-            .toLocalDateTime()
           setConvertedValues(timestampAtSelectedTimeZone, conversionOrigin)
         }
 
         TIME_ZONE, UNIX_TIMESTAMP_MILLIS -> {
           val timestampAtSelectedTimeZone = Instant.ofEpochMilli(unixTimeStampMillis)
             .atZone(selectedTimeZoneId())
-            .toLocalDateTime()
           setConvertedValues(timestampAtSelectedTimeZone, conversionOrigin)
         }
 
@@ -362,7 +361,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
           val minute = minuteTextField.text.toInt()
           val second = secondTextField.text.toInt()
 
-          val localDateTime = LocalDateTime.of(year, month, day, hour, minute, second)
+          val localDateTime = ZonedDateTime.of(year, month, day, hour, minute, second, 0, selectedTimeZoneId())
           setConvertedValues(localDateTime, conversionOrigin)
         }
       }
@@ -376,8 +375,8 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     }
   }
 
-  private fun setConvertedValues(localDateTime: LocalDateTime, conversionOrigin: ConversionOrigin) {
-    val millis = localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli()
+  private fun setConvertedValues(localDateTime: ZonedDateTime, conversionOrigin: ConversionOrigin) {
+    val millis = localDateTime.withZoneSameInstant(ZoneOffset.UTC).toInstant().toEpochMilli()
     if (conversionOrigin != UNIX_TIMESTAMP_SECONDS) {
       unixTimeStampSecondsTextField.text = millis.div(1000).toString()
     }
@@ -412,7 +411,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     formattedText.set(formatDateTime(localDateTime).ifBlank { "No result" })
   }
 
-  private fun formatDateTime(localDateTime: LocalDateTime): String =
+  private fun formatDateTime(localDateTime: ZonedDateTime): String =
     try {
       val formatter = if (formattedIndividual.get()) {
         DateTimeFormatter.ofPattern(formattedIndividualFormat.get())
@@ -424,7 +423,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
           .withLocale(formattedLocale.get().locale)
           .withZone(formattedStandardFormat.get().fixedTimeZone ?: selectedTimeZoneId())
       }
-      localDateTime.atZone(selectedTimeZoneId()).format(formatter)
+      localDateTime.format(formatter)
     } catch (e: Exception) {
       "Error: ${e.message}"
     }
