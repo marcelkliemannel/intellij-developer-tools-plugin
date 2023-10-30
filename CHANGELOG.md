@@ -10,6 +10,11 @@
 
 ### Fixed
 
+## [2.0.1] - 2023-10-30
+
+### Removed
+- Remove not fully implemented JSON path library switch
+
 ## 2.0.0 - 2023-10-28
 
 ### Added
