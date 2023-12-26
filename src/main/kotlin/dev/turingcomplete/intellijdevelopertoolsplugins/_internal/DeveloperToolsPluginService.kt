@@ -395,9 +395,9 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     var saveConfiguration by instance.saveConfiguration
     var saveInputs by instance.saveInputs
     var saveSecrets by instance.saveSecrets
-    val dialogIsModal by instance.dialogIsModal
-    val editorSoftWraps by instance.editorSoftWraps
-    val editorShowSpecialCharacters by instance.editorShowSpecialCharacters
-    val editorShowWhitespaces by instance.editorShowWhitespaces
+    var dialogIsModal by instance.dialogIsModal
+    var editorSoftWraps by instance.editorSoftWraps
+    var editorShowSpecialCharacters by instance.editorShowSpecialCharacters
+    var editorShowWhitespaces by instance.editorShowWhitespaces
   }
 }

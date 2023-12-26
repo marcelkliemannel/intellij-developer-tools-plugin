@@ -26,9 +26,10 @@ class ConfigurationContentPanel {
         DeveloperToolsPluginService.saveInputs = DeveloperToolsPluginService.SAVE_INPUTS_DEFAULT
         DeveloperToolsPluginService.saveSecrets = DeveloperToolsPluginService.SAVE_SECRETS_DEFAULT
         DeveloperToolsPluginService.loadExamples = DeveloperToolsPluginService.LOAD_EXAMPLES_DEFAULT
-        DeveloperToolsPluginService.loadExamples = DeveloperToolsPluginService.LOAD_EXAMPLES_DEFAULT
-        DeveloperToolsPluginService.loadExamples = DeveloperToolsPluginService.LOAD_EXAMPLES_DEFAULT
-        DeveloperToolsPluginService.loadExamples = DeveloperToolsPluginService.LOAD_EXAMPLES_DEFAULT
+        DeveloperToolsPluginService.dialogIsModal = DeveloperToolsPluginService.DIALOG_IS_MODAL_DEFAULT
+        DeveloperToolsPluginService.editorSoftWraps = DeveloperToolsPluginService.EDITOR_SOFT_WRAPS_DEFAULT
+        DeveloperToolsPluginService.editorShowWhitespaces = DeveloperToolsPluginService.EDITOR_SHOW_WHITESPACES_DEFAULT
+        DeveloperToolsPluginService.editorShowSpecialCharacters = DeveloperToolsPluginService.EDITOR_SHOW_SPECIA_CHARACTERS_DEFAULT
       }
     }
 

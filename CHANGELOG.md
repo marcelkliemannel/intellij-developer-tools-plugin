@@ -9,6 +9,7 @@
 ### Removed
 
 ### Fixed
+- Configuration reset does not reset default editor settings 
 
 ## 2.0.1 - 2023-10-30
 
