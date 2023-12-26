@@ -19,10 +19,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolFactoryEp
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.lastSelectedContentNodeId
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.uncheckedCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService.Companion.lastSelectedContentNodeId
 import javax.swing.JTree
 import javax.swing.event.TreeSelectionListener
 import javax.swing.plaf.TreeUI
@@ -167,8 +167,6 @@ internal class MainMenuTree(
         }
       }
     }
-
-    rootNode.add(ConfigurationNode())
 
     return Triple(rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode)
   }

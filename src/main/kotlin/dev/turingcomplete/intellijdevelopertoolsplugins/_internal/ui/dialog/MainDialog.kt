@@ -11,15 +11,13 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.content.ConfigurationContentPanel
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.content.DeveloperToolContentPanel
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.content.GroupContentPanel
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.MainMenuTree
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.ConfigurationNode
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.ContentNode
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.DeveloperToolNode
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.GroupNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.MainMenuTree
 import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -43,7 +41,6 @@ internal class MainDialog(private val project: Project?)
   private val contentPanel = BorderLayoutPanel()
   private val groupsPanels = mutableMapOf<String, GroupContentPanel>()
   private val developerToolsPanels = mutableMapOf<DeveloperToolNode, DeveloperToolContentPanel>()
-  private val configurationPanel = ConfigurationContentPanel()
   private lateinit var mainMenuTree: MainMenuTree
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
@@ -129,8 +126,6 @@ internal class MainDialog(private val project: Project?)
           is DeveloperToolNode -> {
             developerToolsPanels.getOrPut(new) { DeveloperToolContentPanel(new) }.also { it.selected() }
           }
-
-          is ConfigurationNode -> configurationPanel.panel
 
           else -> error("Unexpected menu node: ${new::class}")
         }

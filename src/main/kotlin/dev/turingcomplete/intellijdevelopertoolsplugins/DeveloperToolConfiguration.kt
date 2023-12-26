@@ -7,8 +7,8 @@ import com.intellij.openapi.util.Disposer
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.assertPersistableType
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService.Companion.assertPersistableType
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import java.util.*
@@ -68,7 +68,7 @@ class DeveloperToolConfiguration(
 
   private fun <T : Any> reuseExistingProperty(property: PropertyContainer): ValueProperty<T> {
     if ((property.type == INPUT && !DeveloperToolsPluginService.saveInputs)
-      || (property.type == CONFIGURATION && !DeveloperToolsPluginService.saveConfiguration)
+      || (property.type == CONFIGURATION && !DeveloperToolsPluginService.saveConfigurations)
       || (property.type == SECRET && !DeveloperToolsPluginService.saveSecrets)
     ) {
       property.reset(DeveloperToolsPluginService.loadExamples)

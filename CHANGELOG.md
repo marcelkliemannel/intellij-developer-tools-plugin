@@ -5,11 +5,13 @@
 ### Added
 
 ### Changed
+- Settings have been moved to IntelliJ's settings window
 
 ### Removed
 
 ### Fixed
-- Configuration reset does not reset default editor settings 
+- Configuration reset does not reset default editor settings
+- Setting "Remember configurations" wasn't persisted
 
 ## 2.0.1 - 2023-10-30
 

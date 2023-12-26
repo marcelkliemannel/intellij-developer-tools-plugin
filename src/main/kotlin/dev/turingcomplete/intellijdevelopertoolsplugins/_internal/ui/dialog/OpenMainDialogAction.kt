@@ -3,7 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.dialog
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareAction
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService
 import kotlin.concurrent.withLock
 
 class OpenMainDialogAction : DumbAwareAction() {

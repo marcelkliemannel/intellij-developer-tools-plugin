@@ -44,7 +44,12 @@ The main dialog with all tools is available through:
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationService
-            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService"/>
+            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService"/>
+    <applicationConfigurable
+            parentId="tools"
+            instance="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsConfigurable"
+            id="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsConfigurable"
+            displayName="Developer Tools"/>
   </extensions>
 
   <actions>

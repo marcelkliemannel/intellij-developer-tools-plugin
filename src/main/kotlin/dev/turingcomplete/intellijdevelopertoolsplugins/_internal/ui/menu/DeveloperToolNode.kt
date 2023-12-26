@@ -6,7 +6,7 @@ import com.intellij.openapi.util.Disposer
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService
 
 internal class DeveloperToolNode(
   private val developerToolId: String,
