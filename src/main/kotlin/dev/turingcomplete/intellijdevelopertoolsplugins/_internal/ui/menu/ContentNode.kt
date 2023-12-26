@@ -1,9 +1,15 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu
 
-internal class RootNode : ContentNode(
-  id = "root",
-  title = "Root"
-) {
+import javax.swing.Icon
+import javax.swing.tree.DefaultMutableTreeNode
+
+internal sealed class ContentNode(
+  val id: String,
+  val title: String,
+  val toolTipText: String? = null,
+  val icon: Icon? = null,
+  val isSecondaryNode: Boolean = false,
+) : DefaultMutableTreeNode(title) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //

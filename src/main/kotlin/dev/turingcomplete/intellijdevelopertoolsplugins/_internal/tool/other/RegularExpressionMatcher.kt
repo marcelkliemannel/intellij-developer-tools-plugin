@@ -45,7 +45,7 @@ import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
-import dev.turingcomplete.intellijbytecodeplugin._ui.CopyValuesAction
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT

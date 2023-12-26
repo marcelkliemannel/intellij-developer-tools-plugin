@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.dialog
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent

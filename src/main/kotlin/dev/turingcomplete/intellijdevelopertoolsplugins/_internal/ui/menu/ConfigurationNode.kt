@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu
 
 import com.intellij.icons.AllIcons
 

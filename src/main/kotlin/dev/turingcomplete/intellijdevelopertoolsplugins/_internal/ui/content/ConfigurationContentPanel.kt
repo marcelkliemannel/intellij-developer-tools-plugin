@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.content
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.ui.DialogPanel

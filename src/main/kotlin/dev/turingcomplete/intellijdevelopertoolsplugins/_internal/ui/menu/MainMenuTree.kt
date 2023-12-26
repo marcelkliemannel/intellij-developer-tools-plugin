@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu
 
 import com.intellij.ide.util.treeView.NodeRenderer
 import com.intellij.openapi.Disposable
@@ -23,11 +23,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperTools
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.lastSelectedContentNodeId
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.uncheckedCastTo
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ConfigurationNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ContentNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.DeveloperToolNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.GroupNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.RootNode
 import javax.swing.JTree
 import javax.swing.event.TreeSelectionListener
 import javax.swing.plaf.TreeUI

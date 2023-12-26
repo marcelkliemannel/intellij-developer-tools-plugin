@@ -32,8 +32,7 @@ class ValueProperty<T>(initialValue: T) : ObservableMutableProperty<T> {
   }
 
   fun set(value: T, changeId: String?, fireEvent: Boolean = true) {
-    val oldValue = this.value.get()
-    this.value.set(value)
+    val oldValue = this.value.getAndSet(value)
     if (fireEvent) {
       changeDispatcher.fireEvent(ChangeEvent(changeId, oldValue, value))
     }

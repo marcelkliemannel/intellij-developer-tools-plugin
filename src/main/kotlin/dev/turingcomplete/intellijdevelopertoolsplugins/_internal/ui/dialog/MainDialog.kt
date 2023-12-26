@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.dialog
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
@@ -12,10 +12,14 @@ import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ConfigurationNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ContentNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.DeveloperToolNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.GroupNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.content.ConfigurationContentPanel
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.content.DeveloperToolContentPanel
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.content.GroupContentPanel
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.MainMenuTree
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.ConfigurationNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.ContentNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.DeveloperToolNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.GroupNode
 import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.JPanel

@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.content
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -21,8 +21,8 @@ import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.NotBlankInputValidator
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.castedObject
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.DeveloperToolNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.DeveloperToolNode.DeveloperToolContainer
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.DeveloperToolNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.DeveloperToolNode.DeveloperToolContainer
 import javax.swing.Icon
 import javax.swing.JComponent
 

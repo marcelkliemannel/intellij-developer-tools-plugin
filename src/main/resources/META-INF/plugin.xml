@@ -48,8 +48,8 @@ The main dialog with all tools is available through:
   </extensions>
 
   <actions>
-    <action id="dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.OpenMainDialogAction"
-            class="dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.OpenMainDialogAction"
+    <action id="dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.dialog.OpenMainDialogAction"
+            class="dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.dialog.OpenMainDialogAction"
             text="Developer Tools"
             description="Provides various developer tools"
             icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg">

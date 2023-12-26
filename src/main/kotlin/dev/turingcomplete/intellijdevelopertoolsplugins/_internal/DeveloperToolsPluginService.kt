@@ -22,7 +22,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.MainDialog
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.dialog.MainDialog
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import java.security.Provider
 import java.security.Security
