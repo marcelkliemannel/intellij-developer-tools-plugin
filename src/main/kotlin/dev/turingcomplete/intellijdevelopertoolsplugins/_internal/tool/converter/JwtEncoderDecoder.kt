@@ -25,6 +25,7 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.TopGap
+import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
@@ -35,7 +36,6 @@ import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.ComboBoxPredicate
 import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
-import com.intellij.util.io.decodeBase64
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
@@ -44,7 +44,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
@@ -52,6 +51,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.SimpleT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.UiUtils
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.setValidationResultBorder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.toPrettyStringWithDefaultObjectMapper
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.ChangeOrigin.ENCODED
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.ChangeOrigin.HEADER_PAYLOAD
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.ChangeOrigin.SIGNATURE_CONFIGURATION
@@ -67,7 +67,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithm.RSA256
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithm.RSA384
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithm.RSA512
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithm.values
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithmKind.ECDSA
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithmKind.HMAC
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder.SignatureAlgorithmKind.RSA
@@ -133,6 +132,7 @@ internal class JwtEncoderDecoder(
     row {
       cell(encodedEditor.component)
         .validationOnApply(encodedEditor.bindValidator(jwt.encodedErrorHolder.asValidation()))
+        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
         .align(Align.FILL)
         .resizableColumn()
     }.bottomGap(BottomGap.NONE)
@@ -162,11 +162,13 @@ internal class JwtEncoderDecoder(
     row {
       cell(headerEditor.component)
         .validationOnApply(headerEditor.bindValidator(jwt.headerErrorHolder.asValidation()))
+        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
         .align(Align.FILL)
         .resizableColumn()
 
       cell(payloadEditor.component)
         .validationOnApply(payloadEditor.bindValidator(jwt.payloadErrorHolder.asValidation()))
+        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
         .align(Align.FILL)
         .resizableColumn()
     }.resizableRow().topGap(TopGap.SMALL).bottomGap(BottomGap.NONE)
@@ -174,7 +176,7 @@ internal class JwtEncoderDecoder(
     collapsibleGroup("Signature Algorithm Configuration") {
       lateinit var signatureAlgorithmComboBox: ComboBox<SignatureAlgorithm>
       row {
-        signatureAlgorithmComboBox = comboBox(values().toList())
+        signatureAlgorithmComboBox = comboBox(SignatureAlgorithm.entries)
           .label("Algorithm:")
           .bindItem(jwt.signature.algorithm)
           .whenItemSelectedFromUi { convert(SIGNATURE_CONFIGURATION) }
@@ -193,7 +195,7 @@ internal class JwtEncoderDecoder(
           .resizableColumn()
 
         val encodingActions = mutableListOf<AnAction>().apply {
-          SecretKeyEncodingMode.values().forEach { secretKeyEncodingModeValue ->
+          SecretKeyEncodingMode.entries.forEach { secretKeyEncodingModeValue ->
             add(SimpleToggleAction(
               text = secretKeyEncodingModeValue.title,
               icon = AllIcons.Actions.ToggleSoftWrap,
@@ -476,7 +478,7 @@ internal class JwtEncoderDecoder(
     companion object {
 
       fun findByHeaderValue(headerValue: String): SignatureAlgorithm? =
-        values().firstOrNull { it.headerValue == headerValue }
+        entries.firstOrNull { it.headerValue == headerValue }
     }
   }
 
@@ -686,7 +688,7 @@ internal class JwtEncoderDecoder(
     }
 
     fun reset() {
-      if (DeveloperToolsApplicationSettings.loadExamples) {
+      if (DeveloperToolsApplicationSettings.instance.loadExamples) {
         secret.set(EXAMPLE_SECRET)
         when (algorithm.get().kind) {
           HMAC -> {}
@@ -770,12 +772,11 @@ internal class JwtEncoderDecoder(
       null
     }
 
-    private fun toRawKey(keyInput: String): ByteArray = keyInput
-      .replace(RAW_KEY_REGEX, "")
-      .decodeBase64()
+    private fun toRawKey(keyInput: String): ByteArray =
+      Base64.getDecoder().decode(keyInput.replace(RAW_KEY_REGEX, ""))
 
     private fun handleAlgorithmChange() {
-      if (DeveloperToolsApplicationSettings.loadExamples) {
+      if (DeveloperToolsApplicationSettings.instance.loadExamples) {
         loadExampleSecrets()
       }
     }
@@ -834,7 +835,7 @@ internal class JwtEncoderDecoder(
 
     companion object {
 
-      fun findByFieldName(fieldName: String): StandardClaim? = values().firstOrNull { it.fieldName == fieldName }
+      fun findByFieldName(fieldName: String): StandardClaim? = entries.firstOrNull { it.fieldName == fieldName }
     }
   }
 

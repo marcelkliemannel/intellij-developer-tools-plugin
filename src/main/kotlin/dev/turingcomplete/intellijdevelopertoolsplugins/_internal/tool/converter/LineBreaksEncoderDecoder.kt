@@ -49,7 +49,7 @@ internal class LineBreaksEncoderDecoder(
 
   override fun Panel.buildMiddleFirstConfigurationUi() {
     row {
-      comboBox(LineBreak.values().toList())
+      comboBox(LineBreak.entries)
         .label("Decode line break to:")
         .bindItem(lineBreakDecoding)
     }

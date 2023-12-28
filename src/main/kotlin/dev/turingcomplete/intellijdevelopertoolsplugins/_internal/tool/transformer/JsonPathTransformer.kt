@@ -25,6 +25,7 @@ import com.intellij.ui.dsl.builder.LabelPosition
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.whenStateChangedFromUi
@@ -80,13 +81,13 @@ class JsonPathTransformer(
         .bindText(queryText)
         .label("JSON path:", LabelPosition.TOP)
         .validationOnApply(errorHolder.asValidation())
+        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
         .align(Align.FILL)
         .resizableColumn()
         .gap(RightGap.SMALL)
         .whenTextChangedFromUi { configurationChanged(queryText) }
       lateinit var helpButton: JComponent
-      helpButton = actionButton(ShowOperatorsHelpPopup { helpButton })
-        .component
+      helpButton = actionButton(ShowOperatorsHelpPopup { helpButton }).component
     }
   }
 

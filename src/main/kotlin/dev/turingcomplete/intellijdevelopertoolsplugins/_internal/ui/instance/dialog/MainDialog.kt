@@ -29,7 +29,7 @@ internal class MainDialog(project: Project?)
   init {
     title = "Developer Tools"
     setSize(950, 705)
-    isModal = DeveloperToolsDialogSettings.dialogIsModal
+    isModal = DeveloperToolsDialogSettings.instance.dialogIsModal
     init()
   }
 

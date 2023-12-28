@@ -57,7 +57,7 @@ internal class CodeFormattingConverter(
 
   override fun Panel.buildTopConfigurationUi() {
     row {
-      comboBox(Language.values().toList())
+      comboBox(Language.entries)
         .label("First language:")
         .bindItem(firstLanguage)
     }
@@ -65,7 +65,7 @@ internal class CodeFormattingConverter(
 
   override fun Panel.buildMiddleSecondConfigurationUi() {
     row {
-      comboBox(Language.values().toList())
+      comboBox(Language.entries)
         .label("Second language:")
         .bindItem(secondLanguage)
     }

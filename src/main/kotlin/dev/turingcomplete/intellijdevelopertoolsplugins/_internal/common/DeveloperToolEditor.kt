@@ -52,9 +52,9 @@ import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.UiUtils.actionsPopup
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.UiUtils.dumbAwareAction
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import java.awt.datatransfer.StringSelection
 import java.nio.file.Files
@@ -81,9 +81,9 @@ internal class DeveloperToolEditor(
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var softWraps = configuration.register("${context.id}-${id}-softWraps", DeveloperToolsApplicationSettings.editorSoftWraps, CONFIGURATION)
-  private var showSpecialCharacters = configuration.register("${context.id}-${id}-showSpecialCharacters", DeveloperToolsApplicationSettings.editorShowSpecialCharacters, CONFIGURATION)
-  private var showWhitespaces = configuration.register("${context.id}-${id}-showWhitespaces", DeveloperToolsApplicationSettings.editorShowWhitespaces, CONFIGURATION)
+  private var softWraps = configuration.register("${context.id}-${id}-softWraps", DeveloperToolsApplicationSettings.instance.editorSoftWraps, CONFIGURATION)
+  private var showSpecialCharacters = configuration.register("${context.id}-${id}-showSpecialCharacters", DeveloperToolsApplicationSettings.instance.editorShowSpecialCharacters, CONFIGURATION)
+  private var showWhitespaces = configuration.register("${context.id}-${id}-showWhitespaces", DeveloperToolsApplicationSettings.instance.editorShowWhitespaces, CONFIGURATION)
 
   private var onTextChangeFromUi = mutableListOf<((String) -> Unit)>()
   private var onFocusGained: (() -> Unit)? = null
@@ -157,6 +157,7 @@ internal class DeveloperToolEditor(
     return this
   }
 
+  @Suppress("unused")
   fun onFocusLost(changeListener: () -> Unit): DeveloperToolEditor {
     onFocusLost = changeListener
     return this

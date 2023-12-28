@@ -60,7 +60,7 @@ internal class PasswordGenerator(
       }.layout(RowLayout.PARENT_GRID)
 
       row {
-        comboBox(LettersMode.values().toList())
+        comboBox(LettersMode.entries)
           .label("Letters:")
           .bindItem(lettersMode)
           .validationInfo(validateAtLeastOneCharacter())

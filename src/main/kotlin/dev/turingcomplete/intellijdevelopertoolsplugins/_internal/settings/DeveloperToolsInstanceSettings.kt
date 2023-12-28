@@ -18,9 +18,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings.Companion.saveConfigurations
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings.Companion.saveInputs
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings.Companion.saveSecrets
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import java.security.Provider
 import java.security.Security
@@ -100,8 +97,8 @@ internal abstract class DeveloperToolsInstanceSettings {
           persistentProperties = developerToolsConfigurationState.properties!!
             .asSequence()
             .filter { it.key != null && it.type != null }
-            .filter { it.type != INPUT || saveInputs }
-            .filter { it.type != CONFIGURATION || saveConfigurations }
+            .filter { it.type != INPUT || DeveloperToolsApplicationSettings.instance.saveInputs }
+            .filter { it.type != CONFIGURATION || DeveloperToolsApplicationSettings.instance.saveConfigurations }
             .mapNotNull { property ->
               restorePropertyValue(
                 developerToolId = developerToolsConfigurationState.developerToolId!!,
@@ -130,8 +127,8 @@ internal abstract class DeveloperToolsInstanceSettings {
     properties = developerToolConfiguration
       .properties
       .filter { (_, property) -> property.valueChanged() }
-      .filter { (_, property) -> !(!saveInputs && property.type != INPUT) }
-      .filter { (_, property) -> !(!saveSecrets && property.type != SECRET) }
+      .filter { (_, property) -> !(!DeveloperToolsApplicationSettings.instance.saveInputs && property.type != INPUT) }
+      .filter { (_, property) -> !(!DeveloperToolsApplicationSettings.instance.saveSecrets && property.type != SECRET) }
       .map { (key, property) ->
         storeProperty(developerToolId = developerToolId, key = key, property = property)
       }
@@ -171,7 +168,7 @@ internal abstract class DeveloperToolsInstanceSettings {
         val credentialAttribute = createPropertyCredentialAttribute(developerToolId = developerToolId, propertyKey = key)
         val secretValue = PasswordSafe.instance.getPassword(credentialAttribute)
 
-        if (!saveSecrets) {
+        if (!DeveloperToolsApplicationSettings.instance.saveSecrets) {
           if (secretValue != null) {
             // Remove the secret from the password safe
             PasswordSafe.instance.set(credentialAttribute, null)

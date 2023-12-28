@@ -3,12 +3,20 @@
 ## Unreleased
 
 ### Added
+
+### Changed
+
+### Removed
+
+### Fixed
+
+## [3.0.0] - 2023-12-28
+
+### Added
 - The tools are now available through a tool window.
 
 ### Changed
 - Settings have been moved to IntelliJ's settings window
-
-### Removed
 
 ### Fixed
 - Configuration reset does not reset default editor settings

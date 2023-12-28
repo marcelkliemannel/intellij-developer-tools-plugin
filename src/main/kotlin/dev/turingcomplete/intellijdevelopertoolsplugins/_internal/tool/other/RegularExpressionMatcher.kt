@@ -45,7 +45,6 @@ import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
@@ -53,6 +52,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CommonsDataKeys
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.allowUiDslLabel
@@ -105,6 +105,7 @@ class RegularExpressionMatcher(
       cell(regexInputEditor)
         .label("Regular expression:", LabelPosition.TOP)
         .validationOnApply(regexInputErrorHolder.asValidation())
+        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
         .align(Align.FILL)
         .resizableColumn()
         .gap(RightGap.SMALL)
@@ -274,7 +275,7 @@ class RegularExpressionMatcher(
       }
 
       val selectedRegexOptionFlag = selectedRegexOptionFlag.get()
-      RegexOption.values().forEach { regexOption ->
+      RegexOption.entries.forEach { regexOption ->
         row {
           regexOptionCheckBox[regexOption] = checkBox(regexOption.title)
             .comment(regexOption.description)

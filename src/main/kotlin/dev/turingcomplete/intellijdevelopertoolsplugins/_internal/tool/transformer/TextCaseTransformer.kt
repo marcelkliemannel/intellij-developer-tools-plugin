@@ -62,7 +62,7 @@ class TextCaseTransformer(
         radioButton("Fixed text case:")
           .bind(originalParsingMode, FIXED_TEXT_CASE)
           .gap(RightGap.SMALL)
-        comboBox(TextCase.values().toList())
+        comboBox(TextCase.entries)
           .bindItem(inputTextCase)
       }
 
@@ -77,7 +77,7 @@ class TextCaseTransformer(
     }
 
     row {
-      comboBox(TextCase.values().toList())
+      comboBox(TextCase.entries)
         .label("Target:")
         .bindItem(outputTextCase)
     }
@@ -108,7 +108,6 @@ class TextCaseTransformer(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  @Suppress("unused")
   private enum class TextCase(val textCase: StandardTextCase) {
 
     STRICT_CAMEL_CASE(StandardTextCases.STRICT_CAMEL_CASE),

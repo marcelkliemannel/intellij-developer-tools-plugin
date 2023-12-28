@@ -26,7 +26,7 @@ internal class DeveloperToolsDialogSettings :
   val dialogLock = ReentrantLock()
   val currentDialog = AtomicReference<MainDialog?>()
 
-  val dialogIsModal: ValueProperty<Boolean> = ValueProperty(DIALOG_IS_MODAL_DEFAULT)
+  var dialogIsModal: Boolean by ValueProperty(DIALOG_IS_MODAL_DEFAULT)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -34,7 +34,7 @@ internal class DeveloperToolsDialogSettings :
   override fun getState(): DialogState {
     val instanceState = super.getState()
     return DialogState(
-      dialogIsModal = dialogIsModal.get(),
+      dialogIsModal = dialogIsModal,
       developerToolsConfigurations = instanceState.developerToolsConfigurations,
       lastSelectedContentNodeId = instanceState.lastSelectedContentNodeId,
       expandedGroupNodeIds = instanceState.expandedGroupNodeIds
@@ -43,7 +43,7 @@ internal class DeveloperToolsDialogSettings :
 
   override fun loadState(state: DialogState) {
     super.loadState(state)
-    dialogIsModal.set(state.dialogIsModal ?: DIALOG_IS_MODAL_DEFAULT)
+    dialogIsModal = (state.dialogIsModal ?: DIALOG_IS_MODAL_DEFAULT)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
@@ -70,7 +70,5 @@ internal class DeveloperToolsDialogSettings :
       get() = ApplicationManager.getApplication().getService(DeveloperToolsDialogSettings::class.java)
 
     const val DIALOG_IS_MODAL_DEFAULT = false
-
-    var dialogIsModal by instance.dialogIsModal
   }
 }

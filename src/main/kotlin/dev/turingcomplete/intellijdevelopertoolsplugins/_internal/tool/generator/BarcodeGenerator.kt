@@ -33,6 +33,7 @@ import com.intellij.ui.dsl.builder.MAX_LINE_LENGTH_WORD_WRAP
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.RowLayout
+import com.intellij.ui.dsl.builder.actionsButton
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.columns
@@ -101,7 +102,7 @@ internal class BarcodeGenerator private constructor(
   override fun Panel.buildUi() {
     lateinit var formatComboBox: ComboBox<Format>
     row {
-      formatComboBox = comboBox(Format.values().asList())
+      formatComboBox = comboBox(Format.entries)
         .label("Format:")
         .bindItem(format)
         .whenItemSelectedFromUi { generate() }
@@ -111,6 +112,7 @@ internal class BarcodeGenerator private constructor(
     row {
       cell(contentEditor.component)
         .validationOnApply(contentEditor.bindValidator(contentErrorHolder.asValidation()))
+        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
         .align(Align.FILL)
     }.layout(RowLayout.INDEPENDENT)
 
@@ -236,7 +238,6 @@ internal class BarcodeGenerator private constructor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  @Suppress("unused")
   private enum class Format(
     val title: String,
     val createConfiguration: (DeveloperToolConfiguration) -> FormatConfiguration
@@ -442,7 +443,7 @@ internal class BarcodeGenerator private constructor(
         }
 
         if (supportsErrorCorrection != UNSUPPORTED) {
-          comboBox(ErrorCorrection.values().asList())
+          comboBox(ErrorCorrection.entries)
             .label("Error correction:")
             .bindItem(errorCorrection)
             .onChanged { onConfigurationChange() }
@@ -521,7 +522,7 @@ internal class BarcodeGenerator private constructor(
         val compactionRenderer = listCellRenderer<Compaction> { value ->
           text = value.name.lowercase().replaceFirstChar { it.titlecase(Locale.ROOT) }
         }
-        comboBox(Compaction.values().toList(), compactionRenderer)
+        comboBox(Compaction.entries, compactionRenderer)
           .bindItem(compactModeType)
           .whenItemSelectedFromUi { onConfigurationChange() }
           .enabledIf(useCompactModeCheckBox.selected)
@@ -738,7 +739,7 @@ internal class BarcodeGenerator private constructor(
             SymbolShapeHint.FORCE_RECTANGLE -> "Rectangle"
           }
         }
-        comboBox(SymbolShapeHint.values().toList(), symbolShapeRenderer)
+        comboBox(SymbolShapeHint.entries, symbolShapeRenderer)
           .bindItem(symbolShape)
           .label("Symbol shape:")
           .whenItemSelectedFromUi { onConfigurationChange() }
@@ -757,7 +758,6 @@ internal class BarcodeGenerator private constructor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  @Suppress("unused")
   private enum class ErrorCorrection(val level: ErrorCorrectionLevel, val title: String) {
 
     L(ErrorCorrectionLevel.L, "~7%"),
@@ -864,7 +864,7 @@ internal class BarcodeGenerator private constructor(
       parentDisposable: Disposable,
       context: DeveloperToolContext
     ): ((DeveloperToolConfiguration) -> BarcodeGenerator) = { configuration ->
-      val formats: Map<Format, FormatConfiguration> = Format.values().associateWith {
+      val formats: Map<Format, FormatConfiguration> = Format.entries.associateWith {
         it.createConfiguration(configuration)
       }
       BarcodeGenerator(formats, context, configuration, project, parentDisposable)

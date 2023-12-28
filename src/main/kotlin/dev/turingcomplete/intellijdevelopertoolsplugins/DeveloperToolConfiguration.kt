@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 package dev.turingcomplete.intellijdevelopertoolsplugins
 
 import com.intellij.openapi.Disposable
@@ -49,7 +47,7 @@ class DeveloperToolConfiguration(
 
   fun reset(
     type: PropertyType? = null,
-    loadExamples: Boolean = DeveloperToolsApplicationSettings.loadExamples
+    loadExamples: Boolean = DeveloperToolsApplicationSettings.instance.loadExamples
   ) {
     isResetting = true
     try {
@@ -67,11 +65,11 @@ class DeveloperToolConfiguration(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun <T : Any> reuseExistingProperty(property: PropertyContainer): ValueProperty<T> {
-    if ((property.type == INPUT && !DeveloperToolsApplicationSettings.saveInputs)
-      || (property.type == CONFIGURATION && !DeveloperToolsApplicationSettings.saveConfigurations)
-      || (property.type == SECRET && !DeveloperToolsApplicationSettings.saveSecrets)
+    if ((property.type == INPUT && !DeveloperToolsApplicationSettings.instance.saveInputs)
+      || (property.type == CONFIGURATION && !DeveloperToolsApplicationSettings.instance.saveConfigurations)
+      || (property.type == SECRET && !DeveloperToolsApplicationSettings.instance.saveSecrets)
     ) {
-      property.reset(DeveloperToolsApplicationSettings.loadExamples)
+      property.reset(DeveloperToolsApplicationSettings.instance.loadExamples)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -87,7 +85,7 @@ class DeveloperToolConfiguration(
     val type = assertPersistableType(defaultValue::class, propertyType)
     val existingProperty = persistentProperties[key]
     val initialValue: T = existingProperty?.uncheckedCastTo(type) ?: let {
-      if (DeveloperToolsApplicationSettings.loadExamples && example != null) example else defaultValue
+      if (DeveloperToolsApplicationSettings.instance.loadExamples && example != null) example else defaultValue
     }
     val valueProperty = ValueProperty(initialValue).apply {
       afterChangeConsumeEvent(null, handlePropertyChange(key))

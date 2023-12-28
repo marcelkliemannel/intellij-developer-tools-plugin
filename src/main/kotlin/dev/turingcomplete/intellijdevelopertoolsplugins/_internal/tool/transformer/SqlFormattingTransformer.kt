@@ -52,7 +52,7 @@ class SqlFormattingTransformer(
 
   override fun Panel.buildMiddleConfigurationUi() {
     row {
-      comboBox(Dialect.values().toList())
+      comboBox(Dialect.entries)
         .label("Dialect:")
         .bindItem(dialect)
     }.layout(RowLayout.PARENT_GRID)

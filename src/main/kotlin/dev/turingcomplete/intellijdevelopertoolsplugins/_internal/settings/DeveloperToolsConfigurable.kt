@@ -29,41 +29,41 @@ class DeveloperToolsConfigurable : Configurable {
 
   override fun createComponent(): JComponent = panel {
     row {
-      saveConfigurations = ValueProperty(DeveloperToolsApplicationSettings.saveConfigurations)
+      saveConfigurations = ValueProperty(DeveloperToolsApplicationSettings.instance.saveConfigurations)
       checkBox("Remember configurations")
         .bindSelected(saveConfigurations)
     }
     row {
-      saveInputs = ValueProperty(DeveloperToolsApplicationSettings.saveInputs)
+      saveInputs = ValueProperty(DeveloperToolsApplicationSettings.instance.saveInputs)
       checkBox("Remember inputs")
         .bindSelected(saveInputs)
     }
     row {
-      saveSecrets = ValueProperty(DeveloperToolsApplicationSettings.saveSecrets)
+      saveSecrets = ValueProperty(DeveloperToolsApplicationSettings.instance.saveSecrets)
       checkBox("Remember secrets")
         .bindSelected(saveSecrets)
     }.comment("Secrets are stored in the <a href='https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html#storage'>system keychain</a>.") {
       BrowserUtil.browse(it.url)
     }
     row {
-      loadExamples = ValueProperty(DeveloperToolsApplicationSettings.loadExamples)
+      loadExamples = ValueProperty(DeveloperToolsApplicationSettings.instance.loadExamples)
       checkBox("Load examples")
         .bindSelected(loadExamples)
     }
 
     groupRowsRange("Default Editor Settings") {
       row {
-        editorSoftWraps = ValueProperty(DeveloperToolsApplicationSettings.editorSoftWraps)
+        editorSoftWraps = ValueProperty(DeveloperToolsApplicationSettings.instance.editorSoftWraps)
         checkBox("Soft-wrap")
           .bindSelected(editorSoftWraps)
       }
       row {
-        editorShowSpecialCharacters = ValueProperty(DeveloperToolsApplicationSettings.editorShowSpecialCharacters)
+        editorShowSpecialCharacters = ValueProperty(DeveloperToolsApplicationSettings.instance.editorShowSpecialCharacters)
         checkBox("Show special characters")
           .bindSelected(editorShowSpecialCharacters)
       }
       row {
-        editorShowWhitespaces = ValueProperty(DeveloperToolsApplicationSettings.editorShowWhitespaces)
+        editorShowWhitespaces = ValueProperty(DeveloperToolsApplicationSettings.instance.editorShowWhitespaces)
         checkBox("Show whitespaces")
           .bindSelected(editorShowWhitespaces)
       }
@@ -71,12 +71,12 @@ class DeveloperToolsConfigurable : Configurable {
 
     groupRowsRange("Advanced") {
       row {
-        dialogIsModal = ValueProperty(DeveloperToolsDialogSettings.dialogIsModal)
+        dialogIsModal = ValueProperty(DeveloperToolsDialogSettings.instance.dialogIsModal)
         checkBox("Dialog is modal and must be closed before continuing to work with IntelliJ")
           .bindSelected(dialogIsModal)
       }
       row {
-        toolWindowMenuHideOnToolSelection = ValueProperty(DeveloperToolsApplicationSettings.toolWindowMenuHideOnToolSelection)
+        toolWindowMenuHideOnToolSelection = ValueProperty(DeveloperToolsApplicationSettings.instance.toolWindowMenuHideOnToolSelection)
         checkBox("Hide the menu in the tool window after selecting a tool")
           .bindSelected(toolWindowMenuHideOnToolSelection)
       }
@@ -93,26 +93,26 @@ class DeveloperToolsConfigurable : Configurable {
   }
 
   override fun isModified(): Boolean =
-    DeveloperToolsApplicationSettings.saveConfigurations != saveConfigurations.get() ||
-            DeveloperToolsApplicationSettings.saveInputs != saveInputs.get() ||
-            DeveloperToolsApplicationSettings.saveSecrets != saveSecrets.get() ||
-            DeveloperToolsApplicationSettings.loadExamples != loadExamples.get() ||
-            DeveloperToolsDialogSettings.dialogIsModal != dialogIsModal.get() ||
-            DeveloperToolsApplicationSettings.editorSoftWraps != editorSoftWraps.get() ||
-            DeveloperToolsApplicationSettings.editorShowWhitespaces != editorShowWhitespaces.get() ||
-            DeveloperToolsApplicationSettings.editorShowSpecialCharacters != editorShowSpecialCharacters.get() ||
-            DeveloperToolsApplicationSettings.toolWindowMenuHideOnToolSelection != toolWindowMenuHideOnToolSelection.get()
+    DeveloperToolsApplicationSettings.instance.saveConfigurations != saveConfigurations.get() ||
+            DeveloperToolsApplicationSettings.instance.saveInputs != saveInputs.get() ||
+            DeveloperToolsApplicationSettings.instance.saveSecrets != saveSecrets.get() ||
+            DeveloperToolsApplicationSettings.instance.loadExamples != loadExamples.get() ||
+            DeveloperToolsDialogSettings.instance.dialogIsModal != dialogIsModal.get() ||
+            DeveloperToolsApplicationSettings.instance.editorSoftWraps != editorSoftWraps.get() ||
+            DeveloperToolsApplicationSettings.instance.editorShowWhitespaces != editorShowWhitespaces.get() ||
+            DeveloperToolsApplicationSettings.instance.editorShowSpecialCharacters != editorShowSpecialCharacters.get() ||
+            DeveloperToolsApplicationSettings.instance.toolWindowMenuHideOnToolSelection != toolWindowMenuHideOnToolSelection.get()
 
   override fun apply() {
-    DeveloperToolsApplicationSettings.saveConfigurations = saveConfigurations.get()
-    DeveloperToolsApplicationSettings.saveInputs = saveInputs.get()
-    DeveloperToolsApplicationSettings.saveSecrets = saveSecrets.get()
-    DeveloperToolsApplicationSettings.loadExamples = loadExamples.get()
-    DeveloperToolsDialogSettings.dialogIsModal = dialogIsModal.get()
-    DeveloperToolsApplicationSettings.editorSoftWraps = editorSoftWraps.get()
-    DeveloperToolsApplicationSettings.editorShowWhitespaces = editorShowWhitespaces.get()
-    DeveloperToolsApplicationSettings.editorShowSpecialCharacters = editorShowSpecialCharacters.get()
-    DeveloperToolsApplicationSettings.toolWindowMenuHideOnToolSelection = toolWindowMenuHideOnToolSelection.get()
+    DeveloperToolsApplicationSettings.instance.saveConfigurations = saveConfigurations.get()
+    DeveloperToolsApplicationSettings.instance.saveInputs = saveInputs.get()
+    DeveloperToolsApplicationSettings.instance.saveSecrets = saveSecrets.get()
+    DeveloperToolsApplicationSettings.instance.loadExamples = loadExamples.get()
+    DeveloperToolsDialogSettings.instance.dialogIsModal = dialogIsModal.get()
+    DeveloperToolsApplicationSettings.instance.editorSoftWraps = editorSoftWraps.get()
+    DeveloperToolsApplicationSettings.instance.editorShowWhitespaces = editorShowWhitespaces.get()
+    DeveloperToolsApplicationSettings.instance.editorShowSpecialCharacters = editorShowSpecialCharacters.get()
+    DeveloperToolsApplicationSettings.instance.toolWindowMenuHideOnToolSelection = toolWindowMenuHideOnToolSelection.get()
   }
 
   override fun reset() {

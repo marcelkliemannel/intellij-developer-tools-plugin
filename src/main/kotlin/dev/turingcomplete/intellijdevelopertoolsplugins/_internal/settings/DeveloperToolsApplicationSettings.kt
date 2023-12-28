@@ -17,37 +17,37 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 internal class DeveloperToolsApplicationSettings : PersistentStateComponent<ApplicationState> {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  val loadExamples: ValueProperty<Boolean> = ValueProperty(LOAD_EXAMPLES_DEFAULT)
-  val saveConfigurations: ValueProperty<Boolean> = ValueProperty(SAVE_CONFIGURATIONS_DEFAULT)
-  val saveInputs: ValueProperty<Boolean> = ValueProperty(SAVE_INPUTS_DEFAULT)
-  val saveSecrets: ValueProperty<Boolean> = ValueProperty(SAVE_SECRETS_DEFAULT)
-  val editorSoftWraps: ValueProperty<Boolean> = ValueProperty(EDITOR_SOFT_WRAPS_DEFAULT)
-  val editorShowSpecialCharacters: ValueProperty<Boolean> = ValueProperty(EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
-  val editorShowWhitespaces: ValueProperty<Boolean> = ValueProperty(EDITOR_SHOW_WHITESPACES_DEFAULT)
-  val toolWindowMenuHideOnToolSelection: ValueProperty<Boolean> = ValueProperty(TOOL_WINDOW_MENU_HIDE_ON_TOOL_SELECTION)
+  var loadExamples: Boolean by ValueProperty(LOAD_EXAMPLES_DEFAULT)
+  var saveConfigurations: Boolean by ValueProperty(SAVE_CONFIGURATIONS_DEFAULT)
+  var saveInputs: Boolean by ValueProperty(SAVE_INPUTS_DEFAULT)
+  var saveSecrets: Boolean by ValueProperty(SAVE_SECRETS_DEFAULT)
+  var editorSoftWraps: Boolean by ValueProperty(EDITOR_SOFT_WRAPS_DEFAULT)
+  var editorShowSpecialCharacters: Boolean by ValueProperty(EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
+  var editorShowWhitespaces: Boolean by ValueProperty(EDITOR_SHOW_WHITESPACES_DEFAULT)
+  var toolWindowMenuHideOnToolSelection: Boolean by ValueProperty(TOOL_WINDOW_MENU_HIDE_ON_TOOL_SELECTION)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   override fun getState(): ApplicationState = ApplicationState(
-    loadExamples = loadExamples.get(),
-    saveConfigurations = saveConfigurations.get(),
-    saveInputs = saveInputs.get(),
-    saveSecrets = saveSecrets.get(),
-    editorSoftWraps = editorSoftWraps.get(),
-    editorShowSpecialCharacters = editorShowSpecialCharacters.get(),
-    editorShowWhitespaces = editorShowWhitespaces.get()
+    loadExamples = loadExamples,
+    saveConfigurations = saveConfigurations,
+    saveInputs = saveInputs,
+    saveSecrets = saveSecrets,
+    editorSoftWraps = editorSoftWraps,
+    editorShowSpecialCharacters = editorShowSpecialCharacters,
+    editorShowWhitespaces = editorShowWhitespaces
   )
 
   override fun loadState(state: ApplicationState) {
-    loadExamples.set(state.loadExamples ?: LOAD_EXAMPLES_DEFAULT)
-    saveConfigurations.set(state.saveConfigurations ?: SAVE_CONFIGURATIONS_DEFAULT)
-    saveInputs.set(state.saveInputs ?: SAVE_INPUTS_DEFAULT)
-    saveSecrets.set(state.saveSecrets ?: SAVE_SECRETS_DEFAULT)
-    editorSoftWraps.set(state.editorSoftWraps ?: EDITOR_SOFT_WRAPS_DEFAULT)
-    editorShowSpecialCharacters.set(state.editorShowSpecialCharacters ?: EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
-    editorShowWhitespaces.set(state.editorShowWhitespaces ?: EDITOR_SHOW_WHITESPACES_DEFAULT)
-    toolWindowMenuHideOnToolSelection.set(state.toolWindowMenuHideOnClick ?: TOOL_WINDOW_MENU_HIDE_ON_TOOL_SELECTION)
+    loadExamples = (state.loadExamples ?: LOAD_EXAMPLES_DEFAULT)
+    saveConfigurations = (state.saveConfigurations ?: SAVE_CONFIGURATIONS_DEFAULT)
+    saveInputs = (state.saveInputs ?: SAVE_INPUTS_DEFAULT)
+    saveSecrets = (state.saveSecrets ?: SAVE_SECRETS_DEFAULT)
+    editorSoftWraps = (state.editorSoftWraps ?: EDITOR_SOFT_WRAPS_DEFAULT)
+    editorShowSpecialCharacters = (state.editorShowSpecialCharacters ?: EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
+    editorShowWhitespaces = (state.editorShowWhitespaces ?: EDITOR_SHOW_WHITESPACES_DEFAULT)
+    toolWindowMenuHideOnToolSelection = (state.toolWindowMenuHideOnClick ?: TOOL_WINDOW_MENU_HIDE_ON_TOOL_SELECTION)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
@@ -87,14 +87,5 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     const val EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT = false
     const val EDITOR_SHOW_WHITESPACES_DEFAULT = false
     const val TOOL_WINDOW_MENU_HIDE_ON_TOOL_SELECTION = true
-
-    var loadExamples by instance.loadExamples
-    var saveConfigurations by instance.saveConfigurations
-    var saveInputs by instance.saveInputs
-    var saveSecrets by instance.saveSecrets
-    var editorSoftWraps by instance.editorSoftWraps
-    var editorShowSpecialCharacters by instance.editorShowSpecialCharacters
-    var editorShowWhitespaces by instance.editorShowWhitespaces
-    var toolWindowMenuHideOnToolSelection by instance.toolWindowMenuHideOnToolSelection
   }
 }

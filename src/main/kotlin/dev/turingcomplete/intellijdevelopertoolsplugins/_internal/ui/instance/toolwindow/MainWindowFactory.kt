@@ -89,7 +89,7 @@ class MainWindowFactory : ToolWindowFactory, DumbAware {
       Disposer.register(parentDisposable) { toolsMenuTreeWrapper = null }
 
       selectedContentNode.afterChangeConsumeEvent(parentDisposable) {
-        if (DeveloperToolsApplicationSettings.toolWindowMenuHideOnToolSelection) {
+        if (DeveloperToolsApplicationSettings.instance.toolWindowMenuHideOnToolSelection) {
           lastToolsMenuTreePopup?.takeIf { !it.isDisposed }?.cancel()
         }
       }
