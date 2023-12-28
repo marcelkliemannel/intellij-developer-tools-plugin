@@ -16,7 +16,8 @@
 - The tools are now available through a tool window.
 
 ### Changed
-- Settings have been moved to IntelliJ's settings window
+- The Open Dialog action is still available but no longer automatically added to the main menu to favor the new tool window. To restore the old behavior, the action can be added again via **Customize Toolbar... | Add Actions... | Developer Tools**.
+- Settings have been moved to IntelliJ's settings/preferences window
 
 ### Fixed
 - Configuration reset does not reset default editor settings

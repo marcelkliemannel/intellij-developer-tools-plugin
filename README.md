@@ -29,17 +29,16 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 
 ## Integration
 
-The tools are currently available from the main toolbar as a dialog or tool window. By default, they are added automatically, and you can choose which way you want to keep them. Additional settings can be found in IntelliJ's settings/preferences under **Tools | Developer Tools**.
+The tools are currently available as a standalone dialog or tool window.  Additional settings can be found in IntelliJ's settings/preferences under **Tools | Developer Tools**.
 
 ### Tool Window
 
 The tool window is available through **View | Tool Windows | Tools**. All inputs and configurations of a tool window will be stored on the project level.
 
 ### Dialog
-The action to access the dialog is available through:
- - IntelliJ's main menu under **Tools | Developer Tools**;
- - in the toolbar of the old UI if enabled via **View | Toolbar**;
- - and in the new UI in the right main toolbar.
+The action to access the dialog is available through IntelliJ's main menu under **Tools | Developer Tools**.
+
+It's quite handy to add the open dialog action to the main toolbar (which must be activated in the old UI under **View | Toolbar**) via **Customize Toolbar... | Add Actions... | Developer Tools**.
 
 All inputs and configurations of the dialog will be stored on the application level.
 
