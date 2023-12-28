@@ -62,7 +62,9 @@ internal abstract class TextConverter(
       resizableRow()
       val sourceEditorCell = cell(sourceEditor.component).align(Align.FILL)
       textConverterContext.sourceErrorHolder?.let { sourceErrorHolder ->
-        sourceEditorCell.validationOnApply(sourceEditor.bindValidator(sourceErrorHolder.asValidation()))
+        sourceEditorCell
+          .validationOnApply(sourceEditor.bindValidator(sourceErrorHolder.asValidation()))
+          .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
       }
     }
 
@@ -74,7 +76,9 @@ internal abstract class TextConverter(
       resizableRow()
       val targetEditorCell = cell(targetEditor.component).align(Align.FILL)
       textConverterContext.targetErrorHolder?.let { targetErrorHolder ->
-        targetEditorCell.validationOnApply(targetEditor.bindValidator(targetErrorHolder.asValidation()))
+        targetEditorCell
+          .validationOnApply(targetEditor.bindValidator(targetErrorHolder.asValidation()))
+          .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
       }
     }
   }

@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijbytecodeplugin._ui
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.common
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent

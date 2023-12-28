@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.content
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -10,6 +10,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.Messages.InputDialog
 import com.intellij.ui.ScrollPaneFactory.createScrollPane
 import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.tabs.JBTabs
 import com.intellij.ui.tabs.JBTabsFactory
@@ -21,13 +22,13 @@ import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.NotBlankInputValidator
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.castedObject
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.DeveloperToolNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.DeveloperToolNode.DeveloperToolContainer
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.DeveloperToolNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.DeveloperToolNode.DeveloperToolContainer
 import javax.swing.Icon
 import javax.swing.JComponent
 
-internal class DeveloperToolContentPanel(
-  private val developerToolNode: DeveloperToolNode
+internal open class DeveloperToolContentPanel(
+  protected val developerToolNode: DeveloperToolNode
 ) : BorderLayoutPanel() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -51,15 +52,19 @@ internal class DeveloperToolContentPanel(
     selectedDeveloperToolInstance.get().instance.deactivated()
   }
 
+  @Suppress("DialogTitleCapitalization")
+  protected open fun Row.buildTitle() {
+    label(developerToolNode.developerToolPresentation.contentTitle)
+      .applyToComponent { font = JBFont.label().asBold() }
+      .align(Align.FILL)
+      .resizableColumn()
+  }
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  @Suppress("DialogTitleCapitalization")
   private fun createTitleBar(): JComponent = panel {
     row {
-      label(developerToolNode.developerToolPresentation.contentTitle)
-        .applyToComponent { font = JBFont.label().asBold() }
-        .align(Align.FILL)
-        .resizableColumn()
+      buildTitle()
 
       link("Reset") {
         selectedDeveloperToolInstance.get().apply {

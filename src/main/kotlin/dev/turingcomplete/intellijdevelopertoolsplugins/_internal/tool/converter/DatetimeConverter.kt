@@ -17,6 +17,7 @@ import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.TopGap
+import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
@@ -209,7 +210,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
               .bindSelected(formattedIndividual.not())
               .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
               .gap(RightGap.SMALL)
-            val formattedStandardFormatComboBox = comboBox(StandardFormat.values().toList())
+            val formattedStandardFormatComboBox = comboBox(StandardFormat.entries)
               .bindItem(formattedStandardFormat)
               .whenItemSelectedFromUi { syncFormattedStandardFormatPattern(); convert(UNIX_TIMESTAMP_MILLIS) }
               .enabledIf(formattedIndividual.not())
@@ -481,7 +482,6 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  @Suppress("unused")
   private enum class StandardFormat(
     private val title: String,
     private val pattern: String,

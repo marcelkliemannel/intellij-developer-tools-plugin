@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer
 
 import com.intellij.openapi.Disposable
@@ -106,7 +104,7 @@ internal class TextSortingTransformer(
     }
 
     row {
-      comboBox(SortingOrder.values().toList())
+      comboBox(SortingOrder.entries)
         .label("Order:")
         .bindItem(sortingOrder)
       checkBox("Reverse")
@@ -132,7 +130,7 @@ internal class TextSortingTransformer(
     splitWordsDelimiter: ObservableMutableProperty<WordsDelimiter>,
     individualDelimiter: ObservableMutableProperty<String>
   ) {
-    val splitWordsDelimiterComboBox = comboBox(WordsDelimiter.values().toList())
+    val splitWordsDelimiterComboBox = comboBox(WordsDelimiter.entries)
       .label(title)
       .bindItem(splitWordsDelimiter)
       .component
@@ -147,7 +145,7 @@ internal class TextSortingTransformer(
 
     NATURAL("Natural", NaturalComparator()),
     LEXICOGRAPHIC("Lexicographic", { a, b -> a.compareTo(b) }),
-    WORD_LENGTH("Word length", Comparator<String> { a, b -> a.length - b.length });
+    WORD_LENGTH("Word length", Comparator { a, b -> a.length - b.length });
 
     override fun toString(): String = title
   }

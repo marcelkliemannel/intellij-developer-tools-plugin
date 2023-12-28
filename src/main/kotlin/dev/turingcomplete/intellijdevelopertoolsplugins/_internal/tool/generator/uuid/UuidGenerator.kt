@@ -47,7 +47,7 @@ internal class UuidGenerator(
   override fun Panel.buildConfigurationUi() {
     lateinit var selectedVersionComboBox: ComboBox<UuidVersion>
     row {
-      selectedVersionComboBox = comboBox(UuidVersion.values().toList())
+      selectedVersionComboBox = comboBox(UuidVersion.entries)
         .label("Version:")
         .bindItem(selectedUuidVersion)
         .component

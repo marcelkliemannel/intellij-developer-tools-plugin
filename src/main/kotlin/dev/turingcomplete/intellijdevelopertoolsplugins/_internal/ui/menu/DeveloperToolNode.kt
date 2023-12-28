@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
@@ -6,12 +6,13 @@ import com.intellij.openapi.util.Disposer
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperTool
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsInstanceSettings
 
 internal class DeveloperToolNode(
   private val developerToolId: String,
   val parentDisposable: Disposable,
   val project: Project?,
+  val settings: DeveloperToolsInstanceSettings,
   val developerToolPresentation: DeveloperToolPresentation,
   private val developerToolCreator: (DeveloperToolConfiguration) -> DeveloperTool
 ) : ContentNode(
@@ -38,7 +39,7 @@ internal class DeveloperToolNode(
 
   fun destroyDeveloperToolInstance(developerTool: DeveloperTool) {
     _developerTools.find { it.instance === developerTool }?.let {
-      DeveloperToolsPluginService.instance.removeDeveloperToolConfiguration(
+      settings.removeDeveloperToolConfiguration(
         developerToolId = developerToolId,
         developerToolConfiguration = it.configuration
       )
@@ -49,12 +50,11 @@ internal class DeveloperToolNode(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun restoreDeveloperToolInstances(): List<DeveloperToolContainer> =
-    DeveloperToolsPluginService.instance
-      .getDeveloperToolConfigurations(developerToolId)
+    settings.getDeveloperToolConfigurations(developerToolId)
       .map { developerToolConfiguration -> doCreateNewDeveloperToolInstance(developerToolConfiguration) }
 
   private fun doCreateNewDeveloperToolInstance(
-    developerToolConfiguration: DeveloperToolConfiguration = DeveloperToolsPluginService.instance.createDeveloperToolConfiguration(developerToolId)
+    developerToolConfiguration: DeveloperToolConfiguration = settings.createDeveloperToolConfiguration(developerToolId)
   ): DeveloperToolContainer {
     val developerTool = developerToolCreator(developerToolConfiguration)
     Disposer.register(parentDisposable, developerTool)

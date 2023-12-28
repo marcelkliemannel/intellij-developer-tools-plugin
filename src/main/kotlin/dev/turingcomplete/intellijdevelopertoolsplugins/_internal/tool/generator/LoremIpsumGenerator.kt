@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator
 
 import ai.grazie.utils.capitalize
@@ -68,7 +66,7 @@ class LoremIpsumGenerator(
         .validateLongValue(LongRange(1, 999))
         .columns(COLUMNS_TINY)
         .gap(RightGap.SMALL)
-      textModeComboBox = comboBox(TextMode.values().toList())
+      textModeComboBox = comboBox(TextMode.entries)
         .bindItem(textMode)
         .component
     }

@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.openapi.ui.validation.DialogValidationRequestor
 import com.intellij.ui.ComponentUtil.findComponentsOfType
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
@@ -101,4 +102,21 @@ abstract class DeveloperTool(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    /**
+     * If [com.intellij.ui.dsl.builder.Cell.validationOnApply] gets called and
+     * there is no [com.intellij.ui.dsl.builder.Cell.validationRequestor]
+     * registered, IntelliJ will log the warning `Please, install
+     * Cell.validationRequestor`. To circumvent this, we set a dummy requestor
+     * without any functionally.
+     *
+     * Future todos: The validation mechanism of the new UI has been further
+     * developed since the initial creation of the plugin. The current mechanism
+     * in [DeveloperTool.validate], may no longer be necessary and may be better
+     * solved with on-board resources.
+     */
+    val DUMMY_DIALOG_VALIDATION_REQUESTOR = DialogValidationRequestor { _, _ -> }
+  }
 }

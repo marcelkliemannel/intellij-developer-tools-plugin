@@ -54,7 +54,7 @@ abstract class NamespaceAndNameBasedUuidGenerator(
           val usePredefined = radioButton("Predefined:")
             .bind(namespaceMode, PREDEFINED)
             .gap(RightGap.SMALL)
-          comboBox(PredefinedNamespace.values().toList())
+          comboBox(PredefinedNamespace.entries)
             .bindItem(predefinedNamespace)
             .enabledIf(usePredefined.selected).component
         }

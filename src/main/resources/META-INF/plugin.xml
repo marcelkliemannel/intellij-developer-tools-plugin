@@ -22,6 +22,7 @@
     <li>JSON Path Parser</li>
     <li>JSON Schema Validator</li>
     <li>Hashing</li>
+    <li>Date Time Converter</li>
     <li>Code Style Formatting</li>
     <li>SQL Formatting</li>
     <li>Password Generator</li>
@@ -31,12 +32,19 @@
 
 <h2>Integration</h2>
 
-The main dialog with all tools is available through:
-<ul>
-  <li>The menu under <b>Tools | Developer Tools</b>;</li>
-  <li>in the toolbar of the old UI, if enabled via <b>View | Toolbar</b>;</li>
-  <li>and in the new UI in the right main toolbar.</li>
-</ul>
+<p>The tools are currently available as a standalone dialog or tool window. Additional settings can be found in IntelliJ's settings/preferences under <b>Tools | Developer Tools</b>.</p>
+
+<h3>Tool Window</h3>
+
+<p>The tool window is available under <b>View | Tool Windows | Tools</b>. All inputs and configurations will be stored in the project.</p>
+
+<h2>Dialog</h3>
+
+<p>The action to access the dialog is available through IntelliJ's main menu under <b>Tools | Developer Tools</b>.</p>
+
+<p>It's quite handy to add the open dialog action to the main toolbar (which must be activated in the old UI under <b>View | Toolbar</b>) via <b>Customize Toolbar... | Add Actions... | Developer Tools</b>.</p>
+
+<p>All inputs and configurations of the dialog will be stored on the application level.</p>
     ]]></description>
 
   <depends>com.intellij.modules.platform</depends>
@@ -44,17 +52,28 @@ The main dialog with all tools is available through:
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationService
-            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService"/>
+            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings"/>
+    <applicationService
+            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsDialogSettings"/>
+    <applicationService
+            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.LegacyDeveloperToolsSettingsMigrator"/>
+    <applicationConfigurable
+            parentId="tools"
+            instance="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsConfigurable"
+            id="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsConfigurable"
+            displayName="Developer Tools"/>
+    <toolWindow id="Developer Tools"
+                factoryClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.instance.toolwindow.MainWindowFactory"
+                anchor="right" secondary="true" canCloseContents="false"
+                icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/toolwindow.svg"/>
   </extensions>
 
   <actions>
-    <action id="dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.OpenMainDialogAction"
-            class="dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.OpenMainDialogAction"
+    <action id="dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.instance.dialog.OpenMainDialogAction"
+            class="dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.instance.dialog.OpenMainDialogAction"
             text="Developer Tools"
             description="Provides various developer tools"
             icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg">
-      <add-to-group group-id="MainToolBar" anchor="last"/>
-      <add-to-group group-id="MainToolbarRight" relative-to-action="SearchEverywhere" anchor="before"/>
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
   </actions>

@@ -65,6 +65,7 @@ class JsonSchemaValidator(
     row {
       cell(schemaEditor.component).align(Align.FILL)
         .validationOnApply(schemaEditor.bindValidator(schemaErrorHolder.asValidation()))
+        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
     }.resizableRow()
 
     row {
@@ -80,6 +81,7 @@ class JsonSchemaValidator(
     row {
       cell(dataEditor.component).align(Align.FILL)
         .validationOnApply(dataEditor.bindValidator(dataErrorHolder.asValidation()))
+        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
     }.resizableRow()
 
     row {

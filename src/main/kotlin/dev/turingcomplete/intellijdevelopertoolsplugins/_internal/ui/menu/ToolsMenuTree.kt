@@ -1,10 +1,12 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu
 
 import com.intellij.ide.util.treeView.NodeRenderer
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
+import com.intellij.ui.ColoredSideBorder
 import com.intellij.ui.RelativeFont
+import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.SimpleTextAttributes.REGULAR_ATTRIBUTES
 import com.intellij.ui.SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
 import com.intellij.ui.TreeUIHelper
@@ -19,16 +21,14 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolFactoryEp
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginService.Companion.lastSelectedContentNodeId
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.uncheckedCastTo
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ConfigurationNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.ContentNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.DeveloperToolNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.GroupNode
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.dialog.structure.RootNode
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsInstanceSettings
+import javax.swing.JComponent
 import javax.swing.JTree
+import javax.swing.ScrollPaneConstants
+import javax.swing.event.TreeExpansionEvent
+import javax.swing.event.TreeExpansionListener
 import javax.swing.event.TreeSelectionListener
 import javax.swing.plaf.TreeUI
 import javax.swing.tree.DefaultMutableTreeNode
@@ -36,16 +36,19 @@ import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreePath
 import javax.swing.tree.TreeSelectionModel
 
-internal class MainMenuTree(
-  private val onContentNodeSelection: (ContentNode) -> Unit,
-  project: Project?,
-  parentDisposable: Disposable
+internal class ToolsMenuTree(
+  private val project: Project?,
+  parentDisposable: Disposable,
+  settings: DeveloperToolsInstanceSettings,
+  private val groupNodeSelectionEnabled: Boolean = true,
+  private val selectContentNode: (ContentNode) -> Unit
 ) : SimpleTree() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
-    val (rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode) = createTreeNodes(project, parentDisposable)
+    val (rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode) =
+      createTreeNodes(parentDisposable, settings)
 
     model = DefaultTreeModel(rootNode)
     setCellRenderer(MenuTreeNodeRenderer(rootNode))
@@ -55,18 +58,42 @@ internal class MainMenuTree(
     TreeUtil.installActions(this)
     isOpaque = true
     selectionModel.selectionMode = TreeSelectionModel.SINGLE_TREE_SELECTION
-    addTreeSelectionListener(handleMenuTreeSelection())
+    addTreeSelectionListener(createTreeSelectionListener(settings))
+    addTreeExpansionListener(createTreeExpansionListener(settings))
     isRootVisible = false
     setExpandableItemsEnabled(false)
     RelativeFont.BOLD.install<SimpleTree>(this)
 
-    expandNodes(defaultGroupNodesToExpand)
+    expandNodes(defaultGroupNodesToExpand, settings)
 
-    selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode)
+    selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode, settings)
   }
 
-  private fun expandNodes(defaultGroupNodesToExpand: List<GroupNode>) {
-    val expandedGroupNodeIds = DeveloperToolsPluginService.instance.expandedGroupNodeIds ?: defaultGroupNodesToExpand.map { it.id }.toSet()
+  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+
+  override fun configureUiHelper(helper: TreeUIHelper) {
+    helper.installTreeSpeedSearch(this, { path: TreePath? -> path?.lastPathComponent?.toString() }, true)
+  }
+
+  override fun setUI(ui: TreeUI?) {
+    super.setUI(ui)
+    val standardRowHeight = JBUI.CurrentTheme.Tree.rowHeight()
+    setRowHeight(standardRowHeight + (standardRowHeight * 0.2f).toInt())
+  }
+
+  fun createWrapperComponent(): JComponent =
+    ScrollPaneFactory.createScrollPane(this@ToolsMenuTree, true).apply {
+      border = ColoredSideBorder(null, null, null, JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(), 1)
+      background = UIUtil.SIDE_PANEL_BACKGROUND
+      viewport.background = UIUtil.SIDE_PANEL_BACKGROUND
+      verticalScrollBar.background = UIUtil.SIDE_PANEL_BACKGROUND
+      horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+    }
+
+  // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun expandNodes(defaultGroupNodesToExpand: List<GroupNode>, settings: DeveloperToolsInstanceSettings) {
+    val expandedGroupNodeIds = settings.expandedGroupNodeIds ?: defaultGroupNodesToExpand.map { it.id }.toSet()
 
     TreeUtil.promiseVisit(this) {
       val lastPathComponent = it.lastPathComponent
@@ -77,9 +104,12 @@ internal class MainMenuTree(
     }
   }
 
-  private fun selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode: ContentNode?) {
+  private fun selectInitiallySelectedDeveloperToolNode(
+    preferredSelectedDeveloperToolNode: ContentNode?,
+    settings: DeveloperToolsInstanceSettings
+  ) {
     var lastSelectedContentNodeSelected = false
-    lastSelectedContentNodeId?.let { lastSelectedComponentNodeId ->
+    settings.lastSelectedContentNodeId.get()?.let { lastSelectedComponentNodeId ->
       TreeUtil.promiseVisit(this) {
         val lastPathComponent = it.lastPathComponent
         if (lastPathComponent is ContentNode && lastPathComponent.id == lastSelectedComponentNodeId) {
@@ -109,32 +139,39 @@ internal class MainMenuTree(
     }
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
-
-  override fun configureUiHelper(helper: TreeUIHelper) {
-    helper.installTreeSpeedSearch(this, { path: TreePath? -> path?.lastPathComponent?.toString() }, true)
-  }
-
-  override fun setUI(ui: TreeUI?) {
-    super.setUI(ui)
-    val standardRowHeight = JBUI.CurrentTheme.Tree.rowHeight()
-    setRowHeight(standardRowHeight + (standardRowHeight * 0.2f).toInt())
-  }
-
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-
-  private fun handleMenuTreeSelection() = TreeSelectionListener { e ->
+  private fun createTreeSelectionListener(settings: DeveloperToolsInstanceSettings) = TreeSelectionListener { e ->
     e.path?.lastPathComponent
       ?.safeCastTo<ContentNode>()
+      ?.takeIf { groupNodeSelectionEnabled || it !is GroupNode }
       ?.let {
-        onContentNodeSelection(it)
-        lastSelectedContentNodeId = it.id
+        selectContentNode(it)
+        settings.lastSelectedContentNodeId.set(it.id)
       }
   }
 
+  private fun createTreeExpansionListener(settings: DeveloperToolsInstanceSettings) = object : TreeExpansionListener {
+
+    override fun treeExpanded(event: TreeExpansionEvent?) {
+      saveState(settings)
+    }
+
+    override fun treeCollapsed(event: TreeExpansionEvent?) {
+      saveState(settings)
+    }
+
+    fun saveState(settings: DeveloperToolsInstanceSettings) {
+      val expandedGroupNodeIds = TreeUtil.collectExpandedPaths(this@ToolsMenuTree)
+        .map { it.lastPathComponent }
+        .filterIsInstance<GroupNode>()
+        .map { it.id }
+        .toSet()
+      settings.setExpandedGroupNodeIds(expandedGroupNodeIds)
+    }
+  }
+
   private fun createTreeNodes(
-    project: Project?,
-    parentDisposable: Disposable
+    parentDisposable: Disposable,
+    settings: DeveloperToolsInstanceSettings
   ): Triple<RootNode, List<GroupNode>, ContentNode?> {
     val rootNode = RootNode()
 
@@ -160,6 +197,7 @@ internal class MainMenuTree(
         val developerToolNode = DeveloperToolNode(
           developerToolId = developerToolFactoryEp.id,
           project = project,
+          settings = settings,
           parentDisposable = parentDisposable,
           developerToolPresentation = developerToolFactory.getDeveloperToolPresentation(),
           developerToolCreator = developerToolCreator
@@ -173,18 +211,7 @@ internal class MainMenuTree(
       }
     }
 
-    rootNode.add(ConfigurationNode())
-
     return Triple(rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode)
-  }
-
-  fun saveState() {
-    val expandedGroupNodeIds = TreeUtil.collectExpandedPaths(this)
-      .map { it.lastPathComponent }
-      .filterIsInstance<GroupNode>()
-      .map { it.id }
-      .toSet()
-    DeveloperToolsPluginService.instance.setExpandedGroupNodeIds(expandedGroupNodeIds)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
