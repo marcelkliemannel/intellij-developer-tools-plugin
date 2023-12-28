@@ -1,9 +1,9 @@
-package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.dialog
+package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.instance.dialog
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareAction
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsDialogSettings
 import kotlin.concurrent.withLock
 
 class OpenMainDialogAction : DumbAwareAction() {
@@ -12,11 +12,11 @@ class OpenMainDialogAction : DumbAwareAction() {
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun actionPerformed(e: AnActionEvent) {
-    DeveloperToolsPluginService.instance.dialogLock.withLock {
-      val currentDialog = DeveloperToolsPluginService.instance.currentDialog.get()
+    DeveloperToolsDialogSettings.instance.dialogLock.withLock {
+      val currentDialog = DeveloperToolsDialogSettings.instance.currentDialog.get()
       if (currentDialog == null || !currentDialog.isShowing) {
         val mainDialog = MainDialog(e.project)
-        DeveloperToolsPluginService.instance.currentDialog.set(mainDialog)
+        DeveloperToolsDialogSettings.instance.currentDialog.set(mainDialog)
         mainDialog.show()
       }
       else {

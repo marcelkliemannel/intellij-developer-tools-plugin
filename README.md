@@ -4,7 +4,7 @@
 
 This plugin is a powerful and versatile set of tools designed to enhance the development experience for software engineers. With its extensive collection of features, developers can increase their productivity and simplify complex operations without leaving their coding environment.
 
-<img src="screenshots/main-dialog.png" alt="Main Dialog" width="932px"/>
+<img src="screenshots/tool-window.png" alt="Main Dialog" width="693px"/>
 
 Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 
@@ -20,6 +20,7 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 - JSON Path Parser
 - JSON Schema Validator
 - Hashing
+- Date Time Converter
 - Code Style Formatting
 - SQL Formatting
 - Password Generator
@@ -28,11 +29,19 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 
 ## Integration
 
-The main dialog with all tools is available through:
+The tools are currently available from the main toolbar as a dialog or tool window. By default, they are added automatically, and you can choose which way you want to keep them. Additional settings can be found in IntelliJ's settings/preferences under **Tools | Developer Tools**.
+
+### Tool Window
+
+The tool window is available through **View | Tool Windows | Tools**. All inputs and configurations of a tool window will be stored on the project level.
+
+### Dialog
+The action to access the dialog is available through:
  - IntelliJ's main menu under **Tools | Developer Tools**;
  - in the toolbar of the old UI if enabled via **View | Toolbar**;
  - and in the new UI in the right main toolbar.
 
+All inputs and configurations of the dialog will be stored on the application level.
 
 ## Development
 

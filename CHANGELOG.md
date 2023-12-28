@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+- The tools are now available through a tool window.
 
 ### Changed
 - Settings have been moved to IntelliJ's settings window

@@ -7,9 +7,9 @@ import com.intellij.openapi.util.Disposer
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService.Companion.assertPersistableType
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.uncheckedCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsInstanceSettings.Companion.assertPersistableType
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -49,7 +49,7 @@ class DeveloperToolConfiguration(
 
   fun reset(
     type: PropertyType? = null,
-    loadExamples: Boolean = DeveloperToolsPluginService.loadExamples
+    loadExamples: Boolean = DeveloperToolsApplicationSettings.loadExamples
   ) {
     isResetting = true
     try {
@@ -67,11 +67,11 @@ class DeveloperToolConfiguration(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun <T : Any> reuseExistingProperty(property: PropertyContainer): ValueProperty<T> {
-    if ((property.type == INPUT && !DeveloperToolsPluginService.saveInputs)
-      || (property.type == CONFIGURATION && !DeveloperToolsPluginService.saveConfigurations)
-      || (property.type == SECRET && !DeveloperToolsPluginService.saveSecrets)
+    if ((property.type == INPUT && !DeveloperToolsApplicationSettings.saveInputs)
+      || (property.type == CONFIGURATION && !DeveloperToolsApplicationSettings.saveConfigurations)
+      || (property.type == SECRET && !DeveloperToolsApplicationSettings.saveSecrets)
     ) {
-      property.reset(DeveloperToolsPluginService.loadExamples)
+      property.reset(DeveloperToolsApplicationSettings.loadExamples)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -87,7 +87,7 @@ class DeveloperToolConfiguration(
     val type = assertPersistableType(defaultValue::class, propertyType)
     val existingProperty = persistentProperties[key]
     val initialValue: T = existingProperty?.uncheckedCastTo(type) ?: let {
-      if (DeveloperToolsPluginService.loadExamples && example != null) example else defaultValue
+      if (DeveloperToolsApplicationSettings.loadExamples && example != null) example else defaultValue
     }
     val valueProperty = ValueProperty(initialValue).apply {
       afterChangeConsumeEvent(null, handlePropertyChange(key))

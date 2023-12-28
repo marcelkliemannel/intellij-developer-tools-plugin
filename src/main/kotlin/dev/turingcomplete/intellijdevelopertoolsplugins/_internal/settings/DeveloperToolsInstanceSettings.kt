@@ -4,10 +4,6 @@ import com.intellij.credentialStore.CredentialAttributes
 import com.intellij.credentialStore.Credentials
 import com.intellij.credentialStore.generateServiceName
 import com.intellij.ide.passwordSafe.PasswordSafe
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.State
-import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.ui.JBColor
 import com.intellij.util.xmlb.Converter
@@ -22,41 +18,25 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.LocaleContainer
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.dialog.MainDialog
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings.Companion.saveConfigurations
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings.Companion.saveInputs
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings.Companion.saveSecrets
 import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 import java.security.Provider
 import java.security.Security
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.locks.ReentrantLock
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
-@State(
-  name = "DeveloperToolsPluginService",
-  storages = [Storage("developer-tools.xml")]
-)
-internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperToolsPluginService.State?> {
+internal abstract class DeveloperToolsInstanceSettings {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val developerToolsConfigurations = ConcurrentHashMap<String, CopyOnWriteArrayList<DeveloperToolConfiguration>>()
-  private val lastSelectedContentNodeId: ValueProperty<String?> = ValueProperty(null)
-  val loadExamples: ValueProperty<Boolean> = ValueProperty(LOAD_EXAMPLES_DEFAULT)
-  val saveConfigurations: ValueProperty<Boolean> = ValueProperty(SAVE_CONFIGURATIONS_DEFAULT)
-  val saveInputs: ValueProperty<Boolean> = ValueProperty(SAVE_INPUTS_DEFAULT)
-  val saveSecrets: ValueProperty<Boolean> = ValueProperty(SAVE_SECRETS_DEFAULT)
-  val dialogIsModal: ValueProperty<Boolean> = ValueProperty(DIALOG_IS_MODAL_DEFAULT)
-  val editorSoftWraps: ValueProperty<Boolean> = ValueProperty(EDITOR_SOFT_WRAPS_DEFAULT)
-  val editorShowSpecialCharacters: ValueProperty<Boolean> = ValueProperty(EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
-  val editorShowWhitespaces: ValueProperty<Boolean> = ValueProperty(EDITOR_SHOW_WHITESPACES_DEFAULT)
-
+  val lastSelectedContentNodeId: ValueProperty<String?> = ValueProperty(null)
   var expandedGroupNodeIds: MutableSet<String>? = null
     private set
-
-  val dialogLock = ReentrantLock()
-  val currentDialog = AtomicReference<MainDialog?>()
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -91,7 +71,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     developerToolsConfigurations[developerToolId]?.remove(developerToolConfiguration)
   }
 
-  override fun getState(): State {
+  open fun getState(): InstanceState {
     val stateDeveloperToolsConfigurations = developerToolsConfigurations.asSequence()
       .flatMap { (developerToolId, developerToolConfigurations) ->
         developerToolConfigurations
@@ -99,31 +79,15 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
           .map { createDeveloperToolConfigurationState(developerToolId, it) }
       }.toList()
 
-    return State(
+    return InstanceState(
       developerToolsConfigurations = stateDeveloperToolsConfigurations,
       lastSelectedContentNodeId = lastSelectedContentNodeId.get(),
-      loadExamples = loadExamples.get(),
-      saveConfigurations = saveConfigurations.get(),
-      saveInputs = saveInputs.get(),
-      saveSecrets = saveSecrets.get(),
-      dialogIsModal = dialogIsModal.get(),
-      editorSoftWraps = editorSoftWraps.get(),
-      editorShowSpecialCharacters = editorShowSpecialCharacters.get(),
-      editorShowWhitespaces = editorShowWhitespaces.get(),
       expandedGroupNodeIds = expandedGroupNodeIds?.toList()
     )
   }
 
-  override fun loadState(state: State) {
+  open fun loadState(state: InstanceState) {
     lastSelectedContentNodeId.set(state.lastSelectedContentNodeId)
-    loadExamples.set(state.loadExamples ?: LOAD_EXAMPLES_DEFAULT)
-    saveConfigurations.set(state.saveConfigurations ?: SAVE_CONFIGURATIONS_DEFAULT)
-    saveInputs.set(state.saveInputs ?: SAVE_INPUTS_DEFAULT)
-    saveSecrets.set(state.saveInputs ?: SAVE_SECRETS_DEFAULT)
-    dialogIsModal.set(state.dialogIsModal ?: DIALOG_IS_MODAL_DEFAULT)
-    editorSoftWraps.set(state.editorSoftWraps ?: EDITOR_SOFT_WRAPS_DEFAULT)
-    editorShowSpecialCharacters.set(state.editorShowSpecialCharacters ?: EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
-    editorShowWhitespaces.set(state.editorShowWhitespaces ?: EDITOR_SHOW_WHITESPACES_DEFAULT)
     setExpandedGroupNodeIds(state.expandedGroupNodeIds?.toSet() ?: emptySet())
 
     developerToolsConfigurations.clear()
@@ -136,8 +100,8 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
           persistentProperties = developerToolsConfigurationState.properties!!
             .asSequence()
             .filter { it.key != null && it.type != null }
-            .filter { it.type != INPUT || saveInputs.get() }
-            .filter { it.type != CONFIGURATION || saveConfigurations.get() }
+            .filter { it.type != INPUT || saveInputs }
+            .filter { it.type != CONFIGURATION || saveConfigurations }
             .mapNotNull { property ->
               restorePropertyValue(
                 developerToolId = developerToolsConfigurationState.developerToolId!!,
@@ -166,8 +130,8 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     properties = developerToolConfiguration
       .properties
       .filter { (_, property) -> property.valueChanged() }
-      .filter { (_, property) -> !(!saveInputs.get() && property.type != INPUT) }
-      .filter { (_, property) -> !(!saveSecrets.get() && property.type != SECRET) }
+      .filter { (_, property) -> !(!saveInputs && property.type != INPUT) }
+      .filter { (_, property) -> !(!saveSecrets && property.type != SECRET) }
       .map { (key, property) ->
         storeProperty(developerToolId = developerToolId, key = key, property = property)
       }
@@ -185,6 +149,9 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
       SECRET -> {
         val credentialAttribute = createPropertyCredentialAttribute(developerToolId = developerToolId, propertyKey = key)
         PasswordSafe.instance.set(credentialAttribute, Credentials(null, property.reference.get() as String))
+        // The value is not stored in the XML file, but we still need the
+        // `DeveloperToolConfigurationProperty` to represent the property.
+        // Therefore we use `*******` as a dummy value.
         DeveloperToolConfigurationProperty(key = key, value = "*******", type = property.type)
       }
     }
@@ -204,7 +171,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
         val credentialAttribute = createPropertyCredentialAttribute(developerToolId = developerToolId, propertyKey = key)
         val secretValue = PasswordSafe.instance.getPassword(credentialAttribute)
 
-        if (!saveSecrets.get()) {
+        if (!saveSecrets) {
           if (secretValue != null) {
             // Remove the secret from the password safe
             PasswordSafe.instance.set(credentialAttribute, null)
@@ -233,29 +200,13 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  data class State(
+  open class InstanceState(
     @get:XCollection(style = v2, elementName = "developerToolsConfigurations")
     var developerToolsConfigurations: List<DeveloperToolConfigurationState>? = null,
     @get:Attribute("lastSelectedContentNodeId")
     var lastSelectedContentNodeId: String? = null,
-    @get:Attribute("loadExamples")
-    var loadExamples: Boolean? = null,
-    @get:Attribute("saveConfigurations")
-    var saveConfigurations: Boolean? = null,
-    @get:Attribute("saveInputs")
-    var saveInputs: Boolean? = null,
-    @get:Attribute("saveSecrets")
-    var saveSecrets: Boolean? = null,
-    @get:Attribute("dialogIsModal")
-    var dialogIsModal: Boolean? = null,
-    @get:Attribute("editorSoftWraps")
-    var editorSoftWraps: Boolean? = null,
-    @get:Attribute("editorShowSpecialCharacters")
-    var editorShowSpecialCharacters: Boolean? = null,
-    @get:Attribute("editorShowWhitespaces")
-    var editorShowWhitespaces: Boolean? = null,
     @get:XCollection(style = v2, elementName = "expandedGroupNodeId")
-    var expandedGroupNodeIds: List<String>? = null,
+    var expandedGroupNodeIds: List<String>? = null
   )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -310,7 +261,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
     /**
      * If the value can't be restored this method must return null. All
      * properties with null values will be filtered in
-     * [DeveloperToolsPluginService.loadState].
+     * [DeveloperToolsInstanceSettings.loadState].
      */
     override fun fromString(serializedValue: String): Any? {
       val valueAndType = serializedValue.split(PROPERTY_TYPE_VALUE_DELIMITER, limit = 2)
@@ -350,10 +301,7 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
 
   companion object {
 
-    val instance: DeveloperToolsPluginService
-      get() = ApplicationManager.getApplication().getService(DeveloperToolsPluginService::class.java)
-
-    private val log = logger<DeveloperToolsPluginService>()
+    private val log = logger<DeveloperToolsInstanceSettings>()
 
     private const val PROPERTY_TYPE_VALUE_DELIMITER = "|"
     private val SUPPORTED_TYPES = setOf<KClass<*>>(
@@ -384,24 +332,5 @@ internal class DeveloperToolsPluginService : PersistentStateComponent<DeveloperT
 
       return type
     }
-
-    const val LOAD_EXAMPLES_DEFAULT = true
-    const val DIALOG_IS_MODAL_DEFAULT = false
-    const val SAVE_INPUTS_DEFAULT = true
-    const val SAVE_SECRETS_DEFAULT = true
-    const val SAVE_CONFIGURATIONS_DEFAULT = true
-    const val EDITOR_SOFT_WRAPS_DEFAULT = true
-    const val EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT = false
-    const val EDITOR_SHOW_WHITESPACES_DEFAULT = false
-
-    var lastSelectedContentNodeId by instance.lastSelectedContentNodeId
-    var loadExamples by instance.loadExamples
-    var saveConfigurations by instance.saveConfigurations
-    var saveInputs by instance.saveInputs
-    var saveSecrets by instance.saveSecrets
-    var dialogIsModal by instance.dialogIsModal
-    var editorSoftWraps by instance.editorSoftWraps
-    var editorShowSpecialCharacters by instance.editorShowSpecialCharacters
-    var editorShowWhitespaces by instance.editorShowWhitespaces
   }
 }

@@ -17,6 +17,7 @@ class DeveloperToolsConfigurable : Configurable {
   private lateinit var saveSecrets: ValueProperty<Boolean>
   private lateinit var loadExamples: ValueProperty<Boolean>
   private lateinit var dialogIsModal: ValueProperty<Boolean>
+  private lateinit var toolWindowMenuHideOnToolSelection: ValueProperty<Boolean>
   private lateinit var editorSoftWraps: ValueProperty<Boolean>
   private lateinit var editorShowSpecialCharacters: ValueProperty<Boolean>
   private lateinit var editorShowWhitespaces: ValueProperty<Boolean>
@@ -28,41 +29,41 @@ class DeveloperToolsConfigurable : Configurable {
 
   override fun createComponent(): JComponent = panel {
     row {
-      saveConfigurations = ValueProperty(DeveloperToolsPluginService.saveConfigurations)
+      saveConfigurations = ValueProperty(DeveloperToolsApplicationSettings.saveConfigurations)
       checkBox("Remember configurations")
         .bindSelected(saveConfigurations)
     }
     row {
-      saveInputs = ValueProperty(DeveloperToolsPluginService.saveInputs)
+      saveInputs = ValueProperty(DeveloperToolsApplicationSettings.saveInputs)
       checkBox("Remember inputs")
         .bindSelected(saveInputs)
     }
     row {
-      saveSecrets = ValueProperty(DeveloperToolsPluginService.saveSecrets)
+      saveSecrets = ValueProperty(DeveloperToolsApplicationSettings.saveSecrets)
       checkBox("Remember secrets")
         .bindSelected(saveSecrets)
     }.comment("Secrets are stored in the <a href='https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html#storage'>system keychain</a>.") {
       BrowserUtil.browse(it.url)
     }
     row {
-      loadExamples = ValueProperty(DeveloperToolsPluginService.loadExamples)
+      loadExamples = ValueProperty(DeveloperToolsApplicationSettings.loadExamples)
       checkBox("Load examples")
         .bindSelected(loadExamples)
     }
 
     groupRowsRange("Default Editor Settings") {
       row {
-        editorSoftWraps = ValueProperty(DeveloperToolsPluginService.editorSoftWraps)
+        editorSoftWraps = ValueProperty(DeveloperToolsApplicationSettings.editorSoftWraps)
         checkBox("Soft-wrap")
           .bindSelected(editorSoftWraps)
       }
       row {
-        editorShowSpecialCharacters = ValueProperty(DeveloperToolsPluginService.editorShowSpecialCharacters)
+        editorShowSpecialCharacters = ValueProperty(DeveloperToolsApplicationSettings.editorShowSpecialCharacters)
         checkBox("Show special characters")
           .bindSelected(editorShowSpecialCharacters)
       }
       row {
-        editorShowWhitespaces = ValueProperty(DeveloperToolsPluginService.editorShowWhitespaces)
+        editorShowWhitespaces = ValueProperty(DeveloperToolsApplicationSettings.editorShowWhitespaces)
         checkBox("Show whitespaces")
           .bindSelected(editorShowWhitespaces)
       }
@@ -70,9 +71,14 @@ class DeveloperToolsConfigurable : Configurable {
 
     groupRowsRange("Advanced") {
       row {
-        dialogIsModal = ValueProperty(DeveloperToolsPluginService.dialogIsModal)
-        checkBox("Dialog is modal")
+        dialogIsModal = ValueProperty(DeveloperToolsDialogSettings.dialogIsModal)
+        checkBox("Dialog is modal and must be closed before continuing to work with IntelliJ")
           .bindSelected(dialogIsModal)
+      }
+      row {
+        toolWindowMenuHideOnToolSelection = ValueProperty(DeveloperToolsApplicationSettings.toolWindowMenuHideOnToolSelection)
+        checkBox("Hide the menu in the tool window after selecting a tool")
+          .bindSelected(toolWindowMenuHideOnToolSelection)
       }
     }
 
@@ -87,35 +93,39 @@ class DeveloperToolsConfigurable : Configurable {
   }
 
   override fun isModified(): Boolean =
-    DeveloperToolsPluginService.saveConfigurations != saveConfigurations.get() ||
-            DeveloperToolsPluginService.saveInputs != saveInputs.get() ||
-            DeveloperToolsPluginService.saveSecrets != saveSecrets.get() ||
-            DeveloperToolsPluginService.loadExamples != loadExamples.get() ||
-            DeveloperToolsPluginService.dialogIsModal != dialogIsModal.get() ||
-            DeveloperToolsPluginService.editorSoftWraps != editorSoftWraps.get() ||
-            DeveloperToolsPluginService.editorShowWhitespaces != editorShowWhitespaces.get() ||
-            DeveloperToolsPluginService.editorShowSpecialCharacters != editorShowSpecialCharacters.get()
+    DeveloperToolsApplicationSettings.saveConfigurations != saveConfigurations.get() ||
+            DeveloperToolsApplicationSettings.saveInputs != saveInputs.get() ||
+            DeveloperToolsApplicationSettings.saveSecrets != saveSecrets.get() ||
+            DeveloperToolsApplicationSettings.loadExamples != loadExamples.get() ||
+            DeveloperToolsDialogSettings.dialogIsModal != dialogIsModal.get() ||
+            DeveloperToolsApplicationSettings.editorSoftWraps != editorSoftWraps.get() ||
+            DeveloperToolsApplicationSettings.editorShowWhitespaces != editorShowWhitespaces.get() ||
+            DeveloperToolsApplicationSettings.editorShowSpecialCharacters != editorShowSpecialCharacters.get() ||
+            DeveloperToolsApplicationSettings.toolWindowMenuHideOnToolSelection != toolWindowMenuHideOnToolSelection.get()
 
   override fun apply() {
-    DeveloperToolsPluginService.saveConfigurations = saveConfigurations.get()
-    DeveloperToolsPluginService.saveInputs = saveInputs.get()
-    DeveloperToolsPluginService.saveSecrets = saveSecrets.get()
-    DeveloperToolsPluginService.loadExamples = loadExamples.get()
-    DeveloperToolsPluginService.dialogIsModal = dialogIsModal.get()
-    DeveloperToolsPluginService.editorSoftWraps = editorSoftWraps.get()
-    DeveloperToolsPluginService.editorShowWhitespaces = editorShowWhitespaces.get()
-    DeveloperToolsPluginService.editorShowSpecialCharacters = editorShowSpecialCharacters.get()
+    DeveloperToolsApplicationSettings.saveConfigurations = saveConfigurations.get()
+    DeveloperToolsApplicationSettings.saveInputs = saveInputs.get()
+    DeveloperToolsApplicationSettings.saveSecrets = saveSecrets.get()
+    DeveloperToolsApplicationSettings.loadExamples = loadExamples.get()
+    DeveloperToolsDialogSettings.dialogIsModal = dialogIsModal.get()
+    DeveloperToolsApplicationSettings.editorSoftWraps = editorSoftWraps.get()
+    DeveloperToolsApplicationSettings.editorShowWhitespaces = editorShowWhitespaces.get()
+    DeveloperToolsApplicationSettings.editorShowSpecialCharacters = editorShowSpecialCharacters.get()
+    DeveloperToolsApplicationSettings.toolWindowMenuHideOnToolSelection = toolWindowMenuHideOnToolSelection.get()
   }
 
   override fun reset() {
-    saveConfigurations.set(DeveloperToolsPluginService.SAVE_CONFIGURATIONS_DEFAULT)
-    saveInputs.set(DeveloperToolsPluginService.SAVE_INPUTS_DEFAULT)
-    saveSecrets.set(DeveloperToolsPluginService.SAVE_SECRETS_DEFAULT)
-    loadExamples.set(DeveloperToolsPluginService.LOAD_EXAMPLES_DEFAULT)
-    dialogIsModal.set(DeveloperToolsPluginService.DIALOG_IS_MODAL_DEFAULT)
-    editorSoftWraps.set(DeveloperToolsPluginService.EDITOR_SOFT_WRAPS_DEFAULT)
-    editorShowWhitespaces.set(DeveloperToolsPluginService.EDITOR_SHOW_WHITESPACES_DEFAULT)
-    editorShowSpecialCharacters.set(DeveloperToolsPluginService.EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
+    saveConfigurations.set(DeveloperToolsApplicationSettings.SAVE_CONFIGURATIONS_DEFAULT)
+    saveInputs.set(DeveloperToolsApplicationSettings.SAVE_INPUTS_DEFAULT)
+    saveSecrets.set(DeveloperToolsApplicationSettings.SAVE_SECRETS_DEFAULT)
+    loadExamples.set(DeveloperToolsApplicationSettings.LOAD_EXAMPLES_DEFAULT)
+    dialogIsModal.set(DeveloperToolsDialogSettings.DIALOG_IS_MODAL_DEFAULT)
+    editorSoftWraps.set(DeveloperToolsApplicationSettings.EDITOR_SOFT_WRAPS_DEFAULT)
+    editorShowWhitespaces.set(DeveloperToolsApplicationSettings.EDITOR_SHOW_WHITESPACES_DEFAULT)
+    editorShowSpecialCharacters.set(DeveloperToolsApplicationSettings.EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
+    toolWindowMenuHideOnToolSelection.set(DeveloperToolsApplicationSettings.TOOL_WINDOW_MENU_HIDE_ON_TOOL_SELECTION)
+    apply()
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //

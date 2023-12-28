@@ -44,7 +44,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolConfigurati
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsPluginService
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.ErrorHolder
@@ -686,7 +686,7 @@ internal class JwtEncoderDecoder(
     }
 
     fun reset() {
-      if (DeveloperToolsPluginService.loadExamples) {
+      if (DeveloperToolsApplicationSettings.loadExamples) {
         secret.set(EXAMPLE_SECRET)
         when (algorithm.get().kind) {
           HMAC -> {}
@@ -775,7 +775,7 @@ internal class JwtEncoderDecoder(
       .decodeBase64()
 
     private fun handleAlgorithmChange() {
-      if (DeveloperToolsPluginService.loadExamples) {
+      if (DeveloperToolsApplicationSettings.loadExamples) {
         loadExampleSecrets()
       }
     }
