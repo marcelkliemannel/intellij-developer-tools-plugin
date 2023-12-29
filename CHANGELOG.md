@@ -5,7 +5,8 @@
 ### Added
 
 ### Changed
-- The tool window is not activated on startup, even if it was previously open, to avoid negatively impacting IntelliJ's startup time.
+- The tool window is not activated on startup anymore if it was previously open, to avoid negatively impacting IntelliJ's startup time.
+- The Open Dialog action will be automatically added to the main menu again. The tools are now visibly available through two ways (toolbar button and tool window), the user has do decide which one to keep.
 
 ### Removed
 
