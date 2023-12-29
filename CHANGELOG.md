@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- The tool window is not activated on startup, even if it was previously open, to avoid negatively impacting IntelliJ's startup time.
 
 ### Removed
 
