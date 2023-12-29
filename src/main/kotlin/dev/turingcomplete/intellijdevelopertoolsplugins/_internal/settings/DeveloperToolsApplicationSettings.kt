@@ -17,6 +17,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugins.common.ValueProperty
 internal class DeveloperToolsApplicationSettings : PersistentStateComponent<ApplicationState> {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
+  var addOpenMainDialogActionToMainToolbar: Boolean by ValueProperty(ADD_OPEN_MAIN_DIALOG_ACTION_TO_MAIN_TOOLBAR_DEFAULT)
+  var promoteAddOpenMainDialogActionToMainToolbar: Boolean by ValueProperty(PROMOTE_ADD_OPEN_MAIN_DIALOG_ACTION_TO_MAIN_TOOLBAR)
   var loadExamples: Boolean by ValueProperty(LOAD_EXAMPLES_DEFAULT)
   var saveConfigurations: Boolean by ValueProperty(SAVE_CONFIGURATIONS_DEFAULT)
   var saveInputs: Boolean by ValueProperty(SAVE_INPUTS_DEFAULT)
@@ -30,6 +32,8 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   override fun getState(): ApplicationState = ApplicationState(
+    addOpenMainDialogActionToMainToolbar = addOpenMainDialogActionToMainToolbar,
+    promoteAddOpenMainDialogActionToMainToolbar = promoteAddOpenMainDialogActionToMainToolbar,
     loadExamples = loadExamples,
     saveConfigurations = saveConfigurations,
     saveInputs = saveInputs,
@@ -40,6 +44,8 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   )
 
   override fun loadState(state: ApplicationState) {
+    addOpenMainDialogActionToMainToolbar = (state.addOpenMainDialogActionToMainToolbar ?: ADD_OPEN_MAIN_DIALOG_ACTION_TO_MAIN_TOOLBAR_DEFAULT)
+    promoteAddOpenMainDialogActionToMainToolbar = (state.promoteAddOpenMainDialogActionToMainToolbar ?: PROMOTE_ADD_OPEN_MAIN_DIALOG_ACTION_TO_MAIN_TOOLBAR)
     loadExamples = (state.loadExamples ?: LOAD_EXAMPLES_DEFAULT)
     saveConfigurations = (state.saveConfigurations ?: SAVE_CONFIGURATIONS_DEFAULT)
     saveInputs = (state.saveInputs ?: SAVE_INPUTS_DEFAULT)
@@ -54,6 +60,10 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   data class ApplicationState(
+    @get:Attribute("addOpenMainDialogActionToMainToolbar")
+    var addOpenMainDialogActionToMainToolbar: Boolean? = null,
+    @get:Attribute("promoteAddOpenMainDialogActionToMainToolbar")
+    var promoteAddOpenMainDialogActionToMainToolbar: Boolean? = null,
     @get:Attribute("loadExamples")
     var loadExamples: Boolean? = null,
     @get:Attribute("saveConfigurations")
@@ -79,6 +89,8 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     val instance: DeveloperToolsApplicationSettings
       get() = ApplicationManager.getApplication().getService(DeveloperToolsApplicationSettings::class.java)
 
+    const val ADD_OPEN_MAIN_DIALOG_ACTION_TO_MAIN_TOOLBAR_DEFAULT = false
+    const val PROMOTE_ADD_OPEN_MAIN_DIALOG_ACTION_TO_MAIN_TOOLBAR = true
     const val LOAD_EXAMPLES_DEFAULT = true
     const val SAVE_INPUTS_DEFAULT = true
     const val SAVE_SECRETS_DEFAULT = true

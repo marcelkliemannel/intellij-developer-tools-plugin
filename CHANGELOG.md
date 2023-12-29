@@ -10,6 +10,20 @@
 
 ### Fixed
 
+## 3.1.0 - 2023-12-29
+
+### Added
+
+- A new option in the settings to add the 'Developer Tools' action to the main toolbar during startup
+
+### Changed
+
+- The tool window is not activated on startup anymore if it was previously open, to avoid negatively impacting IntelliJ's startup time.
+
+### Fixed
+
+- Opening IntelliJ's settings window will reset the configuration to the default values.
+
 ## 3.0.0 - 2023-12-28
 
 ### Added
@@ -19,7 +33,7 @@
 ### Changed
 
 - The Open Dialog action is still available but no longer automatically added to the main menu to favor the new tool window. To restore the old behavior, the action can be added again via **Customize Toolbar... | Add Actions... | Developer Tools**.
-- Settings have been moved to IntelliJ's settings/preferences window
+- Settings have been moved to IntelliJ's settings window
 
 ### Fixed
 

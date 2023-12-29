@@ -29,7 +29,7 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 
 ## Integration
 
-The tools are currently available as a standalone dialog or tool window.  Additional settings can be found in IntelliJ's settings/preferences under **Tools | Developer Tools**.
+The tools are currently available as a standalone dialog or tool window. Additional settings can be found in IntelliJ's settings/preferences under **Tools | Developer Tools**.
 
 ### Tool Window
 

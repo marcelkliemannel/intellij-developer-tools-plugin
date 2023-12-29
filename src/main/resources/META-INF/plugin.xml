@@ -51,6 +51,7 @@
   <depends>com.intellij.modules.lang</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <postStartupActivity implementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginProjectActivity"/>
     <applicationService
             serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings"/>
     <applicationService
@@ -64,7 +65,7 @@
             displayName="Developer Tools"/>
     <toolWindow id="Developer Tools"
                 factoryClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.instance.toolwindow.MainWindowFactory"
-                anchor="right" secondary="true" canCloseContents="false"
+                anchor="right" secondary="true" canCloseContents="false" doNotActivateOnStart="true"
                 icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/toolwindow.svg"/>
   </extensions>
 
