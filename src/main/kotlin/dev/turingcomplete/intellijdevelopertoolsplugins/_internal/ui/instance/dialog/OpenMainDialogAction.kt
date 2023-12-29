@@ -1,8 +1,10 @@
 package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.instance.dialog
 
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareAction
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsDialogSettings
 import kotlin.concurrent.withLock
 
@@ -30,4 +32,11 @@ class OpenMainDialogAction : DumbAwareAction() {
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    fun getAction(): OpenMainDialogAction? = ActionManager.getInstance().getAction(ID)?.safeCastTo<OpenMainDialogAction>()
+
+    private const val ID = "dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.instance.dialog.OpenMainDialogAction"
+  }
 }

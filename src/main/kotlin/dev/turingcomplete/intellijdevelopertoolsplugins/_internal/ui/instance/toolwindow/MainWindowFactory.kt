@@ -79,7 +79,13 @@ class MainWindowFactory : ToolWindowFactory, DumbAware {
   private class ToolWindowContentPanelHandler(
     project: Project,
     parentDisposable: Disposable
-  ) : ContentPanelHandler(project, parentDisposable, DeveloperToolsToolWindowSettings.getInstance(project), false) {
+  ) : ContentPanelHandler(
+    project = project,
+    parentDisposable = parentDisposable,
+    settings = DeveloperToolsToolWindowSettings.getInstance(project),
+    groupNodeSelectionEnabled = false,
+    promoteMainDialog = true
+  ) {
 
     private var lastToolsMenuTreePopup: JBPopup? = null
     private var toolsMenuTreeWrapper: JComponent?

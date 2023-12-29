@@ -2,8 +2,12 @@ package dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.content
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
+import com.intellij.ui.EditorNotificationPanel
+import com.intellij.ui.components.ActionLink
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.AddOpenMainDialogActionToMainToolbarTask
+import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsInstanceSettings
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.ContentNode
 import dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.menu.DeveloperToolNode
@@ -16,7 +20,8 @@ internal open class ContentPanelHandler(
   project: Project?,
   protected val parentDisposable: Disposable,
   settings: DeveloperToolsInstanceSettings,
-  groupNodeSelectionEnabled: Boolean = true
+  groupNodeSelectionEnabled: Boolean = true,
+  promoteMainDialog: Boolean = false
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -24,6 +29,9 @@ internal open class ContentPanelHandler(
 
   val contentPanel = BorderLayoutPanel()
   val toolsMenuTree: ToolsMenuTree
+
+  private val innerContentPanel = BorderLayoutPanel()
+  private val mainDialogPromotionPanel = BorderLayoutPanel()
 
   private val cachedGroupsPanels = mutableMapOf<String, GroupContentPanel>()
   private val cachedDeveloperToolsPanels = mutableMapOf<DeveloperToolNode, DeveloperToolContentPanel>()
@@ -35,6 +43,13 @@ internal open class ContentPanelHandler(
     toolsMenuTree = ToolsMenuTree(project, parentDisposable, settings, groupNodeSelectionEnabled) {
       handleContentNodeSelection(it)
     }
+
+    initMainDialogPromotionPanel(promoteMainDialog)
+
+    contentPanel.apply {
+      addToTop(mainDialogPromotionPanel)
+      addToCenter(innerContentPanel)
+    }
   }
 
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -43,6 +58,33 @@ internal open class ContentPanelHandler(
     DeveloperToolContentPanel(developerToolNode)
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun initMainDialogPromotionPanel(promoteMainDialog: Boolean) {
+    if (!promoteMainDialog) {
+      return
+    }
+
+    if (!DeveloperToolsApplicationSettings.instance.promoteAddOpenMainDialogActionToMainToolbar) {
+      return
+    }
+
+    val addOpenMainDialogActionToMainToolbarTask = AddOpenMainDialogActionToMainToolbarTask.createIfAvailable()
+      ?: return
+
+    val promoteMainDialogNotificationPanel = PromoteMainDialogNotificationPanel { addOpenMainDialogActionToMainToolbar ->
+      DeveloperToolsApplicationSettings.instance.apply {
+        this@apply.addOpenMainDialogActionToMainToolbar = addOpenMainDialogActionToMainToolbar
+        promoteAddOpenMainDialogActionToMainToolbar = false
+      }
+
+      if (addOpenMainDialogActionToMainToolbar) {
+        addOpenMainDialogActionToMainToolbarTask.run()
+      }
+
+      mainDialogPromotionPanel.isVisible = false
+    }
+    mainDialogPromotionPanel.addToCenter(promoteMainDialogNotificationPanel)
+  }
 
   private fun handleContentNodeSelection(new: ContentNode?) {
     val old = selectedContentNode.get()
@@ -77,7 +119,7 @@ internal open class ContentPanelHandler(
   }
 
   private fun setContentPanel(nodePanel: JPanel) {
-    contentPanel.apply {
+    innerContentPanel.apply {
       removeAll()
       addToCenter(nodePanel)
       revalidate()
@@ -86,5 +128,17 @@ internal open class ContentPanelHandler(
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class PromoteMainDialogNotificationPanel(
+    closeNotification: (Boolean) -> Unit
+  ) : EditorNotificationPanel(Status.Promo) {
+
+    init {
+      text = "<html>The tools are also available as a standalone window.</html>"
+      myLinksPanel.add(ActionLink("Add to main toolbar") { closeNotification(true) })
+      setCloseAction { closeNotification(false) }
+    }
+  }
+
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 }
