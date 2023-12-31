@@ -2,7 +2,7 @@
   <developerToolsConfigurations>
     <property key="selectedTimeZoneId" referenceId="unix-timestamp-converter" value="kotlin.String|Europe/Berlin"/>
     <property key="lettersMode" referenceId="password-generator"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator$LettersMode|ASCII_ALPHABET"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.PasswordGenerator$LettersMode|ASCII_ALPHABET"/>
     <property key="length" referenceId="password-generator" value="kotlin.Int|30"/>
     <property key="addSymbols" referenceId="password-generator" value="kotlin.Boolean|true"/>
     <property key="symbols" referenceId="password-generator"
@@ -18,7 +18,7 @@
     <property key="liveConversion" referenceId="java-text-escape" value="kotlin.Boolean|true"/>
     <property key="liveConversion" referenceId="jwt-encoder-decoder" value="kotlin.Boolean|true"/>
     <property key="signatureAlgorithm" referenceId="jwt-encoder-decoder"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder$SignatureAlgorithm|HMAC512"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder$SignatureAlgorithm|HMAC512"/>
     <property key="selectedAlgorithm" referenceId="hmac-transformer" value="kotlin.String|HMACSHA256"/>
     <property key="liveTransformation" referenceId="hmac-transformer" value="kotlin.Boolean|true"/>
     <property key="liveTransformation" referenceId="json-path" value="kotlin.Boolean|true"/>
@@ -27,9 +27,9 @@
     <property key="liveTransformation" referenceId="code-style-formatter" value="kotlin.Boolean|true"/>
     <property key="liveConversion" referenceId="text-format-converter" value="kotlin.Boolean|true"/>
     <property key="secondLanguage" referenceId="text-format-converter"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.CodeFormattingConverter$Language|YAML"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CodeFormattingConverter$Language|YAML"/>
     <property key="firstLanguage" referenceId="text-format-converter"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.CodeFormattingConverter$Language|JSON"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CodeFormattingConverter$Language|JSON"/>
     <property key="liveConversion" referenceId="mime-base64-encoder-decoder" value="kotlin.Boolean|true"/>
     <property key="selectedRegexOption" referenceId="regular-expression-matcher" value="kotlin.Int|0"/>
     <property key="uppercase" referenceId="sql-formatter" value="kotlin.Boolean|true"/>
@@ -42,32 +42,32 @@
     <property key="UUIDv1IndividualMacAddress" referenceId="uuid-generator" value="kotlin.String|kkkkkkkkkkk"/>
     <property key="UUIDv5Name" referenceId="uuid-generator" value="kotlin.String|"/>
     <property key="UUIDv6MacAddressGenerationMode" referenceId="uuid-generator"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.MacAddressBasedUuidGenerator$MacAddressGenerationMode|RANDOM"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.MacAddressBasedUuidGenerator$MacAddressGenerationMode|RANDOM"/>
     <property key="UUIDv6IndividualMacAddress" referenceId="uuid-generator" value="kotlin.String|"/>
     <property key="UUIDv5IndividualNamespace" referenceId="uuid-generator" value="kotlin.String|"/>
     <property key="UUIDv1LocalInterface" referenceId="uuid-generator" value="kotlin.String|:aa:bb:5c:43:e8:41"/>
     <property key="UUIDv6LocalInterface" referenceId="uuid-generator" value="kotlin.String|"/>
     <property key="UUIDv5PredefinedNamespace" referenceId="uuid-generator"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.NamespaceAndNameBasedUuidGenerator$PredefinedNamespace|DNS"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.NamespaceAndNameBasedUuidGenerator$PredefinedNamespace|DNS"/>
     <property key="UUIDv3Name" referenceId="uuid-generator" value="kotlin.String|lll"/>
     <property key="version" referenceId="uuid-generator"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.UuidVersion|V4"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.UuidVersion|V4"/>
     <property key="UUIDv3PredefinedNamespace" referenceId="uuid-generator"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.NamespaceAndNameBasedUuidGenerator$PredefinedNamespace|DNS"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.NamespaceAndNameBasedUuidGenerator$PredefinedNamespace|DNS"/>
     <property key="UUIDv5NamespaceMode" referenceId="uuid-generator"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.NamespaceAndNameBasedUuidGenerator$NamespaceMode|PREDEFINED"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.NamespaceAndNameBasedUuidGenerator$NamespaceMode|PREDEFINED"/>
     <property key="UUIDv3IndividualNamespace" referenceId="uuid-generator" value="kotlin.String|lll"/>
     <property key="UUIDv1MacAddressGenerationMode" referenceId="uuid-generator"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.MacAddressBasedUuidGenerator$MacAddressGenerationMode|RANDOM"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.MacAddressBasedUuidGenerator$MacAddressGenerationMode|RANDOM"/>
     <property key="UUIDv3NamespaceMode" referenceId="uuid-generator"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.NamespaceAndNameBasedUuidGenerator$NamespaceMode|PREDEFINED"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.NamespaceAndNameBasedUuidGenerator$NamespaceMode|PREDEFINED"/>
     <property key="outputTextCase" referenceId="text-case-transformer"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$TextCase|COBOL_CASE"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextCaseTransformer$TextCase|COBOL_CASE"/>
     <property key="inputTextCase" referenceId="text-case-transformer"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$TextCase|CAMEL_CASE"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextCaseTransformer$TextCase|CAMEL_CASE"/>
     <property key="liveTransformation" referenceId="text-case-transformer" value="kotlin.Boolean|true"/>
     <property key="originalParsingMode" referenceId="text-case-transformer"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$OriginalParsingMode|FIXED_TEXT_CASE"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextCaseTransformer$OriginalParsingMode|FIXED_TEXT_CASE"/>
     <property key="individualDelimiter" referenceId="text-case-transformer" value="kotlin.String| "/>
     <property key="startWithLoremIpsum" referenceId="lorem-ipsum-generator" value="kotlin.Boolean|true"/>
     <property key="maxWordsInBullet" referenceId="lorem-ipsum-generator" value="kotlin.Int|30"/>
@@ -76,7 +76,7 @@
     <property key="numberOfValues" referenceId="lorem-ipsum-generator" value="kotlin.Int|9"/>
     <property key="minWordsInBullet" referenceId="lorem-ipsum-generator" value="kotlin.Int|10"/>
     <property key="generatedTextKind" referenceId="lorem-ipsum-generator"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$TextMode|PARAGRAPHS"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.LoremIpsumGenerator$TextMode|PARAGRAPHS"/>
     <property key="liveConversion" referenceId="url-base64-encoder-decoder" value="kotlin.Boolean|true"/>
     <property key="liveConversion" referenceId="csv-text-escape" value="kotlin.Boolean|true"/>
     <property key="selectedAlgorithm" referenceId="hashing-transformer" value="kotlin.String|SHA3-256"/>
@@ -84,22 +84,22 @@
     <property key="sortedIndividualJoinWordsDelimiter" referenceId="text-sorting-transformer" value="kotlin.String| "/>
     <property key="reverseOrder" referenceId="text-sorting-transformer" value="kotlin.Boolean|false"/>
     <property key="sortedJoinWordsDelimiter" referenceId="text-sorting-transformer"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$WordsDelimiter|LINE_BREAK"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextSortingTransformer$WordsDelimiter|LINE_BREAK"/>
     <property key="trimWords" referenceId="text-sorting-transformer" value="kotlin.Boolean|true"/>
     <property key="unsortedIndividualSplitWordsDelimiter" referenceId="text-sorting-transformer"
               value="kotlin.String| "/>
     <property key="unsortedPredefinedDelimiter" referenceId="text-sorting-transformer"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$WordsDelimiter|LINE_BREAK"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextSortingTransformer$WordsDelimiter|LINE_BREAK"/>
     <property key="caseInsensitive" referenceId="text-sorting-transformer" value="kotlin.Boolean|false"/>
     <property key="removeBlankWords" referenceId="text-sorting-transformer" value="kotlin.Boolean|true"/>
     <property key="sortingOrder" referenceId="text-sorting-transformer"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$SortingOrder|LEXICOGRAPHIC"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextSortingTransformer$SortingOrder|LEXICOGRAPHIC"/>
     <property key="liveTransformation" referenceId="text-sorting-transformer" value="kotlin.Boolean|true"/>
     <property key="removeDuplicates" referenceId="text-sorting-transformer" value="kotlin.Boolean|true"/>
     <property key="liveConversion" referenceId="xml-text-escape" value="kotlin.Boolean|true"/>
     <property key="liveConversion" referenceId="line-breaks-encoder-decoder" value="kotlin.Boolean|true"/>
     <property key="lineBreakDecoding" referenceId="line-breaks-encoder-decoder"
-              value="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.LineBreaksEncoderDecoder$LineBreak|LF"/>
+              value="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.LineBreaksEncoderDecoder$LineBreak|LF"/>
   </developerToolsConfigurations>
   <generalSettings>
     <property key="mainMenuTree_lastSelectedContentNodeId" value="kotlin.String|jwt-encoder-decoder"/>
