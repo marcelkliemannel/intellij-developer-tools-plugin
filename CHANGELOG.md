@@ -3,8 +3,10 @@
 ## Unreleased
 
 ### Added
+- Add Nano ID generator
 
 ### Changed
+- The UUID generator was moved to the "Cryptography" group
 
 ### Removed
 

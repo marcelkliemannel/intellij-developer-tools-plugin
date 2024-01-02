@@ -169,6 +169,14 @@
 
     <!-- cryptography -->
     <developerUiTool
+            id="uuid-generator"
+            groupId="cryptography"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.UuidGenerator$Factory"/>
+    <developerUiTool
+            id="nano-id-generator"
+            groupId="cryptography"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.NanoIdGenerator$Factory"/>
+    <developerUiTool
             id="hashing-transformer"
             groupId="cryptography"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.HashingTransformer$Factory"/>
@@ -203,9 +211,6 @@
     <developerUiTool
             id="text-format-converter"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CodeFormattingConverter$Factory"/>
-    <developerUiTool
-            id="uuid-generator"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.UuidGenerator$Factory"/>
     <developerUiTool
             id="text-sorting-transformer"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextSortingTransformer$Factory"/>

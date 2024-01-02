@@ -16,8 +16,8 @@ class ErrorHolder {
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  fun add(postFix: String, exception: Exception) {
-    errors.add("$postFix ${exception.message ?: exception::class.java.simpleName}")
+  fun add(prefix: String, exception: Exception) {
+    errors.add("$prefix ${exception.message ?: exception::class.java.simpleName}")
     fireChange()
   }
 

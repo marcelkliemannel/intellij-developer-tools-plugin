@@ -47,6 +47,7 @@ dependencies {
   val zxing = "3.5.1"
   implementation("com.google.zxing:core:$zxing")
   implementation("com.google.zxing:javase:$zxing")
+  implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
 
   testImplementation("org.assertj:assertj-core:3.24.2")
   testImplementation("org.xmlunit:xmlunit-assertj:2.9.1")
