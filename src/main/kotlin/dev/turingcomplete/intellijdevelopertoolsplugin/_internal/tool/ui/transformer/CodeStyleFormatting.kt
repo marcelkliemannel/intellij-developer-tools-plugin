@@ -11,14 +11,14 @@ import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 
 class CodeStyleFormatting(
   private val codeStyles: List<CodeStyle>,
   project: Project,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : TextTransformer(
@@ -105,7 +105,7 @@ class CodeStyleFormatting(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> CodeStyleFormatting)? {
       if (project == null) {
         return null

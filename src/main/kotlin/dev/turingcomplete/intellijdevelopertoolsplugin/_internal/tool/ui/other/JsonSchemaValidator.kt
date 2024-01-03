@@ -21,7 +21,7 @@ import com.networknt.schema.SpecVersionDetector
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
@@ -30,7 +30,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHol
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.PropertyComponentPredicate
 
 class JsonSchemaValidator(
-  private val context: DeveloperUiToolExContext,
+  private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   private val project: Project?
@@ -211,7 +211,7 @@ class JsonSchemaValidator(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> JsonSchemaValidator) =
       { configuration -> JsonSchemaValidator(context, configuration, parentDisposable, project) }
   }

@@ -6,14 +6,14 @@ import com.intellij.ui.EditorNotificationPanel
 import com.intellij.ui.components.ActionLink
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.AddOpenMainDialogActionToMainToolbarTask
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsInstanceSettings
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.AddOpenMainDialogActionToMainToolbarTask
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.ContentNode
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.DeveloperToolNode
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.GroupNode
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.ToolsMenuTree
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import javax.swing.JPanel
 
 internal open class ContentPanelHandler(
@@ -21,7 +21,8 @@ internal open class ContentPanelHandler(
   protected val parentDisposable: Disposable,
   settings: DeveloperToolsInstanceSettings,
   groupNodeSelectionEnabled: Boolean = true,
-  promoteMainDialog: Boolean = false
+  promoteMainDialog: Boolean = false,
+  prioritizeVerticalLayout: Boolean = false
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -40,7 +41,7 @@ internal open class ContentPanelHandler(
 
   init {
     // The creation of `ToolsMenuTree` will trigger the initial node selection
-    toolsMenuTree = ToolsMenuTree(project, parentDisposable, settings, groupNodeSelectionEnabled) {
+    toolsMenuTree = ToolsMenuTree(project, parentDisposable, settings, groupNodeSelectionEnabled, prioritizeVerticalLayout) {
       handleContentNodeSelection(it)
     }
 

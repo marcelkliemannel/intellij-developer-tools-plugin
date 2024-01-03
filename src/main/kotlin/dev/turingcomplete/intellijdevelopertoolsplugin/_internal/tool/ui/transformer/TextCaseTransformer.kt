@@ -8,7 +8,7 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.selected
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.bind
@@ -22,7 +22,7 @@ import dev.turingcomplete.textcaseconverter.toWordsSplitter
 import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 
 class TextCaseTransformer(
-  context : DeveloperUiToolExContext,
+  context : DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   project: Project?
@@ -148,7 +148,7 @@ class TextCaseTransformer(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> TextCaseTransformer) = { configuration ->
       TextCaseTransformer(context, configuration, parentDisposable, project)
     }

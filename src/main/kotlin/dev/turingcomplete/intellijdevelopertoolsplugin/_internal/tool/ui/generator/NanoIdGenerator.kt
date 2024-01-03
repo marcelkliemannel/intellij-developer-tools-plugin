@@ -4,13 +4,13 @@ import com.aventrix.jnanoid.jnanoid.NanoIdUtils
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 
 internal class NanoIdGenerator(
   project: Project?,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : OneLineTextGenerator(
@@ -39,7 +39,7 @@ internal class NanoIdGenerator(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> NanoIdGenerator) = { configuration ->
       NanoIdGenerator(project, context, configuration, parentDisposable)
     }

@@ -6,7 +6,7 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.util.system.OS
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import java.lang.System.lineSeparator
@@ -14,7 +14,7 @@ import java.lang.System.lineSeparator
 internal class CliCommandConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) : TextConverter(
   textConverterContext = TextConverterContext(
@@ -84,7 +84,7 @@ internal class CliCommandConverter(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> CliCommandConverter) =
       { configuration ->
         CliCommandConverter(

@@ -84,7 +84,8 @@ class MainWindowFactory : ToolWindowFactory, DumbAware {
     parentDisposable = parentDisposable,
     settings = DeveloperToolsToolWindowSettings.getInstance(project),
     groupNodeSelectionEnabled = false,
-    promoteMainDialog = true
+    promoteMainDialog = true,
+    prioritizeVerticalLayout = true
   ) {
 
     private var lastToolsMenuTreePopup: JBPopup? = null

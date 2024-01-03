@@ -51,7 +51,7 @@ import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.actionsPopup
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.dumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
@@ -66,7 +66,7 @@ import kotlin.math.max
 
 internal class DeveloperToolEditor(
   private val id: String,
-  private val context: DeveloperUiToolExContext,
+  private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
   private val project: Project?,
   private val title: String? = null,

@@ -50,7 +50,7 @@ import com.intellij.util.ui.JBUI
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
@@ -77,7 +77,7 @@ import javax.swing.border.LineBorder
 
 internal class BarcodeGenerator private constructor(
   private val formats: Map<Format, FormatConfiguration>,
-  private val context: DeveloperUiToolExContext,
+  private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
   private val project: Project?,
   parentDisposable: Disposable
@@ -862,7 +862,7 @@ internal class BarcodeGenerator private constructor(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> BarcodeGenerator) = { configuration ->
       val formats: Map<Format, FormatConfiguration> = Format.entries.associateWith {
         it.createConfiguration(configuration)

@@ -15,7 +15,7 @@ import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
@@ -27,7 +27,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValuePro
 internal abstract class TextConverter(
   protected val textConverterContext: TextConverterContext,
   protected val configuration: DeveloperToolConfiguration,
-  protected val context: DeveloperUiToolExContext,
+  protected val context: DeveloperUiToolContext,
   protected val project: Project?,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {

@@ -4,7 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.testFramework.junit5.TestApplication
 import com.intellij.testFramework.junit5.TestDisposable
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CliCommandConverter
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -53,6 +53,6 @@ app \
 
   companion object {
 
-    private val context = DeveloperUiToolExContext("cli-command-converter")
+    private val context = DeveloperUiToolContext("cli-command-converter", true)
   }
 }

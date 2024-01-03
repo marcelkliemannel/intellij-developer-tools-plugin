@@ -48,7 +48,7 @@ import com.intellij.util.ui.UIUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CommonsDataKeys
@@ -72,7 +72,7 @@ import javax.swing.table.AbstractTableModel
 import java.util.regex.Pattern as JavaPattern
 
 class RegularExpressionMatcher(
-  private val context: DeveloperUiToolExContext,
+  private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
   private val project: Project?,
   parentDisposable: Disposable
@@ -462,7 +462,7 @@ class RegularExpressionMatcher(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> RegularExpressionMatcher) =
       { configuration -> RegularExpressionMatcher(context, configuration, project, parentDisposable) }
   }

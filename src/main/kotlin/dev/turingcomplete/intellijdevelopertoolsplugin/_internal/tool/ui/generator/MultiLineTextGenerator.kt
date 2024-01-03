@@ -6,13 +6,13 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 
 abstract class MultiLineTextGenerator(
   private val generatedTextTitle: String,
-  private val context: DeveloperUiToolExContext,
+  private val context: DeveloperUiToolContext,
   private val project: Project?,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable

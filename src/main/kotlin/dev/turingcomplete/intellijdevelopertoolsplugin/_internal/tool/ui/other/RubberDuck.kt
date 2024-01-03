@@ -7,11 +7,11 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.util.ui.components.BorderLayoutPanel
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import java.awt.Image.SCALE_SMOOTH
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
@@ -66,7 +66,7 @@ class RubberDuck(parentDisposable: Disposable) : DeveloperUiTool(parentDisposabl
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> RubberDuck) = { RubberDuck(parentDisposable) }
   }
 

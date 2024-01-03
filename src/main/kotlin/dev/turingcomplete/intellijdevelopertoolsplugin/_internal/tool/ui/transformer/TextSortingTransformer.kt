@@ -11,7 +11,7 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.layout.ComboBoxPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.makeCaseInsensitive
@@ -19,7 +19,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transfo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextSortingTransformer.WordsDelimiter.LINE_BREAK
 
 internal class TextSortingTransformer(
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   project: Project?
@@ -177,7 +177,7 @@ internal class TextSortingTransformer(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> TextSortingTransformer) = { configuration ->
       TextSortingTransformer(context, configuration, parentDisposable, project)
     }

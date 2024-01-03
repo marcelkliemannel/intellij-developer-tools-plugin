@@ -21,7 +21,7 @@ import com.intellij.util.Alarm
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.BooleanComponentPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyAction.Companion.CONTENT_DATA_KEY
@@ -36,7 +36,7 @@ import org.apache.commons.text.StringEscapeUtils
 
 abstract class OneLineTextGenerator(
   private val project: Project?,
-  private val context: DeveloperUiToolExContext,
+  private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   initialGeneratedTextTitle: String = "Generated text:"

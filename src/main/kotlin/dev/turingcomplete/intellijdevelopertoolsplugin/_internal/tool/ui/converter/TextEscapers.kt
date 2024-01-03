@@ -3,7 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.conver
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.TextConverter.TextConverterContext
@@ -28,7 +28,7 @@ internal fun createEscapeUnescapeContext(title: String) = TextConverterContext(
 internal class HtmlEntitiesEscape(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) :
   TextConverter(
@@ -57,7 +57,7 @@ internal class HtmlEntitiesEscape(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> HtmlEntitiesEscape) =
       { configuration -> HtmlEntitiesEscape(configuration, parentDisposable, context, project) }
   }
@@ -68,7 +68,7 @@ internal class HtmlEntitiesEscape(
 internal class JavaTextEscape(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) :
   TextConverter(
@@ -97,7 +97,7 @@ internal class JavaTextEscape(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> JavaTextEscape) =
       { configuration -> JavaTextEscape(configuration, parentDisposable, context, project) }
   }
@@ -108,7 +108,7 @@ internal class JavaTextEscape(
 internal class JsonTextEscape(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) :
   TextConverter(
@@ -137,7 +137,7 @@ internal class JsonTextEscape(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> JsonTextEscape) =
       { configuration -> JsonTextEscape(configuration, parentDisposable, context, project) }
   }
@@ -148,7 +148,7 @@ internal class JsonTextEscape(
 internal class CsvTextEscape(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) :
   TextConverter(
@@ -177,7 +177,7 @@ internal class CsvTextEscape(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> CsvTextEscape) =
       { configuration -> CsvTextEscape(configuration, parentDisposable, context, project) }
   }
@@ -188,7 +188,7 @@ internal class CsvTextEscape(
 internal class XmlTextEscape(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) :
   TextConverter(
@@ -217,7 +217,7 @@ internal class XmlTextEscape(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> XmlTextEscape) =
       { configuration -> XmlTextEscape(configuration, parentDisposable, context, project) }
   }

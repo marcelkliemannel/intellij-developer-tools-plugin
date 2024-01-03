@@ -12,7 +12,7 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.selected
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.bindIntTextImproved
@@ -28,7 +28,7 @@ import javax.swing.JComponent
 
 internal class PasswordGenerator(
   project: Project?,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : OneLineTextGenerator(
@@ -150,7 +150,7 @@ internal class PasswordGenerator(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> PasswordGenerator) = { configuration ->
       PasswordGenerator(project, context, configuration, parentDisposable)
     }

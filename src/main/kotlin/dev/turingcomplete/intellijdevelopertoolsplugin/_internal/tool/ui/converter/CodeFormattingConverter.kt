@@ -12,7 +12,7 @@ import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
@@ -22,7 +22,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValuePro
 internal class CodeFormattingConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) : TextConverter(
   textConverterContext = TextConverterContext(
@@ -132,7 +132,7 @@ internal class CodeFormattingConverter(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> CodeFormattingConverter) = { configuration ->
       CodeFormattingConverter(configuration, parentDisposable, context, project)
     }

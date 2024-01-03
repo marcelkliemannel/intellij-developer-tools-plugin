@@ -3,7 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.conver
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import org.apache.commons.codec.binary.Base32
@@ -28,7 +28,7 @@ internal val encoderDecoderTextConverterContext = TextConverter.TextConverterCon
 internal class Base32EncoderDecoder(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) :
   TextConverter(
@@ -57,7 +57,7 @@ internal class Base32EncoderDecoder(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> Base32EncoderDecoder) =
       { configuration -> Base32EncoderDecoder(configuration, parentDisposable, context, project) }
   }
@@ -68,7 +68,7 @@ internal class Base32EncoderDecoder(
 internal class Base64EncoderDecoder(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) :
   TextConverter(
@@ -97,7 +97,7 @@ internal class Base64EncoderDecoder(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> Base64EncoderDecoder) =
       { configuration -> Base64EncoderDecoder(configuration, parentDisposable, context, project) }
   }
@@ -108,7 +108,7 @@ internal class Base64EncoderDecoder(
 internal class UrlBase64EncoderDecoder(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) :
   TextConverter(
@@ -137,7 +137,7 @@ internal class UrlBase64EncoderDecoder(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> UrlBase64EncoderDecoder) =
       { configuration -> UrlBase64EncoderDecoder(configuration, parentDisposable, context, project) }
   }
@@ -148,7 +148,7 @@ internal class UrlBase64EncoderDecoder(
 internal class MimeBase64EncoderDecoder(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) :
   TextConverter(
@@ -177,7 +177,7 @@ internal class MimeBase64EncoderDecoder(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> MimeBase64EncoderDecoder) =
       { configuration -> MimeBase64EncoderDecoder(configuration, parentDisposable, context, project) }
   }
@@ -188,7 +188,7 @@ internal class MimeBase64EncoderDecoder(
 internal class UrlEncodingEncoderDecoder(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) :
   TextConverter(
@@ -217,7 +217,7 @@ internal class UrlEncodingEncoderDecoder(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> UrlEncodingEncoderDecoder) =
       { configuration -> UrlEncodingEncoderDecoder(configuration, parentDisposable, context, project) }
   }

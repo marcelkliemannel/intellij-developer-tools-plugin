@@ -17,7 +17,7 @@ import com.intellij.ui.treeStructure.SimpleTree
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.tree.TreeUtil
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperUiToolFactoryEp
@@ -41,7 +41,8 @@ internal class ToolsMenuTree(
   parentDisposable: Disposable,
   settings: DeveloperToolsInstanceSettings,
   private val groupNodeSelectionEnabled: Boolean = true,
-  private val selectContentNode: (ContentNode) -> Unit
+  private val prioritizeVerticalLayout: Boolean = false,
+  private val selectContentNode: (ContentNode) -> Unit,
 ) : SimpleTree() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
@@ -190,7 +191,7 @@ internal class ToolsMenuTree(
     val application = ApplicationManager.getApplication()
     DeveloperUiToolFactoryEp.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
       val developerUiToolFactory: DeveloperUiToolFactory<*> = developerToolFactoryEp.createInstance(application)
-      val context = DeveloperUiToolExContext(developerToolFactoryEp.id)
+      val context = DeveloperUiToolContext(developerToolFactoryEp.id, prioritizeVerticalLayout)
       developerUiToolFactory.getDeveloperUiToolCreator(project, parentDisposable, context)?.let { developerToolCreator ->
         val groupId: String? = developerToolFactoryEp.groupId
         val parentNode = if (groupId != null) (groupNodes[groupId] ?: error("Unknown group: $groupId")) else rootNode

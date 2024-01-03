@@ -3,7 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.developertool.generator
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.intellij.testFramework.junit5.TestApplication
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.LoremIpsumGenerator
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
@@ -31,7 +31,7 @@ class LoremIpsumGeneratorTest : BasePlatformTestCase() {
     ]
   )
   fun `test generation of iconic sentence`(atMostWords: Int, expectedSentence: String?) {
-    val actualSentence = LoremIpsumGenerator(null, DeveloperUiToolExContext("lorem-ipsum-generator"), DeveloperToolConfiguration("Test")) { }
+    val actualSentence = LoremIpsumGenerator(null, DeveloperUiToolContext("lorem-ipsum-generator", true), DeveloperToolConfiguration("Test")) { }
       .generateIconicText(atMostWords, true)
     assertThat(actualSentence.joinToString(" ")).isEqualTo(expectedSentence ?: "")
   }

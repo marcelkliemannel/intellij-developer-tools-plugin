@@ -14,7 +14,7 @@ interface DeveloperUiToolFactory<T : DeveloperUiTool> {
   fun getDeveloperUiToolCreator(
     project: Project?,
     parentDisposable: Disposable,
-    context: DeveloperUiToolExContext
+    context: DeveloperUiToolContext
   ): ((DeveloperToolConfiguration) -> T)?
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //

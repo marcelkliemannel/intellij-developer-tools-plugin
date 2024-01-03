@@ -23,6 +23,7 @@ import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.LabelPosition
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.actionButton
@@ -36,12 +37,12 @@ import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.ComboBoxPredicate
 import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SECRET
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
@@ -49,6 +50,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.Develope
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.SimpleToggleAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.setValidationResultBorder
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toPrettyStringWithDefaultObjectMapper
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
@@ -70,7 +72,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.convert
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.ECDSA
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.HMAC
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.RSA
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import io.ktor.util.*
 import org.apache.commons.codec.binary.Base32
 import java.security.KeyFactory
@@ -86,7 +87,7 @@ import java.util.*
 import javax.swing.Icon
 
 internal class JwtEncoderDecoder(
-  private val context: DeveloperUiToolExContext,
+  private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   private val project: Project?,
@@ -159,19 +160,20 @@ internal class JwtEncoderDecoder(
       }.enabledIf(liveConversionCheckBox.selected.not())
     }
 
-    row {
-      cell(headerEditor.component)
-        .validationOnApply(headerEditor.bindValidator(jwt.headerErrorHolder.asValidation()))
-        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
-        .align(Align.FILL)
-        .resizableColumn()
-
-      cell(payloadEditor.component)
-        .validationOnApply(payloadEditor.bindValidator(jwt.payloadErrorHolder.asValidation()))
-        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
-        .align(Align.FILL)
-        .resizableColumn()
-    }.resizableRow().topGap(TopGap.SMALL).bottomGap(BottomGap.NONE)
+    if (context.prioritizeVerticalLayout) {
+      row {
+        buildHeaderEditorUi()
+      }.topGap(TopGap.SMALL)
+      row {
+        buildPayloadEditorUi()
+      }.topGap(TopGap.SMALL).bottomGap(BottomGap.NONE)
+    }
+    else {
+      row {
+        buildHeaderEditorUi()
+        buildPayloadEditorUi()
+      }.resizableRow().topGap(TopGap.SMALL).bottomGap(BottomGap.NONE)
+    }
 
     collapsibleGroup("Signature Algorithm Configuration") {
       lateinit var signatureAlgorithmComboBox: ComboBox<SignatureAlgorithm>
@@ -233,6 +235,22 @@ internal class JwtEncoderDecoder(
           .validationInfo(jwt.signature.privateKeyErrorHolder.asValidation())
       }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind != HMAC })
     }
+  }
+
+  private fun Row.buildPayloadEditorUi() {
+    cell(payloadEditor.component)
+      .validationOnApply(payloadEditor.bindValidator(jwt.payloadErrorHolder.asValidation()))
+      .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
+      .align(Align.FILL)
+      .resizableColumn()
+  }
+
+  private fun Row.buildHeaderEditorUi() {
+    cell(headerEditor.component)
+      .validationOnApply(headerEditor.bindValidator(jwt.headerErrorHolder.asValidation()))
+      .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
+      .align(Align.FILL)
+      .resizableColumn()
   }
 
   override fun afterBuildUi() {
@@ -359,7 +377,7 @@ internal class JwtEncoderDecoder(
       title = "Header",
       language = JsonLanguage.INSTANCE,
       textProperty = headerText,
-      minimumSizeHeight = 340
+      minimumSizeHeight = 240
     ) { highlightHeaderClaims() }
 
   private fun createPayloadEditor(): DeveloperToolEditor =
@@ -851,7 +869,7 @@ internal class JwtEncoderDecoder(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> JwtEncoderDecoder) =
       { configuration -> JwtEncoderDecoder(context, configuration, parentDisposable, project) }
   }

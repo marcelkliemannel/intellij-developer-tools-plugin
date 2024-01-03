@@ -26,7 +26,7 @@ import com.intellij.util.ui.UIUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
@@ -35,7 +35,7 @@ import javax.swing.JComponent
 
 abstract class TextTransformer(
   private val textTransformerContext: TextTransformerContext,
-  protected val context: DeveloperUiToolExContext,
+  protected val context: DeveloperUiToolContext,
   protected val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   protected val project: Project?

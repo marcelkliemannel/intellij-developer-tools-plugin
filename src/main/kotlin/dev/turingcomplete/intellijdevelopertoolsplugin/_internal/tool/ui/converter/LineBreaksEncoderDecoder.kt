@@ -6,14 +6,14 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 
 internal class LineBreaksEncoderDecoder(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  context: DeveloperUiToolExContext,
+  context: DeveloperUiToolContext,
   project: Project?
 ) : TextConverter(
   textConverterContext = encoderDecoderTextConverterContext,
@@ -78,7 +78,7 @@ internal class LineBreaksEncoderDecoder(
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> LineBreaksEncoderDecoder) =
       { configuration -> LineBreaksEncoderDecoder(configuration, parentDisposable, context, project) }
   }

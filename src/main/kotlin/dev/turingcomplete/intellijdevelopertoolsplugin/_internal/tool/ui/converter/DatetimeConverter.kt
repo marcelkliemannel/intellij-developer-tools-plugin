@@ -32,7 +32,7 @@ import com.intellij.util.text.OrdinalFormat.formatEnglish
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolExContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyAction
@@ -460,7 +460,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolExContext
+      context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> DatetimeConverter) =
       { configuration -> DatetimeConverter(configuration, parentDisposable) }
   }

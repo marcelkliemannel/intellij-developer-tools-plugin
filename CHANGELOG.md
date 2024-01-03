@@ -4,6 +4,7 @@
 
 ### Added
 - Add Nano ID generator
+- Improve layout of the tools in the tool window
 
 ### Changed
 - The UUID generator was moved to the "Cryptography" group
