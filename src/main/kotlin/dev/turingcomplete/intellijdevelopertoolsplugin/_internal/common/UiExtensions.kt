@@ -30,6 +30,7 @@ import java.awt.event.ItemEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
+import javax.swing.JLabel
 import javax.swing.JTable
 import javax.swing.JTextField
 import javax.swing.border.CompoundBorder
@@ -170,6 +171,10 @@ fun JTable.setContextMenu(place: String, actionGroup: ActionGroup) {
 }
 
 fun JBFont.toMonospace(): JBFont = JBFont.create(Font(Font.MONOSPACED, this.style, this.size))
+
+fun Cell<JLabel>.changeFont(scale: Float = 1.0f, style: Int = Font.PLAIN) = this.applyToComponent {
+  font = JBFont.create(this.font.deriveFont(style), false).biggerOn(scale)
+}
 
 fun EditorEx.setLanguage(language: Language) {
   val syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(language, project, null)

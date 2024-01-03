@@ -36,7 +36,7 @@ internal class PasswordGenerator(
   project = project,
   configuration = configuration,
   parentDisposable = parentDisposable,
-  initialGeneratedTextTitle = "Generated password:"
+  initialGeneratedTextTitle = "Generated password"
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 

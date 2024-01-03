@@ -48,6 +48,7 @@ dependencies {
   implementation("com.google.zxing:core:$zxing")
   implementation("com.google.zxing:javase:$zxing")
   implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
+  implementation("com.github.f4b6a3:ulid-creator:5.2.3")
 
   testImplementation("org.assertj:assertj-core:3.24.2")
   testImplementation("org.xmlunit:xmlunit-assertj:2.9.1")

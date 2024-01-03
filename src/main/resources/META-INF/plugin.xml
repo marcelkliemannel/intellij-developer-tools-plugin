@@ -177,6 +177,10 @@
             groupId="cryptography"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.NanoIdGenerator$Factory"/>
     <developerUiTool
+            id="ulid-generator"
+            groupId="cryptography"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.UlidGenerator$Factory"/>
+    <developerUiTool
             id="hashing-transformer"
             groupId="cryptography"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.HashingTransformer$Factory"/>
@@ -202,7 +206,6 @@
             id="cli-command-converter"
             groupId="formatting"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CliCommandConverter$Factory"/>
-
 
     <!-- root level -->
     <developerUiTool

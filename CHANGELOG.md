@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+- Add ULID generator
 - Add Nano ID generator
 - Improve layout of the tools in the tool window
 
