@@ -1,5 +1,7 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin
 
+import com.intellij.ide.BrowserUtil
+import com.intellij.ui.dsl.builder.Row
 import org.jetbrains.annotations.Nls
 
 data class DeveloperUiToolPresentation(
@@ -7,12 +9,30 @@ data class DeveloperUiToolPresentation(
   val menuTitle: String,
 
   @Nls(capitalization = Nls.Capitalization.Title)
-  val contentTitle: String
+  val contentTitle: String,
+
+  @Nls(capitalization = Nls.Capitalization.Sentence)
+  val description: Description? = null
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  interface Description {
+
+    fun Row.buildUi()
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  class ExternalLinkDescription(private val title: String, private val url: String) : Description {
+
+    override fun Row.buildUi() {
+      link(title) { BrowserUtil.open(url) }
+    }
+  }
+
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 }

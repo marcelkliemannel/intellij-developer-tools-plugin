@@ -9,12 +9,10 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.openapi.wm.impl.content.ToolWindowContentUi
-import com.intellij.ui.RelativeFont
 import com.intellij.ui.components.ActionLink
 import com.intellij.ui.content.ContentFactory
-import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
-import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsToolWindowSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.content.ContentPanelHandler
@@ -64,13 +62,9 @@ class MainWindowFactory : ToolWindowFactory, DumbAware {
           toggleMenu(toggleMenuActionLink)
         }
       }
-      toggleMenuActionLink = ActionLink(toggleMenuAction).apply {
-        RelativeFont.BOLD.install(this)
-      }
+      toggleMenuActionLink = ActionLink(toggleMenuAction).apply { formatTitle() }
       cell(toggleMenuActionLink)
-        .applyToComponent { font = JBFont.label().asBold() }
-        .align(Align.FILL)
-        .resizableColumn()
+        .gap(RightGap.SMALL)
     }
   }
 

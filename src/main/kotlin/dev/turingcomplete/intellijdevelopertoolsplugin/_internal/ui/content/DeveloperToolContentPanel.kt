@@ -8,8 +8,10 @@ import com.intellij.openapi.observable.properties.AtomicProperty
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.Messages.InputDialog
+import com.intellij.ui.RelativeFont
 import com.intellij.ui.ScrollPaneFactory.createScrollPane
-import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.tabs.JBTabs
@@ -17,7 +19,6 @@ import com.intellij.ui.tabs.JBTabsFactory
 import com.intellij.ui.tabs.TabInfo
 import com.intellij.ui.tabs.TabsListener
 import com.intellij.util.ui.JBEmptyBorder
-import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.NotBlankInputValidator
@@ -55,9 +56,13 @@ internal open class DeveloperToolContentPanel(
   @Suppress("DialogTitleCapitalization")
   protected open fun Row.buildTitle() {
     label(developerToolNode.developerUiToolPresentation.contentTitle)
-      .applyToComponent { font = JBFont.label().asBold() }
-      .align(Align.FILL)
-      .resizableColumn()
+      .applyToComponent { formatTitle() }
+      .gap(RightGap.SMALL)
+  }
+
+  protected fun JComponent.formatTitle() {
+    RelativeFont.BOLD.install(this)
+    RelativeFont.LARGE.install(this)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
@@ -66,12 +71,14 @@ internal open class DeveloperToolContentPanel(
     row {
       buildTitle()
 
+      developerToolNode.developerUiToolPresentation.description?.apply { buildUi() }
+
       link("Reset") {
         selectedDeveloperToolInstance.get().apply {
           configuration.reset()
           instance.reset()
         }
-      }
+      }.align(AlignX.RIGHT).resizableColumn()
     }.resizableRow()
   }.apply { border = JBEmptyBorder(0, 8, 4, 8) }
 
