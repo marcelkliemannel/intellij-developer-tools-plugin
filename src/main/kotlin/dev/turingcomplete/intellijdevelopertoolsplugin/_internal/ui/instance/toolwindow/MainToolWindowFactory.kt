@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
 import javax.swing.JComponent
 
-class MainWindowFactory : ToolWindowFactory, DumbAware {
+class MainToolWindowFactory : ToolWindowFactory, DumbAware {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -101,10 +101,12 @@ class MainWindowFactory : ToolWindowFactory, DumbAware {
 
     private fun showMenu(): (JComponent) -> Unit = { menuOwner ->
       lastToolsMenuTreePopup = JBPopupFactory.getInstance()
-        .createComponentPopupBuilder(toolsMenuTreeWrapper!!, toolsMenuTreeWrapper)
+        .createComponentPopupBuilder(toolsMenuTreeWrapper!!, toolsMenuTree)
         .setRequestFocus(true)
         .setResizable(true)
-        .setShowBorder(true)
+        .setMovable(true)
+        .setDimensionServiceKey(project, TOOLS_MENU_TREE_DIMENSION_SERVICE_KEY, false)
+        .setCancelOnOtherWindowOpen(true)
         .setCancelOnClickOutside(true)
         .setMinSize(Dimension(220, 200))
         .createPopup()
@@ -117,4 +119,9 @@ class MainWindowFactory : ToolWindowFactory, DumbAware {
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    private const val TOOLS_MENU_TREE_DIMENSION_SERVICE_KEY = "ToolWindowDeveloperToolContentPanel"
+  }
 }

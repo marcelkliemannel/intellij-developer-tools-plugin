@@ -5,7 +5,8 @@
 ### Added
 - Add ULID generator
 - Add Nano ID generator
-- Improve layout of the tools in the tool window
+- Add an action to open the Developer Tools section in IntelliJ's settings
+- Improve the layout of the tools in the tool window
 
 ### Changed
 - The UUID generator was moved to the "Cryptography" group

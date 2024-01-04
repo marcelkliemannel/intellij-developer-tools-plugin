@@ -17,7 +17,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.ToolsMe
 import javax.swing.JPanel
 
 internal open class ContentPanelHandler(
-  project: Project?,
+  protected val project: Project?,
   protected val parentDisposable: Disposable,
   settings: DeveloperToolsInstanceSettings,
   groupNodeSelectionEnabled: Boolean = true,

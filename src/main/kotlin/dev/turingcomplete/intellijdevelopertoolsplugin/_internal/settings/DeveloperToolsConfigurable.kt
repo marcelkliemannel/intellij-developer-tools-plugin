@@ -2,7 +2,6 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.options.Configurable
-import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
@@ -37,7 +36,7 @@ class DeveloperToolsConfigurable : Configurable {
       checkBox("Add 'Developer Tools' action to the main toolbar during startup")
         .comment("If the action was removed manually in the past, this automatic mechanism will not work. The 'Developer Tools' action must first be manually added to the 'Main Toolbar Right' again (or 'Main Toolbar' in the old UI).")
         .bindSelected(addOpenMainDialogActionToMainToolbar)
-    }.bottomGap(BottomGap.MEDIUM)
+    }
 
     row {
       saveConfigurations = ValueProperty(developerToolsApplicationSettings.saveConfigurations)
@@ -89,6 +88,7 @@ class DeveloperToolsConfigurable : Configurable {
       row {
         toolWindowMenuHideOnToolSelection = ValueProperty(developerToolsApplicationSettings.toolWindowMenuHideOnToolSelection)
         checkBox("Hide the menu in the tool window after selecting a tool")
+          .comment("When enabled, menu search and keyboard navigation will not work in the tool window.")
           .bindSelected(toolWindowMenuHideOnToolSelection)
       }
     }

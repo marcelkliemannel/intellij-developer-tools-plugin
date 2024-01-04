@@ -1,11 +1,14 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu
 
+import com.intellij.CommonBundle
+import com.intellij.icons.AllIcons
 import com.intellij.ide.util.treeView.NodeRenderer
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.ui.ColoredSideBorder
-import com.intellij.ui.RelativeFont
+import com.intellij.ui.HyperlinkAdapter
+import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.SimpleTextAttributes.REGULAR_ATTRIBUTES
 import com.intellij.ui.SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
@@ -16,6 +19,7 @@ import com.intellij.ui.tree.TreeVisitor.Action.INTERRUPT
 import com.intellij.ui.treeStructure.SimpleTree
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
+import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
@@ -24,9 +28,11 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsInstanceSettings
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.OpenSettingsAction
 import javax.swing.JComponent
 import javax.swing.JTree
 import javax.swing.ScrollPaneConstants
+import javax.swing.event.HyperlinkEvent
 import javax.swing.event.TreeExpansionEvent
 import javax.swing.event.TreeExpansionListener
 import javax.swing.event.TreeSelectionListener
@@ -63,7 +69,6 @@ internal class ToolsMenuTree(
     addTreeExpansionListener(createTreeExpansionListener(settings))
     isRootVisible = false
     setExpandableItemsEnabled(false)
-    RelativeFont.BOLD.install<SimpleTree>(this)
 
     expandNodes(defaultGroupNodesToExpand, settings)
 
@@ -82,14 +87,42 @@ internal class ToolsMenuTree(
     setRowHeight(standardRowHeight + (standardRowHeight * 0.2f).toInt())
   }
 
-  fun createWrapperComponent(): JComponent =
-    ScrollPaneFactory.createScrollPane(this@ToolsMenuTree, true).apply {
+  fun createWrapperComponent(): JComponent {
+    val wrapper = BorderLayoutPanel().apply {
+      border = JBUI.Borders.empty()
+      addToCenter(this@ToolsMenuTree)
+      addToBottom(BorderLayoutPanel().apply {
+        border = JBUI.Borders.empty(UIUtil.PANEL_REGULAR_INSETS)
+        addToCenter(createSettingsLink())
+      })
+    }
+    return ScrollPaneFactory.createScrollPane(wrapper, true).apply {
       border = ColoredSideBorder(null, null, null, JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(), 1)
       background = UIUtil.SIDE_PANEL_BACKGROUND
       viewport.background = UIUtil.SIDE_PANEL_BACKGROUND
       verticalScrollBar.background = UIUtil.SIDE_PANEL_BACKGROUND
       horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
     }
+  }
+
+  /**
+   * Directly opening the [com.intellij.openapi.options.ShowSettingsUtil] will
+   * lead to the error `Slow operations are prohibited on EDT` if called in the
+   * dialog.
+   * Using [com.intellij.ui.components.ActionLink] will lead to an error related
+   * to the `project.messageBus`.
+   */
+  private fun createSettingsLink(): HyperlinkLabel {
+    @Suppress("DialogTitleCapitalization")
+    return HyperlinkLabel(CommonBundle.settingsTitle()).apply {
+      icon = AllIcons.General.GearPlain
+      addHyperlinkListener(object : HyperlinkAdapter() {
+        override fun hyperlinkActivated(e: HyperlinkEvent) {
+          OpenSettingsAction.openSettings(project)
+        }
+      })
+    }
+  }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
@@ -145,8 +178,13 @@ internal class ToolsMenuTree(
       ?.safeCastTo<ContentNode>()
       ?.takeIf { groupNodeSelectionEnabled || it !is GroupNode }
       ?.let {
-        selectContentNode(it)
-        settings.lastSelectedContentNodeId.set(it.id)
+        if (it is ExternalNode) {
+          it.selected(project)
+        }
+        else {
+          selectContentNode(it)
+          settings.lastSelectedContentNodeId.set(it.id)
+        }
       }
   }
 
@@ -237,7 +275,7 @@ internal class ToolsMenuTree(
       }
       append(contentNode.title, textAttributes)
       icon = contentNode.icon
-      isIconOnTheRight = true
+      isIconOnTheRight = false
       toolTipText = contentNode.toolTipText
     }
   }
