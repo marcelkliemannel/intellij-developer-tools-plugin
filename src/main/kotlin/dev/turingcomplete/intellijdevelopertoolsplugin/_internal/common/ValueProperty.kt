@@ -26,9 +26,9 @@ class ValueProperty<T>(initialValue: T) : ObservableMutableProperty<T> {
     set(value, null)
   }
 
-  internal fun setWithUncheckedCast(value: Any) {
+  internal fun setWithUncheckedCast(value: Any, changeId: String?) {
     @Suppress("UNCHECKED_CAST")
-    set(value as T)
+    set(value as T, changeId)
   }
 
   fun set(value: T, changeId: String?, fireEvent: Boolean = true) {
@@ -49,4 +49,9 @@ class ValueProperty<T>(initialValue: T) : ObservableMutableProperty<T> {
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    const val RESET_CHANGE_ID = "reset"
+  }
 }

@@ -5,10 +5,11 @@ import com.intellij.openapi.util.Disposer
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SECRET
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty.Companion.RESET_CHANGE_ID
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsInstanceSettings.Companion.assertPersistableType
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -125,7 +126,7 @@ class DeveloperToolConfiguration(
 
     fun reset(loadExamples: Boolean) {
       val value = if (example != null && loadExamples) example else defaultValue
-      reference.setWithUncheckedCast(value)
+      reference.setWithUncheckedCast(value, RESET_CHANGE_ID)
     }
 
     fun valueChanged(): Boolean {

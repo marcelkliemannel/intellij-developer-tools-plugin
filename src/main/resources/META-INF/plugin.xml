@@ -52,7 +52,8 @@
   <depends>com.intellij.modules.lang</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <postStartupActivity implementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperToolsPluginProjectActivity"/>
+    <postStartupActivity
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperToolsPluginProjectActivity"/>
     <applicationService
             serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings"/>
     <applicationService
@@ -235,6 +236,9 @@
     <developerUiTool
             id="lorem-ipsum-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.LoremIpsumGenerator$Factory"/>
+    <developerUiTool
+            id="color-picker"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.ColorPicker$Factory"/>
     <developerUiTool
             id="qr-code-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.BarcodeGenerator$Factory"/>

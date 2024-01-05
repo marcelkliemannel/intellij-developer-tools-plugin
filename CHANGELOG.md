@@ -3,8 +3,9 @@
 ## Unreleased
 
 ### Added
-- Add ULID generator
-- Add Nano ID generator
+- Add ULID generator tool
+- Add Nano ID generator tool
+- Add color picker tool
 - Add an action to open the Developer Tools section in IntelliJ's settings
 - Improve the layout of the tools in the tool window
 
