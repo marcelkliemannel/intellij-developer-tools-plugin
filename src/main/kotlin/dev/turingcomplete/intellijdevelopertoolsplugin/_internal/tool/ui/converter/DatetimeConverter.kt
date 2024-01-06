@@ -1,17 +1,18 @@
+@file:Suppress("UnstableApiUsage")
+
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.DataKey
-import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.observable.properties.ObservableProperty
-import com.intellij.openapi.observable.util.bind
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.naturalSorted
-import com.intellij.ui.components.JBLabel
+import com.intellij.openapi.util.text.StringUtil.stripHtml
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.BottomGap
-import com.intellij.ui.dsl.builder.COLUMNS_TINY
+import com.intellij.ui.dsl.builder.COLUMNS_MEDIUM
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
@@ -29,20 +30,17 @@ import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.ComboBoxPredicate
 import com.intellij.util.Alarm
 import com.intellij.util.text.OrdinalFormat.formatEnglish
-import com.intellij.util.ui.JBFont
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ToolBarPlace
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.copyable
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.changeFont
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.not
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toMonospace
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.validateLongValue
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.wrapWithToolBar
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.DAY
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.HOUR
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.MINUTE
@@ -52,7 +50,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.convert
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.UNIX_TIMESTAMP_MILLIS
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.UNIX_TIMESTAMP_SECONDS
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.YEAR
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import java.awt.Font
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -65,8 +63,11 @@ import java.time.temporal.ChronoField
 import java.time.temporal.IsoFields
 import java.util.*
 
-class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
-  DeveloperUiTool(parentDisposable) {
+class DatetimeConverter(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable,
+  private val context: DeveloperUiToolContext
+) : DeveloperUiTool(parentDisposable) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var selectedTimeZoneId = configuration.register("timeZoneId", ZoneId.systemDefault().id)
@@ -110,12 +111,21 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
     group("Current Unix Timestamp") {
-      row {
-        buildTimestampLabelUi("Seconds:", currentUnixTimestampSeconds, TIMESTAMP_SECONDS_CONTENT_DATA_KEY)
-        buildTimestampLabelUi("Milliseconds:", currentUnixTimestampMillis, TIMESTAMP_MILLIS_CONTENT_DATA_KEY)
+      if (context.prioritizeVerticalLayout) {
+        row {
+          buildTimestampLabelUi("Seconds:", currentUnixTimestampSeconds, TIMESTAMP_SECONDS_CONTENT_DATA_KEY)
+        }
+        row {
+          buildTimestampLabelUi("Milliseconds:", currentUnixTimestampMillis, TIMESTAMP_MILLIS_CONTENT_DATA_KEY)
+        }
+      }
+      else {
+        row {
+          buildTimestampLabelUi("Seconds:", currentUnixTimestampSeconds, TIMESTAMP_SECONDS_CONTENT_DATA_KEY)
+          buildTimestampLabelUi("Milliseconds:", currentUnixTimestampMillis, TIMESTAMP_MILLIS_CONTENT_DATA_KEY)
+        }
       }
     }
 
@@ -124,25 +134,22 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
       val initialLocalDateTime = LocalDateTime.ofInstant(initialInstant, selectedTimeZoneId())
 
       group("Unix Timestamp as Seconds") {
-        row {
-          unixTimeStampSecondsTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
-            .label("Seconds:")
-            .text(initialInstant.epochSecond.toString())
-            .columns(12)
-            .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_SECONDS) }
-            .component
-
-          unixTimeStampMillisTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
-            .label("Milliseconds:")
-            .gap(RightGap.SMALL)
-            .text(initialInstant.toEpochMilli().toString())
-            .columns(12)
-            .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
-            .component
-
-          button("Set to Now") {
-            unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
-            convert(UNIX_TIMESTAMP_MILLIS, 0)
+        if (context.prioritizeVerticalLayout) {
+          row {
+            buildUnixTimeStampSecondsTextFieldUi(initialInstant)
+          }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE).layout(RowLayout.PARENT_GRID)
+          row {
+            buildUnixTimeStampMillisTextFieldUi(initialInstant)
+          }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE).layout(RowLayout.PARENT_GRID)
+          row {
+            createSetToNowButton()
+          }
+        }
+        else {
+          row {
+            buildUnixTimeStampSecondsTextFieldUi(initialInstant)
+            buildUnixTimeStampMillisTextFieldUi(initialInstant)
+            createSetToNowButton()
           }
         }
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
@@ -155,23 +162,23 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
             .whenItemSelectedFromUi {
               convert(TIME_ZONE)
             }
-        }.layout(RowLayout.PARENT_GRID)
+        }
         row {
           yearTextField = textField().label("Year:")
             .text(initialLocalDateTime.year.toString())
-            .columns(COLUMNS_TINY)
+            .columns(5)
             .validateLongValue(LongRange(1970, 9999))
             .whenTextChangedFromUi { convert(YEAR) }
             .component
           monthTextField = textField().label("Month:")
             .text(initialLocalDateTime.monthValue.toString())
-            .columns(COLUMNS_TINY)
+            .columns(5)
             .validateLongValue(LongRange(1, 12))
             .whenTextChangedFromUi { convert(MONTH) }
             .component
           dayTextField = textField().label("Day:")
             .text(initialLocalDateTime.dayOfMonth.toString())
-            .columns(COLUMNS_TINY)
+            .columns(5)
             .validateLongValue(LongRange(1, 31))
             .whenTextChangedFromUi { convert(DAY) }
             .gap(RightGap.SMALL)
@@ -180,19 +187,19 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
         row {
           hourTextField = textField().label("Hour:")
             .text(initialLocalDateTime.hour.toString())
-            .columns(COLUMNS_TINY)
+            .columns(5)
             .validateLongValue(LongRange(0, 23))
             .whenTextChangedFromUi { convert(HOUR) }
             .component
           minuteTextField = textField().label("Minute:")
             .text(initialLocalDateTime.minute.toString())
-            .columns(COLUMNS_TINY)
+            .columns(5)
             .validateLongValue(LongRange(0, 59))
             .whenTextChangedFromUi { convert(MINUTE) }
             .component
           secondTextField = textField().label("Second:")
             .text(initialLocalDateTime.second.toString())
-            .columns(COLUMNS_TINY)
+            .columns(5)
             .validateLongValue(LongRange(0, 59))
             .whenTextChangedFromUi { convert(SECOND) }
             .component
@@ -205,29 +212,29 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
       group("Formatted") {
         buttonsGroup {
+          lateinit var formattedStandardFormatComboBox: ComboBox<StandardFormat>
           row {
             radioButton("Standard format:")
               .bindSelected(formattedIndividual.not())
               .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
               .gap(RightGap.SMALL)
-            val formattedStandardFormatComboBox = comboBox(StandardFormat.entries)
+            formattedStandardFormatComboBox = comboBox(StandardFormat.entries)
               .bindItem(formattedStandardFormat)
+              .columns(COLUMNS_MEDIUM)
               .whenItemSelectedFromUi { syncFormattedStandardFormatPattern(); convert(UNIX_TIMESTAMP_MILLIS) }
               .enabledIf(formattedIndividual.not())
               .gap(RightGap.SMALL)
               .component
-            checkBox("Add offset")
-              .bindSelected(formattedStandardFormatAddOffset)
-              .whenStateChangedFromUi { syncFormattedStandardFormatPattern(); convert(UNIX_TIMESTAMP_MILLIS) }
-              .enabledIf(formattedIndividual.not())
-              .visibleIf(ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsOffset ?: false })
-              .gap(RightGap.SMALL)
-            checkBox("Add time zone")
-              .bindSelected(formattedStandardFormatAddTimeZone)
-              .whenStateChangedFromUi { syncFormattedStandardFormatPattern(); convert(UNIX_TIMESTAMP_MILLIS) }
-              .enabledIf(formattedIndividual.not())
-              .visibleIf(ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsTimeZone ?: false })
+            if (!context.prioritizeVerticalLayout) {
+              buildStandardFormatConfigurationUi(formattedStandardFormatComboBox)
+            }
           }.layout(RowLayout.PARENT_GRID).bottomGap(BottomGap.NONE)
+          if (context.prioritizeVerticalLayout) {
+            row {
+              cell()
+              buildStandardFormatConfigurationUi(formattedStandardFormatComboBox)
+            }.topGap(TopGap.NONE).layout(RowLayout.PARENT_GRID)
+          }
           row {
             cell()
             comment("")
@@ -242,6 +249,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
               .gap(RightGap.SMALL)
             expandableTextField()
               .bindText(formattedIndividualFormat)
+              .columns(COLUMNS_MEDIUM)
               .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
               .validationInfo {
                 try {
@@ -261,13 +269,14 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
           comboBox(LOCALES)
             .label("Locale:")
             .bindItem(formattedLocale)
+            .columns(COLUMNS_MEDIUM)
             .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
         }.layout(RowLayout.PARENT_GRID)
 
         row {
           label("")
             .bindText(formattedText)
-            .applyToComponent { font = FORMATTED_TEXT_FONT }
+            .changeFont(scale = 1.1f, style = Font.BOLD)
             .gap(RightGap.SMALL)
           actionButton(CopyAction(FORMATTED_TEXT_DATA_KEY), DatetimeConverter::class.java.name)
         }.topGap(TopGap.SMALL)
@@ -289,9 +298,9 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
   }
 
   override fun getData(dataId: String): Any? = when {
-    TIMESTAMP_SECONDS_CONTENT_DATA_KEY.`is`(dataId) -> currentUnixTimestampSeconds.get()
-    TIMESTAMP_MILLIS_CONTENT_DATA_KEY.`is`(dataId) -> currentUnixTimestampMillis.get()
-    FORMATTED_TEXT_DATA_KEY.`is`(dataId) -> formattedText.get()
+    TIMESTAMP_SECONDS_CONTENT_DATA_KEY.`is`(dataId) -> stripHtml(currentUnixTimestampSeconds.get(), false)
+    TIMESTAMP_MILLIS_CONTENT_DATA_KEY.`is`(dataId) -> stripHtml(currentUnixTimestampMillis.get(), false)
+    FORMATTED_TEXT_DATA_KEY.`is`(dataId) -> stripHtml(formattedText.get(), false)
     else -> null
   }
 
@@ -304,6 +313,45 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun Row.createSetToNowButton() {
+    button("Set to Now") {
+      unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
+      convert(UNIX_TIMESTAMP_MILLIS, 0)
+    }
+  }
+
+  private fun Row.buildUnixTimeStampMillisTextFieldUi(initialInstant: Instant) {
+    unixTimeStampMillisTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
+      .label("Milliseconds:")
+      .text(initialInstant.toEpochMilli().toString())
+      .columns(12)
+      .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
+      .component
+  }
+
+  private fun Row.buildUnixTimeStampSecondsTextFieldUi(initialInstant: Instant) {
+    unixTimeStampSecondsTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
+      .label("Seconds:")
+      .text(initialInstant.epochSecond.toString())
+      .columns(12)
+      .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_SECONDS) }
+      .component
+  }
+
+  private fun Row.buildStandardFormatConfigurationUi(formattedStandardFormatComboBox: ComboBox<StandardFormat>) {
+    checkBox("Add offset")
+      .bindSelected(formattedStandardFormatAddOffset)
+      .whenStateChangedFromUi { syncFormattedStandardFormatPattern(); convert(UNIX_TIMESTAMP_MILLIS) }
+      .enabledIf(formattedIndividual.not())
+      .visibleIf(ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsOffset ?: false })
+      .gap(RightGap.SMALL)
+    checkBox("Add time zone")
+      .bindSelected(formattedStandardFormatAddTimeZone)
+      .whenStateChangedFromUi { syncFormattedStandardFormatPattern(); convert(UNIX_TIMESTAMP_MILLIS) }
+      .enabledIf(formattedIndividual.not())
+      .visibleIf(ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsTimeZone ?: false })
+  }
 
   private fun init() {
     syncFormattedStandardFormatPattern()
@@ -321,8 +369,8 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
   }
 
   private fun createCurrentUnixTimestampUpdate(): Runnable = Runnable {
-    currentUnixTimestampSeconds.set(System.currentTimeMillis().div(1000).toString())
-    currentUnixTimestampMillis.set(System.currentTimeMillis().toString())
+    currentUnixTimestampSeconds.set("<html><code>${System.currentTimeMillis().div(1000)}</code></html>")
+    currentUnixTimestampMillis.set("<html><code>${System.currentTimeMillis()}</code></html>")
     scheduleCurrentUnixTimestampUpdate()
   }
 
@@ -407,9 +455,26 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     val weekNumber = localDateTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR).toLong()
     val quarterOfYear = localDateTime.get(IsoFields.QUARTER_OF_YEAR).toLong()
     val dayName = localDateTime.dayOfWeek.getDisplayName(FULL_STANDALONE, Locale.getDefault())
-    dateDetails.set("A $dayName, the ${formatEnglish(dayOfYear)} day of the year, in the ${formatEnglish(weekNumber)} week, within the ${formatEnglish(quarterOfYear)} quarter.")
+    if (context.prioritizeVerticalLayout) {
+      dateDetails.set(
+        "$dayName; ${formatEnglish(dayOfYear)} day of the year; ${formatEnglish(weekNumber)} week; ${
+          formatEnglish(
+            quarterOfYear
+          )
+        } quarter"
+      )
+    }
+    else {
+      dateDetails.set(
+        "A $dayName, the ${formatEnglish(dayOfYear)} day of the year, in the ${formatEnglish(weekNumber)} week, within the ${
+          formatEnglish(
+            quarterOfYear
+          )
+        } quarter."
+      )
+    }
 
-    formattedText.set(formatDateTime(localDateTime).ifBlank { "No result" })
+    formattedText.set("<html><code>${formatDateTime(localDateTime).ifBlank { "No result" }}</code></html>")
   }
 
   private fun formatDateTime(localDateTime: ZonedDateTime): String =
@@ -436,14 +501,14 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     timestampProperty: ObservableProperty<String>,
     contentDataKey: DataKey<String>
   ) {
-    val timestampLabel = JBLabel().apply { font = TIMESTAMP_TEXT_FONT }.copyable().bind(timestampProperty)
-    val actions = DefaultActionGroup().apply {
-      add(CopyAction(contentDataKey))
-    }
     panel {
       row {
         label(title).gap(RightGap.SMALL)
-        cell(timestampLabel.wrapWithToolBar(DatetimeConverter::class.java.name, actions, ToolBarPlace.APPEND))
+        label("")
+          .changeFont(scale = 1.5f, style = Font.BOLD)
+          .bindText(timestampProperty)
+          .gap(RightGap.SMALL)
+        actionButton(CopyAction(contentDataKey))
       }.topGap(TopGap.NONE)
     }
   }
@@ -462,7 +527,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
       parentDisposable: Disposable,
       context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> DatetimeConverter) =
-      { configuration -> DatetimeConverter(configuration, parentDisposable) }
+      { configuration -> DatetimeConverter(configuration, parentDisposable, context) }
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -492,7 +557,7 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
 
     ISO_8601("ISO-8601 date time", "yyyy-MM-dd'T'HH:mm:ss.SSS"),
     ISO_8601_UTC(
-      title ="ISO-8601 date time at UTC",
+      title = "ISO-8601 date time at UTC",
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
       supportsOffset = false,
       supportsTimeZone = false,
@@ -527,16 +592,13 @@ class DatetimeConverter(configuration: DeveloperToolConfiguration, parentDisposa
     private val FORMATTED_TEXT_DATA_KEY = DataKey.create<String>("formattedText")
 
     private val TIMESTAMP_UPDATE_INTERVAL_MILLIS: Long = Duration.ofSeconds(1).toMillis()
-    private val TIMESTAMP_TEXT_FONT: JBFont = JBFont.label().toMonospace().biggerOn(3f)
 
     private const val DEFAULT_FORMATTED_INDIVIDUAL = false
     private val DEFAULT_FORMATTED_LOCALE = LocaleContainer(Locale.getDefault())
     private const val DEFAULT_INDIVIDUAL_FORMAT = ""
-    private val DEFAULT_FORMATTED_STANDARD_FORMAT = StandardFormat.ISO_8601
+    private val DEFAULT_FORMATTED_STANDARD_FORMAT = StandardFormat.ISO_8601_UTC
     private const val DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_OFFSET = true
     private const val DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_TIME_ZONE = false
-
-    private val FORMATTED_TEXT_FONT = JBFont.label().toMonospace().biggerOn(1.5f)
 
     private val LOCALES = Locale.getAvailableLocales()
       .filter { it.displayName.isNotBlank() }
