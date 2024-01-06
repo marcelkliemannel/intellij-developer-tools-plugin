@@ -15,7 +15,7 @@
 <ul>
     <li>Encoding and Decoding: JWT (JSON Web Tokens), Base32, Base64, URL Base64, MIME Base64, URL encoding, line breaks</li>
     <li>Regular Expression Matcher</li>
-    <li>UUID Generator</li>
+    <li>UUID, ULID, Nano ID and Password Generator</li>
     <li>Text Sorting</li>
     <li>Text Case Transformation</li>
     <li>Text Diff Viewer</li>
@@ -26,7 +26,7 @@
     <li>Date Time Converter</li>
     <li>Code Style Formatting</li>
     <li>SQL Formatting</li>
-    <li>Password Generator</li>
+    <li>Color Picker</li>
     <li>QR Code/Barcode Generator</li>
     <li>Lorem Ipsum Generator</li>
 </ul>
