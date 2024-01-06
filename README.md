@@ -12,7 +12,7 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 
 - Encoding and Decoding: JWT (JSON Web Tokens), Base32, Base64, URL Base64, MIME Base64, URL encoding and line breaks
 - Regular Expression Matcher
-- UUID Generator
+- UUID, ULID, Nano ID and Password Generator
 - Text Sorting
 - Text Case Transformation
 - Text Diff Viewer
@@ -23,7 +23,7 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 - Date Time Converter
 - Code Style Formatting
 - SQL Formatting
-- Password Generator
+- Color Picker
 - QR Code/Barcode Generator
 - Lorem Ipsum Generator
 

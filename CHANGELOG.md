@@ -10,6 +10,20 @@
 
 ### Fixed
 
+## 3.2.0 - 2024-01-06
+
+### Added
+
+- Add ULID generator tool
+- Add Nano ID generator tool
+- Add color picker tool
+- Add an action to open the Developer Tools section in IntelliJ's settings
+- Improve the layout of the tools in the tool window
+
+### Changed
+
+- The UUID generator was moved to the "Cryptography" group
+
 ## 3.1.0 - 2023-12-29
 
 ### Added

@@ -1,4 +1,5 @@
 <idea-plugin>
+  <!-- The typo in the ID is frustrating, but we will never be able to change it :/ -->
   <id>dev.turingcomplete.intellijdevelopertoolsplugins</id>
   <name>Developer Tools</name>
   <vendor email="dev@marcelkliemannel.com" url="https://marcelkliemannel.com/projects/intellij-developer-tools-plugin">
@@ -14,7 +15,7 @@
 <ul>
     <li>Encoding and Decoding: JWT (JSON Web Tokens), Base32, Base64, URL Base64, MIME Base64, URL encoding, line breaks</li>
     <li>Regular Expression Matcher</li>
-    <li>UUID Generator</li>
+    <li>UUID, ULID, Nano ID and Password Generator</li>
     <li>Text Sorting</li>
     <li>Text Case Transformation</li>
     <li>Text Diff Viewer</li>
@@ -25,7 +26,7 @@
     <li>Date Time Converter</li>
     <li>Code Style Formatting</li>
     <li>SQL Formatting</li>
-    <li>Password Generator</li>
+    <li>Color Picker</li>
     <li>QR Code/Barcode Generator</li>
     <li>Lorem Ipsum Generator</li>
 </ul>
@@ -51,27 +52,28 @@
   <depends>com.intellij.modules.lang</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <postStartupActivity implementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolsPluginProjectActivity"/>
+    <postStartupActivity
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperToolsPluginProjectActivity"/>
     <applicationService
-            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsApplicationSettings"/>
+            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings"/>
     <applicationService
-            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsDialogSettings"/>
+            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsDialogSettings"/>
     <applicationService
-            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.LegacyDeveloperToolsSettingsMigrator"/>
+            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.LegacyDeveloperToolsSettingsMigrator"/>
     <applicationConfigurable
             parentId="tools"
-            instance="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsConfigurable"
-            id="dev.turingcomplete.intellijdevelopertoolsplugins._internal.settings.DeveloperToolsConfigurable"
+            instance="dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsConfigurable"
+            id="dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsConfigurable"
             displayName="Developer Tools"/>
     <toolWindow id="Developer Tools"
-                factoryClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.instance.toolwindow.MainWindowFactory"
+                factoryClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.toolwindow.MainToolWindowFactory"
                 anchor="right" secondary="true" canCloseContents="false" doNotActivateOnStart="true"
                 icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/toolwindow.svg"/>
   </extensions>
 
   <actions>
-    <action id="dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.instance.dialog.OpenMainDialogAction"
-            class="dev.turingcomplete.intellijdevelopertoolsplugins._internal.ui.instance.dialog.OpenMainDialogAction"
+    <action id="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.dialog.OpenMainDialogAction"
+            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.dialog.OpenMainDialogAction"
             text="Developer Tools"
             description="Provides various developer tools"
             icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg">
@@ -80,161 +82,172 @@
   </actions>
 
   <extensionPoints>
-    <extensionPoint name="developerTool"
-                    beanClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.DeveloperToolFactoryEp"
-                    dynamic="true">>
+    <extensionPoint name="developerUiTool"
+                    beanClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperUiToolFactoryEp"
+                    dynamic="true">
       <with attribute="implementationClass"
-            implements="dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolFactory"/>
+            implements="dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory"/>
     </extensionPoint>
-    <extensionPoint name="developerToolGroup"
-                    beanClass="dev.turingcomplete.intellijdevelopertoolsplugins.DeveloperToolGroup"
+    <extensionPoint name="developerUiToolGroup"
+                    beanClass="dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolGroup"
                     dynamic="true">
     </extensionPoint>
   </extensionPoints>
 
   <extensions defaultExtensionNs="dev.turingcomplete.intellijdevelopertoolsplugins">
-    <developerToolGroup id="encoder-decoder"
-                        menuTitle="Encoders/Decoders"
-                        detailTitle="Encoders/Decoders"
-                        initiallyExpanded="true"
-                        weight="1"/>
-    <developerToolGroup id="text-escape"
-                        menuTitle="Text Escape"
-                        detailTitle="Text Escape"
-                        weight="7"/>
-    <developerToolGroup id="cryptography"
-                        menuTitle="Cryptography"
-                        detailTitle="Cryptography"
-                        initiallyExpanded="true"
-                        weight="3"/>
-    <developerToolGroup id="formatting"
-                        menuTitle="Formatting"
-                        detailTitle="Formatting"
-                        initiallyExpanded="true"
-                        weight="12"/>
+    <developerUiToolGroup id="encoder-decoder"
+                          menuTitle="Encoders/Decoders"
+                          detailTitle="Encoders/Decoders"
+                          initiallyExpanded="true"
+                          weight="1"/>
+    <developerUiToolGroup id="text-escape"
+                          menuTitle="Text Escape"
+                          detailTitle="Text Escape"
+                          weight="7"/>
+    <developerUiToolGroup id="cryptography"
+                          menuTitle="Cryptography"
+                          detailTitle="Cryptography"
+                          initiallyExpanded="true"
+                          weight="3"/>
+    <developerUiToolGroup id="formatting"
+                          menuTitle="Formatting"
+                          detailTitle="Formatting"
+                          initiallyExpanded="true"
+                          weight="12"/>
 
     <!-- encoder-decoder -->
-    <developerTool
+    <developerUiTool
             id="jwt-encoder-decoder"
             groupId="encoder-decoder"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JwtEncoderDecoder$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder$Factory"/>
+    <developerUiTool
             id="base32-encoder-decoder"
             groupId="encoder-decoder"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.Base32EncoderDecoder$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.Base32EncoderDecoder$Factory"/>
+    <developerUiTool
             id="base64-encoder-decoder"
             groupId="encoder-decoder"
             preferredSelected="true"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.Base64EncoderDecoder$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.Base64EncoderDecoder$Factory"/>
+    <developerUiTool
             id="url-base64-encoder-decoder"
             groupId="encoder-decoder"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UrlBase64EncoderDecoder$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.UrlBase64EncoderDecoder$Factory"/>
+    <developerUiTool
             id="mime-base64-encoder-decoder"
             groupId="encoder-decoder"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.MimeBase64EncoderDecoder$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.MimeBase64EncoderDecoder$Factory"/>
+    <developerUiTool
             id="url-encoding-encoder-decoder"
             groupId="encoder-decoder"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.UrlEncodingEncoderDecoder$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.UrlEncodingEncoderDecoder$Factory"/>
+    <developerUiTool
             id="line-breaks-encoder-decoder"
             groupId="encoder-decoder"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.LineBreaksEncoderDecoder$Factory"/>
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.LineBreaksEncoderDecoder$Factory"/>
 
     <!-- text-escape -->
-    <developerTool
+    <developerUiTool
             id="html-entities-escape"
             groupId="text-escape"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.HtmlEntitiesEscape$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.HtmlEntitiesEscape$Factory"/>
+    <developerUiTool
             id="java-text-escape"
             groupId="text-escape"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JavaTextEscape$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JavaTextEscape$Factory"/>
+    <developerUiTool
             id="json-text-escape"
             groupId="text-escape"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.JsonTextEscape$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JsonTextEscape$Factory"/>
+    <developerUiTool
             id="csv-text-escape"
             groupId="text-escape"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.CsvTextEscape$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CsvTextEscape$Factory"/>
+    <developerUiTool
             id="xml-text-escape"
             groupId="text-escape"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.XmlTextEscape$Factory"/>
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.XmlTextEscape$Factory"/>
 
     <!-- cryptography -->
-    <developerTool
+    <developerUiTool
+            id="uuid-generator"
+            groupId="cryptography"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.UuidGenerator$Factory"/>
+    <developerUiTool
+            id="nano-id-generator"
+            groupId="cryptography"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.NanoIdGenerator$Factory"/>
+    <developerUiTool
+            id="ulid-generator"
+            groupId="cryptography"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.UlidGenerator$Factory"/>
+    <developerUiTool
             id="hashing-transformer"
             groupId="cryptography"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.HashingTransformer$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.HashingTransformer$Factory"/>
+    <developerUiTool
             id="hmac-transformer"
             groupId="cryptography"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.HmacTransformer$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.HmacTransformer$Factory"/>
+    <developerUiTool
             id="password-generator"
             groupId="cryptography"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.PasswordGenerator$Factory"/>
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.PasswordGenerator$Factory"/>
 
     <!-- formatting -->
-    <developerTool
+    <developerUiTool
             id="code-style-formatting"
             groupId="formatting"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.CodeStyleFormatting$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.CodeStyleFormatting$Factory"/>
+    <developerUiTool
             id="sql-formatting"
             groupId="formatting"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.SqlFormattingTransformer$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.SqlFormattingTransformer$Factory"/>
+    <developerUiTool
             id="cli-command-converter"
             groupId="formatting"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.CliCommandConverter$Factory"/>
-
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CliCommandConverter$Factory"/>
 
     <!-- root level -->
-    <developerTool
+    <developerUiTool
             id="regular-expression-matcher"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RegularExpressionMatcher$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RegularExpressionMatcher$Factory"/>
+    <developerUiTool
             id="text-format-converter"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.CodeFormattingConverter$Factory"/>
-    <developerTool
-            id="uuid-generator"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.uuid.UuidGenerator$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CodeFormattingConverter$Factory"/>
+    <developerUiTool
             id="text-sorting-transformer"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextSortingTransformer$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextSortingTransformer$Factory"/>
+    <developerUiTool
             id="text-case-transformer"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.TextCaseTransformer$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextCaseTransformer$Factory"/>
+    <developerUiTool
             id="text-diff"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.TextDiffViewer$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextDiffViewer$Factory"/>
+    <developerUiTool
             id="date-time-converter"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.converter.DatetimeConverter$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter$Factory"/>
+    <developerUiTool
             id="json-path"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.transformer.JsonPathTransformer$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.JsonPathTransformer$Factory"/>
+    <developerUiTool
             id="json-schema-validator"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.JsonSchemaValidator$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.JsonSchemaValidator$Factory"/>
+    <developerUiTool
             id="lorem-ipsum-generator"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.LoremIpsumGenerator$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.LoremIpsumGenerator$Factory"/>
+    <developerUiTool
+            id="color-picker"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.ColorPicker$Factory"/>
+    <developerUiTool
             id="qr-code-generator"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.generator.BarcodeGenerator$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.BarcodeGenerator$Factory"/>
+    <developerUiTool
             id="notes"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.Notes$Factory"/>
-    <developerTool
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.Notes$Factory"/>
+    <developerUiTool
             id="rubber-duck"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugins._internal.tool.other.RubberDuck$Factory"/>
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RubberDuck$Factory"/>
 
   </extensions>
 </idea-plugin>
