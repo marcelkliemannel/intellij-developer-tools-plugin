@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.DataKey
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.observable.properties.AtomicProperty
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.ui.JBColor
 import com.intellij.ui.colorpicker.ColorPickerBuilder
@@ -24,7 +25,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyAction
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty.Companion.RESET_CHANGE_ID
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.NotBlankInputValidator
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toJBColor
 import java.awt.Color
 import java.util.*
 import javax.swing.border.LineBorder
@@ -32,12 +35,13 @@ import kotlin.math.max
 import kotlin.math.min
 
 class ColorPicker(
+  private val project: Project?,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable), DataProvider {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val selectedColor = configuration.register("selectedColor", JBColor.MAGENTA)
+  private val selectedColor: ValueProperty<JBColor> = configuration.register("selectedColor", JBColor.MAGENTA.toJBColor())
 
   private val cssRgb = AtomicProperty("")
   private val cssRgbWithAlpha = AtomicProperty("")
@@ -55,7 +59,7 @@ class ColorPicker(
 
     selectedColor.afterChangeConsumeEvent(parentDisposable) {
       setCssValues(it.newValue)
-      if (it.id?.equals(RESET_CHANGE_ID) == true) {
+      if (it.id?.equals(COLOR_SELECTION_CHANGE_ID) != true) {
         colorPickerModel.setColor(it.newValue)
       }
     }
@@ -71,7 +75,7 @@ class ColorPicker(
         .addSaturationBrightnessComponent()
         .addColorAdjustPanel(MaterialGraphicalColorPipetteProvider())
         .addColorValuePanel()
-        .addColorListener({ color, _ -> setCssValues(color) }, true)
+        .addColorListener({ color, _ -> selectedColor.set(color.toJBColor(), COLOR_SELECTION_CHANGE_ID) }, true)
         .apply { colorPickerModel = this.model }
         .build()
         .apply {
@@ -89,7 +93,7 @@ class ColorPicker(
           .gap(RightGap.SMALL)
 
         actionButton(CopyAction(dataKeyCssRgb), ColorPicker::class.java.name)
-      }.bottomGap(BottomGap.NONE)
+      }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
       row {
         label("")
@@ -124,8 +128,39 @@ class ColorPicker(
           .bindText(cssHlsWithAlpha)
           .gap(RightGap.SMALL)
         actionButton(CopyAction(dataKeyCssHslWithAlpha), ColorPicker::class.java.name)
+      }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
+
+      row {
+        button("Parse CSS Color Value") {
+          val inputDialog = Messages.InputDialog(
+            project,
+            "CSS color value:",
+            PARSE_CSS_VALUE_DIALOG_TITLE,
+            null,
+            "",
+            NotBlankInputValidator()
+          )
+          inputDialog.show()
+          inputDialog.inputString?.let { parseCssColorValue(it) }?.let { selectedColor.set(it) }
+        }
       }.topGap(TopGap.NONE)
     }
+  }
+
+  private fun parseCssColorValue(inputString: String): JBColor? = try {
+    val color = org.silentsoft.csscolor4j.Color.valueOf(inputString)
+    JBColor(
+      Color(color.red, color.green, color.blue, (color.opacity * 255.0).toInt()),
+      Color(color.red, color.green, color.blue, (color.opacity * 255.0).toInt())
+    )
+  }
+  catch (e: IllegalArgumentException) {
+    Messages.showErrorDialog(project, e.message, PARSE_CSS_VALUE_DIALOG_TITLE)
+    null
+  }
+  catch (e: Exception) {
+    Messages.showErrorDialog(project, "Unable to parse input value.", PARSE_CSS_VALUE_DIALOG_TITLE)
+    null
   }
 
   override fun getData(dataId: String): Any? = when {
@@ -218,12 +253,16 @@ class ColorPicker(
       parentDisposable: Disposable,
       context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> ColorPicker) =
-      { configuration -> ColorPicker(configuration, parentDisposable) }
+      { configuration -> ColorPicker(project, configuration, parentDisposable) }
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 
   companion object {
+
+    private const val COLOR_SELECTION_CHANGE_ID = "colorSelection"
+
+    private const val PARSE_CSS_VALUE_DIALOG_TITLE = "Parse CSS Color Value"
 
     private val dataKeyCssRgb = DataKey.create<String>("cssRgb")
     private val dataKeyCssRgbWithAlpha = DataKey.create<String>("cssRgbWithAlpha")
