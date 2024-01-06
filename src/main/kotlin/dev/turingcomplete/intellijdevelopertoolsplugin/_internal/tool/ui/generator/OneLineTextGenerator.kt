@@ -8,6 +8,7 @@ import com.intellij.openapi.observable.properties.AtomicBooleanProperty
 import com.intellij.openapi.observable.properties.AtomicProperty
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.COLUMNS_TINY
@@ -35,13 +36,11 @@ abstract class OneLineTextGenerator(
   private val project: Project?,
   private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable,
-  initialGeneratedTextTitle: String = "Generated text"
+  parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   protected val supportsBulkGeneration = BooleanComponentPredicate(true)
-  protected val generatedTextTitle = AtomicProperty(initialGeneratedTextTitle)
 
   private val generatedText = AtomicProperty("")
   private val invalidConfiguration = AtomicBooleanProperty(false)
@@ -53,12 +52,17 @@ abstract class OneLineTextGenerator(
   final override fun Panel.buildUi() {
     buildConfigurationUi()
     buildGeneratedValueUi()
+    buildAdditionalUi()
     buildBulkGenerationUi()
   }
 
   protected abstract fun generate(): String
 
   open fun Panel.buildConfigurationUi() {
+    // Override if needed
+  }
+
+  open fun Panel.buildAdditionalUi() {
     // Override if needed
   }
 
@@ -86,7 +90,7 @@ abstract class OneLineTextGenerator(
   }
 
   override fun getData(dataId: String): Any? = when {
-    CONTENT_DATA_KEY.`is`(dataId) -> generatedText.get()
+    CONTENT_DATA_KEY.`is`(dataId) -> StringUtil.stripHtml(generatedText.get(), false)
     else -> super.getData(dataId)
   }
 
@@ -139,20 +143,18 @@ abstract class OneLineTextGenerator(
   }
 
   private fun Panel.buildGeneratedValueUi() {
-    group(generatedTextTitle.get(), false) {
-      row {
-        label("")
-          .bindText(generatedText)
-          .changeFont(scale = 1.5f, style = Font.BOLD)
-          .gap(RightGap.SMALL)
-        actionButton(CopyAction()).gap(RightGap.SMALL)
-        actionButton(RegenerateAction { doGenerate() })
-      }.visibleIf(invalidConfiguration.not())
-      row {
-        icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
-        label("Invalid configuration").bold()
-      }.visibleIf(invalidConfiguration)
-    }
+    row {
+      label("")
+        .bindText(generatedText)
+        .changeFont(scale = 1.7f, style = Font.BOLD)
+        .gap(RightGap.SMALL)
+      actionButton(CopyAction()).gap(RightGap.SMALL)
+      actionButton(RegenerateAction { doGenerate() })
+    }.visibleIf(invalidConfiguration.not())
+    row {
+      icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
+      label("Invalid configuration").bold()
+    }.visibleIf(invalidConfiguration)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

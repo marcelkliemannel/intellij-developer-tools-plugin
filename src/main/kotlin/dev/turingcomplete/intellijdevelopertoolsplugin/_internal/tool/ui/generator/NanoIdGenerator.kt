@@ -17,8 +17,7 @@ internal class NanoIdGenerator(
   context = context,
   configuration = configuration,
   parentDisposable = parentDisposable,
-  project = project,
-  initialGeneratedTextTitle = "Generated Nano ID"
+  project = project
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //

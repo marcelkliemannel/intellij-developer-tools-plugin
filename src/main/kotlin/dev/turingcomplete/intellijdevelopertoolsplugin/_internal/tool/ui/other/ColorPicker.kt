@@ -92,42 +92,42 @@ class ColorPicker(
           .bindText(cssRgb)
           .gap(RightGap.SMALL)
 
-        actionButton(CopyAction(dataKeyCssRgb), ColorPicker::class.java.name)
+        actionButton(CopyAction(cssRgbDataKey), ColorPicker::class.java.name)
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
       row {
         label("")
           .bindText(cssRgbWithAlpha)
           .gap(RightGap.SMALL)
-        actionButton(CopyAction(dataKeyCssRgbWithAlpha), ColorPicker::class.java.name)
+        actionButton(CopyAction(cssRgbWithAlphaDataKey), ColorPicker::class.java.name)
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
       row {
         label("")
           .bindText(cssHex)
           .gap(RightGap.SMALL)
-        actionButton(CopyAction(dataKeyCssHex), ColorPicker::class.java.name)
+        actionButton(CopyAction(cssHexDataKey), ColorPicker::class.java.name)
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
       row {
         label("")
           .bindText(cssHexWithAlpha)
           .gap(RightGap.SMALL)
-        actionButton(CopyAction(dataKeyCssHexWithAlpha), ColorPicker::class.java.name)
+        actionButton(CopyAction(cssHexWithAlphaDataKey), ColorPicker::class.java.name)
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
       row {
         label("")
           .bindText(cssHls)
           .gap(RightGap.SMALL)
-        actionButton(CopyAction(dataKeyCssHsl), ColorPicker::class.java.name)
+        actionButton(CopyAction(cssHslDataKey), ColorPicker::class.java.name)
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
       row {
         label("")
           .bindText(cssHlsWithAlpha)
           .gap(RightGap.SMALL)
-        actionButton(CopyAction(dataKeyCssHslWithAlpha), ColorPicker::class.java.name)
+        actionButton(CopyAction(cssHslWithAlphaDataKey), ColorPicker::class.java.name)
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
       row {
@@ -164,12 +164,12 @@ class ColorPicker(
   }
 
   override fun getData(dataId: String): Any? = when {
-    dataKeyCssRgb.`is`(dataId) -> StringUtil.stripHtml(cssRgb.get(), false)
-    dataKeyCssRgbWithAlpha.`is`(dataId) -> StringUtil.stripHtml(cssRgbWithAlpha.get(), false)
-    dataKeyCssHex.`is`(dataId) -> StringUtil.stripHtml(cssHex.get(), false)
-    dataKeyCssHexWithAlpha.`is`(dataId) -> StringUtil.stripHtml(cssHexWithAlpha.get(), false)
-    dataKeyCssHsl.`is`(dataId) -> StringUtil.stripHtml(cssHls.get(), false)
-    dataKeyCssHslWithAlpha.`is`(dataId) -> StringUtil.stripHtml(cssHlsWithAlpha.get(), false)
+    cssRgbDataKey.`is`(dataId) -> StringUtil.stripHtml(cssRgb.get(), false)
+    cssRgbWithAlphaDataKey.`is`(dataId) -> StringUtil.stripHtml(cssRgbWithAlpha.get(), false)
+    cssHexDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHex.get(), false)
+    cssHexWithAlphaDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHexWithAlpha.get(), false)
+    cssHslDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHls.get(), false)
+    cssHslWithAlphaDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHlsWithAlpha.get(), false)
     else -> null
   }
 
@@ -264,11 +264,11 @@ class ColorPicker(
 
     private const val PARSE_CSS_VALUE_DIALOG_TITLE = "Parse CSS Color Value"
 
-    private val dataKeyCssRgb = DataKey.create<String>("cssRgb")
-    private val dataKeyCssRgbWithAlpha = DataKey.create<String>("cssRgbWithAlpha")
-    private val dataKeyCssHex = DataKey.create<String>("cssHex")
-    private val dataKeyCssHexWithAlpha = DataKey.create<String>("cssHexWithAlpha")
-    private val dataKeyCssHsl = DataKey.create<String>("cssHsl")
-    private val dataKeyCssHslWithAlpha = DataKey.create<String>("cssHslWithAlpha")
+    private val cssRgbDataKey = DataKey.create<String>("cssRgb")
+    private val cssRgbWithAlphaDataKey = DataKey.create<String>("cssRgbWithAlpha")
+    private val cssHexDataKey = DataKey.create<String>("cssHex")
+    private val cssHexWithAlphaDataKey = DataKey.create<String>("cssHexWithAlpha")
+    private val cssHslDataKey = DataKey.create<String>("cssHsl")
+    private val cssHslWithAlphaDataKey = DataKey.create<String>("cssHslWithAlpha")
   }
 }

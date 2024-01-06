@@ -81,7 +81,6 @@ internal class UuidGenerator(
 
   private fun handleVersionSelection() {
     val uuidVersion = selectedUuidVersion.get()
-    generatedTextTitle.set("Generated ${uuidVersion.title}:")
     supportsBulkGeneration.value = getGeneratorForSelectedUuidVersion(uuidVersion).supportsBulkGeneration
   }
 

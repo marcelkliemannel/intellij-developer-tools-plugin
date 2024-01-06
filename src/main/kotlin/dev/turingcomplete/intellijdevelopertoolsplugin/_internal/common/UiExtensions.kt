@@ -85,6 +85,21 @@ fun Cell<JBTextField>.bindIntTextImproved(property: ObservableMutableProperty<In
   }
 }
 
+/**
+ * IntelliJ's `bindIntText` will silently fail if the input is empty and will
+ * not execute any other validators.
+ */
+@Suppress("UnstableApiUsage")
+fun Cell<JBTextField>.bindLongTextImproved(property: ObservableMutableProperty<Long>) = this.apply {
+  applyToComponent {
+    text = property.get().toString()
+    property.afterChange { text = it.toString() }
+  }
+  this.whenTextChangedFromUi {
+    it.toLongOrNull()?.let { longValue -> property.set(longValue) }
+  }
+}
+
 @Suppress("UnstableApiUsage")
 fun Cell<JBTextField>.validateNonEmpty(errorMessage: String) = this.applyToComponent {
   validationInfo {
