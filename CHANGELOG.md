@@ -3,6 +3,17 @@
 ## Unreleased
 
 ### Added
+
+### Changed
+
+### Removed
+
+### Fixed
+
+## 3.2.0 - 2024-01-06
+
+### Added
+
 - Add ULID generator tool
 - Add Nano ID generator tool
 - Add color picker tool
@@ -10,11 +21,8 @@
 - Improve the layout of the tools in the tool window
 
 ### Changed
+
 - The UUID generator was moved to the "Cryptography" group
-
-### Removed
-
-### Fixed
 
 ## 3.1.0 - 2023-12-29
 
