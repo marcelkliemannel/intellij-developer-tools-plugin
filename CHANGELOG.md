@@ -9,6 +9,8 @@
 ### Removed
 
 ### Fixed
+- Inputs and configurations for tools that were not opened were lost the next time the settings were saved.
+- Loading the tool window settings causes an error if one of the tools has a saved secret.
 
 ## 3.2.0 - 2024-01-06
 

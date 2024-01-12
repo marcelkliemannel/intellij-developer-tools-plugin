@@ -6,6 +6,7 @@ import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.XCollection
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings.ApplicationState
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsInstanceSettings.DeveloperToolConfigurationState
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.LegacyDeveloperToolsSettingsMigrator.LegacyState
 
 @State(
@@ -46,7 +47,7 @@ internal class LegacyDeveloperToolsSettingsMigrator : PersistentStateComponent<L
 
   data class LegacyState(
     @get:XCollection(style = XCollection.Style.v2, elementName = "developerToolsConfigurations")
-    var developerToolsConfigurations: List<DeveloperToolsInstanceSettings.DeveloperToolConfigurationState>? = null,
+    var developerToolsConfigurations: List<DeveloperToolConfigurationState>? = null,
     @get:Attribute("lastSelectedContentNodeId")
     var lastSelectedContentNodeId: String? = null,
     @get:Attribute("loadExamples")

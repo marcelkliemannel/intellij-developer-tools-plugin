@@ -27,6 +27,15 @@ internal class DeveloperToolsToolWindowSettings :
 
   companion object {
 
+    /**
+     * Warning: The first access to this service will trigger `loadState()`.
+     * If the persistent state contains a property of type `PropertyType.SECRET`,
+     * the `PasswordSafe` will be called to retrieve the secret.
+     * This call will check if it's not called on the EDT, therefore, the first
+     * call to this method must be done on a background thread.
+     * Note that this is not the case for the dialog, since it is opened by an
+     * action and actions are exempt from the EDT check.
+     */
     fun getInstance(project: Project): DeveloperToolsToolWindowSettings =
       project.getService(DeveloperToolsToolWindowSettings::class.java)
   }

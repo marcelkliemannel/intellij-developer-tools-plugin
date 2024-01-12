@@ -5,9 +5,12 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.SettingsCategory
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.xmlb.annotations.Attribute
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings.ApplicationState
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings.ApplicationState
+import java.security.Provider
+import java.security.Security
 
 @State(
   name = "DeveloperToolsApplicationSettingsV1",
@@ -29,6 +32,17 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   var toolWindowMenuHideOnToolSelection: Boolean by ValueProperty(TOOL_WINDOW_MENU_HIDE_ON_TOOL_SELECTION)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
+
+  init {
+    try {
+      val bouncyCastleProviderClass = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider")
+      val bouncyCastleProvider = bouncyCastleProviderClass.getConstructor().newInstance()
+      Security.addProvider(bouncyCastleProvider as Provider)
+    } catch (e: Exception) {
+      log.debug("Can't load BouncyCastleProvider", e)
+    }
+  }
+
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   override fun getState(): ApplicationState = ApplicationState(
@@ -85,6 +99,8 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 
   companion object {
+
+    private val log = logger<DeveloperToolsInstanceSettings>()
 
     val instance: DeveloperToolsApplicationSettings
       get() = ApplicationManager.getApplication().getService(DeveloperToolsApplicationSettings::class.java)

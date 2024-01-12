@@ -3,8 +3,8 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsInstanceSettings
 
@@ -57,6 +57,7 @@ internal class DeveloperToolNode(
     developerToolConfiguration: DeveloperToolConfiguration = settings.createDeveloperToolConfiguration(developerToolId)
   ): DeveloperToolContainer {
     val developerTool = developerUiToolCreator(developerToolConfiguration)
+    developerToolConfiguration.wasConsumedByDeveloperTool = true
     Disposer.register(parentDisposable, developerTool)
     return DeveloperToolContainer(developerTool, developerToolConfiguration, developerUiToolPresentation)
   }

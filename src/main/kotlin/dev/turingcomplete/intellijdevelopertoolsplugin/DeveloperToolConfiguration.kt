@@ -16,12 +16,16 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 class DeveloperToolConfiguration(
   var name: String,
-  val id: UUID = UUID.randomUUID(),
-  val persistentProperties: Map<String, Any> = emptyMap()
+  val id: UUID,
+  val persistentProperties: Map<String, PersistentProperty>
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   internal val properties = ConcurrentHashMap<String, PropertyContainer>()
+  // If false, the `DeveloperToolFactory` never created a `DeveloperTool`
+  // instance that could have register the current properties.
+  // In this case, the `persistentProperties` need to be persisted again.
+  internal var wasConsumedByDeveloperTool = false
   private val changeListeners = CopyOnWriteArrayList<ChangeListener>()
   var isResetting = false
     internal set
@@ -84,8 +88,8 @@ class DeveloperToolConfiguration(
     example: T?
   ): ValueProperty<T> {
     val type = assertPersistableType(defaultValue::class, propertyType)
-    val existingProperty = persistentProperties[key]
-    val initialValue: T = existingProperty?.uncheckedCastTo(type) ?: let {
+    val existingPropertyValue = persistentProperties[key]?.value
+    val initialValue: T = existingPropertyValue?.uncheckedCastTo(type) ?: let {
       if (DeveloperToolsApplicationSettings.instance.loadExamples && example != null) example else defaultValue
     }
     val valueProperty = ValueProperty(initialValue).apply {
@@ -129,7 +133,7 @@ class DeveloperToolConfiguration(
       reference.setWithUncheckedCast(value, RESET_CHANGE_ID)
     }
 
-    fun valueChanged(): Boolean {
+    fun valueIsNotDefaultOrExample(): Boolean {
       val value = reference.get()
       return defaultValue != value && example != value
     }
@@ -150,6 +154,10 @@ class DeveloperToolConfiguration(
 
     fun configurationChanged(property: ValueProperty<out Any>)
   }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  data class PersistentProperty(val key: String, val value: Any, val type: PropertyType)
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 }
