@@ -102,7 +102,7 @@ internal class JwtEncoderDecoder(
   private val highlightEncodedAlarm by lazy { Alarm(parentDisposable) }
   private val highlightHeaderAlarm by lazy { Alarm(parentDisposable) }
   private val highlightPayloadAlarm by lazy { Alarm(parentDisposable) }
-  private val conversationAlarm by lazy { Alarm(parentDisposable) }
+  private val conversionAlarm by lazy { Alarm(parentDisposable) }
 
   private var lastActiveInput: DeveloperToolEditor? = null
 
@@ -273,9 +273,9 @@ internal class JwtEncoderDecoder(
       return
     }
 
-    if (!isDisposed && !conversationAlarm.isDisposed) {
-      conversationAlarm.cancelAllRequests()
-      conversationAlarm.addRequest({ doConvert(changeOrigin) }, 100)
+    if (!isDisposed && !conversionAlarm.isDisposed) {
+      conversionAlarm.cancelAllRequests()
+      conversionAlarm.addRequest({ doConvert(changeOrigin) }, 100)
     }
   }
 

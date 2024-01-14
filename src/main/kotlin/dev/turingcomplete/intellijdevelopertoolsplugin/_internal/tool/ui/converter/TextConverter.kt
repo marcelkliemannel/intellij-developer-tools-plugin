@@ -12,17 +12,17 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.PropertyComponentPredicate
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.TextConverter.ActiveInput.SOURCE
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.TextConverter.ActiveInput.TARGET
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 
 internal abstract class TextConverter(
   protected val textConverterContext: TextConverterContext,
@@ -37,7 +37,7 @@ internal abstract class TextConverter(
   protected var sourceText = configuration.register("sourceText", textConverterContext.defaultSourceText, INPUT)
   protected var targetText = configuration.register("targetText", textConverterContext.defaultTargetText, INPUT)
 
-  private val conversationAlarm by lazy { Alarm(parentDisposable) }
+  private val conversionAlarm by lazy { Alarm(parentDisposable) }
 
   private var lastActiveInput = AtomicProperty(SOURCE)
   private val toSourceActive = PropertyComponentPredicate(lastActiveInput, TARGET)
@@ -158,7 +158,7 @@ internal abstract class TextConverter(
   }
 
   private fun doToTarget(text: String) {
-    doConversation {
+    doConversion {
       try {
         toTarget(text)
       } catch (ignore: Exception) {
@@ -167,7 +167,7 @@ internal abstract class TextConverter(
   }
 
   private fun doToSource(text: String) {
-    doConversation {
+    doConversion {
       try {
         toSource(text)
       } catch (ignore: Exception) {
@@ -175,10 +175,10 @@ internal abstract class TextConverter(
     }
   }
 
-  private fun doConversation(conversation: () -> Unit) {
-    if (!isDisposed && !conversationAlarm.isDisposed) {
-      conversationAlarm.cancelAllRequests()
-      conversationAlarm.addRequest(conversation, 0)
+  private fun doConversion(conversion: () -> Unit) {
+    if (!isDisposed && !conversionAlarm.isDisposed) {
+      conversionAlarm.cancelAllRequests()
+      conversionAlarm.addRequest(conversion, 0)
     }
   }
 

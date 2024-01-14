@@ -8,6 +8,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CliCommandConverter
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.util.*
 
 @TestApplication
 class CliCommandConverterTest {
@@ -21,7 +22,7 @@ class CliCommandConverterTest {
 
   @Test
   fun `test toTarget()`() {
-    val cliCommandConverter = CliCommandConverter(DeveloperToolConfiguration("Test"), disposable, context, null)
+    val cliCommandConverter = CliCommandConverter(DeveloperToolConfiguration("Test", UUID.randomUUID(), emptyMap()), disposable, context, null)
     cliCommandConverter.toTarget("  app -foo   --baz ---baz     -foo-bar \"foo -baz\"   '-foo-bar'")
     val actual = cliCommandConverter.targetText()
     assertThat(actual).isEqualTo("""
@@ -35,7 +36,7 @@ app \
 
   @Test
   fun `test toSource()`() {
-    val cliCommandConverter = CliCommandConverter(DeveloperToolConfiguration("Test"), disposable, context, null)
+    val cliCommandConverter = CliCommandConverter(DeveloperToolConfiguration("Test", UUID.randomUUID(), emptyMap()), disposable, context, null)
     cliCommandConverter.toSource("""
 app \
   -foo \

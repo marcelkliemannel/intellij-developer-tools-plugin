@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+- Add time conversion tool
 
 ### Changed
 

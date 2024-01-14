@@ -8,7 +8,6 @@ import com.intellij.openapi.observable.properties.ObservableProperty
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ValidationInfo
-import com.intellij.openapi.ui.naturalSorted
 import com.intellij.openapi.util.text.StringUtil.stripHtml
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.BottomGap
@@ -37,6 +36,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer.Companion.ALL_AVAILABLE_LOCALES
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.changeFont
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.not
@@ -104,7 +104,7 @@ class DatetimeConverter(
     if (!ZoneId.getAvailableZoneIds().contains(selectedTimeZoneId.get())) {
       selectedTimeZoneId.set(ZoneId.systemDefault().id)
     }
-    if (!LOCALES.contains(formattedLocale.get())) {
+    if (!ALL_AVAILABLE_LOCALES.contains(formattedLocale.get())) {
       formattedLocale.set(DEFAULT_FORMATTED_LOCALE)
     }
   }
@@ -266,7 +266,7 @@ class DatetimeConverter(
         }
 
         row {
-          comboBox(LOCALES)
+          comboBox(ALL_AVAILABLE_LOCALES)
             .label("Locale:")
             .bindItem(formattedLocale)
             .columns(COLUMNS_MEDIUM)
@@ -599,10 +599,5 @@ class DatetimeConverter(
     private val DEFAULT_FORMATTED_STANDARD_FORMAT = StandardFormat.ISO_8601_UTC
     private const val DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_OFFSET = true
     private const val DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_TIME_ZONE = false
-
-    private val LOCALES = Locale.getAvailableLocales()
-      .filter { it.displayName.isNotBlank() }
-      .map { LocaleContainer(it) }
-      .naturalSorted()
   }
 }

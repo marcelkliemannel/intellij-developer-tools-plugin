@@ -1,5 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.common
 
+import com.intellij.openapi.ui.naturalSorted
 import java.util.*
 
 /**
@@ -18,4 +19,12 @@ data class LocaleContainer(val locale: Locale) {
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    val ALL_AVAILABLE_LOCALES = Locale.getAvailableLocales()
+      .filter { it.displayName.isNotBlank() }
+      .map { LocaleContainer(it) }
+      .naturalSorted()
+  }
 }

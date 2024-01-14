@@ -21,6 +21,7 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 - JSON Schema Validator
 - Hashing
 - Date Time Converter
+- Time Conversion
 - Code Style Formatting
 - SQL Formatting
 - Color Picker

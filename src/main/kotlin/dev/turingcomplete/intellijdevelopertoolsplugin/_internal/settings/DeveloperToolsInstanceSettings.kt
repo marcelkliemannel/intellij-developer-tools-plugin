@@ -22,6 +22,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguratio
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import java.math.BigDecimal
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -260,6 +261,7 @@ internal abstract class DeveloperToolsInstanceSettings {
         is String -> value to String::class.qualifiedName!!
         is JBColor -> value.rgb.toString() to JBColor::class.qualifiedName!!
         is LocaleContainer -> value.locale.toLanguageTag() to LocaleContainer::class.qualifiedName!!
+        is BigDecimal -> value.toString() to BigDecimal::class.qualifiedName!!
         else -> error("Unsupported configuration property type: ${value::class.qualifiedName}")
       }
       return "${valueType}$PROPERTY_TYPE_VALUE_DELIMITER$serializedValue"
@@ -284,6 +286,7 @@ internal abstract class DeveloperToolsInstanceSettings {
         String::class.qualifiedName -> value
         JBColor::class.qualifiedName -> JBColor(value.toInt(), value.toInt())
         LocaleContainer::class.qualifiedName -> LocaleContainer(Locale.forLanguageTag(value))
+        BigDecimal::class.qualifiedName -> BigDecimal(value)
         else -> parseValue(valueType, value)
       }
     }
@@ -331,6 +334,7 @@ internal abstract class DeveloperToolsInstanceSettings {
       String::class,
       JBColor::class,
       LocaleContainer::class,
+      BigDecimal::class
     )
 
     fun <T : Any> assertPersistableType(type: KClass<T>, propertyType: PropertyType): KClass<T> {
