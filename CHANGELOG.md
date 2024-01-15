@@ -4,6 +4,7 @@
 
 ### Added
 - Add time conversion tool
+- Add 'What's New' overview to the main menu
 
 ### Changed
 

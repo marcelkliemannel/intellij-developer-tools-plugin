@@ -39,7 +39,7 @@ internal class MainDialog(project: Project?)
     return JBSplitter(0.25f).apply {
       dividerWidth = DIVIDER_WIDTH
 
-      firstComponent = contentPanelHandler.toolsMenuTree.createWrapperComponent()
+      firstComponent = contentPanelHandler.toolsMenuTree.createWrapperComponent(this@apply)
 
       secondComponent = contentPanelHandler.contentPanel.apply {
         border = JBEmptyBorder(0, 0, 0, DIVIDER_WIDTH)

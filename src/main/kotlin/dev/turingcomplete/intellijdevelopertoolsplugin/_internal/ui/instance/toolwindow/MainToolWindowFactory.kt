@@ -104,7 +104,7 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     private var toolsMenuTreeWrapper: JComponent?
 
     init {
-      toolsMenuTreeWrapper = toolsMenuTree.createWrapperComponent()
+      toolsMenuTreeWrapper = toolsMenuTree.createWrapperComponent(innerContentPanel)
       Disposer.register(parentDisposable) { toolsMenuTreeWrapper = null }
 
       selectedContentNode.afterChangeConsumeEvent(parentDisposable) {

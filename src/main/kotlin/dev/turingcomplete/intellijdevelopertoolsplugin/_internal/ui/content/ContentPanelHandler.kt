@@ -31,7 +31,7 @@ internal open class ContentPanelHandler(
   val contentPanel = BorderLayoutPanel()
   val toolsMenuTree: ToolsMenuTree
 
-  private val innerContentPanel = BorderLayoutPanel()
+  protected val innerContentPanel = BorderLayoutPanel()
   private val mainDialogPromotionPanel = BorderLayoutPanel()
 
   private val cachedGroupsPanels = mutableMapOf<String, GroupContentPanel>()

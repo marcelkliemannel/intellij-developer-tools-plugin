@@ -344,7 +344,7 @@ internal class TimeConversion(
   }
 
   private fun BigDecimal.formatted() = this.stripTrailingZeros()
-    .setScale(decimalPlaces.get() + 1, roundingMode.get().javaMathRoundingMode)
+    .setScale(decimalPlaces.get(), roundingMode.get().javaMathRoundingMode)
     .toPlainString()
     .let {
       // Remove trailing zeros

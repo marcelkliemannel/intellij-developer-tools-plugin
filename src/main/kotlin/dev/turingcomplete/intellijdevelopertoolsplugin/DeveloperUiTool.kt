@@ -32,7 +32,7 @@ abstract class DeveloperUiTool(
     }
     // This prevents the `Editor` from increasing the size of the dialog if the
     // to display all the text on the screen instead of using scrollbars. The
-    // reason for this behaviour is that the UI DSL always sets the minimum size
+    // reason for this behavior is that the UI DSL always sets the minimum size
     // to the preferred size. But the preferred size gets calculated as if the
     // whole text gets displayed on the screen.
     panel.minimumSize = Dimension(0, 0)
