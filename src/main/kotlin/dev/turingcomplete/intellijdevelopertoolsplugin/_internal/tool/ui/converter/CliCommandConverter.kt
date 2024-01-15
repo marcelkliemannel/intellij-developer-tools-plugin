@@ -35,9 +35,7 @@ internal class CliCommandConverter(
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val lineBreakDelimiter = configuration.register("lineBreakDelimiter",
-                                                          defaultLineBreakDelimiter
-  )
+  private val lineBreakDelimiter = configuration.register("lineBreakDelimiter", defaultLineBreakDelimiter)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -85,17 +83,10 @@ internal class CliCommandConverter(
       project: Project?,
       parentDisposable: Disposable,
       context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> CliCommandConverter) =
-      { configuration ->
-        CliCommandConverter(
-          configuration,
-          parentDisposable,
-          context,
-          project
-        )
-      }
+    ): ((DeveloperToolConfiguration) -> CliCommandConverter) = { configuration ->
+      CliCommandConverter(configuration, parentDisposable, context, project)
+    }
   }
-
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 

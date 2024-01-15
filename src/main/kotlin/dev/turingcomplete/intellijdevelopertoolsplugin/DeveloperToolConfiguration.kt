@@ -7,22 +7,27 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguratio
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SECRET
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty.Companion.RESET_CHANGE_ID
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsInstanceSettings.Companion.assertPersistableType
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.reflect.safeCast
 
 class DeveloperToolConfiguration(
   var name: String,
-  val id: UUID = UUID.randomUUID(),
-  val persistentProperties: Map<String, Any> = emptyMap()
+  val id: UUID,
+  val persistentProperties: Map<String, PersistentProperty>
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   internal val properties = ConcurrentHashMap<String, PropertyContainer>()
+  // If false, the `DeveloperToolFactory` never created a `DeveloperTool`
+  // instance that could have register the current properties.
+  // In this case, the `persistentProperties` need to be persisted again.
+  internal var wasConsumedByDeveloperTool = false
   private val changeListeners = CopyOnWriteArrayList<ChangeListener>()
+  private val resetListeners = CopyOnWriteArrayList<ResetListener>()
   var isResetting = false
     internal set
 
@@ -46,6 +51,15 @@ class DeveloperToolConfiguration(
     changeListeners.remove(changeListener)
   }
 
+  fun addResetListener(parentDisposable: Disposable, resetListener: ResetListener) {
+    resetListeners.add(resetListener)
+    Disposer.register(parentDisposable) { resetListeners.remove(resetListener) }
+  }
+
+  fun removeResetListener(resetListener: ResetListener) {
+    resetListeners.remove(resetListener)
+  }
+
   fun reset(
     type: PropertyType? = null,
     loadExamples: Boolean = DeveloperToolsApplicationSettings.instance.loadExamples
@@ -57,6 +71,7 @@ class DeveloperToolConfiguration(
           property.reset(loadExamples)
           fireConfigurationChanged(property.reference)
         }
+      resetListeners.forEach { it.configurationReset() }
     }
     finally {
       isResetting = false
@@ -84,8 +99,8 @@ class DeveloperToolConfiguration(
     example: T?
   ): ValueProperty<T> {
     val type = assertPersistableType(defaultValue::class, propertyType)
-    val existingProperty = persistentProperties[key]
-    val initialValue: T = existingProperty?.uncheckedCastTo(type) ?: let {
+    val existingPropertyValue = persistentProperties[key]?.value
+    val initialValue: T = type.safeCast(existingPropertyValue) ?: let {
       if (DeveloperToolsApplicationSettings.instance.loadExamples && example != null) example else defaultValue
     }
     val valueProperty = ValueProperty(initialValue).apply {
@@ -129,7 +144,7 @@ class DeveloperToolConfiguration(
       reference.setWithUncheckedCast(value, RESET_CHANGE_ID)
     }
 
-    fun valueChanged(): Boolean {
+    fun valueIsNotDefaultOrExample(): Boolean {
       val value = reference.get()
       return defaultValue != value && example != value
     }
@@ -146,10 +161,23 @@ class DeveloperToolConfiguration(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  interface ChangeListener {
+  @FunctionalInterface
+  fun interface ChangeListener {
 
     fun configurationChanged(property: ValueProperty<out Any>)
   }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  @FunctionalInterface
+  fun interface ResetListener {
+
+    fun configurationReset()
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  data class PersistentProperty(val key: String, val value: Any, val type: PropertyType)
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 }

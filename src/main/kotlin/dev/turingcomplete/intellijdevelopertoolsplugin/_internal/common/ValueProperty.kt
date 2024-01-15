@@ -40,6 +40,8 @@ class ValueProperty<T>(initialValue: T) : ObservableMutableProperty<T> {
 
   override fun get(): T = this.value.get()
 
+  override fun toString(): String = get().toString()
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 

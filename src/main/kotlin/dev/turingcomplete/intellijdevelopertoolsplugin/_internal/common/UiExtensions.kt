@@ -29,6 +29,8 @@ import java.awt.event.InputEvent
 import java.awt.event.ItemEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.math.BigDecimal
+import java.math.MathContext
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JTable
@@ -36,6 +38,10 @@ import javax.swing.JTextField
 import javax.swing.border.CompoundBorder
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
+
+val longMaxValue = BigDecimal(Long.MAX_VALUE)
+val longMinValue = BigDecimal(Long.MIN_VALUE)
+
 // -- Exposed Methods ----------------------------------------------------------------------------------------------- //
 
 /**
@@ -54,6 +60,30 @@ fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) = this.apply {
     }
     else {
       null
+    }
+  }
+}
+
+
+@Suppress("UnstableApiUsage")
+fun Cell<JBTextField>.validateBigDecimalValue(
+  minInclusive: BigDecimal? = null,
+  mathContext: MathContext = MathContext.UNLIMITED,
+  toBigDecimal: (String) -> BigDecimal? = { it.toBigDecimalOrNull(mathContext) }
+) = this.apply {
+  validationInfo {
+    if (!this@validateBigDecimalValue.component.isEnabled) {
+      return@validationInfo null
+    }
+    val value: BigDecimal? = try {
+      toBigDecimal(this@validateBigDecimalValue.component.text)
+    } catch (e: Exception) {
+      return@validationInfo error("Please enter a number")
+    }
+    when {
+      value == null -> error("Please enter a number")
+      minInclusive != null && value < minInclusive -> error("Enter a number greater than or equal to 0")
+      else -> null
     }
   }
 }
@@ -97,6 +127,21 @@ fun Cell<JBTextField>.bindLongTextImproved(property: ObservableMutableProperty<L
   }
   this.whenTextChangedFromUi {
     it.toLongOrNull()?.let { longValue -> property.set(longValue) }
+  }
+}
+
+/**
+ * IntelliJ's `bindIntText` will silently fail if the input is empty and will
+ * not execute any other validators.
+ */
+@Suppress("UnstableApiUsage")
+fun Cell<JBTextField>.bindDoubleTextImproved(property: ObservableMutableProperty<Double>) = this.apply {
+  applyToComponent {
+    text = property.get().toString()
+    property.afterChange { text = it.toString() }
+  }
+  this.whenTextChangedFromUi {
+    it.toDoubleOrNull()?.let { doubleValue -> property.set(doubleValue) }
   }
 }
 
@@ -185,8 +230,6 @@ fun JTable.setContextMenu(place: String, actionGroup: ActionGroup) {
   addMouseListener(mouseAdapter)
 }
 
-fun JBFont.toMonospace(): JBFont = JBFont.create(Font(Font.MONOSPACED, this.style, this.size))
-
 fun Cell<JLabel>.changeFont(scale: Float = 1.0f, style: Int = Font.PLAIN) = this.applyToComponent {
   font = JBFont.create(this.font.deriveFont(style), false).biggerOn(scale)
 }
@@ -203,6 +246,8 @@ fun <T> TabInfo.castedObject(): T = this.`object` as T
 
 operator fun ObservableMutableProperty<Boolean>.not(): ObservableMutableProperty<Boolean> =
   transform({ !it }) { !it }
+
+fun BigDecimal.isWithinLongRange(): Boolean = (this <= longMaxValue) && (this >= longMinValue)
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

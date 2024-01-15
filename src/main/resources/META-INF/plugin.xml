@@ -24,6 +24,7 @@
     <li>JSON Schema Validator</li>
     <li>Hashing</li>
     <li>Date Time Converter</li>
+    <li>Time Conversion</li>
     <li>Code Style Formatting</li>
     <li>SQL Formatting</li>
     <li>Color Picker</li>
@@ -227,6 +228,9 @@
     <developerUiTool
             id="date-time-converter"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter$Factory"/>
+    <developerUiTool
+            id="time-conversion"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.TimeConversion$Factory"/>
     <developerUiTool
             id="json-path"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.JsonPathTransformer$Factory"/>

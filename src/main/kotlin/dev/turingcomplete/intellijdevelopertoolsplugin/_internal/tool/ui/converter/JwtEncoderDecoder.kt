@@ -102,7 +102,7 @@ internal class JwtEncoderDecoder(
   private val highlightEncodedAlarm by lazy { Alarm(parentDisposable) }
   private val highlightHeaderAlarm by lazy { Alarm(parentDisposable) }
   private val highlightPayloadAlarm by lazy { Alarm(parentDisposable) }
-  private val conversationAlarm by lazy { Alarm(parentDisposable) }
+  private val conversionAlarm by lazy { Alarm(parentDisposable) }
 
   private var lastActiveInput: DeveloperToolEditor? = null
 
@@ -212,7 +212,7 @@ internal class JwtEncoderDecoder(
           icon = AllIcons.General.Settings,
           actions = encodingActions
         ))
-      }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind == HMAC }).layout(RowLayout.PARENT_GRID)
+      }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.requiresPublicPrivateKey?.not() ?: false }).layout(RowLayout.PARENT_GRID)
 
       row {
         textArea()
@@ -223,7 +223,7 @@ internal class JwtEncoderDecoder(
           .setValidationResultBorder()
           .whenTextChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
           .validationInfo(jwt.signature.publicKeyErrorHolder.asValidation())
-      }
+      }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.requiresPublicPrivateKey ?: false })
       row {
         textArea()
           .rows(5)
@@ -233,7 +233,7 @@ internal class JwtEncoderDecoder(
           .setValidationResultBorder()
           .whenTextChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
           .validationInfo(jwt.signature.privateKeyErrorHolder.asValidation())
-      }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind != HMAC })
+      }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.requiresPublicPrivateKey ?: false })
     }
   }
 
@@ -273,9 +273,9 @@ internal class JwtEncoderDecoder(
       return
     }
 
-    if (!isDisposed && !conversationAlarm.isDisposed) {
-      conversationAlarm.cancelAllRequests()
-      conversationAlarm.addRequest({ doConvert(changeOrigin) }, 100)
+    if (!isDisposed && !conversionAlarm.isDisposed) {
+      conversionAlarm.cancelAllRequests()
+      conversionAlarm.addRequest({ doConvert(changeOrigin) }, 100)
     }
   }
 
@@ -472,9 +472,11 @@ internal class JwtEncoderDecoder(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private enum class SignatureAlgorithmKind {
+  private enum class SignatureAlgorithmKind(val requiresPublicPrivateKey: Boolean) {
 
-    HMAC, RSA, ECDSA
+    HMAC(false),
+    RSA(true),
+    ECDSA(true)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

@@ -1,6 +1,8 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.toolwindow
 
+import com.intellij.collaboration.ui.CollaborationToolsUIUtil
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopup
@@ -13,6 +15,7 @@ import com.intellij.ui.components.ActionLink
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
+import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsToolWindowSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.content.ContentPanelHandler
@@ -22,6 +25,7 @@ import java.awt.Dimension
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
 import javax.swing.JComponent
+import javax.swing.JLabel
 
 class MainToolWindowFactory : ToolWindowFactory, DumbAware {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -33,15 +37,28 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     toolWindow.stripeTitle = "Developer Tools"
   }
 
+  @Suppress("UnstableApiUsage")
   override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-    val contentPanelHandler = ToolWindowContentPanelHandler(project, toolWindow.disposable)
+    val loaderPanel = BorderLayoutPanel().apply {
+      addToCenter(JLabel(CollaborationToolsUIUtil.animatedLoadingIcon))
+    }
+    toolWindow.contentManager.addContent(ContentFactory.getInstance().createContent(loaderPanel, "", false))
 
-    with(toolWindow.contentManager) {
-      val content = ContentFactory.getInstance().createContent(contentPanelHandler.contentPanel, "", false).apply {
-        preferredFocusableComponent = contentPanelHandler.contentPanel
+    ApplicationManager.getApplication().executeOnPooledThread {
+      // See `DeveloperToolsToolWindowSettings#getInstance` for an explanation
+      // why the settings must be instantiated on a background thread.
+      val settings = DeveloperToolsToolWindowSettings.getInstance(project)
+
+      ApplicationManager.getApplication().invokeLater {
+        toolWindow.contentManager.removeAllContents(true)
+
+        val contentPanelHandler = ToolWindowContentPanelHandler(settings, project, toolWindow.disposable)
+        val mainContent = ContentFactory.getInstance().createContent(contentPanelHandler.contentPanel, "", false).apply {
+          preferredFocusableComponent = contentPanelHandler.contentPanel
+        }
+        toolWindow.contentManager.addContent(mainContent)
+        toolWindow.contentManager.setSelectedContent(mainContent)
       }
-      addContent(content)
-      setSelectedContent(content)
     }
   }
 
@@ -71,12 +88,13 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class ToolWindowContentPanelHandler(
+    settings: DeveloperToolsToolWindowSettings,
     project: Project,
     parentDisposable: Disposable
   ) : ContentPanelHandler(
     project = project,
     parentDisposable = parentDisposable,
-    settings = DeveloperToolsToolWindowSettings.getInstance(project),
+    settings = settings,
     groupNodeSelectionEnabled = false,
     promoteMainDialog = true,
     prioritizeVerticalLayout = true
@@ -86,7 +104,7 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     private var toolsMenuTreeWrapper: JComponent?
 
     init {
-      toolsMenuTreeWrapper = toolsMenuTree.createWrapperComponent()
+      toolsMenuTreeWrapper = toolsMenuTree.createWrapperComponent(innerContentPanel)
       Disposer.register(parentDisposable) { toolsMenuTreeWrapper = null }
 
       selectedContentNode.afterChangeConsumeEvent(parentDisposable) {

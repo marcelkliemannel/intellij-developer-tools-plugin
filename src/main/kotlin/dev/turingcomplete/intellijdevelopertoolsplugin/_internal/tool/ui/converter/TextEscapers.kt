@@ -51,7 +51,8 @@ internal class HtmlEntitiesEscape(
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
       menuTitle = "HTML Entities",
-      contentTitle = "HTML Entities Escape/Unescape"
+      contentTitle = "HTML Entities Escape/Unescape",
+      description = DeveloperUiToolPresentation.contextHelp("This tool will use <code>StringEscapeUtils.escapeHtml4(text)</code> and <code>StringEscapeUtils.unescapeHtml4(text)</code> from the 'Apache Commons Text' library.")
     )
 
     override fun getDeveloperUiToolCreator(
@@ -91,7 +92,8 @@ internal class JavaTextEscape(
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
       menuTitle = "Java Text",
-      contentTitle = "Java Text Escape/Unescape"
+      contentTitle = "Java Text Escape/Unescape",
+      description = DeveloperUiToolPresentation.contextHelp("This tool will use <code>StringEscapeUtils.escapeJava(text)</code> and <code>StringEscapeUtils.unescapeJava(text)</code> from the 'Apache Commons Text' library.")
     )
 
     override fun getDeveloperUiToolCreator(
@@ -131,7 +133,8 @@ internal class JsonTextEscape(
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
       menuTitle = "JSON Text",
-      contentTitle = "JSON Text Escape/Unescape"
+      contentTitle = "JSON Text Escape/Unescape",
+      description = DeveloperUiToolPresentation.contextHelp("This tool will use <code>StringEscapeUtils.escapeJson(text)</code> and <code>StringEscapeUtils.unescapeJson(text)</code> from the 'Apache Commons Text' library.")
     )
 
     override fun getDeveloperUiToolCreator(
@@ -171,7 +174,8 @@ internal class CsvTextEscape(
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
       menuTitle = "CSV Text",
-      contentTitle = "CSV Text Escape/Unescape"
+      contentTitle = "CSV Text Escape/Unescape",
+      description = DeveloperUiToolPresentation.contextHelp("This tool will use <code>StringEscapeUtils.escapeCsv(text)</code> and <code>StringEscapeUtils.unescapeCsv(text)</code> from the 'Apache Commons Text' library.")
     )
 
     override fun getDeveloperUiToolCreator(
@@ -211,7 +215,8 @@ internal class XmlTextEscape(
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
       menuTitle = "XML Text",
-      contentTitle = "XML Text Escape/Unescape"
+      contentTitle = "XML Text Escape/Unescape",
+      description = DeveloperUiToolPresentation.contextHelp("This tool will use <code>StringEscapeUtils.escapeXml11(text)</code> and <code>StringEscapeUtils.unescapeXml(text)</code> from the 'Apache Commons Text' library.")
     )
 
     override fun getDeveloperUiToolCreator(

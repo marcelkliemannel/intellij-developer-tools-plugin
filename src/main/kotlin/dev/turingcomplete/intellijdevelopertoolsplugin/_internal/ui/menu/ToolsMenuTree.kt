@@ -13,6 +13,7 @@ import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.SimpleTextAttributes.REGULAR_ATTRIBUTES
 import com.intellij.ui.SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
 import com.intellij.ui.TreeUIHelper
+import com.intellij.ui.components.panels.VerticalLayout
 import com.intellij.ui.render.RenderingUtil
 import com.intellij.ui.tree.TreeVisitor.Action.CONTINUE
 import com.intellij.ui.tree.TreeVisitor.Action.INTERRUPT
@@ -28,8 +29,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsInstanceSettings
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.ChangelogDialog
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.OpenSettingsAction
 import javax.swing.JComponent
+import javax.swing.JPanel
 import javax.swing.JTree
 import javax.swing.ScrollPaneConstants
 import javax.swing.event.HyperlinkEvent
@@ -87,13 +90,19 @@ internal class ToolsMenuTree(
     setRowHeight(standardRowHeight + (standardRowHeight * 0.2f).toInt())
   }
 
-  fun createWrapperComponent(): JComponent {
+  fun createWrapperComponent(parentComponent: JComponent): JComponent {
     val wrapper = BorderLayoutPanel().apply {
       border = JBUI.Borders.empty()
       addToCenter(this@ToolsMenuTree)
       addToBottom(BorderLayoutPanel().apply {
         border = JBUI.Borders.empty(UIUtil.PANEL_REGULAR_INSETS)
-        addToCenter(createSettingsLink())
+        background = UIUtil.SIDE_PANEL_BACKGROUND
+        val linksPanel = JPanel(VerticalLayout(UIUtil.LARGE_VGAP)).apply {
+          background = UIUtil.SIDE_PANEL_BACKGROUND
+          add(createSettingsLink())
+          add(createWhatsNewLink(parentComponent))
+        }
+        addToCenter(linksPanel)
       })
     }
     return ScrollPaneFactory.createScrollPane(wrapper, true).apply {
@@ -105,6 +114,8 @@ internal class ToolsMenuTree(
     }
   }
 
+  // -- Private Methods --------------------------------------------------------------------------------------------- //
+
   /**
    * Directly opening the [com.intellij.openapi.options.ShowSettingsUtil] will
    * lead to the error `Slow operations are prohibited on EDT` if called in the
@@ -112,19 +123,28 @@ internal class ToolsMenuTree(
    * Using [com.intellij.ui.components.ActionLink] will lead to an error related
    * to the `project.messageBus`.
    */
-  private fun createSettingsLink(): HyperlinkLabel {
-    @Suppress("DialogTitleCapitalization")
-    return HyperlinkLabel(CommonBundle.settingsTitle()).apply {
-      icon = AllIcons.General.GearPlain
-      addHyperlinkListener(object : HyperlinkAdapter() {
-        override fun hyperlinkActivated(e: HyperlinkEvent) {
-          OpenSettingsAction.openSettings(project)
-        }
-      })
-    }
+  @Suppress("DialogTitleCapitalization")
+  private fun createSettingsLink() = HyperlinkLabel(CommonBundle.settingsTitle()).apply {
+    icon = AllIcons.General.GearPlain
+    addHyperlinkListener(object : HyperlinkAdapter() {
+
+      override fun hyperlinkActivated(e: HyperlinkEvent) {
+        OpenSettingsAction.openSettings(project)
+      }
+    })
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  private fun createWhatsNewLink(parentComponent: JComponent) = HyperlinkLabel("What's new").apply {
+    icon = AllIcons.Actions.IntentionBulbGrey
+    addHyperlinkListener(object : HyperlinkAdapter() {
+
+      override fun hyperlinkActivated(e: HyperlinkEvent) {
+        ApplicationManager.getApplication().invokeLater {
+          ChangelogDialog(project, parentComponent).show()
+        }
+      }
+    })
+  }
 
   private fun expandNodes(defaultGroupNodesToExpand: List<GroupNode>, settings: DeveloperToolsInstanceSettings) {
     val expandedGroupNodeIds = settings.expandedGroupNodeIds ?: defaultGroupNodesToExpand.map { it.id }.toSet()

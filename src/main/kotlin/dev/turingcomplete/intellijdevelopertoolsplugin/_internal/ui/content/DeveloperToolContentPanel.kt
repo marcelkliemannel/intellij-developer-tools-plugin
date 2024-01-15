@@ -57,7 +57,6 @@ internal open class DeveloperToolContentPanel(
   protected open fun Row.buildTitle() {
     label(developerToolNode.developerUiToolPresentation.contentTitle)
       .applyToComponent { formatTitle() }
-      .gap(RightGap.SMALL)
   }
 
   protected fun JComponent.formatTitle() {
@@ -71,14 +70,14 @@ internal open class DeveloperToolContentPanel(
     row {
       buildTitle()
 
-      developerToolNode.developerUiToolPresentation.description?.apply { buildUi() }
-
       link("Reset") {
         selectedDeveloperToolInstance.get().apply {
           configuration.reset()
           instance.reset()
         }
-      }.align(AlignX.RIGHT).resizableColumn()
+      }.align(AlignX.RIGHT).resizableColumn().gap(RightGap.SMALL)
+
+      developerToolNode.developerUiToolPresentation.description?.apply { buildUi() }
     }.resizableRow()
   }.apply { border = JBEmptyBorder(0, 8, 4, 8) }
 

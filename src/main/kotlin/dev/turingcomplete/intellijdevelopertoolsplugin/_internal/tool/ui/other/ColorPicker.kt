@@ -20,6 +20,7 @@ import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.util.ui.JBUI
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
@@ -41,7 +42,7 @@ class ColorPicker(
 ) : DeveloperUiTool(parentDisposable), DataProvider {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val selectedColor: ValueProperty<JBColor> = configuration.register("selectedColor", JBColor.MAGENTA.toJBColor())
+  private val selectedColor: ValueProperty<JBColor> = configuration.register("selectedColor", JBColor.MAGENTA.toJBColor(), INPUT)
 
   private val cssRgb = AtomicProperty("")
   private val cssRgbWithAlpha = AtomicProperty("")
