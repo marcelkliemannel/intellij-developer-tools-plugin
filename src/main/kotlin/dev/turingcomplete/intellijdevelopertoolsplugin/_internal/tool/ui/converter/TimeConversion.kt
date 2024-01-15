@@ -203,7 +203,6 @@ internal class TimeConversion(
       textField()
         .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal(getMathContext()) }
         .label("Years:")
-        .comment("One year is equal to 365 days.")
         .bindText(yearsFormatted)
         .whenTextChangedFromUi { convert(YEARS) }
         .columns(15)

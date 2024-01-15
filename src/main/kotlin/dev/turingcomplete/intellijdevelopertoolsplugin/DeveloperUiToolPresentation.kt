@@ -27,7 +27,16 @@ data class DeveloperUiToolPresentation(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class ExternalLinkDescription(private val title: String, private val url: String) : Description {
+  private class ContextHelpDescription(private val description: String) : Description {
+
+    override fun Row.buildUi() {
+      contextHelp(description)
+    }
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class ExternalLinkDescription(private val title: String, private val url: String) : Description {
 
     override fun Row.buildUi() {
       link(title) { BrowserUtil.open(url) }
@@ -35,4 +44,11 @@ data class DeveloperUiToolPresentation(
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    fun contextHelp(description: String): Description = ContextHelpDescription(description)
+
+    fun externalLink(title: String, url: String): Description = ExternalLinkDescription(title, url)
+  }
 }
