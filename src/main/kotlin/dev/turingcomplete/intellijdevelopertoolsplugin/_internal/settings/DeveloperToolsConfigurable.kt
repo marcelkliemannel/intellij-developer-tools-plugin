@@ -18,7 +18,6 @@ class DeveloperToolsConfigurable : Configurable {
   private lateinit var saveSecrets: ValueProperty<Boolean>
   private lateinit var loadExamples: ValueProperty<Boolean>
   private lateinit var dialogIsModal: ValueProperty<Boolean>
-  private lateinit var toolWindowMenuHideOnToolSelection: ValueProperty<Boolean>
   private lateinit var editorSoftWraps: ValueProperty<Boolean>
   private lateinit var editorShowSpecialCharacters: ValueProperty<Boolean>
   private lateinit var editorShowWhitespaces: ValueProperty<Boolean>
@@ -85,12 +84,6 @@ class DeveloperToolsConfigurable : Configurable {
         checkBox("Dialog is modal and must be closed before continuing to work with IntelliJ")
           .bindSelected(dialogIsModal)
       }
-      row {
-        toolWindowMenuHideOnToolSelection = ValueProperty(developerToolsApplicationSettings.toolWindowMenuHideOnToolSelection)
-        checkBox("Hide the menu in the tool window after selecting a tool")
-          .comment("When enabled, menu search and keyboard navigation will not work in the tool window.")
-          .bindSelected(toolWindowMenuHideOnToolSelection)
-      }
     }
 
     row {
@@ -113,8 +106,7 @@ class DeveloperToolsConfigurable : Configurable {
             DeveloperToolsDialogSettings.instance.dialogIsModal != dialogIsModal.get() ||
             developerToolsApplicationSettings.editorSoftWraps != editorSoftWraps.get() ||
             developerToolsApplicationSettings.editorShowWhitespaces != editorShowWhitespaces.get() ||
-            developerToolsApplicationSettings.editorShowSpecialCharacters != editorShowSpecialCharacters.get() ||
-            developerToolsApplicationSettings.toolWindowMenuHideOnToolSelection != toolWindowMenuHideOnToolSelection.get()
+            developerToolsApplicationSettings.editorShowSpecialCharacters != editorShowSpecialCharacters.get()
   }
 
   override fun apply() {
@@ -128,7 +120,6 @@ class DeveloperToolsConfigurable : Configurable {
     developerToolsApplicationSettings.editorSoftWraps = editorSoftWraps.get()
     developerToolsApplicationSettings.editorShowWhitespaces = editorShowWhitespaces.get()
     developerToolsApplicationSettings.editorShowSpecialCharacters = editorShowSpecialCharacters.get()
-    developerToolsApplicationSettings.toolWindowMenuHideOnToolSelection = toolWindowMenuHideOnToolSelection.get()
   }
 
   override fun reset() {
@@ -142,7 +133,6 @@ class DeveloperToolsConfigurable : Configurable {
     editorSoftWraps.set(developerToolsApplicationSettings.editorSoftWraps)
     editorShowWhitespaces.set(developerToolsApplicationSettings.editorShowWhitespaces)
     editorShowSpecialCharacters.set(developerToolsApplicationSettings.editorShowSpecialCharacters)
-    toolWindowMenuHideOnToolSelection.set(developerToolsApplicationSettings.toolWindowMenuHideOnToolSelection)
     apply()
   }
 

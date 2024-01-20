@@ -12,12 +12,14 @@ import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.SimpleTextAttributes.REGULAR_ATTRIBUTES
 import com.intellij.ui.SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
+import com.intellij.ui.TreeSpeedSearch
 import com.intellij.ui.TreeUIHelper
 import com.intellij.ui.components.panels.VerticalLayout
 import com.intellij.ui.render.RenderingUtil
 import com.intellij.ui.tree.TreeVisitor.Action.CONTINUE
 import com.intellij.ui.tree.TreeVisitor.Action.INTERRUPT
 import com.intellij.ui.treeStructure.SimpleTree
+import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
@@ -51,9 +53,12 @@ internal class ToolsMenuTree(
   settings: DeveloperToolsInstanceSettings,
   private val groupNodeSelectionEnabled: Boolean = true,
   private val prioritizeVerticalLayout: Boolean = false,
-  private val selectContentNode: (ContentNode) -> Unit,
+  private val selectContentNode: (ContentNode, Boolean) -> Unit,
 ) : SimpleTree() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
+
+  private var selectionTriggeredBySearch = false
+
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
@@ -81,7 +86,7 @@ internal class ToolsMenuTree(
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun configureUiHelper(helper: TreeUIHelper) {
-    helper.installTreeSpeedSearch(this, { path: TreePath? -> path?.lastPathComponent?.toString() }, true)
+    MenuTreeSearch(this) { selectionTriggeredBySearch = it }.apply { setupListeners() }
   }
 
   override fun setUI(ui: TreeUI?) {
@@ -202,7 +207,7 @@ internal class ToolsMenuTree(
           it.selected(project)
         }
         else {
-          selectContentNode(it)
+          selectContentNode(it, selectionTriggeredBySearch)
           settings.lastSelectedContentNodeId.set(it.id)
         }
       }
@@ -271,6 +276,24 @@ internal class ToolsMenuTree(
     }
 
     return Triple(rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode)
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class MenuTreeSearch(tree: Tree, private val setSelectionTriggeredBySearch: (Boolean) -> Unit)
+    : TreeSpeedSearch(tree, null as Void?) {
+
+    override fun getElementText(element: Any?): String = (element as TreePath).lastPathComponent.toString()
+
+    override fun selectElement(element: Any?, selectedText: String?) {
+      try {
+        setSelectionTriggeredBySearch(true)
+        super.selectElement(element, selectedText)
+      }
+      finally {
+        setSelectionTriggeredBySearch(false)
+      }
+    }
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

@@ -26,7 +26,7 @@ internal open class ContentPanelHandler(
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  protected var selectedContentNode = ValueProperty<ContentNode?>(null)
+  private var selectedContentNode = ValueProperty<ContentNode?>(null)
 
   val contentPanel = BorderLayoutPanel()
   val toolsMenuTree: ToolsMenuTree
@@ -41,9 +41,13 @@ internal open class ContentPanelHandler(
 
   init {
     // The creation of `ToolsMenuTree` will trigger the initial node selection
-    toolsMenuTree = ToolsMenuTree(project, parentDisposable, settings, groupNodeSelectionEnabled, prioritizeVerticalLayout) {
-      handleContentNodeSelection(it)
-    }
+    toolsMenuTree = ToolsMenuTree(
+      project,
+      parentDisposable,
+      settings,
+      groupNodeSelectionEnabled,
+      prioritizeVerticalLayout
+    ) { node, selectionTriggeredBySearch -> handleContentNodeSelection(node, selectionTriggeredBySearch) }
 
     initMainDialogPromotionPanel(promoteMainDialog)
 
@@ -58,36 +62,7 @@ internal open class ContentPanelHandler(
   protected open fun createDeveloperToolContentPanel(developerToolNode: DeveloperToolNode): DeveloperToolContentPanel =
     DeveloperToolContentPanel(developerToolNode)
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-
-  private fun initMainDialogPromotionPanel(promoteMainDialog: Boolean) {
-    if (!promoteMainDialog) {
-      return
-    }
-
-    if (!DeveloperToolsApplicationSettings.instance.promoteAddOpenMainDialogActionToMainToolbar) {
-      return
-    }
-
-    val addOpenMainDialogActionToMainToolbarTask = AddOpenMainDialogActionToMainToolbarTask.createIfAvailable()
-      ?: return
-
-    val promoteMainDialogNotificationPanel = PromoteMainDialogNotificationPanel { addOpenMainDialogActionToMainToolbar ->
-      DeveloperToolsApplicationSettings.instance.apply {
-        this@apply.addOpenMainDialogActionToMainToolbar = addOpenMainDialogActionToMainToolbar
-        promoteAddOpenMainDialogActionToMainToolbar = false
-      }
-
-      if (addOpenMainDialogActionToMainToolbar) {
-        addOpenMainDialogActionToMainToolbarTask.run()
-      }
-
-      mainDialogPromotionPanel.isVisible = false
-    }
-    mainDialogPromotionPanel.addToCenter(promoteMainDialogNotificationPanel)
-  }
-
-  private fun handleContentNodeSelection(new: ContentNode?) {
+  protected open fun handleContentNodeSelection(new: ContentNode?, selectionTriggeredBySearch: Boolean) {
     val old = selectedContentNode.get()
     if (old != new) {
       if (old is DeveloperToolNode) {
@@ -117,6 +92,35 @@ internal open class ContentPanelHandler(
         else -> error("Unexpected menu node: ${new::class}")
       }
     }
+  }
+
+  // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun initMainDialogPromotionPanel(promoteMainDialog: Boolean) {
+    if (!promoteMainDialog) {
+      return
+    }
+
+    if (!DeveloperToolsApplicationSettings.instance.promoteAddOpenMainDialogActionToMainToolbar) {
+      return
+    }
+
+    val addOpenMainDialogActionToMainToolbarTask = AddOpenMainDialogActionToMainToolbarTask.createIfAvailable()
+      ?: return
+
+    val promoteMainDialogNotificationPanel = PromoteMainDialogNotificationPanel { addOpenMainDialogActionToMainToolbar ->
+      DeveloperToolsApplicationSettings.instance.apply {
+        this@apply.addOpenMainDialogActionToMainToolbar = addOpenMainDialogActionToMainToolbar
+        promoteAddOpenMainDialogActionToMainToolbar = false
+      }
+
+      if (addOpenMainDialogActionToMainToolbar) {
+        addOpenMainDialogActionToMainToolbarTask.run()
+      }
+
+      mainDialogPromotionPanel.isVisible = false
+    }
+    mainDialogPromotionPanel.addToCenter(promoteMainDialogNotificationPanel)
   }
 
   private fun setContentPanel(nodePanel: JPanel) {

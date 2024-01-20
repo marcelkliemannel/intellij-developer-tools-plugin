@@ -29,7 +29,6 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   var editorSoftWraps: Boolean by ValueProperty(EDITOR_SOFT_WRAPS_DEFAULT)
   var editorShowSpecialCharacters: Boolean by ValueProperty(EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
   var editorShowWhitespaces: Boolean by ValueProperty(EDITOR_SHOW_WHITESPACES_DEFAULT)
-  var toolWindowMenuHideOnToolSelection: Boolean by ValueProperty(TOOL_WINDOW_MENU_HIDE_ON_TOOL_SELECTION)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -67,7 +66,6 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     editorSoftWraps = (state.editorSoftWraps ?: EDITOR_SOFT_WRAPS_DEFAULT)
     editorShowSpecialCharacters = (state.editorShowSpecialCharacters ?: EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
     editorShowWhitespaces = (state.editorShowWhitespaces ?: EDITOR_SHOW_WHITESPACES_DEFAULT)
-    toolWindowMenuHideOnToolSelection = (state.toolWindowMenuHideOnClick ?: TOOL_WINDOW_MENU_HIDE_ON_TOOL_SELECTION)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
@@ -114,6 +112,5 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     const val EDITOR_SOFT_WRAPS_DEFAULT = true
     const val EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT = false
     const val EDITOR_SHOW_WHITESPACES_DEFAULT = false
-    const val TOOL_WINDOW_MENU_HIDE_ON_TOOL_SELECTION = true
   }
 }

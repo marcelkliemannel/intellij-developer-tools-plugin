@@ -16,10 +16,10 @@ import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.util.ui.components.BorderLayoutPanel
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsToolWindowSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.content.ContentPanelHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.content.DeveloperToolContentPanel
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.ContentNode
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.DeveloperToolNode
 import java.awt.Dimension
 import java.awt.event.ActionEvent
@@ -106,16 +106,18 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     init {
       toolsMenuTreeWrapper = toolsMenuTree.createWrapperComponent(innerContentPanel)
       Disposer.register(parentDisposable) { toolsMenuTreeWrapper = null }
-
-      selectedContentNode.afterChangeConsumeEvent(parentDisposable) {
-        if (DeveloperToolsApplicationSettings.instance.toolWindowMenuHideOnToolSelection) {
-          lastToolsMenuTreePopup?.takeIf { !it.isDisposed }?.cancel()
-        }
-      }
     }
 
     override fun createDeveloperToolContentPanel(developerToolNode: DeveloperToolNode): DeveloperToolContentPanel =
       ToolWindowDeveloperToolContentPanel(developerToolNode, showMenu())
+
+    override fun handleContentNodeSelection(new: ContentNode?, selectionTriggeredBySearch: Boolean) {
+      super.handleContentNodeSelection(new, selectionTriggeredBySearch)
+
+      if (!selectionTriggeredBySearch) {
+        lastToolsMenuTreePopup?.takeIf { !it.isDisposed }?.cancel()
+      }
+    }
 
     private fun showMenu(): (JComponent) -> Unit = { menuOwner ->
       lastToolsMenuTreePopup = JBPopupFactory.getInstance()

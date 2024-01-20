@@ -6,6 +6,7 @@
 
 ### Changed
 
+Removed the setting to hide the tool window menu on a tool selection. The selection mechanism now distinguishes between a search result selection (menu remains visible) and a user selection (menu is hidden).
 ### Removed
 
 ### Fixed
