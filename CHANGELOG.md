@@ -4,6 +4,16 @@
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## 3.4.0 - 2024-01-21
+
+### Added
+
 - Settings option to enable or disable the grouping of tools
 - Settings option to sort the tools menu alphabetically
 
@@ -14,12 +24,9 @@
 - Renamed tool "Java Text Escape/Unescape" to "Java String Escape/Unescape"
 - Renamed tool "Code Formatting Converter" to "Code Format Converter"
 
-### Removed
-
 ### Fixed
 
 - Tool "Code Format Converter" wasn't working correctly
-
 
 ## 3.3.0 - 2024-01-15
 
