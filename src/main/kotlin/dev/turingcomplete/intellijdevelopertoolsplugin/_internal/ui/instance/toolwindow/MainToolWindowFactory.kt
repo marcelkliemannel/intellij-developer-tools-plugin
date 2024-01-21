@@ -20,6 +20,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.Develo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsToolWindowSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.content.ContentPanelHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.content.DeveloperToolContentPanel
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.ContentNode
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.DeveloperToolNode
 import java.awt.Dimension
 import java.awt.event.ActionEvent
@@ -102,22 +103,30 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
 
     private var lastToolsMenuTreePopup: JBPopup? = null
     private var toolsMenuTreeWrapper: JComponent?
+    private var lastApplicationSettingsModificationsCounter = DeveloperToolsApplicationSettings.instance.modificationCounter
 
     init {
       toolsMenuTreeWrapper = toolsMenuTree.createWrapperComponent(innerContentPanel)
       Disposer.register(parentDisposable) { toolsMenuTreeWrapper = null }
-
-      selectedContentNode.afterChangeConsumeEvent(parentDisposable) {
-        if (DeveloperToolsApplicationSettings.instance.toolWindowMenuHideOnToolSelection) {
-          lastToolsMenuTreePopup?.takeIf { !it.isDisposed }?.cancel()
-        }
-      }
     }
 
     override fun createDeveloperToolContentPanel(developerToolNode: DeveloperToolNode): DeveloperToolContentPanel =
       ToolWindowDeveloperToolContentPanel(developerToolNode, showMenu())
 
+    override fun handleContentNodeSelection(new: ContentNode?, selectionTriggeredBySearch: Boolean) {
+      super.handleContentNodeSelection(new, selectionTriggeredBySearch)
+
+      if (!selectionTriggeredBySearch) {
+        lastToolsMenuTreePopup?.takeIf { !it.isDisposed }?.cancel()
+      }
+    }
+
     private fun showMenu(): (JComponent) -> Unit = { menuOwner ->
+      if (lastApplicationSettingsModificationsCounter != DeveloperToolsApplicationSettings.instance.modificationCounter) {
+        toolsMenuTree.recreateTreeNodes()
+        lastApplicationSettingsModificationsCounter = DeveloperToolsApplicationSettings.instance.modificationCounter
+      }
+
       lastToolsMenuTreePopup = JBPopupFactory.getInstance()
         .createComponentPopupBuilder(toolsMenuTreeWrapper!!, toolsMenuTree)
         .setRequestFocus(true)

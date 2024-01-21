@@ -18,10 +18,11 @@ class DeveloperToolsConfigurable : Configurable {
   private lateinit var saveSecrets: ValueProperty<Boolean>
   private lateinit var loadExamples: ValueProperty<Boolean>
   private lateinit var dialogIsModal: ValueProperty<Boolean>
-  private lateinit var toolWindowMenuHideOnToolSelection: ValueProperty<Boolean>
   private lateinit var editorSoftWraps: ValueProperty<Boolean>
   private lateinit var editorShowSpecialCharacters: ValueProperty<Boolean>
   private lateinit var editorShowWhitespaces: ValueProperty<Boolean>
+  private lateinit var toolsMenuShowGroupNodes: ValueProperty<Boolean>
+  private lateinit var toolsMenuOrderAlphabetically: ValueProperty<Boolean>
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -81,15 +82,23 @@ class DeveloperToolsConfigurable : Configurable {
 
     groupRowsRange("Advanced") {
       row {
+        comment("For these changes to take effect, the dialog must be reopened once.")
+      }
+
+      row {
         dialogIsModal = ValueProperty(DeveloperToolsDialogSettings.instance.dialogIsModal)
         checkBox("Dialog is modal and must be closed before continuing to work with IntelliJ")
           .bindSelected(dialogIsModal)
       }
       row {
-        toolWindowMenuHideOnToolSelection = ValueProperty(developerToolsApplicationSettings.toolWindowMenuHideOnToolSelection)
-        checkBox("Hide the menu in the tool window after selecting a tool")
-          .comment("When enabled, menu search and keyboard navigation will not work in the tool window.")
-          .bindSelected(toolWindowMenuHideOnToolSelection)
+        toolsMenuShowGroupNodes = ValueProperty(developerToolsApplicationSettings.toolsMenuTreeShowGroupNodes)
+        checkBox("Group tools in the menu")
+          .bindSelected(toolsMenuShowGroupNodes)
+      }
+      row {
+        toolsMenuOrderAlphabetically = ValueProperty(developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically)
+        checkBox("Oder tools in the menu alphabetically")
+          .bindSelected(toolsMenuOrderAlphabetically)
       }
     }
 
@@ -114,21 +123,24 @@ class DeveloperToolsConfigurable : Configurable {
             developerToolsApplicationSettings.editorSoftWraps != editorSoftWraps.get() ||
             developerToolsApplicationSettings.editorShowWhitespaces != editorShowWhitespaces.get() ||
             developerToolsApplicationSettings.editorShowSpecialCharacters != editorShowSpecialCharacters.get() ||
-            developerToolsApplicationSettings.toolWindowMenuHideOnToolSelection != toolWindowMenuHideOnToolSelection.get()
+            developerToolsApplicationSettings.toolsMenuTreeShowGroupNodes != toolsMenuShowGroupNodes.get() ||
+            developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically != toolsMenuOrderAlphabetically.get()
   }
 
   override fun apply() {
-    val developerToolsApplicationSettings = DeveloperToolsApplicationSettings.instance
-    developerToolsApplicationSettings.addOpenMainDialogActionToMainToolbar = addOpenMainDialogActionToMainToolbar.get()
-    developerToolsApplicationSettings.saveConfigurations = saveConfigurations.get()
-    developerToolsApplicationSettings.saveInputs = saveInputs.get()
-    developerToolsApplicationSettings.saveSecrets = saveSecrets.get()
-    developerToolsApplicationSettings.loadExamples = loadExamples.get()
+    DeveloperToolsApplicationSettings.instance.update {
+      it.addOpenMainDialogActionToMainToolbar = addOpenMainDialogActionToMainToolbar.get()
+      it.saveConfigurations = saveConfigurations.get()
+      it.saveInputs = saveInputs.get()
+      it.saveSecrets = saveSecrets.get()
+      it.loadExamples = loadExamples.get()
+      it.editorSoftWraps = editorSoftWraps.get()
+      it.editorShowWhitespaces = editorShowWhitespaces.get()
+      it.editorShowSpecialCharacters = editorShowSpecialCharacters.get()
+      it.toolsMenuTreeShowGroupNodes = toolsMenuShowGroupNodes.get()
+      it.toolsMenuTreeOrderAlphabetically = toolsMenuOrderAlphabetically.get()
+    }
     DeveloperToolsDialogSettings.instance.dialogIsModal = dialogIsModal.get()
-    developerToolsApplicationSettings.editorSoftWraps = editorSoftWraps.get()
-    developerToolsApplicationSettings.editorShowWhitespaces = editorShowWhitespaces.get()
-    developerToolsApplicationSettings.editorShowSpecialCharacters = editorShowSpecialCharacters.get()
-    developerToolsApplicationSettings.toolWindowMenuHideOnToolSelection = toolWindowMenuHideOnToolSelection.get()
   }
 
   override fun reset() {
@@ -142,7 +154,8 @@ class DeveloperToolsConfigurable : Configurable {
     editorSoftWraps.set(developerToolsApplicationSettings.editorSoftWraps)
     editorShowWhitespaces.set(developerToolsApplicationSettings.editorShowWhitespaces)
     editorShowSpecialCharacters.set(developerToolsApplicationSettings.editorShowSpecialCharacters)
-    toolWindowMenuHideOnToolSelection.set(developerToolsApplicationSettings.toolWindowMenuHideOnToolSelection)
+    toolsMenuShowGroupNodes.set(developerToolsApplicationSettings.toolsMenuTreeShowGroupNodes)
+    toolsMenuOrderAlphabetically.set(developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically)
     apply()
   }
 

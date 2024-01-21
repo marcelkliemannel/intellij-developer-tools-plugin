@@ -16,7 +16,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toPrettyStringWithDefaultObjectMapper
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 
 internal class CodeFormattingConverter(
@@ -33,7 +32,7 @@ internal class CodeFormattingConverter(
     sourceErrorHolder = ErrorHolder(),
     targetErrorHolder = ErrorHolder(),
     diffSupport = DiffSupport(
-      title = "Code Formatting Converter"
+      title = "Code Format Converter"
     )
   ),
   configuration = configuration,
@@ -53,6 +52,7 @@ internal class CodeFormattingConverter(
 
   override fun configurationChanged(property: ValueProperty<out Any>) {
     setLanguages()
+    super.configurationChanged(property)
   }
 
   override fun Panel.buildTopConfigurationUi() {
@@ -73,24 +73,39 @@ internal class CodeFormattingConverter(
 
   override fun toTarget(text: String) {
     covert(textConverterContext.sourceErrorHolder!!) {
-      targetText.set(secondLanguage.get().asString(firstLanguage.get().parse(text)))
+      if (text.isBlank()) {
+        targetText.set("")
+      }
+      else {
+        targetText.set(secondLanguage.get().asString(firstLanguage.get().parse(text)))
+      }
     }
   }
 
   override fun toSource(text: String) {
     covert(textConverterContext.targetErrorHolder!!) {
-      sourceText.set(firstLanguage.get().asString(secondLanguage.get().parse(text)))
+      if (text.isBlank()) {
+        sourceText.set("")
+      }
+      else {
+        sourceText.set(firstLanguage.get().asString(secondLanguage.get().parse(text)))
+      }
     }
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun covert(errorHolder: ErrorHolder, doConvert: () -> Unit) {
-    errorHolder.clear()
+  private fun covert(inputErrorHolder: ErrorHolder, doConvert: () -> Unit) {
+    // We have to clear both `ErrorHolder`s here. If he user makes an invalid
+    // input in A, which shows an error, and then edits B, the contents of A
+    // would be replaced, but the error message is still visible.
+    textConverterContext.targetErrorHolder!!.clear()
+    textConverterContext.sourceErrorHolder!!.clear()
+
     try {
       doConvert()
     } catch (e: Exception) {
-      errorHolder.add(e)
+      inputErrorHolder.add(e)
     }
 
     // The `validate` in this class is not used as a validation mechanism. We
@@ -117,7 +132,7 @@ internal class CodeFormattingConverter(
 
     fun parse(text: String): JsonNode = objectMapper.readTree(text)
 
-    fun asString(root: JsonNode): String = root.toPrettyStringWithDefaultObjectMapper()
+    fun asString(root: JsonNode): String = objectMapper.writeValueAsString(root)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -125,8 +140,8 @@ internal class CodeFormattingConverter(
   class Factory : DeveloperUiToolFactory<CodeFormattingConverter> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Code Formatting",
-      contentTitle = "Code Formatting Converter"
+      menuTitle = "Code Format",
+      contentTitle = "Code Format Converter"
     )
 
     override fun getDeveloperUiToolCreator(
