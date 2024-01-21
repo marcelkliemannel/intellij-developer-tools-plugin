@@ -82,7 +82,7 @@ class DeveloperToolsConfigurable : Configurable {
 
     groupRowsRange("Advanced") {
       row {
-        comment("For these changes to take effect, the dialog must be reopened once.")
+        comment("For these changes to take effect in the dialog, the dialog must be reopened once.")
       }
 
       row {

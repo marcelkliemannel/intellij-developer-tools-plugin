@@ -16,6 +16,7 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 - Text Sorting
 - Text Case Transformation
 - Text Diff Viewer
+- Text Format Conversion
 - Text Escaping: HTML entities, Java Strings, JSON, CSV, and XML
 - JSON Path Parser
 - JSON Schema Validator

@@ -32,7 +32,7 @@ internal class CodeFormattingConverter(
     sourceErrorHolder = ErrorHolder(),
     targetErrorHolder = ErrorHolder(),
     diffSupport = DiffSupport(
-      title = "Code Format Converter"
+      title = "Text Format Converter"
     )
   ),
   configuration = configuration,
@@ -140,8 +140,8 @@ internal class CodeFormattingConverter(
   class Factory : DeveloperUiToolFactory<CodeFormattingConverter> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Code Format",
-      contentTitle = "Code Format Converter"
+      menuTitle = "Text Format",
+      contentTitle = "Text Format Converter"
     )
 
     override fun getDeveloperUiToolCreator(
