@@ -73,24 +73,39 @@ internal class CodeFormattingConverter(
 
   override fun toTarget(text: String) {
     covert(textConverterContext.sourceErrorHolder!!) {
-      targetText.set(secondLanguage.get().asString(firstLanguage.get().parse(text)))
+      if (text.isBlank()) {
+        targetText.set("")
+      }
+      else {
+        targetText.set(secondLanguage.get().asString(firstLanguage.get().parse(text)))
+      }
     }
   }
 
   override fun toSource(text: String) {
     covert(textConverterContext.targetErrorHolder!!) {
-      sourceText.set(firstLanguage.get().asString(secondLanguage.get().parse(text)))
+      if (text.isBlank()) {
+        sourceText.set("")
+      }
+      else {
+        sourceText.set(firstLanguage.get().asString(secondLanguage.get().parse(text)))
+      }
     }
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun covert(errorHolder: ErrorHolder, doConvert: () -> Unit) {
-    errorHolder.clear()
+  private fun covert(inputErrorHolder: ErrorHolder, doConvert: () -> Unit) {
+    // We have to clear both `ErrorHolder`s here. If he user makes an invalid
+    // input in A, which shows an error, and then edits B, the contents of A
+    // would be replaced, but the error message is still visible.
+    textConverterContext.targetErrorHolder!!.clear()
+    textConverterContext.sourceErrorHolder!!.clear()
+
     try {
       doConvert()
     } catch (e: Exception) {
-      errorHolder.add(e)
+      inputErrorHolder.add(e)
     }
 
     // The `validate` in this class is not used as a validation mechanism. We
