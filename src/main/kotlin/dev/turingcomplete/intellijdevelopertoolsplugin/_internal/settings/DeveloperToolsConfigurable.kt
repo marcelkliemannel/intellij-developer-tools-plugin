@@ -82,6 +82,10 @@ class DeveloperToolsConfigurable : Configurable {
 
     groupRowsRange("Advanced") {
       row {
+        comment("For these changes to take effect, the dialog must be reopened once.")
+      }
+
+      row {
         dialogIsModal = ValueProperty(DeveloperToolsDialogSettings.instance.dialogIsModal)
         checkBox("Dialog is modal and must be closed before continuing to work with IntelliJ")
           .bindSelected(dialogIsModal)

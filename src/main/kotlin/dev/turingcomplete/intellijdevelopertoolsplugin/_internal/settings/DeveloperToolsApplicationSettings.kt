@@ -128,7 +128,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     const val EDITOR_SOFT_WRAPS_DEFAULT = true
     const val EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT = false
     const val EDITOR_SHOW_WHITESPACES_DEFAULT = false
-    const val TOOLS_MENU_TREE_GROUP_NODES = true
-    const val TOOLS_MENU_TREE_ORDER_ALPHABETICALLY = false
+    const val TOOLS_MENU_TREE_GROUP_NODES = false
+    const val TOOLS_MENU_TREE_ORDER_ALPHABETICALLY = true
   }
 }

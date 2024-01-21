@@ -21,6 +21,7 @@ import com.intellij.ui.tree.TreeVisitor.Action.INTERRUPT
 import com.intellij.ui.treeStructure.SimpleTree
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBUI
+import com.intellij.util.ui.JBUI.Borders
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
@@ -65,7 +66,8 @@ internal class ToolsMenuTree(
     val (rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode) = createTreeNodes()
 
     model = DefaultTreeModel(rootNode)
-    setCellRenderer(MenuTreeNodeRenderer())
+    setCellRenderer(MenuTreeNodeRenderer(DeveloperToolsApplicationSettings.instance.toolsMenuTreeShowGroupNodes))
+    setTreeBorder()
     putClientProperty(RenderingUtil.ALWAYS_PAINT_SELECTION_AS_FOCUSED, true)
     background = UIUtil.SIDE_PANEL_BACKGROUND
     inputMap.clear()
@@ -88,6 +90,12 @@ internal class ToolsMenuTree(
     val (newRootNode, defaultGroupNodesToExpand, _) = createTreeNodes()
     (model as DefaultTreeModel).setRoot(newRootNode)
     expandGroupNodes(defaultGroupNodesToExpand)
+
+    setCellRenderer(MenuTreeNodeRenderer(DeveloperToolsApplicationSettings.instance.toolsMenuTreeShowGroupNodes))
+    setTreeBorder()
+
+    revalidate()
+    repaint()
   }
 
   override fun configureUiHelper(helper: TreeUIHelper) {
@@ -102,10 +110,10 @@ internal class ToolsMenuTree(
 
   fun createWrapperComponent(parentComponent: JComponent): JComponent {
     val wrapper = BorderLayoutPanel().apply {
-      border = JBUI.Borders.empty()
+      border = Borders.empty()
       addToCenter(this@ToolsMenuTree)
       addToBottom(BorderLayoutPanel().apply {
-        border = JBUI.Borders.empty(UIUtil.PANEL_REGULAR_INSETS)
+        border = Borders.empty(UIUtil.PANEL_REGULAR_INSETS)
         background = UIUtil.SIDE_PANEL_BACKGROUND
         val linksPanel = JPanel(VerticalLayout(UIUtil.LARGE_VGAP)).apply {
           background = UIUtil.SIDE_PANEL_BACKGROUND
@@ -125,6 +133,15 @@ internal class ToolsMenuTree(
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun setTreeBorder() {
+    border = if (DeveloperToolsApplicationSettings.instance.toolsMenuTreeShowGroupNodes) {
+      Borders.emptyLeft(4)
+    }
+    else {
+      Borders.empty()
+    }
+  }
 
   /**
    * Directly opening the [com.intellij.openapi.options.ShowSettingsUtil] will
@@ -305,7 +322,7 @@ internal class ToolsMenuTree(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class MenuTreeNodeRenderer : NodeRenderer() {
+  private class MenuTreeNodeRenderer(private val toolsMenuTreeShowGroupNodes: Boolean) : NodeRenderer() {
 
     override fun customizeCellRenderer(tree: JTree,
                                        value: Any,
@@ -317,7 +334,7 @@ internal class ToolsMenuTree(
       val contentNode = value.uncheckedCastTo(ContentNode::class)
 
       val isTopLevelNode = contentNode.parent is RootNode
-      val textAttributes = if (isTopLevelNode && !contentNode.isSecondaryNode) {
+      val textAttributes = if (toolsMenuTreeShowGroupNodes && isTopLevelNode && !contentNode.isSecondaryNode) {
         REGULAR_BOLD_ATTRIBUTES
       }
       else {
