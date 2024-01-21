@@ -19,6 +19,7 @@
     <li>Text Sorting</li>
     <li>Text Case Transformation</li>
     <li>Text Diff Viewer</li>
+    <li>Text Format Conversion</li>
     <li>Text Escaping:</b> HTML entities, Java Strings, JSON, CSV, and XML</li>
     <li>JSON Path Parser</li>
     <li>JSON Schema Validator</li>
@@ -110,6 +111,11 @@
                           detailTitle="Cryptography"
                           initiallyExpanded="true"
                           weight="3"/>
+    <developerUiToolGroup id="text"
+                          menuTitle="Text"
+                          detailTitle="Text"
+                          initiallyExpanded="true"
+                          weight="4"/>
     <developerUiToolGroup id="formatting"
                           menuTitle="Formatting"
                           detailTitle="Formatting"
@@ -209,22 +215,28 @@
             groupId="formatting"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CliCommandConverter$Factory"/>
 
+    <!-- text -->
+    <developerUiTool
+            id="text-format-converter"
+            groupId="text"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CodeFormattingConverter$Factory"/>
+    <developerUiTool
+            id="text-sorting-transformer"
+            groupId="text"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextSortingTransformer$Factory"/>
+    <developerUiTool
+            id="text-case-transformer"
+            groupId="text"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextCaseTransformer$Factory"/>
+    <developerUiTool
+            id="text-diff"
+            groupId="text"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextDiffViewer$Factory"/>
+
     <!-- root level -->
     <developerUiTool
             id="regular-expression-matcher"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RegularExpressionMatcher$Factory"/>
-    <developerUiTool
-            id="text-format-converter"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CodeFormattingConverter$Factory"/>
-    <developerUiTool
-            id="text-sorting-transformer"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextSortingTransformer$Factory"/>
-    <developerUiTool
-            id="text-case-transformer"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextCaseTransformer$Factory"/>
-    <developerUiTool
-            id="text-diff"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextDiffViewer$Factory"/>
     <developerUiTool
             id="date-time-converter"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter$Factory"/>

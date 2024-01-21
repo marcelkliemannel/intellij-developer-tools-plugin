@@ -22,7 +22,8 @@
 - By default, the tools menu is a flat alphabetical list. The old behavior (e.g., grouping of nodes) can be restored through the settings.
 - Removed the setting to hide the tool window menu on a tool selection. The selection mechanism now distinguishes between an automatic search result selection (the menu remains visible) and an user selection (a menu is hidden).
 - Renamed tool "Java Text Escape/Unescape" to "Java String Escape/Unescape"
-- Renamed tool "Code Formatting Converter" to "Code Format Converter"
+- Renamed tool "Code Formatting Converter" to "Text Format Converter"
+- Text related tools moved to new group "text"
 
 ### Fixed
 
