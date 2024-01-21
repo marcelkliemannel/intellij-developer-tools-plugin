@@ -29,6 +29,11 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   var editorSoftWraps: Boolean by ValueProperty(EDITOR_SOFT_WRAPS_DEFAULT)
   var editorShowSpecialCharacters: Boolean by ValueProperty(EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
   var editorShowWhitespaces: Boolean by ValueProperty(EDITOR_SHOW_WHITESPACES_DEFAULT)
+  var toolsMenuTreeShowGroupNodes: Boolean by ValueProperty(TOOLS_MENU_TREE_GROUP_NODES)
+  var toolsMenuTreeOrderAlphabetically: Boolean by ValueProperty(TOOLS_MENU_TREE_ORDER_ALPHABETICALLY)
+
+  var modificationCounter = 0
+    private set
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -44,6 +49,11 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
 
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
+  fun update(applyModifications: (DeveloperToolsApplicationSettings) -> Unit) {
+    applyModifications(this)
+    modificationCounter++
+  }
+
   override fun getState(): ApplicationState = ApplicationState(
     addOpenMainDialogActionToMainToolbar = addOpenMainDialogActionToMainToolbar,
     promoteAddOpenMainDialogActionToMainToolbar = promoteAddOpenMainDialogActionToMainToolbar,
@@ -53,7 +63,9 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     saveSecrets = saveSecrets,
     editorSoftWraps = editorSoftWraps,
     editorShowSpecialCharacters = editorShowSpecialCharacters,
-    editorShowWhitespaces = editorShowWhitespaces
+    editorShowWhitespaces = editorShowWhitespaces,
+    toolsMenuTreeOrderAlphabetically = toolsMenuTreeOrderAlphabetically,
+    toolsMenuTreeShowGroupNodes = toolsMenuTreeShowGroupNodes
   )
 
   override fun loadState(state: ApplicationState) {
@@ -66,6 +78,8 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     editorSoftWraps = (state.editorSoftWraps ?: EDITOR_SOFT_WRAPS_DEFAULT)
     editorShowSpecialCharacters = (state.editorShowSpecialCharacters ?: EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
     editorShowWhitespaces = (state.editorShowWhitespaces ?: EDITOR_SHOW_WHITESPACES_DEFAULT)
+    toolsMenuTreeShowGroupNodes = (state.toolsMenuTreeShowGroupNodes ?: TOOLS_MENU_TREE_GROUP_NODES)
+    toolsMenuTreeOrderAlphabetically = (state.toolsMenuTreeOrderAlphabetically ?: TOOLS_MENU_TREE_ORDER_ALPHABETICALLY)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
@@ -90,8 +104,10 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     var editorShowSpecialCharacters: Boolean? = null,
     @get:Attribute("editorShowWhitespaces")
     var editorShowWhitespaces: Boolean? = null,
-    @get:Attribute("toolWindowMenuHideOnClick")
-    var toolWindowMenuHideOnClick: Boolean? = null
+    @get:Attribute("toolsMenuTreeShowGroupNodes")
+    var toolsMenuTreeShowGroupNodes: Boolean? = null,
+    @get:Attribute("toolsMenuTreeOrderAlphabetically")
+    var toolsMenuTreeOrderAlphabetically: Boolean? = null
   )
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
@@ -112,5 +128,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     const val EDITOR_SOFT_WRAPS_DEFAULT = true
     const val EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT = false
     const val EDITOR_SHOW_WHITESPACES_DEFAULT = false
+    const val TOOLS_MENU_TREE_GROUP_NODES = true
+    const val TOOLS_MENU_TREE_ORDER_ALPHABETICALLY = false
   }
 }

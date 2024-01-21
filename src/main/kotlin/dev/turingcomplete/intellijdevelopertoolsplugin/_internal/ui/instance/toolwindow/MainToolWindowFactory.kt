@@ -16,6 +16,7 @@ import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.util.ui.components.BorderLayoutPanel
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsToolWindowSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.content.ContentPanelHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.content.DeveloperToolContentPanel
@@ -102,6 +103,7 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
 
     private var lastToolsMenuTreePopup: JBPopup? = null
     private var toolsMenuTreeWrapper: JComponent?
+    private var lastApplicationSettingsModificationsCounter = DeveloperToolsApplicationSettings.instance.modificationCounter
 
     init {
       toolsMenuTreeWrapper = toolsMenuTree.createWrapperComponent(innerContentPanel)
@@ -120,6 +122,11 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     }
 
     private fun showMenu(): (JComponent) -> Unit = { menuOwner ->
+      if (lastApplicationSettingsModificationsCounter != DeveloperToolsApplicationSettings.instance.modificationCounter) {
+        toolsMenuTree.recreateTreeNodes()
+        lastApplicationSettingsModificationsCounter = DeveloperToolsApplicationSettings.instance.modificationCounter
+      }
+
       lastToolsMenuTreePopup = JBPopupFactory.getInstance()
         .createComponentPopupBuilder(toolsMenuTreeWrapper!!, toolsMenuTree)
         .setRequestFocus(true)

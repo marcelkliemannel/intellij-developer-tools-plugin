@@ -30,6 +30,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperUiToolFactoryEp
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.uncheckedCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsInstanceSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.ChangelogDialog
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.OpenSettingsAction
@@ -42,15 +43,14 @@ import javax.swing.event.TreeExpansionEvent
 import javax.swing.event.TreeExpansionListener
 import javax.swing.event.TreeSelectionListener
 import javax.swing.plaf.TreeUI
-import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreePath
 import javax.swing.tree.TreeSelectionModel
 
 internal class ToolsMenuTree(
   private val project: Project?,
-  parentDisposable: Disposable,
-  settings: DeveloperToolsInstanceSettings,
+  private val parentDisposable: Disposable,
+  private val settings: DeveloperToolsInstanceSettings,
   private val groupNodeSelectionEnabled: Boolean = true,
   private val prioritizeVerticalLayout: Boolean = false,
   private val selectContentNode: (ContentNode, Boolean) -> Unit,
@@ -62,28 +62,33 @@ internal class ToolsMenuTree(
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
-    val (rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode) =
-      createTreeNodes(parentDisposable, settings)
+    val (rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode) = createTreeNodes()
 
     model = DefaultTreeModel(rootNode)
-    setCellRenderer(MenuTreeNodeRenderer(rootNode))
+    setCellRenderer(MenuTreeNodeRenderer())
     putClientProperty(RenderingUtil.ALWAYS_PAINT_SELECTION_AS_FOCUSED, true)
     background = UIUtil.SIDE_PANEL_BACKGROUND
     inputMap.clear()
     TreeUtil.installActions(this)
     isOpaque = true
     selectionModel.selectionMode = TreeSelectionModel.SINGLE_TREE_SELECTION
-    addTreeSelectionListener(createTreeSelectionListener(settings))
-    addTreeExpansionListener(createTreeExpansionListener(settings))
+    addTreeSelectionListener(createTreeSelectionListener())
+    addTreeExpansionListener(createTreeExpansionListener())
     isRootVisible = false
     setExpandableItemsEnabled(false)
 
-    expandNodes(defaultGroupNodesToExpand, settings)
+    expandGroupNodes(defaultGroupNodesToExpand)
 
-    selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode, settings)
+    selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode)
   }
 
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+
+  fun recreateTreeNodes() {
+    val (newRootNode, defaultGroupNodesToExpand, _) = createTreeNodes()
+    (model as DefaultTreeModel).setRoot(newRootNode)
+    expandGroupNodes(defaultGroupNodesToExpand)
+  }
 
   override fun configureUiHelper(helper: TreeUIHelper) {
     MenuTreeSearch(this) { selectionTriggeredBySearch = it }.apply { setupListeners() }
@@ -151,7 +156,7 @@ internal class ToolsMenuTree(
     })
   }
 
-  private fun expandNodes(defaultGroupNodesToExpand: List<GroupNode>, settings: DeveloperToolsInstanceSettings) {
+  private fun expandGroupNodes(defaultGroupNodesToExpand: List<GroupNode>) {
     val expandedGroupNodeIds = settings.expandedGroupNodeIds ?: defaultGroupNodesToExpand.map { it.id }.toSet()
 
     TreeUtil.promiseVisit(this) {
@@ -163,10 +168,7 @@ internal class ToolsMenuTree(
     }
   }
 
-  private fun selectInitiallySelectedDeveloperToolNode(
-    preferredSelectedDeveloperToolNode: ContentNode?,
-    settings: DeveloperToolsInstanceSettings
-  ) {
+  private fun selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode: ContentNode?) {
     var lastSelectedContentNodeSelected = false
     settings.lastSelectedContentNodeId.get()?.let { lastSelectedComponentNodeId ->
       TreeUtil.promiseVisit(this) {
@@ -198,7 +200,7 @@ internal class ToolsMenuTree(
     }
   }
 
-  private fun createTreeSelectionListener(settings: DeveloperToolsInstanceSettings) = TreeSelectionListener { e ->
+  private fun createTreeSelectionListener() = TreeSelectionListener { e ->
     e.path?.lastPathComponent
       ?.safeCastTo<ContentNode>()
       ?.takeIf { groupNodeSelectionEnabled || it !is GroupNode }
@@ -213,7 +215,7 @@ internal class ToolsMenuTree(
       }
   }
 
-  private fun createTreeExpansionListener(settings: DeveloperToolsInstanceSettings) = object : TreeExpansionListener {
+  private fun createTreeExpansionListener() = object : TreeExpansionListener {
 
     override fun treeExpanded(event: TreeExpansionEvent?) {
       saveState(settings)
@@ -233,21 +235,22 @@ internal class ToolsMenuTree(
     }
   }
 
-  private fun createTreeNodes(
-    parentDisposable: Disposable,
-    settings: DeveloperToolsInstanceSettings
-  ): Triple<RootNode, List<GroupNode>, ContentNode?> {
+  private fun createTreeNodes(): Triple<RootNode, List<GroupNode>, ContentNode?> {
+    val applicationSettings = DeveloperToolsApplicationSettings.instance
+
     val rootNode = RootNode()
 
     val defaultGroupNodesToExpand = mutableListOf<GroupNode>()
     val groupNodes = mutableMapOf<String, GroupNode>()
-    DeveloperUiToolGroup.EP_NAME.extensions.forEach { developerToolGroup ->
-      val groupNode = GroupNode(developerToolGroup)
-      groupNodes[developerToolGroup.id] = groupNode
-      if (developerToolGroup.initiallyExpanded == true) {
-        defaultGroupNodesToExpand.add(groupNode)
+    if (applicationSettings.toolsMenuTreeShowGroupNodes) {
+      DeveloperUiToolGroup.EP_NAME.extensions.forEach { developerToolGroup ->
+        val groupNode = GroupNode(developerToolGroup)
+        groupNodes[developerToolGroup.id] = groupNode
+        if (developerToolGroup.initiallyExpanded == true) {
+          defaultGroupNodesToExpand.add(groupNode)
+        }
+        rootNode.add(groupNode)
       }
-      rootNode.add(groupNode)
     }
 
     var preferredSelectedDeveloperToolNode: DeveloperToolNode? = null
@@ -256,7 +259,7 @@ internal class ToolsMenuTree(
       val developerUiToolFactory: DeveloperUiToolFactory<*> = developerToolFactoryEp.createInstance(application)
       val context = DeveloperUiToolContext(developerToolFactoryEp.id, prioritizeVerticalLayout)
       developerUiToolFactory.getDeveloperUiToolCreator(project, parentDisposable, context)?.let { developerToolCreator ->
-        val groupId: String? = developerToolFactoryEp.groupId
+        val groupId: String? = if (applicationSettings.toolsMenuTreeShowGroupNodes) developerToolFactoryEp.groupId else null
         val parentNode = if (groupId != null) (groupNodes[groupId] ?: error("Unknown group: $groupId")) else rootNode
         val developerToolNode = DeveloperToolNode(
           developerToolId = developerToolFactoryEp.id,
@@ -273,6 +276,10 @@ internal class ToolsMenuTree(
           preferredSelectedDeveloperToolNode = developerToolNode
         }
       }
+    }
+
+    if (applicationSettings.toolsMenuTreeOrderAlphabetically) {
+      TreeUtil.sortChildren<ContentNode>(rootNode) { o1, o2 -> o1.title.compareTo(o2.title) }
     }
 
     return Triple(rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode)
@@ -298,7 +305,7 @@ internal class ToolsMenuTree(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class MenuTreeNodeRenderer(private val root: DefaultMutableTreeNode) : NodeRenderer() {
+  private class MenuTreeNodeRenderer : NodeRenderer() {
 
     override fun customizeCellRenderer(tree: JTree,
                                        value: Any,
@@ -309,7 +316,7 @@ internal class ToolsMenuTree(
                                        hasFocus: Boolean) {
       val contentNode = value.uncheckedCastTo(ContentNode::class)
 
-      val isTopLevelNode = contentNode.parent == root
+      val isTopLevelNode = contentNode.parent is RootNode
       val textAttributes = if (isTopLevelNode && !contentNode.isSecondaryNode) {
         REGULAR_BOLD_ATTRIBUTES
       }

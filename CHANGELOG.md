@@ -4,9 +4,13 @@
 
 ### Added
 
+- Settings option to enable or disable the grouping of tools
+- Settings option to sort the tools menu alphabetically
+
 ### Changed
 
-Removed the setting to hide the tool window menu on a tool selection. The selection mechanism now distinguishes between a search result selection (menu remains visible) and a user selection (menu is hidden).
+- Removed the setting to hide the tool window menu on a tool selection. The selection mechanism now distinguishes between an automatically search result selection (menu remains visible) and an user selection (menu is hidden).
+
 ### Removed
 
 ### Fixed

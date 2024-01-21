@@ -21,6 +21,8 @@ class DeveloperToolsConfigurable : Configurable {
   private lateinit var editorSoftWraps: ValueProperty<Boolean>
   private lateinit var editorShowSpecialCharacters: ValueProperty<Boolean>
   private lateinit var editorShowWhitespaces: ValueProperty<Boolean>
+  private lateinit var toolsMenuShowGroupNodes: ValueProperty<Boolean>
+  private lateinit var toolsMenuOrderAlphabetically: ValueProperty<Boolean>
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -84,6 +86,16 @@ class DeveloperToolsConfigurable : Configurable {
         checkBox("Dialog is modal and must be closed before continuing to work with IntelliJ")
           .bindSelected(dialogIsModal)
       }
+      row {
+        toolsMenuShowGroupNodes = ValueProperty(developerToolsApplicationSettings.toolsMenuTreeShowGroupNodes)
+        checkBox("Group tools in the menu")
+          .bindSelected(toolsMenuShowGroupNodes)
+      }
+      row {
+        toolsMenuOrderAlphabetically = ValueProperty(developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically)
+        checkBox("Oder tools in the menu alphabetically")
+          .bindSelected(toolsMenuOrderAlphabetically)
+      }
     }
 
     row {
@@ -106,20 +118,25 @@ class DeveloperToolsConfigurable : Configurable {
             DeveloperToolsDialogSettings.instance.dialogIsModal != dialogIsModal.get() ||
             developerToolsApplicationSettings.editorSoftWraps != editorSoftWraps.get() ||
             developerToolsApplicationSettings.editorShowWhitespaces != editorShowWhitespaces.get() ||
-            developerToolsApplicationSettings.editorShowSpecialCharacters != editorShowSpecialCharacters.get()
+            developerToolsApplicationSettings.editorShowSpecialCharacters != editorShowSpecialCharacters.get() ||
+            developerToolsApplicationSettings.toolsMenuTreeShowGroupNodes != toolsMenuShowGroupNodes.get() ||
+            developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically != toolsMenuOrderAlphabetically.get()
   }
 
   override fun apply() {
-    val developerToolsApplicationSettings = DeveloperToolsApplicationSettings.instance
-    developerToolsApplicationSettings.addOpenMainDialogActionToMainToolbar = addOpenMainDialogActionToMainToolbar.get()
-    developerToolsApplicationSettings.saveConfigurations = saveConfigurations.get()
-    developerToolsApplicationSettings.saveInputs = saveInputs.get()
-    developerToolsApplicationSettings.saveSecrets = saveSecrets.get()
-    developerToolsApplicationSettings.loadExamples = loadExamples.get()
+    DeveloperToolsApplicationSettings.instance.update {
+      it.addOpenMainDialogActionToMainToolbar = addOpenMainDialogActionToMainToolbar.get()
+      it.saveConfigurations = saveConfigurations.get()
+      it.saveInputs = saveInputs.get()
+      it.saveSecrets = saveSecrets.get()
+      it.loadExamples = loadExamples.get()
+      it.editorSoftWraps = editorSoftWraps.get()
+      it.editorShowWhitespaces = editorShowWhitespaces.get()
+      it.editorShowSpecialCharacters = editorShowSpecialCharacters.get()
+      it.toolsMenuTreeShowGroupNodes = toolsMenuShowGroupNodes.get()
+      it.toolsMenuTreeOrderAlphabetically = toolsMenuOrderAlphabetically.get()
+    }
     DeveloperToolsDialogSettings.instance.dialogIsModal = dialogIsModal.get()
-    developerToolsApplicationSettings.editorSoftWraps = editorSoftWraps.get()
-    developerToolsApplicationSettings.editorShowWhitespaces = editorShowWhitespaces.get()
-    developerToolsApplicationSettings.editorShowSpecialCharacters = editorShowSpecialCharacters.get()
   }
 
   override fun reset() {
@@ -133,6 +150,8 @@ class DeveloperToolsConfigurable : Configurable {
     editorSoftWraps.set(developerToolsApplicationSettings.editorSoftWraps)
     editorShowWhitespaces.set(developerToolsApplicationSettings.editorShowWhitespaces)
     editorShowSpecialCharacters.set(developerToolsApplicationSettings.editorShowSpecialCharacters)
+    toolsMenuShowGroupNodes.set(developerToolsApplicationSettings.toolsMenuTreeShowGroupNodes)
+    toolsMenuOrderAlphabetically.set(developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically)
     apply()
   }
 
