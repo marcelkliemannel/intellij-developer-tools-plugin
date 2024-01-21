@@ -10,11 +10,15 @@
 ### Changed
 
 - Removed the setting to hide the tool window menu on a tool selection. The selection mechanism now distinguishes between an automatically search result selection (menu remains visible) and an user selection (menu is hidden).
-- Renamed tools "Java Text Escape/Unescape" to "Java String Escape/Unescape"
+- Renamed tool "Java Text Escape/Unescape" to "Java String Escape/Unescape"
+- Renamed tool "Code Formatting Converter" to "Code Format Converter"
 
 ### Removed
 
 ### Fixed
+
+- Tool "Code Format Converter" wasn't working correctly
+
 
 ## 3.3.0 - 2024-01-15
 

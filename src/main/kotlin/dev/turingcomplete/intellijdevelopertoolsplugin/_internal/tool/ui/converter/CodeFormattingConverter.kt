@@ -16,7 +16,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toPrettyStringWithDefaultObjectMapper
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 
 internal class CodeFormattingConverter(
@@ -33,7 +32,7 @@ internal class CodeFormattingConverter(
     sourceErrorHolder = ErrorHolder(),
     targetErrorHolder = ErrorHolder(),
     diffSupport = DiffSupport(
-      title = "Code Formatting Converter"
+      title = "Code Format Converter"
     )
   ),
   configuration = configuration,
@@ -53,6 +52,7 @@ internal class CodeFormattingConverter(
 
   override fun configurationChanged(property: ValueProperty<out Any>) {
     setLanguages()
+    super.configurationChanged(property)
   }
 
   override fun Panel.buildTopConfigurationUi() {
@@ -117,7 +117,7 @@ internal class CodeFormattingConverter(
 
     fun parse(text: String): JsonNode = objectMapper.readTree(text)
 
-    fun asString(root: JsonNode): String = root.toPrettyStringWithDefaultObjectMapper()
+    fun asString(root: JsonNode): String = objectMapper.writeValueAsString(root)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -125,8 +125,8 @@ internal class CodeFormattingConverter(
   class Factory : DeveloperUiToolFactory<CodeFormattingConverter> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Code Formatting",
-      contentTitle = "Code Formatting Converter"
+      menuTitle = "Code Format",
+      contentTitle = "Code Format Converter"
     )
 
     override fun getDeveloperUiToolCreator(
