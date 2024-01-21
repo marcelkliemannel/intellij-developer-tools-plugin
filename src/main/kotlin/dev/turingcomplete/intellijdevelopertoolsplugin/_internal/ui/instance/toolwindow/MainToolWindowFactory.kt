@@ -106,9 +106,7 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     private var lastApplicationSettingsModificationsCounter = DeveloperToolsApplicationSettings.instance.modificationCounter
 
     init {
-      toolsMenuTreeWrapper = toolsMenuTree.createWrapperComponent(innerContentPanel).apply {
-        maximumSize = Dimension(300, 600)
-      }
+      toolsMenuTreeWrapper = toolsMenuTree.createWrapperComponent(innerContentPanel)
       Disposer.register(parentDisposable) { toolsMenuTreeWrapper = null }
     }
 
@@ -140,6 +138,7 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
         .setMinSize(Dimension(220, 200))
         .createPopup()
         .apply {
+          size = Dimension(220, 600)
           Disposer.register(parentDisposable, this)
           showUnderneathOf(menuOwner)
         }
