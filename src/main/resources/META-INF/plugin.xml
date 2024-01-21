@@ -155,7 +155,7 @@
     <developerUiTool
             id="java-text-escape"
             groupId="text-escape"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JavaTextEscape$Factory"/>
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JavaStringEscape$Factory"/>
     <developerUiTool
             id="json-text-escape"
             groupId="text-escape"

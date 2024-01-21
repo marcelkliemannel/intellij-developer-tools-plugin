@@ -10,6 +10,7 @@
 ### Changed
 
 - Removed the setting to hide the tool window menu on a tool selection. The selection mechanism now distinguishes between an automatically search result selection (menu remains visible) and an user selection (menu is hidden).
+- Renamed tools "Java Text Escape/Unescape" to "Java String Escape/Unescape"
 
 ### Removed
 

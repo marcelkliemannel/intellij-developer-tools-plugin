@@ -66,14 +66,14 @@ internal class HtmlEntitiesEscape(
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 
-internal class JavaTextEscape(
+internal class JavaStringEscape(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   context: DeveloperUiToolContext,
   project: Project?
 ) :
   TextConverter(
-    textConverterContext = createEscapeUnescapeContext("Java Text Escape/Unescape"),
+    textConverterContext = createEscapeUnescapeContext("Java String Escape/Unescape"),
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
@@ -88,11 +88,11 @@ internal class JavaTextEscape(
     sourceText.set(StringEscapeUtils.unescapeJava(text))
   }
 
-  class Factory : DeveloperUiToolFactory<JavaTextEscape> {
+  class Factory : DeveloperUiToolFactory<JavaStringEscape> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Java Text",
-      contentTitle = "Java Text Escape/Unescape",
+      menuTitle = "Java String",
+      contentTitle = "Java String Escape/Unescape",
       description = DeveloperUiToolPresentation.contextHelp("This tool will use <code>StringEscapeUtils.escapeJava(text)</code> and <code>StringEscapeUtils.unescapeJava(text)</code> from the 'Apache Commons Text' library.")
     )
 
@@ -100,8 +100,8 @@ internal class JavaTextEscape(
       project: Project?,
       parentDisposable: Disposable,
       context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> JavaTextEscape) =
-      { configuration -> JavaTextEscape(configuration, parentDisposable, context, project) }
+    ): ((DeveloperToolConfiguration) -> JavaStringEscape) =
+      { configuration -> JavaStringEscape(configuration, parentDisposable, context, project) }
   }
 }
 
