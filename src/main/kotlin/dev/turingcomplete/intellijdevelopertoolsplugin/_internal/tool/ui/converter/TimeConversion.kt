@@ -52,7 +52,7 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.ParsePosition
 import java.time.Duration
-import java.util.*
+import java.util.Locale
 
 internal class TimeConversion(
   private val configuration: DeveloperToolConfiguration,
@@ -61,17 +61,6 @@ internal class TimeConversion(
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val nanoseconds = configuration.register("nanoseconds", ZERO, INPUT, NANOSECONDS_EXAMPLE)
-  private val milliseconds = configuration.register("milliseconds", ZERO, INPUT)
-  private val seconds = configuration.register("seconds", ZERO, INPUT)
-  private val minutes = configuration.register("minutes", ZERO, INPUT)
-  private val hours = configuration.register("hours", ZERO, INPUT)
-  private val days = configuration.register("days", ZERO, INPUT)
-  private val weeks = configuration.register("weeks", ZERO, INPUT)
-  private val months = configuration.register("months", ZERO, INPUT)
-  private val years = configuration.register("years", ZERO, INPUT)
-  private val decades = configuration.register("decades", ZERO, INPUT)
-  private val centuries = configuration.register("centuries", ZERO, INPUT)
-  private val millenniums = configuration.register("millenniums", ZERO, INPUT)
 
   private var parsingLocale = configuration.register("parsingLocale", DEFAULT_PARSING_LOCALE)
   private val roundingMode = configuration.register("roundingMode", DEFAULT_ROUNDING_MODE, CONFIGURATION)
@@ -287,56 +276,56 @@ internal class TimeConversion(
       }
 
       nanoseconds.set(changeOriginAsNanosecondsToUse)
-      milliseconds.set(changeOriginAsNanosecondsToUse.divide(MILLISECONDS_TO_NANOSECONDS, mathContext))
-      seconds.set(changeOriginAsNanosecondsToUse.divide(SECONDS_TO_NANOSECONDS, mathContext))
-      minutes.set(changeOriginAsNanosecondsToUse.divide(MINUTES_TO_NANOSECONDS, mathContext))
-      hours.set(changeOriginAsNanosecondsToUse.divide(HOURS_TO_NANOSECONDS, mathContext))
-      days.set(changeOriginAsNanosecondsToUse.divide(DAYS_TO_NANOSECONDS, mathContext))
-      months.set(changeOriginAsNanosecondsToUse.divide(monthToNanoseconds, mathContext))
-      weeks.set(changeOriginAsNanosecondsToUse.divide(WEEK_TO_NANOSECONDS, mathContext))
-      years.set(changeOriginAsNanosecondsToUse.divide(YEARS_TO_NANOSECONDS, mathContext))
-      decades.set(changeOriginAsNanosecondsToUse.divide(DECADES_TO_NANOSECONDS, mathContext))
-      centuries.set(changeOriginAsNanosecondsToUse.divide(CENTURIES_TO_NANOSECONDS, mathContext))
-      millenniums.set(changeOriginAsNanosecondsToUse.divide(millenniumsToNanoseconds, mathContext))
+      val minutes = changeOriginAsNanosecondsToUse.divide(MINUTES_TO_NANOSECONDS, mathContext)
+      val hours = changeOriginAsNanosecondsToUse.divide(HOURS_TO_NANOSECONDS, mathContext)
+      val days = changeOriginAsNanosecondsToUse.divide(DAYS_TO_NANOSECONDS, mathContext)
 
       if (changeOrigin != NANOSECONDS) {
         nanosecondsFormatted.set(nanoseconds.get().formatted())
       }
       if (changeOrigin != MILLISECONDS) {
-        millisecondsFormatted.set(milliseconds.get().formatted())
+        val milliseconds = changeOriginAsNanosecondsToUse.divide(MILLISECONDS_TO_NANOSECONDS, mathContext)
+        millisecondsFormatted.set(milliseconds.formatted())
       }
       if (changeOrigin != SECONDS) {
-        secondsFormatted.set(seconds.get().formatted())
+        val seconds = changeOriginAsNanosecondsToUse.divide(SECONDS_TO_NANOSECONDS, mathContext)
+        secondsFormatted.set(seconds.formatted())
       }
       if (changeOrigin != MINUTES) {
-        minutesFormatted.set(minutes.get().formatted())
+        minutesFormatted.set(minutes.formatted())
       }
       if (changeOrigin != HOURS) {
-        hoursFormatted.set(hours.get().formatted())
+        hoursFormatted.set(hours.formatted())
       }
       if (changeOrigin != DAYS) {
-        daysFormatted.set(days.get().formatted())
+        daysFormatted.set(days.formatted())
       }
       if (changeOrigin != MONTHS) {
-        monthsFormatted.set(months.get().formatted())
+        val months = changeOriginAsNanosecondsToUse.divide(monthToNanoseconds, mathContext)
+        monthsFormatted.set(months.formatted())
       }
       if (changeOrigin != WEEKS) {
-        weeksFormatted.set(weeks.get().formatted())
+        val weeks = changeOriginAsNanosecondsToUse.divide(WEEK_TO_NANOSECONDS, mathContext)
+        weeksFormatted.set(weeks.formatted())
       }
       if (changeOrigin != YEARS) {
-        yearsFormatted.set(years.get().formatted())
+        val years = changeOriginAsNanosecondsToUse.divide(YEARS_TO_NANOSECONDS, mathContext)
+        yearsFormatted.set(years.formatted())
       }
       if (changeOrigin != DECADES) {
-        decadesFormatted.set(decades.get().formatted())
+        val decades = changeOriginAsNanosecondsToUse.divide(DECADES_TO_NANOSECONDS, mathContext)
+        decadesFormatted.set(decades.formatted())
       }
       if (changeOrigin != CENTURIES) {
-        centuriesFormatted.set(centuries.get().formatted())
+        val centuries = changeOriginAsNanosecondsToUse.divide(CENTURIES_TO_NANOSECONDS, mathContext)
+        centuriesFormatted.set(centuries.formatted())
       }
       if (changeOrigin != MILLENNIUMS) {
-        millenniumsFormatted.set(millenniums.get().formatted())
+        val millenniums = changeOriginAsNanosecondsToUse.divide(millenniumsToNanoseconds, mathContext)
+        millenniumsFormatted.set(millenniums.formatted())
       }
 
-      formatDetails()
+      formatDetails(days = days, hours = hours, minutes = minutes)
     } catch (e: Exception) {
       log.warn("Failed to convert time", e)
     }
@@ -356,13 +345,13 @@ internal class TimeConversion(
       }
     }.replace(".", getDecimalSeparator())
 
-  private fun formatDetails() {
+  private fun formatDetails(days: BigDecimal, hours: BigDecimal, minutes: BigDecimal) {
     try {
       val javaMathRoundingMode = roundingMode.get().javaMathRoundingMode
       val mathContext = MathContext(decimalPlaces.get(), javaMathRoundingMode)
 
       run {
-        val daysAsNanos = days.get().multiply(DAYS_TO_NANOSECONDS, mathContext).setScale(0, javaMathRoundingMode)
+        val daysAsNanos = days.multiply(DAYS_TO_NANOSECONDS, mathContext).setScale(0, javaMathRoundingMode)
         if (daysAsNanos.isWithinLongRange()) {
           val duration = Duration.ofNanos(daysAsNanos.longValueExact())
           daysDetail.set(
@@ -380,7 +369,7 @@ internal class TimeConversion(
       }
 
       run {
-        val hoursAsNanos = hours.get().multiply(HOURS_TO_NANOSECONDS, mathContext).setScale(0, javaMathRoundingMode)
+        val hoursAsNanos = hours.multiply(HOURS_TO_NANOSECONDS, mathContext).setScale(0, javaMathRoundingMode)
         if (hoursAsNanos.isWithinLongRange()) {
           val duration = Duration.ofNanos(hoursAsNanos.longValueExact())
           hoursDetail.set(
@@ -397,7 +386,7 @@ internal class TimeConversion(
       }
 
       run {
-        val minutesAsNanos = minutes.get().multiply(MINUTES_TO_NANOSECONDS, mathContext).setScale(0, javaMathRoundingMode)
+        val minutesAsNanos = minutes.multiply(MINUTES_TO_NANOSECONDS, mathContext).setScale(0, javaMathRoundingMode)
         if (minutesAsNanos.isWithinLongRange()) {
           val duration = Duration.ofNanos(minutesAsNanos.longValueExact())
           minutesDetail.set(
@@ -438,7 +427,6 @@ internal class TimeConversion(
 
   private fun sync() {
     convert(null, nanoseconds.get())
-    formatDetails()
 
     val decimalSeparator = getDecimalSeparator()
     val postfix = when (decimalSeparator) {
