@@ -97,7 +97,7 @@ class DeveloperToolsConfigurable : Configurable {
       }
       row {
         toolsMenuOrderAlphabetically = ValueProperty(developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically)
-        checkBox("Oder tools in the menu alphabetically")
+        checkBox("Order tools in the menu alphabetically")
           .bindSelected(toolsMenuOrderAlphabetically)
       }
     }
