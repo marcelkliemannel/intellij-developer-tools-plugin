@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Improve UI of the Regular Expression Matcher tool
+
 ### Removed
 
 ### Fixed

@@ -115,7 +115,7 @@ internal class ToolsMenuTree(
       addToBottom(BorderLayoutPanel().apply {
         border = Borders.empty(UIUtil.PANEL_REGULAR_INSETS)
         background = UIUtil.SIDE_PANEL_BACKGROUND
-        val linksPanel = JPanel(VerticalLayout(UIUtil.LARGE_VGAP)).apply {
+        val linksPanel = JPanel(VerticalLayout(UIUtil.DEFAULT_VGAP)).apply {
           background = UIUtil.SIDE_PANEL_BACKGROUND
           add(createSettingsLink())
           add(createWhatsNewLink(parentComponent))
