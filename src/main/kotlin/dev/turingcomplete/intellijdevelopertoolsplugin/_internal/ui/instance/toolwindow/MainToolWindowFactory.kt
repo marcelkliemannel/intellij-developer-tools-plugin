@@ -71,8 +71,7 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     private val toggleMenu: (JComponent) -> Unit
   ) : DeveloperToolContentPanel(developerToolNode) {
 
-    override fun Row.buildTitle() {
-
+    override fun Row.buildTitle(): JComponent {
       lateinit var toggleMenuActionLink: ActionLink
       val toggleMenuAction: AbstractAction = object : AbstractAction(developerToolNode.developerUiToolPresentation.contentTitle) {
 
@@ -83,6 +82,7 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
       toggleMenuActionLink = ActionLink(toggleMenuAction).apply { formatTitle() }
       cell(toggleMenuActionLink)
         .gap(RightGap.SMALL)
+      return toggleMenuActionLink
     }
   }
 
