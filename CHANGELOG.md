@@ -4,13 +4,21 @@
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## 3.5.0 - 2024-02-28
+
+### Added
+
 - New tool 'Unarchiver' to analyze and extract archive files
 
 ### Changed
 
 - Improve UI of the Regular Expression Matcher tool
-
-### Removed
 
 ### Fixed
 

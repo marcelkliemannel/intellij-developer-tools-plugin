@@ -84,7 +84,6 @@ internal open class DeveloperToolContentPanel(
     row {
       val titleComponent = buildTitle()
 
-      lateinit var actionsButton: JComponent
       val actions = mutableListOf(
         dumbAwareAction("Reset") {
           selectedDeveloperToolInstance.get().apply {
