@@ -2,11 +2,16 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.options.Configurable
+import com.intellij.ui.dsl.builder.BottomGap
+import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.TopGap
+import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.not
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings.ActionHandlingInstance
 import javax.swing.JComponent
 
 class DeveloperToolsConfigurable : Configurable {
@@ -23,6 +28,8 @@ class DeveloperToolsConfigurable : Configurable {
   private lateinit var editorShowWhitespaces: ValueProperty<Boolean>
   private lateinit var toolsMenuShowGroupNodes: ValueProperty<Boolean>
   private lateinit var toolsMenuOrderAlphabetically: ValueProperty<Boolean>
+  private lateinit var autoDetectActionHandlingInstance: ValueProperty<Boolean>
+  private lateinit var selectedActionHandlingInstance: ValueProperty<ActionHandlingInstance>
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -60,6 +67,25 @@ class DeveloperToolsConfigurable : Configurable {
       loadExamples = ValueProperty(developerToolsApplicationSettings.loadExamples)
       checkBox("Load examples")
         .bindSelected(loadExamples)
+    }.bottomGap(BottomGap.SMALL)
+
+    buttonsGroup("External Action Handling") {
+      row("Open tools in:") {
+        autoDetectActionHandlingInstance = ValueProperty(developerToolsApplicationSettings.autoDetectActionHandlingInstance)
+        radioButton("Auto detect")
+          .bindSelected(autoDetectActionHandlingInstance)
+
+        radioButton("Use:")
+          .bindSelected(autoDetectActionHandlingInstance.not())
+          .gap(RightGap.SMALL)
+        selectedActionHandlingInstance = ValueProperty(developerToolsApplicationSettings.selectedActionHandlingInstance)
+        comboBox(ActionHandlingInstance.entries)
+          .bindItem(selectedActionHandlingInstance)
+          .enabledIf(autoDetectActionHandlingInstance.not())
+      }.bottomGap(BottomGap.NONE)
+      row {
+        comment("The plugin provides actions in other places in IntelliJ (e.g. in the editor or the project file tree) that open a developer tool. In these settings you can specify whether these actions open the dialog or the tool window.")
+      }
     }
 
     groupRowsRange("Default Editor Settings") {
@@ -124,7 +150,9 @@ class DeveloperToolsConfigurable : Configurable {
             developerToolsApplicationSettings.editorShowWhitespaces != editorShowWhitespaces.get() ||
             developerToolsApplicationSettings.editorShowSpecialCharacters != editorShowSpecialCharacters.get() ||
             developerToolsApplicationSettings.toolsMenuTreeShowGroupNodes != toolsMenuShowGroupNodes.get() ||
-            developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically != toolsMenuOrderAlphabetically.get()
+            developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically != toolsMenuOrderAlphabetically.get() ||
+            developerToolsApplicationSettings.autoDetectActionHandlingInstance != autoDetectActionHandlingInstance.get() ||
+            developerToolsApplicationSettings.selectedActionHandlingInstance != selectedActionHandlingInstance.get()
   }
 
   override fun apply() {
@@ -139,6 +167,8 @@ class DeveloperToolsConfigurable : Configurable {
       it.editorShowSpecialCharacters = editorShowSpecialCharacters.get()
       it.toolsMenuTreeShowGroupNodes = toolsMenuShowGroupNodes.get()
       it.toolsMenuTreeOrderAlphabetically = toolsMenuOrderAlphabetically.get()
+      it.autoDetectActionHandlingInstance = autoDetectActionHandlingInstance.get()
+      it.selectedActionHandlingInstance = selectedActionHandlingInstance.get()
     }
     DeveloperToolsDialogSettings.instance.dialogIsModal = dialogIsModal.get()
   }
@@ -156,6 +186,8 @@ class DeveloperToolsConfigurable : Configurable {
     editorShowSpecialCharacters.set(developerToolsApplicationSettings.editorShowSpecialCharacters)
     toolsMenuShowGroupNodes.set(developerToolsApplicationSettings.toolsMenuTreeShowGroupNodes)
     toolsMenuOrderAlphabetically.set(developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically)
+    autoDetectActionHandlingInstance.set(developerToolsApplicationSettings.autoDetectActionHandlingInstance)
+    selectedActionHandlingInstance.set(developerToolsApplicationSettings.selectedActionHandlingInstance)
     apply()
   }
 

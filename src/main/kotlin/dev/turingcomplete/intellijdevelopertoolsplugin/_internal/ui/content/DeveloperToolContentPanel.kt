@@ -25,10 +25,14 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.NotBlankInputValidator
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.dumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.castedObject
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolHandler
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.DeveloperToolNode
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.DeveloperToolNode.DeveloperToolContainer
 import javax.swing.Icon
 import javax.swing.JComponent
+import kotlin.reflect.cast
 
 internal open class DeveloperToolContentPanel(
   protected val developerToolNode: DeveloperToolNode
@@ -53,6 +57,13 @@ internal open class DeveloperToolContentPanel(
 
   fun deselected() {
     selectedDeveloperToolInstance.get().instance.deactivated()
+  }
+
+  fun <T: OpenDeveloperToolContext> openTool(context: T, reference: OpenDeveloperToolReference<out T>) {
+    val developerUiToolInstance = selectedDeveloperToolInstance.get().instance
+    assert(developerUiToolInstance is OpenDeveloperToolHandler<*>)
+    @Suppress("UNCHECKED_CAST")
+    (developerUiToolInstance as OpenDeveloperToolHandler<T>).applyOpenDeveloperToolContext(reference.contextClass.cast(context))
   }
 
   @Suppress("DialogTitleCapitalization")

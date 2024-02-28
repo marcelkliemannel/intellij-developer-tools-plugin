@@ -5,14 +5,20 @@ import com.intellij.diff.DiffManager
 import com.intellij.diff.requests.DiffRequest
 import com.intellij.diff.requests.SimpleDiffRequest
 import com.intellij.openapi.actionSystem.ActionGroup
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.ToggleAction
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.util.PopupUtil
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.popup.PopupState
+import java.awt.event.InputEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.Icon
 
 object UiUtils {
@@ -80,6 +86,43 @@ object UiUtils {
   fun createLink(title: String, url: String): HyperlinkLabel {
     return HyperlinkLabel(title).apply {
       setHyperlinkTarget(url)
+    }
+  }
+
+  fun createToggleAction(
+    title: String,
+    isSelected: () -> Boolean,
+    setSelected: (Boolean) -> Unit
+  ) = object : ToggleAction(title) {
+    override fun isSelected(e: AnActionEvent): Boolean = isSelected()
+
+    override fun setSelected(e: AnActionEvent, state: Boolean) {
+      setSelected(state)
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
+  }
+
+  fun createContextMenuMouseListener(
+    place: String,
+    actionGroup: (MouseEvent) -> ActionGroup?
+  ) = object : MouseAdapter() {
+    override fun mousePressed(e: MouseEvent) {
+      handleMouseEvent(e)
+    }
+
+    override fun mouseReleased(e: MouseEvent) {
+      handleMouseEvent(e)
+    }
+
+    private fun handleMouseEvent(e: InputEvent) {
+      if (e is MouseEvent && e.isPopupTrigger) {
+        actionGroup(e)?.let {
+          ActionManager.getInstance()
+            .createActionPopupMenu(place, it).component
+            .show(e.getComponent(), e.x, e.y)
+        }
+      }
     }
   }
 

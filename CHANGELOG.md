@@ -4,6 +4,8 @@
 
 ### Added
 
+- New tool 'Unarchiver' to analyze and extract archive files
+
 ### Changed
 
 - Improve UI of the Regular Expression Matcher tool

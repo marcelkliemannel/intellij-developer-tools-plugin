@@ -71,6 +71,8 @@
                 factoryClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.toolwindow.MainToolWindowFactory"
                 anchor="right" secondary="true" canCloseContents="false" doNotActivateOnStart="true"
                 icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/toolwindow.svg"/>
+    <notificationGroup id="Developer Tools Plugin Notifications" displayType="TOOL_WINDOW"
+                       toolWindowId="Developer Tools"/>
   </extensions>
 
   <actions>
@@ -250,6 +252,9 @@
             id="json-schema-validator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.JsonSchemaValidator$Factory"/>
     <developerUiTool
+            id="unarchiver"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.Unarchiver$Factory"/>
+    <developerUiTool
             id="lorem-ipsum-generator"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.LoremIpsumGenerator$Factory"/>
     <developerUiTool
@@ -266,4 +271,11 @@
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RubberDuck$Factory"/>
 
   </extensions>
+
+  <actions>
+    <action popup="true" id="dev.turingcomplete.intellijdevelopertoolsplugin.openArchiveFile"
+            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.Unarchiver$OpenArchiveFileInUnarchiverAction">
+      <add-to-group group-id="RevealGroup" anchor="last"/>
+    </action>
+  </actions>
 </idea-plugin>

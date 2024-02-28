@@ -44,6 +44,7 @@ dependencies {
     exclude("org.apache.commons", "commons-lang3")
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
+  implementation("org.apache.commons:commons-compress:1.26.0")
   val zxing = "3.5.1"
   implementation("com.google.zxing:core:$zxing")
   implementation("com.google.zxing:javase:$zxing")

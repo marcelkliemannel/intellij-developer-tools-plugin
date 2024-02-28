@@ -32,5 +32,20 @@ fun Comparator<String>.makeCaseInsensitive(): Comparator<String> {
   }
 }
 
+fun Long?.compareTo(other: Long?) : Int {
+  return if (this == null && other == null) {
+    0
+  }
+  else if (this == null) {
+    1
+  }
+  else if (other == null) {
+    -1
+  }
+  else {
+    this.compareTo(other)
+  }
+}
+
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

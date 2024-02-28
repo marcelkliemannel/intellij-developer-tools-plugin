@@ -132,6 +132,24 @@ internal class ToolsMenuTree(
     }
   }
 
+  fun selectDeveloperTool(developerToolId: String, onSuccess: () -> Unit) {
+    TreeUtil.promiseVisit(this) {
+      val lastPathComponent = it.lastPathComponent
+      if (lastPathComponent is ContentNode && lastPathComponent.id == developerToolId) {
+        INTERRUPT
+      }
+      else {
+        CONTINUE
+      }
+    }.onSuccess {
+      if (it != null) {
+        TreeUtil.selectPath(this, TreeUtil.getPathFromRoot(it.lastPathComponent as ContentNode)).doWhenDone {
+          onSuccess()
+        }
+      }
+    }
+  }
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun setTreeBorder() {

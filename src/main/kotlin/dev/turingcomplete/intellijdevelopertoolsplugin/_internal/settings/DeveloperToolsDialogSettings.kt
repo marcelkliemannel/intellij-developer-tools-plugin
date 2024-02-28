@@ -7,11 +7,8 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Property
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsDialogSettings.DialogState
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.dialog.MainDialog
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
-import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.locks.ReentrantLock
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsDialogSettings.DialogState
 
 @State(
   name = "DeveloperToolsDialogSettingsV1",
@@ -22,9 +19,6 @@ internal class DeveloperToolsDialogSettings :
   DeveloperToolsInstanceSettings(),
   PersistentStateComponent<DialogState> {
   // -- Properties -------------------------------------------------------------------------------------------------- //
-
-  val dialogLock = ReentrantLock()
-  val currentDialog = AtomicReference<MainDialog?>()
 
   var dialogIsModal: Boolean by ValueProperty(DIALOG_IS_MODAL_DEFAULT)
 

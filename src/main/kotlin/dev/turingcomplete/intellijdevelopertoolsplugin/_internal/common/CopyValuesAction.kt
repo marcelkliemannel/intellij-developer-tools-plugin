@@ -7,8 +7,14 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.util.PlatformIcons
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CommonsDataKeys.SELECTED_VALUES
 import java.awt.datatransfer.StringSelection
+import javax.swing.Icon
 
-class CopyValuesAction : DumbAwareAction("Copy Values", null, PlatformIcons.COPY_ICON) {
+class CopyValuesAction(
+  private val singleValue: String = "Copy Value",
+  private val pluralValue: (Int) -> String = { "Copy $it Values" },
+  private val valueToString: (Any) -> String? = { it.toString() },
+  icon: Icon? = PlatformIcons.COPY_ICON
+) : DumbAwareAction(singleValue, null, icon) {
   // -- Companion Object -------------------------------------------------------------------------------------------- //
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
@@ -17,22 +23,18 @@ class CopyValuesAction : DumbAwareAction("Copy Values", null, PlatformIcons.COPY
   override fun update(e: AnActionEvent) {
     val selectedValues = SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
 
-    e.presentation.isVisible = selectedValues.isNotEmpty()
-    e.presentation.text = if (selectedValues.size > 1) {
-      "Copy ${selectedValues.size} Values"
-    }
-    else {
-      "Copy Value"
-    }
+    val nonBlankValues = selectedValues.count { valueToString(it)?.isNotBlank() ?: false }
+    e.presentation.isVisible = nonBlankValues >= 1
+    e.presentation.text = if (nonBlankValues > 1) pluralValue(nonBlankValues) else singleValue
   }
 
   override fun actionPerformed(e: AnActionEvent) {
-    val selectedProperties: List<String> = SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
-    if (selectedProperties.isEmpty()) {
+    val values: List<Any> = SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
+    if (values.isEmpty()) {
       return
     }
 
-    CopyPasteManager.getInstance().setContents(StringSelection(selectedProperties.joinToString(System.lineSeparator())))
+    CopyPasteManager.getInstance().setContents(StringSelection(values.mapNotNull { valueToString(it) }.joinToString(System.lineSeparator())))
   }
 
   override fun getActionUpdateThread() = ActionUpdateThread.EDT

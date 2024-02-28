@@ -29,8 +29,10 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   var editorSoftWraps: Boolean by ValueProperty(EDITOR_SOFT_WRAPS_DEFAULT)
   var editorShowSpecialCharacters: Boolean by ValueProperty(EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
   var editorShowWhitespaces: Boolean by ValueProperty(EDITOR_SHOW_WHITESPACES_DEFAULT)
-  var toolsMenuTreeShowGroupNodes: Boolean by ValueProperty(TOOLS_MENU_TREE_GROUP_NODES)
-  var toolsMenuTreeOrderAlphabetically: Boolean by ValueProperty(TOOLS_MENU_TREE_ORDER_ALPHABETICALLY)
+  var toolsMenuTreeShowGroupNodes: Boolean by ValueProperty(TOOLS_MENU_TREE_GROUP_NODES_DEFAULT)
+  var toolsMenuTreeOrderAlphabetically: Boolean by ValueProperty(TOOLS_MENU_TREE_ORDER_ALPHABETICALLY_DEFAULT)
+  var autoDetectActionHandlingInstance: Boolean by ValueProperty(AUTO_DETECT_ACTION_HANDLING_INSTANCE_DEFAULT)
+  var selectedActionHandlingInstance: ActionHandlingInstance by ValueProperty(SELECTED_ACTION_HANDLING_INSTANCE_DEFAULT)
 
   var modificationCounter = 0
     private set
@@ -65,7 +67,9 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     editorShowSpecialCharacters = editorShowSpecialCharacters,
     editorShowWhitespaces = editorShowWhitespaces,
     toolsMenuTreeOrderAlphabetically = toolsMenuTreeOrderAlphabetically,
-    toolsMenuTreeShowGroupNodes = toolsMenuTreeShowGroupNodes
+    toolsMenuTreeShowGroupNodes = toolsMenuTreeShowGroupNodes,
+    autoDetectActionHandlingInstance = autoDetectActionHandlingInstance,
+    selectedActionHandlingInstance = selectedActionHandlingInstance
   )
 
   override fun loadState(state: ApplicationState) {
@@ -78,11 +82,23 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     editorSoftWraps = (state.editorSoftWraps ?: EDITOR_SOFT_WRAPS_DEFAULT)
     editorShowSpecialCharacters = (state.editorShowSpecialCharacters ?: EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
     editorShowWhitespaces = (state.editorShowWhitespaces ?: EDITOR_SHOW_WHITESPACES_DEFAULT)
-    toolsMenuTreeShowGroupNodes = (state.toolsMenuTreeShowGroupNodes ?: TOOLS_MENU_TREE_GROUP_NODES)
-    toolsMenuTreeOrderAlphabetically = (state.toolsMenuTreeOrderAlphabetically ?: TOOLS_MENU_TREE_ORDER_ALPHABETICALLY)
+    toolsMenuTreeShowGroupNodes = (state.toolsMenuTreeShowGroupNodes ?: TOOLS_MENU_TREE_GROUP_NODES_DEFAULT)
+    toolsMenuTreeOrderAlphabetically = (state.toolsMenuTreeOrderAlphabetically ?: TOOLS_MENU_TREE_ORDER_ALPHABETICALLY_DEFAULT)
+    autoDetectActionHandlingInstance = (state.autoDetectActionHandlingInstance ?: AUTO_DETECT_ACTION_HANDLING_INSTANCE_DEFAULT)
+    selectedActionHandlingInstance = (state.selectedActionHandlingInstance ?: SELECTED_ACTION_HANDLING_INSTANCE_DEFAULT)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  enum class ActionHandlingInstance(private val title: String) {
+
+    TOOL_WINDOW("Tool Window"),
+    DIALOG("Dialog");
+
+    override fun toString(): String = title
+  }
+
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   data class ApplicationState(
@@ -107,7 +123,11 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     @get:Attribute("toolsMenuTreeShowGroupNodes")
     var toolsMenuTreeShowGroupNodes: Boolean? = null,
     @get:Attribute("toolsMenuTreeOrderAlphabetically")
-    var toolsMenuTreeOrderAlphabetically: Boolean? = null
+    var toolsMenuTreeOrderAlphabetically: Boolean? = null,
+    @get:Attribute("autoDetectActionHandlingInstance")
+    val autoDetectActionHandlingInstance: Boolean? = null,
+    @get:Attribute("selectedActionHandlingInstance")
+    val selectedActionHandlingInstance: ActionHandlingInstance? = null
   )
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
@@ -128,7 +148,9 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     const val EDITOR_SOFT_WRAPS_DEFAULT = true
     const val EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT = false
     const val EDITOR_SHOW_WHITESPACES_DEFAULT = false
-    const val TOOLS_MENU_TREE_GROUP_NODES = false
-    const val TOOLS_MENU_TREE_ORDER_ALPHABETICALLY = true
+    const val TOOLS_MENU_TREE_GROUP_NODES_DEFAULT = false
+    const val TOOLS_MENU_TREE_ORDER_ALPHABETICALLY_DEFAULT = true
+    const val AUTO_DETECT_ACTION_HANDLING_INSTANCE_DEFAULT = true
+    val SELECTED_ACTION_HANDLING_INSTANCE_DEFAULT = ActionHandlingInstance.TOOL_WINDOW
   }
 }

@@ -10,6 +10,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.ui.JBColor
 import com.intellij.ui.ScrollPaneFactory.createScrollPane
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.dsl.builder.Align
@@ -150,6 +151,7 @@ abstract class TextTransformer(
           .createBalloonBuilder(createScrollPane(debugComponent, true))
           .setDialogMode(true)
           .setFillColor(UIUtil.getPanelBackground())
+          .setBorderColor(JBColor.border())
           .setBlockClicksThroughBalloon(true)
           .setRequestFocus(true)
           .createBalloon()

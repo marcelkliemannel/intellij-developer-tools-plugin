@@ -28,6 +28,7 @@ import com.intellij.openapi.ui.setEmptyState
 import com.intellij.openapi.util.TextRange
 import com.intellij.ui.ColoredTableCellRenderer
 import com.intellij.ui.EditorTextField
+import com.intellij.ui.JBColor
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.SimpleTextAttributes.GRAY_SMALL_ATTRIBUTES
@@ -271,6 +272,7 @@ class RegularExpressionMatcher(
       currentDialog = JBPopupFactory.getInstance().createBalloonBuilder(createRegexOptionPanel())
         .setDialogMode(true)
         .setFillColor(UIUtil.getPanelBackground())
+        .setBorderColor(JBColor.border())
         .setBlockClicksThroughBalloon(true)
         .setRequestFocus(true)
         .createBalloon()

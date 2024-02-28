@@ -1,5 +1,7 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.dialog
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.JBSplitter
@@ -9,7 +11,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.Develo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.content.ContentPanelHandler
 import javax.swing.Action
 import javax.swing.JComponent
-import kotlin.concurrent.withLock
 
 /**
  * Note regarding modality:
@@ -17,12 +18,18 @@ import kotlin.concurrent.withLock
  * dialog is always shown in front of the IDE window. This can also be seen
  * in IntelliJ's "UI DSL Showcase" dialog.
  */
-internal class MainDialog(project: Project?)
-  : DialogWrapper(project, null, true, IdeModalityType.MODELESS, false),
-    Place.Navigator {
+internal class MainDialog(
+  project: Project?
+) : DialogWrapper(
+  project,
+  null,
+  true,
+  IdeModalityType.MODELESS,
+  false
+), Place.Navigator {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val contentPanelHandler = ContentPanelHandler(project, disposable, DeveloperToolsDialogSettings.instance)
+  val contentPanelHandler = ContentPanelHandler(project, disposable, DeveloperToolsDialogSettings.instance)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -58,17 +65,13 @@ internal class MainDialog(project: Project?)
   override fun getPreferredFocusedComponent(): JComponent = contentPanelHandler.toolsMenuTree
 
   override fun doOKAction() {
-    DeveloperToolsDialogSettings.instance.dialogLock.withLock {
-      DeveloperToolsDialogSettings.instance.currentDialog.set(null)
-      super.doOKAction()
-    }
+    ApplicationManager.getApplication().service<MainDialogService>().closeDialog()
+    super.doOKAction()
   }
 
   override fun doCancelAction() {
-    DeveloperToolsDialogSettings.instance.dialogLock.withLock {
-      DeveloperToolsDialogSettings.instance.currentDialog.set(null)
-      super.doCancelAction()
-    }
+    ApplicationManager.getApplication().service<MainDialogService>().closeDialog()
+    super.doCancelAction()
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //

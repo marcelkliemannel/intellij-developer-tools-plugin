@@ -59,15 +59,14 @@ internal class DeveloperToolNode(
     val developerTool = developerUiToolCreator(developerToolConfiguration)
     developerToolConfiguration.wasConsumedByDeveloperTool = true
     Disposer.register(parentDisposable, developerTool)
-    return DeveloperToolContainer(developerTool, developerToolConfiguration, developerUiToolPresentation)
+    return DeveloperToolContainer(developerTool, developerToolConfiguration)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   data class DeveloperToolContainer(
     val instance: DeveloperUiTool,
-    val configuration: DeveloperToolConfiguration,
-    val context: DeveloperUiToolPresentation
+    val configuration: DeveloperToolConfiguration
   )
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
