@@ -27,7 +27,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValuePro
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.bindLongTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.not
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.validateLongValue
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.ColorPicker
 import java.time.format.DateTimeFormatter
 
 class UlidGenerator(
@@ -101,7 +100,7 @@ class UlidGenerator(
           .label("Timestamp:")
           .bindText(parsedUlIdTimestamp)
           .gap(RightGap.SMALL)
-        actionButton(CopyAction(parsedUlIdTimestampDataKey), ColorPicker::class.java.name)
+        actionButton(CopyAction(parsedUlIdTimestampDataKey), UlidGenerator::class.java.name)
       }
       row {
         comboBox(UlidFormat.entries.filter { it != UlidFormat.NONE })
@@ -112,7 +111,7 @@ class UlidGenerator(
         label("")
           .bindText(parsedUlIdTransformed)
           .gap(RightGap.SMALL)
-        actionButton(CopyAction(parsedUlIdTransformedDataKey), ColorPicker::class.java.name)
+        actionButton(CopyAction(parsedUlIdTransformedDataKey), UlidGenerator::class.java.name)
       }.topGap(TopGap.NONE)
     }
   }

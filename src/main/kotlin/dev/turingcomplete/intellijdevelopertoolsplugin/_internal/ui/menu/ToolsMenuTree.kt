@@ -115,7 +115,7 @@ internal class ToolsMenuTree(
       addToBottom(BorderLayoutPanel().apply {
         border = Borders.empty(UIUtil.PANEL_REGULAR_INSETS)
         background = UIUtil.SIDE_PANEL_BACKGROUND
-        val linksPanel = JPanel(VerticalLayout(UIUtil.LARGE_VGAP)).apply {
+        val linksPanel = JPanel(VerticalLayout(UIUtil.DEFAULT_VGAP)).apply {
           background = UIUtil.SIDE_PANEL_BACKGROUND
           add(createSettingsLink())
           add(createWhatsNewLink(parentComponent))
@@ -129,6 +129,24 @@ internal class ToolsMenuTree(
       viewport.background = UIUtil.SIDE_PANEL_BACKGROUND
       verticalScrollBar.background = UIUtil.SIDE_PANEL_BACKGROUND
       horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+    }
+  }
+
+  fun selectDeveloperTool(developerToolId: String, onSuccess: () -> Unit) {
+    TreeUtil.promiseVisit(this) {
+      val lastPathComponent = it.lastPathComponent
+      if (lastPathComponent is ContentNode && lastPathComponent.id == developerToolId) {
+        INTERRUPT
+      }
+      else {
+        CONTINUE
+      }
+    }.onSuccess {
+      if (it != null) {
+        TreeUtil.selectPath(this, TreeUtil.getPathFromRoot(it.lastPathComponent as ContentNode)).doWhenDone {
+          onSuccess()
+        }
+      }
     }
   }
 

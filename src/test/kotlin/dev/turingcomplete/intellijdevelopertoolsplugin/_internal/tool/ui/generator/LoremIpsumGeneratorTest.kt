@@ -1,17 +1,15 @@
-package dev.turingcomplete.intellijdevelopertoolsplugin.developertool.generator
+package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.intellij.testFramework.junit5.TestApplication
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.LoremIpsumGenerator
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import java.util.*
 
 @TestApplication
-class LoremIpsumGeneratorTest : BasePlatformTestCase() {
+class LoremIpsumGeneratorTest {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //

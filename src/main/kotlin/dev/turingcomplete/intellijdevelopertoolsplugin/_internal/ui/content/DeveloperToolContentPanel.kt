@@ -13,6 +13,7 @@ import com.intellij.ui.ScrollPaneFactory.createScrollPane
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.actionsButton
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.tabs.JBTabs
 import com.intellij.ui.tabs.JBTabsFactory
@@ -22,11 +23,16 @@ import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.NotBlankInputValidator
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.dumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.castedObject
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolHandler
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.DeveloperToolNode
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.DeveloperToolNode.DeveloperToolContainer
 import javax.swing.Icon
 import javax.swing.JComponent
+import kotlin.reflect.cast
 
 internal open class DeveloperToolContentPanel(
   protected val developerToolNode: DeveloperToolNode
@@ -53,10 +59,18 @@ internal open class DeveloperToolContentPanel(
     selectedDeveloperToolInstance.get().instance.deactivated()
   }
 
+  fun <T: OpenDeveloperToolContext> openTool(context: T, reference: OpenDeveloperToolReference<out T>) {
+    val developerUiToolInstance = selectedDeveloperToolInstance.get().instance
+    assert(developerUiToolInstance is OpenDeveloperToolHandler<*>)
+    @Suppress("UNCHECKED_CAST")
+    (developerUiToolInstance as OpenDeveloperToolHandler<T>).applyOpenDeveloperToolContext(reference.contextClass.cast(context))
+  }
+
   @Suppress("DialogTitleCapitalization")
-  protected open fun Row.buildTitle() {
-    label(developerToolNode.developerUiToolPresentation.contentTitle)
+  protected open fun Row.buildTitle(): JComponent {
+    return label(developerToolNode.developerUiToolPresentation.contentTitle)
       .applyToComponent { formatTitle() }
+      .component
   }
 
   protected fun JComponent.formatTitle() {
@@ -68,16 +82,27 @@ internal open class DeveloperToolContentPanel(
 
   private fun createTitleBar(): JComponent = panel {
     row {
-      buildTitle()
+      val titleComponent = buildTitle()
 
-      link("Reset") {
-        selectedDeveloperToolInstance.get().apply {
-          configuration.reset()
-          instance.reset()
+      val actions = mutableListOf(
+        dumbAwareAction("Reset") {
+          selectedDeveloperToolInstance.get().apply {
+            configuration.reset()
+            instance.reset()
+          }
         }
-      }.align(AlignX.RIGHT).resizableColumn().gap(RightGap.SMALL)
-
-      developerToolNode.developerUiToolPresentation.description?.apply { buildUi() }
+      )
+      developerToolNode.developerUiToolPresentation.description?.let { description ->
+        actions.add(
+          dumbAwareAction("Show Tool Description") {
+            description.show(titleComponent)
+          }
+        )
+      }
+      actionsButton(
+        actions = actions.toTypedArray(),
+        icon = AllIcons.General.GearPlain
+      ).align(AlignX.RIGHT).resizableColumn().gap(RightGap.SMALL)
     }.resizableRow()
   }.apply { border = JBEmptyBorder(0, 8, 4, 8) }
 

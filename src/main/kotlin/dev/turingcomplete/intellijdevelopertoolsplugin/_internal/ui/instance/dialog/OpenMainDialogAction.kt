@@ -3,10 +3,10 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.di
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.safeCastTo
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsDialogSettings
-import kotlin.concurrent.withLock
 
 class OpenMainDialogAction : DumbAwareAction() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -14,17 +14,7 @@ class OpenMainDialogAction : DumbAwareAction() {
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun actionPerformed(e: AnActionEvent) {
-    DeveloperToolsDialogSettings.instance.dialogLock.withLock {
-      val currentDialog = DeveloperToolsDialogSettings.instance.currentDialog.get()
-      if (currentDialog == null || !currentDialog.isShowing) {
-        val mainDialog = MainDialog(e.project)
-        DeveloperToolsDialogSettings.instance.currentDialog.set(mainDialog)
-        mainDialog.show()
-      }
-      else {
-        currentDialog.toFront()
-      }
-    }
+    ApplicationManager.getApplication().service<MainDialogService>().openDialog(e.project)
   }
 
   override fun getActionUpdateThread() = ActionUpdateThread.BGT

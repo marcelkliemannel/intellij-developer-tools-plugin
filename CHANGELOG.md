@@ -10,6 +10,20 @@
 
 ### Fixed
 
+## 3.5.0 - 2024-02-28
+
+### Added
+
+- New tool 'Unarchiver' to analyze and extract archive files
+
+### Changed
+
+- Improve UI of the Regular Expression Matcher tool
+
+### Fixed
+
+- Lorem Ipsum text was regenerated each time the tool window was opened
+
 ## 3.4.0 - 2024-01-21
 
 ### Added

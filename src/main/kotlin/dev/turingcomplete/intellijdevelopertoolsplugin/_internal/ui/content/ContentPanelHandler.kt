@@ -10,6 +10,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValuePro
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsInstanceSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.AddOpenMainDialogActionToMainToolbarTask
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.ContentNode
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.DeveloperToolNode
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.GroupNode
@@ -58,6 +60,12 @@ internal open class ContentPanelHandler(
   }
 
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
+
+  fun <T: OpenDeveloperToolContext> openTool(context: T, reference: OpenDeveloperToolReference<out T>) {
+    toolsMenuTree.selectDeveloperTool(reference.id) {
+      cachedDeveloperToolsPanels[selectedContentNode.get()]?.openTool(context, reference)
+    }
+  }
 
   protected open fun createDeveloperToolContentPanel(developerToolNode: DeveloperToolNode): DeveloperToolContentPanel =
     DeveloperToolContentPanel(developerToolNode)

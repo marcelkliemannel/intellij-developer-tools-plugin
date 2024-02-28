@@ -22,13 +22,16 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.ui.popup.JBPopupListener
+import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import com.intellij.openapi.ui.setEmptyState
 import com.intellij.openapi.util.TextRange
 import com.intellij.ui.ColoredTableCellRenderer
 import com.intellij.ui.EditorTextField
+import com.intellij.ui.JBColor
 import com.intellij.ui.LanguageTextField
 import com.intellij.ui.ScrollPaneFactory
-import com.intellij.ui.SimpleTextAttributes.GRAYED_ATTRIBUTES
+import com.intellij.ui.SimpleTextAttributes.GRAY_SMALL_ATTRIBUTES
 import com.intellij.ui.SimpleTextAttributes.REGULAR_ATTRIBUTES
 import com.intellij.ui.SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
 import com.intellij.ui.TableSpeedSearch
@@ -43,11 +46,12 @@ import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.table.JBTable
+import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
@@ -55,16 +59,17 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CommonsD
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.allowUiDslLabel
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.setContextMenu
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RegularExpressionMatcher.MatchResultType.MATCH
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RegularExpressionMatcher.MatchResultType.NAMED_GROUP
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import org.intellij.lang.regexp.RegExpLanguage
 import org.intellij.lang.regexp.intention.CheckRegExpForm
 import java.awt.Dimension
 import java.lang.Boolean.TRUE
 import javax.swing.BorderFactory
+import javax.swing.JComponent
 import javax.swing.JTable
 import javax.swing.ListSelectionModel
 import javax.swing.event.ListSelectionListener
@@ -185,10 +190,10 @@ class RegularExpressionMatcher(
         val textRange = TextRange(matcher.start(), matcher.end())
         inputEditor.highlightTextRange(textRange, REGEX_MATCH_HIGHLIGHT_LAYER, regexMatchingAttributes)
 
-        results.add(listOf("${i + 1}", textRange, matcher.group(), MATCH))
+        results.add(listOf("${i + 1}" to textRange, matcher.group(), MATCH))
         if (namedGroups.isNotEmpty()) {
           namedGroups[i].filter { it.value != null }.forEach {
-            results.add(listOf(it.key, TextRange(matcher.start(it.key), matcher.end(it.key)), it.value, NAMED_GROUP))
+            results.add(listOf(it.key to TextRange(matcher.start(it.key), matcher.end(it.key)), it.value, NAMED_GROUP))
           }
         }
 
@@ -214,6 +219,8 @@ class RegularExpressionMatcher(
 
       init {
         text = regexText.get()
+        font = JBFont.create(font, false).biggerOn(2f)
+
         addDocumentListener(object : DocumentListener {
           override fun documentChanged(event: DocumentEvent) {
             if (!isDisposed) {
@@ -222,6 +229,7 @@ class RegularExpressionMatcher(
             }
           }
         })
+
         allowUiDslLabel(this.component)
 
         regexText.afterChangeConsumeEvent(parentDisposable) { event ->
@@ -236,35 +244,50 @@ class RegularExpressionMatcher(
       }
     }
 
-  private fun createSelectRegexOptionsButton(): ActionButton =
-    ActionButton(
-      SelectRegexOptionsAction(regexInputEditor, selectedRegexOptionFlag),
+  private fun createSelectRegexOptionsButton(): ActionButton {
+    lateinit var actionButton: ActionButton
+    actionButton = ActionButton(
+      SelectRegexOptionsAction({ actionButton }, selectedRegexOptionFlag),
       null,
       RegularExpressionMatcher::class.java.name,
       DEFAULT_MINIMUM_BUTTON_SIZE
     )
+    return actionButton
+  }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class SelectRegexOptionsAction(
-    val regexInputEditor: EditorTextField,
+    val parentComponent: () -> JComponent,
     val selectedRegexOptionFlag: ObservableMutableProperty<Int>
   ) : DumbAwareAction("Regular Expression Options", null, AllIcons.General.GearPlain) {
 
+    private var currentDialog: Balloon? = null
+
     override fun actionPerformed(e: AnActionEvent) {
-      JBPopupFactory.getInstance().createBalloonBuilder(createRegexOptionPanel())
+      if (currentDialog != null) {
+        return
+      }
+
+      currentDialog = JBPopupFactory.getInstance().createBalloonBuilder(createRegexOptionPanel())
         .setDialogMode(true)
         .setFillColor(UIUtil.getPanelBackground())
+        .setBorderColor(JBColor.border())
         .setBlockClicksThroughBalloon(true)
         .setRequestFocus(true)
         .createBalloon()
         .apply {
           setAnimationEnabled(false)
-          show(RelativePoint.getSouthOf(regexInputEditor), Balloon.Position.below)
+          addListener(object : JBPopupListener {
+            override fun onClosed(event: LightweightWindowEvent) {
+              currentDialog = null
+            }
+          })
+          show(RelativePoint.getSouthOf(parentComponent()), Balloon.Position.below)
         }
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
     @Suppress("UnstableApiUsage")
     private fun createRegexOptionPanel() = panel {
@@ -296,9 +319,8 @@ class RegularExpressionMatcher(
 
     init {
       columnModel.apply {
-        getColumn(0).preferredWidth = 120
-        getColumn(1).preferredWidth = 50
-        getColumn(2).preferredWidth = 300
+        getColumn(0).preferredWidth = 150
+        getColumn(1).preferredWidth = 300
       }
       visibleRowCount = 4
       putClientProperty(JBViewport.FORCE_VISIBLE_ROW_COUNT_KEY, true)
@@ -316,13 +338,14 @@ class RegularExpressionMatcher(
     }
 
     override fun getData(dataId: String): Any? = when {
-      CommonsDataKeys.SELECTED_VALUES.`is`(dataId) -> selectedRows.map { model.getValueAt(it, 2) as String }.toList()
+      CommonsDataKeys.SELECTED_VALUES.`is`(dataId) -> selectedRows.map { model.getValueAt(it, 1) as String }.toList()
       else -> null
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun createSelectionListener() = ListSelectionListener { e ->
       if (!e.valueIsAdjusting) {
-        val selectedTextRanges = this@MatchResultsTable.selectedRows.map { model.getValueAt(it, 1) as TextRange }.toList()
+        val selectedTextRanges = this@MatchResultsTable.selectedRows.map { (model.getValueAt(it, 0) as Pair<String, TextRange>).second }.toList()
         selectedMatchResultHighlight(selectedTextRanges)
       }
     }
@@ -341,24 +364,24 @@ class RegularExpressionMatcher(
 
     override fun getRowCount(): Int = matches.size
 
-    override fun getColumnCount(): Int = 3
+    override fun getColumnCount(): Int = 2
 
     override fun getColumnName(column: Int): String = when (column) {
       0 -> "Group"
-      1 -> "Range"
-      2 -> "Value"
+      1 -> "Value"
       else -> error("Unknown column: $column")
     }
 
     override fun getValueAt(row: Int, column: Int): Any = matches[row][column]
 
-    fun getMatchResultType(row: Int): MatchResultType = matches[row][3] as MatchResultType
+    fun getMatchResultType(row: Int): MatchResultType = matches[row][2] as MatchResultType
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class MatchResultsTableCellRenderer(private val model: MatchResultsTableModel) : ColoredTableCellRenderer() {
 
+    @Suppress("UNCHECKED_CAST")
     override fun customizeCellRenderer(table: JTable, value: Any?, selected: Boolean, hasFocus: Boolean, row: Int, column: Int) {
       val matchResultType = model.getMatchResultType(row)
 
@@ -368,16 +391,14 @@ class RegularExpressionMatcher(
             MATCH -> "Match: "
             NAMED_GROUP -> "Group: "
           }
-          append(prefix, GRAYED_ATTRIBUTES)
-          append(value as String, REGULAR_BOLD_ATTRIBUTES)
+         val (group, textRange) = (value as Pair<String, TextRange>)
+          append(prefix, REGULAR_ATTRIBUTES)
+          append("$group ", REGULAR_BOLD_ATTRIBUTES)
+          append("(${textRange.startOffset} to ${textRange.endOffset})", GRAY_SMALL_ATTRIBUTES)
+
         }
 
-        1 -> {
-          val textRange = value as TextRange
-          append("${textRange.startOffset} to ${textRange.endOffset}", REGULAR_ATTRIBUTES)
-        }
-
-        2 -> append(value as String)
+        1 -> append(value as String)
 
         else -> error("Unknown column: $column")
       }
