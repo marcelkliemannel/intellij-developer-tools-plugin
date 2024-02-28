@@ -52,7 +52,7 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.ParsePosition
 import java.time.Duration
-import java.util.Locale
+import java.util.*
 
 internal class TimeConversion(
   private val configuration: DeveloperToolConfiguration,
@@ -171,7 +171,6 @@ internal class TimeConversion(
       textField()
         .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal(getMathContext()) }
         .label("Days:")
-        .comment("One month is equal to 30.416 days.")
         .bindText(daysFormatted)
         .whenTextChangedFromUi { convert(DAYS) }
         .columns(15)
@@ -187,6 +186,8 @@ internal class TimeConversion(
         .bindText(monthsFormatted)
         .whenTextChangedFromUi { convert(MONTHS) }
         .columns(15)
+        .gap(RightGap.SMALL)
+      contextHelp("One month is equal to 30.416 days (365/12).")
     }.layout(RowLayout.PARENT_GRID)
     row {
       textField()

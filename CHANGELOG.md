@@ -14,7 +14,7 @@
 
 ### Fixed
 
-- Lorem Ipsum text was regenerated each time the tool window was opened.
+- Lorem Ipsum text was regenerated each time the tool window was opened
 
 ## 3.4.0 - 2024-01-21
 
