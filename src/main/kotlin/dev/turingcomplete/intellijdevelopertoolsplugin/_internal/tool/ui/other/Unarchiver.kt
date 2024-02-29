@@ -101,7 +101,7 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipUtils
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
-import org.apache.tools.zip.ZipEntry
+import java.util.zip.ZipEntry
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
