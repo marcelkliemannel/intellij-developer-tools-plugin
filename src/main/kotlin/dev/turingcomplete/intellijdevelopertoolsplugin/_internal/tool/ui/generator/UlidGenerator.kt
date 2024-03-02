@@ -42,7 +42,7 @@ class UlidGenerator(
 ), DataProvider {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val generateMonotonicUlid by configuration.register("generateMonotonicUlid", false)
+  private val generateMonotonicUlid = configuration.register("generateMonotonicUlid", false)
   private val ulidFormat = configuration.register("ulidFormat", UlidFormat.NONE)
   private val useIndividualTime = configuration.register("useIndividualTime", false)
   private val individualTime = configuration.register("individualTime", System.currentTimeMillis())
@@ -67,6 +67,12 @@ class UlidGenerator(
       comboBox(UlidFormat.entries)
         .label("Format:")
         .bindItem(ulidFormat)
+    }
+    row {
+      checkBox("Monotonic")
+        .bindSelected(generateMonotonicUlid)
+        .gap(RightGap.SMALL)
+      contextHelp("If selected, the random component is incremented for each new ULID generated in the same millisecond. Otherwise, the random component is reset for each new ULID generated.")
     }
 
     buttonsGroup {
@@ -117,7 +123,7 @@ class UlidGenerator(
   }
 
   override fun generate(): String {
-    val ulid: Ulid = if (generateMonotonicUlid) {
+    val ulid: Ulid = if (generateMonotonicUlid.get()) {
       if (useIndividualTime.get()) {
         UlidCreator.getMonotonicUlid(individualTime.get())
       }

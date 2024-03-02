@@ -4,6 +4,8 @@
 
 ### Added
 
+- Extend the ULID generator for monotonic ULIDs.
+
 ### Changed
 
 ### Removed
