@@ -219,7 +219,7 @@ class RegularExpressionMatcher(
 
       init {
         text = regexText.get()
-        font = JBFont.create(font, false).biggerOn(2f)
+        font = JBFont.create(font, false).biggerOn(1.6f)
 
         addDocumentListener(object : DocumentListener {
           override fun documentChanged(event: DocumentEvent) {

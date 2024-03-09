@@ -1,0 +1,1 @@
+private const val AUTHORIZATION_CREDENTIALS = "<spot>user:password</spot>"

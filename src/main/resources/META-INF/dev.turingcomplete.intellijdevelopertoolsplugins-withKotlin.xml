@@ -1,0 +1,26 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="com.intellij">
+    <intentionAction>
+      <language>kotlin</language>
+      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.TextCaseConverterKotlinCodeIntentionAction</className>
+      <bundleName>messages.KotlinBundle</bundleName>
+      <categoryKey>group.names.kotlin</categoryKey>
+    </intentionAction>
+    <intentionAction>
+      <language>kotlin</language>
+      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.EncoderDecoderKotlinCodeIntentionAction</className>
+      <bundleName>messages.KotlinBundle</bundleName>
+      <categoryKey>group.names.kotlin</categoryKey>
+    </intentionAction>
+  </extensions>
+  <actions>
+    <action id="EncoderDecoderKotlinLiteralActionGroup"
+            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncoderDecoderKotlinCodeActionGroup">
+      <add-to-group group-id="DeveloperToolsGroup"/>
+    </action>
+    <action id="TextCaseConverterKotlinLiteralActionGroup"
+            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.TextCaseConverterKotlinCodeActionGroup">
+      <add-to-group group-id="DeveloperToolsGroup"/>
+    </action>
+  </actions>
+</idea-plugin>

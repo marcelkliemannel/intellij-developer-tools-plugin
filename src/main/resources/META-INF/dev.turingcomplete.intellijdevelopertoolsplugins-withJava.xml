@@ -1,0 +1,26 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="com.intellij">
+    <intentionAction>
+      <language>JAVA</language>
+      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.TextCaseConverterJavaCodeIntentionAction</className>
+      <bundleName>messages.JavaBundle</bundleName>
+      <categoryKey>intention.category.declaration</categoryKey>
+    </intentionAction>
+    <intentionAction>
+      <language>JAVA</language>
+      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.EncoderDecoderJavaCodeIntentionAction</className>
+      <bundleName>messages.JavaBundle</bundleName>
+      <categoryKey>intention.category.declaration</categoryKey>
+    </intentionAction>
+  </extensions>
+  <actions>
+    <action id="EncoderDecoderJavaLiteralActionGroup"
+            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncoderDecoderJavaCodeActionGroup">
+      <add-to-group group-id="DeveloperToolsGroup"/>
+    </action>
+    <action id="TextCaseConverterJavaLiteralActionGroup"
+            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.TextCaseConverterJavaCodeActionGroup">
+      <add-to-group group-id="DeveloperToolsGroup"/>
+    </action>
+  </actions>
+</idea-plugin>
