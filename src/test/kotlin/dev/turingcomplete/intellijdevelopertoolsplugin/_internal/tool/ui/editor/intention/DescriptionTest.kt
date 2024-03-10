@@ -29,7 +29,8 @@ class DescriptionTest {
   @MethodSource("intentionActionSimpleClassNames")
   fun testIntentionActionBeforeTemplateFileExist(intentionActionSimpleClassName: String) {
     val classLoader = Thread.currentThread().contextClassLoader
-    val descriptionHtmlResourcePath = "intentionDescriptions/$intentionActionSimpleClassName/before.$intentionActionSimpleClassName.template"
+    val languageInfix = if (intentionActionSimpleClassName.contains("Kotlin")) "kt" else "java"
+    val descriptionHtmlResourcePath = "intentionDescriptions/$intentionActionSimpleClassName/before.$languageInfix.template"
     val packageResource = classLoader.getResource(descriptionHtmlResourcePath)
     assertThat(packageResource).describedAs(descriptionHtmlResourcePath).isNotNull()
   }
@@ -38,7 +39,8 @@ class DescriptionTest {
   @MethodSource("intentionActionSimpleClassNames")
   fun testIntentionActionAfterTemplateFileExist(intentionActionSimpleClassName: String) {
     val classLoader = Thread.currentThread().contextClassLoader
-    val descriptionHtmlResourcePath = "intentionDescriptions/$intentionActionSimpleClassName/after.$intentionActionSimpleClassName.template"
+    val languageInfix = if (intentionActionSimpleClassName.contains("Kotlin")) "kt" else "java"
+    val descriptionHtmlResourcePath = "intentionDescriptions/$intentionActionSimpleClassName/after.$languageInfix.template"
     val packageResource = classLoader.getResource(descriptionHtmlResourcePath)
     assertThat(packageResource).describedAs(descriptionHtmlResourcePath).isNotNull()
   }
