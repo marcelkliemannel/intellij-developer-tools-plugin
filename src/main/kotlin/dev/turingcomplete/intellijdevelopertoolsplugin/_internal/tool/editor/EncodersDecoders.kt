@@ -65,7 +65,7 @@ internal object EncodersDecoders {
       }
     }
     catch (e: Exception) {
-      log.error("Encoding/Decoding failed", e)
+      log.warn("Encoding/Decoding failed", e)
       ApplicationManager.getApplication().invokeLater {
         Messages.showErrorDialog(editor.project, "Encoding/Decoding failed: ${e.message}", "Encode/Decode")
       }

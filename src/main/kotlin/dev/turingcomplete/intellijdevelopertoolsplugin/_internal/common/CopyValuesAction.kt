@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.util.PlatformIcons
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CommonsDataKeys.SELECTED_VALUES
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.PluginCommonDataKeys.SELECTED_VALUES
 import java.awt.datatransfer.StringSelection
 import javax.swing.Icon
 

@@ -286,6 +286,10 @@
     <developerUiTool
             id="rubber-duck"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RubberDuck$Factory"/>
+    <developerUiTool
+            id="intellij-internals"
+            internalTool="true"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.IntelliJInternals$Factory"/>
 
   </extensions>
 

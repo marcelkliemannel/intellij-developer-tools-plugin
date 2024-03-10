@@ -115,7 +115,7 @@ internal class ToolsMenuTree(
       addToBottom(BorderLayoutPanel().apply {
         border = Borders.empty(UIUtil.PANEL_REGULAR_INSETS)
         background = UIUtil.SIDE_PANEL_BACKGROUND
-        val linksPanel = JPanel(VerticalLayout(UIUtil.DEFAULT_VGAP)).apply {
+        val linksPanel = JPanel(VerticalLayout(UIUtil.DEFAULT_VGAP * 2)).apply {
           background = UIUtil.SIDE_PANEL_BACKGROUND
           add(createSettingsLink())
           add(createWhatsNewLink(parentComponent))
@@ -290,7 +290,12 @@ internal class ToolsMenuTree(
 
     var preferredSelectedDeveloperToolNode: DeveloperToolNode? = null
     val application = ApplicationManager.getApplication()
+    val showInternalTools = DeveloperToolsApplicationSettings.instance.showInternalTools
     DeveloperUiToolFactoryEp.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
+      if (developerToolFactoryEp.internalTool && !showInternalTools) {
+        return@forEachExtensionSafe
+      }
+
       val developerUiToolFactory: DeveloperUiToolFactory<*> = developerToolFactoryEp.createInstance(application)
       val context = DeveloperUiToolContext(developerToolFactoryEp.id, prioritizeVerticalLayout)
       developerUiToolFactory.getDeveloperUiToolCreator(project, parentDisposable, context)?.let { developerToolCreator ->

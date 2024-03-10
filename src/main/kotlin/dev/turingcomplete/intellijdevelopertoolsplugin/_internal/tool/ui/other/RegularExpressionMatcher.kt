@@ -55,10 +55,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CommonsDataKeys
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.PluginCommonDataKeys
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.allowUiDslLabel
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.setContextMenu
@@ -338,7 +338,7 @@ class RegularExpressionMatcher(
     }
 
     override fun getData(dataId: String): Any? = when {
-      CommonsDataKeys.SELECTED_VALUES.`is`(dataId) -> selectedRows.map { model.getValueAt(it, 1) as String }.toList()
+      PluginCommonDataKeys.SELECTED_VALUES.`is`(dataId) -> selectedRows.map { model.getValueAt(it, 1) as String }.toList()
       else -> null
     }
 
