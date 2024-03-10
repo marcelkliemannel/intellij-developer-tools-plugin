@@ -4,15 +4,19 @@
 
 ### Added
 
-- Some tools (data generators, encoders/decoders and text case conversion) are now also available in the Editor menu or code intentions. Some of these actions are only available if a text is selected, or the current caret position is on a Java/Kotlin string or identifier.
-- Extend the ULID generator for monotonic ULIDs
-- New tool "IntelliJ Internals"
-
 ### Changed
 
 ### Removed
 
 ### Fixed
+
+## 4.0.0 - 2024-03-10
+
+### Added
+
+- Some tools (data generators, encoders/decoders and text case conversion) are now also available in the Editor menu or code intentions. Some of these actions are only available if a text is selected, or the current caret position is on a Java/Kotlin string or identifier.
+- Extend the ULID generator for monotonic ULIDs
+- New tool "IntelliJ Internals"
 
 ## 3.5.0 - 2024-02-28
 
