@@ -23,6 +23,9 @@ class DeveloperUiToolFactoryEp<T : DeveloperUiToolFactory<*>> : CustomLoadingExt
   @Attribute("groupId")
   var groupId: String? = null
 
+  @Attribute("internalTool")
+  var internalTool: Boolean = false
+
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 

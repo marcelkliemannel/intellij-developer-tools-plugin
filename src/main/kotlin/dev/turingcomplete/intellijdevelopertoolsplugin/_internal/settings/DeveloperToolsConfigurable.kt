@@ -30,6 +30,7 @@ class DeveloperToolsConfigurable : Configurable {
   private lateinit var toolsMenuOrderAlphabetically: ValueProperty<Boolean>
   private lateinit var autoDetectActionHandlingInstance: ValueProperty<Boolean>
   private lateinit var selectedActionHandlingInstance: ValueProperty<ActionHandlingInstance>
+  private lateinit var showInternalTools: ValueProperty<Boolean>
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -108,10 +109,6 @@ class DeveloperToolsConfigurable : Configurable {
 
     groupRowsRange("Advanced") {
       row {
-        comment("For these changes to take effect in the dialog, the dialog must be reopened once.")
-      }
-
-      row {
         dialogIsModal = ValueProperty(DeveloperToolsDialogSettings.instance.dialogIsModal)
         checkBox("Dialog is modal and must be closed before continuing to work with IntelliJ")
           .bindSelected(dialogIsModal)
@@ -125,6 +122,12 @@ class DeveloperToolsConfigurable : Configurable {
         toolsMenuOrderAlphabetically = ValueProperty(developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically)
         checkBox("Order tools in the menu alphabetically")
           .bindSelected(toolsMenuOrderAlphabetically)
+      }
+      row {
+        showInternalTools = ValueProperty(developerToolsApplicationSettings.showInternalTools)
+        checkBox("Show internal tools")
+          .bindSelected(showInternalTools)
+          .comment("Enables additional developer tools that are only useful for special applications, such as supporting IntelliJ plugin development.")
       }
     }
 
@@ -152,7 +155,8 @@ class DeveloperToolsConfigurable : Configurable {
             developerToolsApplicationSettings.toolsMenuTreeShowGroupNodes != toolsMenuShowGroupNodes.get() ||
             developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically != toolsMenuOrderAlphabetically.get() ||
             developerToolsApplicationSettings.autoDetectActionHandlingInstance != autoDetectActionHandlingInstance.get() ||
-            developerToolsApplicationSettings.selectedActionHandlingInstance != selectedActionHandlingInstance.get()
+            developerToolsApplicationSettings.selectedActionHandlingInstance != selectedActionHandlingInstance.get() ||
+            developerToolsApplicationSettings.showInternalTools != showInternalTools.get()
   }
 
   override fun apply() {
@@ -169,6 +173,7 @@ class DeveloperToolsConfigurable : Configurable {
       it.toolsMenuTreeOrderAlphabetically = toolsMenuOrderAlphabetically.get()
       it.autoDetectActionHandlingInstance = autoDetectActionHandlingInstance.get()
       it.selectedActionHandlingInstance = selectedActionHandlingInstance.get()
+      it.showInternalTools = showInternalTools.get()
     }
     DeveloperToolsDialogSettings.instance.dialogIsModal = dialogIsModal.get()
   }
@@ -188,6 +193,7 @@ class DeveloperToolsConfigurable : Configurable {
     toolsMenuOrderAlphabetically.set(developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically)
     autoDetectActionHandlingInstance.set(developerToolsApplicationSettings.autoDetectActionHandlingInstance)
     selectedActionHandlingInstance.set(developerToolsApplicationSettings.selectedActionHandlingInstance)
+    showInternalTools.set(developerToolsApplicationSettings.showInternalTools)
     apply()
   }
 

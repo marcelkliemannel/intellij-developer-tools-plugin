@@ -33,6 +33,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   var toolsMenuTreeOrderAlphabetically: Boolean by ValueProperty(TOOLS_MENU_TREE_ORDER_ALPHABETICALLY_DEFAULT)
   var autoDetectActionHandlingInstance: Boolean by ValueProperty(AUTO_DETECT_ACTION_HANDLING_INSTANCE_DEFAULT)
   var selectedActionHandlingInstance: ActionHandlingInstance by ValueProperty(SELECTED_ACTION_HANDLING_INSTANCE_DEFAULT)
+  var showInternalTools: Boolean by ValueProperty(SHOW_INTERNAL_TOOLS_DEFAULT)
 
   var modificationCounter = 0
     private set
@@ -69,7 +70,8 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     toolsMenuTreeOrderAlphabetically = toolsMenuTreeOrderAlphabetically,
     toolsMenuTreeShowGroupNodes = toolsMenuTreeShowGroupNodes,
     autoDetectActionHandlingInstance = autoDetectActionHandlingInstance,
-    selectedActionHandlingInstance = selectedActionHandlingInstance
+    selectedActionHandlingInstance = selectedActionHandlingInstance,
+    showInternalTools = showInternalTools
   )
 
   override fun loadState(state: ApplicationState) {
@@ -86,6 +88,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     toolsMenuTreeOrderAlphabetically = (state.toolsMenuTreeOrderAlphabetically ?: TOOLS_MENU_TREE_ORDER_ALPHABETICALLY_DEFAULT)
     autoDetectActionHandlingInstance = (state.autoDetectActionHandlingInstance ?: AUTO_DETECT_ACTION_HANDLING_INSTANCE_DEFAULT)
     selectedActionHandlingInstance = (state.selectedActionHandlingInstance ?: SELECTED_ACTION_HANDLING_INSTANCE_DEFAULT)
+    showInternalTools = (state.showInternalTools ?: SHOW_INTERNAL_TOOLS_DEFAULT)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
@@ -125,9 +128,11 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     @get:Attribute("toolsMenuTreeOrderAlphabetically")
     var toolsMenuTreeOrderAlphabetically: Boolean? = null,
     @get:Attribute("autoDetectActionHandlingInstance")
-    val autoDetectActionHandlingInstance: Boolean? = null,
+    var autoDetectActionHandlingInstance: Boolean? = null,
     @get:Attribute("selectedActionHandlingInstance")
-    val selectedActionHandlingInstance: ActionHandlingInstance? = null
+    var selectedActionHandlingInstance: ActionHandlingInstance? = null,
+    @get:Attribute("showInternalTools")
+    var showInternalTools: Boolean? = null
   )
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
@@ -151,6 +156,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     const val TOOLS_MENU_TREE_GROUP_NODES_DEFAULT = false
     const val TOOLS_MENU_TREE_ORDER_ALPHABETICALLY_DEFAULT = true
     const val AUTO_DETECT_ACTION_HANDLING_INSTANCE_DEFAULT = true
+    const val SHOW_INTERNAL_TOOLS_DEFAULT = false
     val SELECTED_ACTION_HANDLING_INSTANCE_DEFAULT = ActionHandlingInstance.TOOL_WINDOW
   }
 }

@@ -13,6 +13,8 @@ inline fun <reified T> Any.safeCastTo(): T? = if (this is T) this else null
 
 fun <T : Any> Any.uncheckedCastTo(type: KClass<T>): T = type.cast(this)
 
+inline fun <reified T> Any.uncheckedCastTo(): T = this as T
+
 fun ByteArray.toHexMacAddress() = StringBuilder(18).also {
   for (byte in this) {
     if (isNotEmpty()) {

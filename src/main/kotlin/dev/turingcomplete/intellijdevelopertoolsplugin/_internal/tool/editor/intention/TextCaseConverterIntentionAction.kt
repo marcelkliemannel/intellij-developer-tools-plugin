@@ -1,0 +1,66 @@
+package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention
+
+import com.intellij.codeInsight.intention.IntentionAction
+import com.intellij.codeInsight.intention.LowPriorityAction
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.ui.popup.PopupStep
+import com.intellij.openapi.ui.popup.util.BaseListPopupStep
+import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiFile
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.executeWriteCommand
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.TextCaseConverter.allTextCases
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.TextCaseConverter.determineWordsSplitter
+import dev.turingcomplete.textcaseconverter.TextCase
+
+internal abstract class TextCaseConverterIntentionAction : IntentionAction, LowPriorityAction {
+  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+
+  final override fun startInWriteAction() = false
+
+  final override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?) =
+    editor != null && file != null && editor.document.isWritable && getSourceText(editor, file) != null
+
+  final override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
+    if (editor == null || file == null) {
+      return
+    }
+
+    val (text, textRange) = getSourceText(editor, file) ?: return
+
+    ApplicationManager.getApplication().invokeLater {
+      JBPopupFactory.getInstance()
+        .createListPopup(TextCaseListPopupStep(editor, text, textRange))
+        .showInBestPositionFor(editor)
+    }
+  }
+
+  abstract fun getSourceText(editor: Editor, file: PsiFile): Pair<String, TextRange>?
+
+  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class TextCaseListPopupStep(
+    private val editor: Editor,
+    private val text: String,
+    private val textRange: TextRange
+  ) : BaseListPopupStep<TextCase>("Select Target Text Case", allTextCases) {
+
+    override fun getTextFor(textCase: TextCase): String = textCase.example()
+
+    override fun onChosen(textCase: TextCase, finalChoice: Boolean): PopupStep<*>? {
+      val result = textCase.convert(text, determineWordsSplitter(text))
+      editor.executeWriteCommand("Convert text case to ${textCase.title().lowercase()}") {
+        it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+      }
+
+      return super.onChosen(textCase, finalChoice)
+    }
+  }
+
+  // -- Companion Object -------------------------------------------------------------------------------------------- //
+}

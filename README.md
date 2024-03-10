@@ -4,7 +4,13 @@
 
 This plugin is a powerful and versatile set of tools designed to enhance the development experience for software engineers. With its extensive collection of features, developers can increase their productivity and simplify complex operations without leaving their coding environment.
 
-<img src="screenshots/tool-window.png" alt="Main Dialog" width="693px"/>
+Main toolbar window:
+
+<img src="screenshots/tool-window.png" alt="Main Tool Window" width="693px"/>
+
+Editor menu:
+
+<img src="screenshots/editor-menu.png" alt="Editor Menu" width="708px"/>
 
 Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 
@@ -21,6 +27,7 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 - JSON Path Parser
 - JSON Schema Validator
 - Hashing
+- Archive (ZIP, TAR, JAR, 7z, ...) viewer and extractor
 - Date Time Converter
 - Time Conversion
 - Code Style Formatting
@@ -31,16 +38,19 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 
 ## Integration
 
-The tools are currently available as a standalone dialog or tool window. Additional settings can be found in IntelliJ's settings/preferences under **Tools | Developer Tools**.
+The main tools are currently available as a standalone dialog or tool window. Additionally, some tools are also available via the editor menu or code intentions. Some of these tools are only available if a text is selected, or the current caret position is on a Java/Kotlin string or identifier.
+
+The plugin settings can be found in IntelliJ's settings/preferences under **Tools | Developer Tools**.
 
 ### Tool Window
 
 The tool window is available through **View | Tool Windows | Tools**. All inputs and configurations of a tool window will be stored on the project level.
 
 ### Dialog
+
 The action to access the dialog is available through IntelliJ's main menu under **Tools | Developer Tools**.
 
-It's quite handy to add the open dialog action to the main toolbar (which must be activated in the old UI under **View | Toolbar**) via **Customize Toolbar... | Add Actions... | Developer Tools**.
+To add the "Open Dialog" action to the main toolbar, we can either enable it in IntelliJ's settings/preferences under **Tools | Developer Tools**, or manually add the action via **Customize Toolbar... | Add Actions... | Developer Tools**.
 
 All inputs and configurations of the dialog will be stored on the application level.
 
@@ -52,7 +62,7 @@ If you want to contribute something, please follow the code style in the `.edito
 
 ## License
 
-Copyright (c) 2023 Marcel Kliemannel
+Copyright (c) 2024 Marcel Kliemannel
 
 Licensed under the **Apache License, Version 2.0** (the "License"); you may not use this file except in compliance with the License.
 

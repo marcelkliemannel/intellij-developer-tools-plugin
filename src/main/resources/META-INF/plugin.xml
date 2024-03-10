@@ -24,6 +24,7 @@
     <li>JSON Path Parser</li>
     <li>JSON Schema Validator</li>
     <li>Hashing</li>
+    <li>Archive (ZIP, TAR, JAR, 7z, ...) viewer and extractor</li>
     <li>Date Time Converter</li>
     <li>Time Conversion</li>
     <li>Code Style Formatting</li>
@@ -35,7 +36,9 @@
 
 <h2>Integration</h2>
 
-<p>The tools are currently available as a standalone dialog or tool window. Additional settings can be found in IntelliJ's settings/preferences under <b>Tools | Developer Tools</b>.</p>
+<p>The main tools are currently available as a standalone dialog or tool window. Additionally, some tools are also available via the editor menu or code intentions. Some of these tools are only available if a text is selected, or the current caret position is on a Java/Kotlin string or identifier.</p>
+
+<p>The plugin settings can be found in IntelliJ's settings/preferences under <b>Tools | Developer Tools</b>.</p>
 
 <h3>Tool Window</h3>
 
@@ -45,13 +48,19 @@
 
 <p>The action to access the dialog is available through IntelliJ's main menu under <b>Tools | Developer Tools</b>.</p>
 
-<p>It's quite handy to add the open dialog action to the main toolbar (which must be activated in the old UI under <b>View | Toolbar</b>) via <b>Customize Toolbar... | Add Actions... | Developer Tools</b>.</p>
+<p>To add the "Open Dialog" action to the main toolbar, we can either enable it in IntelliJ's settings/preferences under <b>Tools | Developer Tools</b>, or manually add the action via <b>Customize Toolbar... | Add Actions... | Developer Tools</b>.</p>
 
 <p>All inputs and configurations of the dialog will be stored on the application level.</p>
     ]]></description>
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
+  <depends optional="true" config-file="dev.turingcomplete.intellijdevelopertoolsplugins-withJava.xml">
+    com.intellij.java
+  </depends>
+  <depends optional="true" config-file="dev.turingcomplete.intellijdevelopertoolsplugins-withKotlin.xml">
+    org.jetbrains.kotlin
+  </depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <postStartupActivity
@@ -73,6 +82,14 @@
                 icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/toolwindow.svg"/>
     <notificationGroup id="Developer Tools Plugin Notifications" displayType="TOOL_WINDOW"
                        toolWindowId="Developer Tools"/>
+    <!--suppress PluginXmlExtensionRegistration (not depending on any language) -->
+    <intentionAction>
+      <className>
+        dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.DataGeneratorIntentionAction
+      </className>
+      <bundleName>messages.LangBundle</bundleName>
+      <categoryKey>intention.category.other</categoryKey>
+    </intentionAction>
   </extensions>
 
   <actions>
@@ -269,6 +286,10 @@
     <developerUiTool
             id="rubber-duck"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RubberDuck$Factory"/>
+    <developerUiTool
+            id="intellij-internals"
+            internalTool="true"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.IntelliJInternals$Factory"/>
 
   </extensions>
 
@@ -277,5 +298,18 @@
             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.Unarchiver$OpenArchiveFileInUnarchiverAction">
       <add-to-group group-id="RevealGroup" anchor="last"/>
     </action>
+
+    <group id="DeveloperToolsGroup" class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.DeveloperToolsActionGroup">
+      <group id="DataGeneratorActionGroup"
+             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.DataGeneratorActionGroup"/>
+
+      <group id="EncoderDecoderActionGroup"
+             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncoderDecoderActionGroup"/>
+
+      <group id="TextCaseConverterActionGroup"
+             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.TextCaseConverterActionGroup"/>
+
+      <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+    </group>
   </actions>
 </idea-plugin>
