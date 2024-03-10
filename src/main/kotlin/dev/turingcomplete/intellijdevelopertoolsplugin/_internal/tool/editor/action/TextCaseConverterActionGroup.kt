@@ -22,7 +22,8 @@ internal open class TextCaseConverterActionGroup : DefaultActionGroup("Convert T
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   final override fun update(e: AnActionEvent) {
-    e.presentation.isVisible = getSourceText(e) != null
+    val editor = e.getData(CommonDataKeys.EDITOR)
+    e.presentation.isVisible = editor != null && editor.document.isWritable && getSourceText(e) != null
   }
 
   final override fun getChildren(e: AnActionEvent?): Array<AnAction> = textCasesAction

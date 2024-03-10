@@ -14,13 +14,13 @@
     </intentionAction>
   </extensions>
   <actions>
-    <action id="EncoderDecoderJavaLiteralActionGroup"
+    <group id="EncoderDecoderJavaLiteralActionGroup"
             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncoderDecoderJavaCodeActionGroup">
       <add-to-group group-id="DeveloperToolsGroup"/>
-    </action>
-    <action id="TextCaseConverterJavaLiteralActionGroup"
+    </group>
+    <group id="TextCaseConverterJavaLiteralActionGroup"
             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.TextCaseConverterJavaCodeActionGroup">
       <add-to-group group-id="DeveloperToolsGroup"/>
-    </action>
+    </group>
   </actions>
 </idea-plugin>

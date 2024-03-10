@@ -1,5 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -20,6 +21,13 @@ internal class DataGeneratorActionGroup : DefaultActionGroup("Insert Generated D
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   override fun getChildren(e: AnActionEvent?): Array<AnAction> = dataGeneratorActions
+
+  override fun update(e: AnActionEvent) {
+    val editor = e.getData(CommonDataKeys.EDITOR)
+    e.presentation.isVisible = editor != null && editor.document.isWritable
+  }
+
+  override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 

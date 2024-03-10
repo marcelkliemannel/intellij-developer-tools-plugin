@@ -21,7 +21,8 @@ internal open class EncoderDecoderActionGroup : DefaultActionGroup("Encoders/Dec
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   final override fun update(e: AnActionEvent) {
-    e.presentation.isVisible = getSourceText(e) != null
+    val editor = e.getData(EDITOR)
+    e.presentation.isVisible = editor != null && editor.document.isWritable && getSourceText(e) != null
   }
 
   final override fun getChildren(e: AnActionEvent?): Array<AnAction> = arrayOf(

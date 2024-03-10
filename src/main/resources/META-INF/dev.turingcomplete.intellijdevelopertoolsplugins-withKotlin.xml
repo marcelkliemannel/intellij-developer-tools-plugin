@@ -14,13 +14,13 @@
     </intentionAction>
   </extensions>
   <actions>
-    <action id="EncoderDecoderKotlinLiteralActionGroup"
-            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncoderDecoderKotlinCodeActionGroup">
+    <group id="EncoderDecoderKotlinLiteralActionGroup"
+           class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncoderDecoderKotlinCodeActionGroup">
       <add-to-group group-id="DeveloperToolsGroup"/>
-    </action>
-    <action id="TextCaseConverterKotlinLiteralActionGroup"
-            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.TextCaseConverterKotlinCodeActionGroup">
+    </group>
+    <group id="TextCaseConverterKotlinLiteralActionGroup"
+           class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.TextCaseConverterKotlinCodeActionGroup">
       <add-to-group group-id="DeveloperToolsGroup"/>
-    </action>
+    </group>
   </actions>
 </idea-plugin>

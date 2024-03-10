@@ -299,11 +299,7 @@
       <add-to-group group-id="RevealGroup" anchor="last"/>
     </action>
 
-    <group id="DeveloperToolsGroup"
-           text="Developer Tools"
-           popup="true"
-           icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg">
-
+    <group id="DeveloperToolsGroup" class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.DeveloperToolsActionGroup">
       <group id="DataGeneratorActionGroup"
              class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.DataGeneratorActionGroup"/>
 
