@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add automatic input text case detection to the text case converter 
+
 ### Changed
 
 ### Removed
