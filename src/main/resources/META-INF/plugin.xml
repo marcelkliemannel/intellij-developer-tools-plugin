@@ -251,6 +251,10 @@
             id="text-diff"
             groupId="text"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextDiffViewer$Factory"/>
+    <developerUiTool
+            id="text-statistic"
+            groupId="text"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextStatistic$Factory"/>
 
     <!-- root level -->
     <developerUiTool
@@ -308,6 +312,9 @@
 
       <group id="TextCaseConverterActionGroup"
              class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.TextCaseConverterActionGroup"/>
+
+      <action id="EditorTextStatisticAction"
+              class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EditorTextStatisticAction"/>
 
       <add-to-group group-id="EditorPopupMenu" anchor="last"/>
     </group>

@@ -5,6 +5,7 @@
 ### Added
 
 - Add automatic input text case detection to the text case converter 
+- Add new tool: Text Statistic
 
 ### Changed
 
