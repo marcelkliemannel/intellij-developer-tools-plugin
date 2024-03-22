@@ -7,7 +7,7 @@ plugins {
   java
   // See bundled version: https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
   kotlin("jvm") version "1.9.10"
-  id("org.jetbrains.intellij") version "1.16.1"
+  id("org.jetbrains.intellij") version "1.17.2"
   id("org.jetbrains.changelog") version "2.2.0"
 }
 
@@ -20,42 +20,42 @@ repositories {
 }
 
 dependencies {
-  implementation("com.fasterxml.uuid:java-uuid-generator:4.1.0") {
+  implementation("com.fasterxml.uuid:java-uuid-generator:5.0.0") {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
-  implementation("com.jayway.jsonpath:json-path:2.8.0") {
+  implementation("com.jayway.jsonpath:json-path:2.9.0") {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
   implementation("com.auth0:java-jwt:4.3.0")
-  val jacksonVersion = "2.15.0"
+  val jacksonVersion = "2.17.0"
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-properties:$jacksonVersion")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:$jacksonVersion")
-  implementation("com.github.tony19:named-regexp:0.2.8")
+  implementation("com.github.tony19:named-regexp:1.0.0")
   implementation("org.apache.commons:commons-text:1.10.0")
   implementation("commons-codec:commons-codec:1.15")
   val textCaseConverterVersion = "1.1.0"
   implementation("dev.turingcomplete:text-case-converter:$textCaseConverterVersion")
   implementation("dev.turingcomplete:text-case-converter-kotlin-extension:$textCaseConverterVersion")
-  implementation("com.github.vertical-blank:sql-formatter:2.0.3")
+  implementation("com.github.vertical-blank:sql-formatter:2.0.4")
   implementation(kotlin("stdlib"))
-  implementation("com.networknt:json-schema-validator:1.0.79") {
+  implementation("com.networknt:json-schema-validator:1.4.0") {
     exclude("org.apache.commons", "commons-lang3")
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
   implementation("org.apache.commons:commons-compress:1.26.0")
-  val zxing = "3.5.1"
+  val zxing = "3.5.3"
   implementation("com.google.zxing:core:$zxing")
   implementation("com.google.zxing:javase:$zxing")
   implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
   implementation("com.github.f4b6a3:ulid-creator:5.2.3")
   implementation("org.silentsoft:csscolor4j:1.0.0")
 
-  testImplementation("org.assertj:assertj-core:3.24.2")
+  testImplementation("org.assertj:assertj-core:3.25.3")
   testImplementation("org.xmlunit:xmlunit-assertj:2.9.1")
-  testImplementation("org.skyscreamer:jsonassert:1.5.0")
-  val junitVersion = "5.10.0"
+  testImplementation("org.skyscreamer:jsonassert:1.5.1")
+  val junitVersion = "5.10.2"
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
   testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")

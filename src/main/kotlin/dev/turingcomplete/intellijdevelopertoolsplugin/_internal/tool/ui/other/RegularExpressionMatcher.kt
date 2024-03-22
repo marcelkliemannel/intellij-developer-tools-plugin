@@ -183,7 +183,7 @@ class RegularExpressionMatcher(
       val pattern = Pattern.compile(regex, selectedRegexOptionFlag.get())
       val matcher = pattern.matcher(inputEditor.text)
 
-      val namedGroups = matcher.namedGroups()
+      val namedGroups = matcher.namedGroupsList()
       val results = mutableListOf<List<Any>>()
       var i = 0
       while (matcher.find()) {
