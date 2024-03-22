@@ -38,7 +38,7 @@ dependencies {
   implementation("com.github.tony19:named-regexp:1.0.0")
   implementation("org.apache.commons:commons-text:1.10.0")
   implementation("commons-codec:commons-codec:1.15")
-  val textCaseConverterVersion = "1.1.0"
+  val textCaseConverterVersion = "2.0.0"
   implementation("dev.turingcomplete:text-case-converter:$textCaseConverterVersion")
   implementation("dev.turingcomplete:text-case-converter-kotlin-extension:$textCaseConverterVersion")
   implementation("com.github.vertical-blank:sql-formatter:2.0.4")

@@ -6,6 +6,7 @@
 
 - Add automatic input text case detection to the text case converter 
 - Add new tool: Text Statistic
+- Add support for dot text case
 
 ### Changed
 

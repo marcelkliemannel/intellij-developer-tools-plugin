@@ -132,7 +132,8 @@ class TextCaseTransformer(
     LOWER_CASE(StandardTextCases.LOWER_CASE),
     UPPER_CASE(StandardTextCases.UPPER_CASE),
     INVERTED_CASE(StandardTextCases.INVERTED_CASE),
-    ALTERNATING_CASE(StandardTextCases.ALTERNATING_CASE);
+    ALTERNATING_CASE(StandardTextCases.ALTERNATING_CASE),
+    DOT_CASE(StandardTextCases.DOT_CASE);
 
     override fun toString(): String = "${textCase.title()} (${textCase.example()})"
   }
