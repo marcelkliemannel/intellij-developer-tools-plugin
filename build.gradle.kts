@@ -9,6 +9,7 @@ plugins {
   kotlin("jvm") version "1.9.10"
   id("org.jetbrains.intellij") version "1.17.2"
   id("org.jetbrains.changelog") version "2.2.0"
+  id("com.autonomousapps.dependency-analysis") version "1.30.0"
 }
 
 group = properties("pluginGroup")
@@ -28,6 +29,8 @@ dependencies {
   }
   implementation("com.auth0:java-jwt:4.3.0")
   val jacksonVersion = "2.17.0"
+  implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
+  implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
   implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-properties:$jacksonVersion")
@@ -51,10 +54,9 @@ dependencies {
   implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
   implementation("com.github.f4b6a3:ulid-creator:5.2.3")
   implementation("org.silentsoft:csscolor4j:1.0.0")
+  implementation("commons-io:commons-io:2.15.1")
 
   testImplementation("org.assertj:assertj-core:3.25.3")
-  testImplementation("org.xmlunit:xmlunit-assertj:2.9.1")
-  testImplementation("org.skyscreamer:jsonassert:1.5.1")
   val junitVersion = "5.10.2"
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
   testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
@@ -95,6 +97,19 @@ sourceSets {
   }
 }
 
+dependencyAnalysis {
+  issues {
+    all {
+      onUsedTransitiveDependencies {
+        severity("fail")
+      }
+      onUnusedDependencies {
+        severity("fail")
+      }
+    }
+  }
+}
+
 tasks {
   patchPluginXml {
     version.set(properties("pluginVersion"))
@@ -130,5 +145,9 @@ tasks {
 
   withType<Test> {
     useJUnitPlatform()
+  }
+
+  named("check") {
+    dependsOn("buildHealth")
   }
 }

@@ -1172,7 +1172,7 @@ internal class Unarchiver(
 
     fun iterateEntries(visitor: (ArchiveEntry, () -> InputStream) -> Boolean) {
       if (archiveFilePath.fileName.extension == "7z") {
-        val sevenZFile = SevenZFile(archiveFilePath.toFile())
+        val sevenZFile = SevenZFile.Builder().setFile(archiveFilePath.toFile()).get()
         var archiveEntry = sevenZFile.nextEntry
         while (archiveEntry != null) {
           if (!visitor(archiveEntry) { sevenZFile.getInputStream(archiveEntry) }) {
