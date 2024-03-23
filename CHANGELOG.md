@@ -7,7 +7,8 @@
 - Add automatic input text case detection to the text case converter 
 - Add new tool: Text Statistic
 - Add support for the "Dot Text Case"
-- Encoding in the editor now also supports commons hashing algorithms
+- Add common hashing algorithms to the editor encoding action
+- Add common SHA3 algorithms to the random data generator editor action
 
 ### Changed
 

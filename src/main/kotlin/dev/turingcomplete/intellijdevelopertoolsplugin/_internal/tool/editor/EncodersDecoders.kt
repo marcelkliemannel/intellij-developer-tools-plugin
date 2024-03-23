@@ -7,12 +7,10 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.TextRange
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.executeWriteCommand
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toHexString
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toMessageDigest
 import org.apache.commons.codec.binary.Base32
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.security.Security
 import java.util.*
 
 internal object EncodersDecoders {
@@ -41,24 +39,8 @@ internal object EncodersDecoders {
       Encoder("URL Encoding", { URLEncoder.encode(it, StandardCharsets.UTF_8) }),
     )
 
-    val availableAlgorithms = Security.getAlgorithms("MessageDigest")
-    if (availableAlgorithms.contains("MD5")) {
-      encoders.add(Encoder("MD5", { "MD5".toMessageDigest().digest(it.encodeToByteArray()).toHexString() }))
-    }
-    if (availableAlgorithms.contains("SHA-1")) {
-      encoders.add(Encoder("SHA-1", { "SHA-1".toMessageDigest().digest(it.encodeToByteArray()).toHexString() }))
-    }
-    if (availableAlgorithms.contains("SHA-256")) {
-      encoders.add(Encoder("SHA-256", { "SHA-256".toMessageDigest().digest(it.encodeToByteArray()).toHexString() }))
-    }
-    if (availableAlgorithms.contains("SHA-512")) {
-      encoders.add(Encoder("SHA-512", { "SHA-512".toMessageDigest().digest(it.encodeToByteArray()).toHexString() }))
-    }
-    if (availableAlgorithms.contains("SHA3-256")) {
-      encoders.add(Encoder("SHA3-256", { "SHA3-256".toMessageDigest().digest(it.encodeToByteArray()).toHexString() }))
-    }
-    if (availableAlgorithms.contains("SHA3-512")) {
-      encoders.add(Encoder("SHA3-512", { "SHA3-512".toMessageDigest().digest(it.encodeToByteArray()).toHexString() }))
+    HashingUtils.commonHashingAlgorithms.forEach { messageDigest ->
+      encoders.add(Encoder(messageDigest.algorithm, { messageDigest.digest(it.encodeToByteArray()).toHexString() }))
     }
 
     this.encoders = encoders
