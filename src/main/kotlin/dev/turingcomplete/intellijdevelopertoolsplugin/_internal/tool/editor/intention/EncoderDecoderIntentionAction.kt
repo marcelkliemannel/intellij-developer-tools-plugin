@@ -10,10 +10,12 @@ import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.EncoderDecoder
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.TransformationMode
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.encoderDecoders
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.executeTransformationInEditor
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.Decoder
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.Encoder
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.decoders
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.encoders
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.executeDecodingInEditor
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.executeEncodingInEditor
 
 internal abstract class EncoderDecoderIntentionAction : IntentionAction, LowPriorityAction {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -36,7 +38,7 @@ internal abstract class EncoderDecoderIntentionAction : IntentionAction, LowPrio
 
     ApplicationManager.getApplication().invokeLater {
       JBPopupFactory.getInstance()
-        .createListPopup(EncodeDecodersModeSelectionListPopupStep(text, textRange, editor, encoderDecoders))
+        .createListPopup(EncodeDecodersModeSelectionListPopupStep(text, textRange, editor))
         .showInBestPositionFor(editor)
     }
   }
@@ -47,35 +49,63 @@ internal abstract class EncoderDecoderIntentionAction : IntentionAction, LowPrio
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class EncodeDecodersModeSelectionListPopupStep(
-    private val text: String,
-    private val textRange: TextRange,
-    private val editor: Editor,
-    private val encoderDecoders: List<EncoderDecoder>
-  ) : BaseListPopupStep<TransformationMode>(null, TransformationMode.entries) {
+    text: String,
+    textRange: TextRange,
+    editor: Editor
+  ) : BaseListPopupStep<EncoderDecoderListPopupStep<*>>(
+    null,
+    EncoderListPopupStep(text, textRange, editor),
+    DecoderListPopupStep(text, textRange, editor)
+  ) {
 
-    override fun hasSubstep(transformationMode: TransformationMode): Boolean = true
+    override fun hasSubstep(baseListPopupStep: EncoderDecoderListPopupStep<*>): Boolean = true
 
-    override fun getTextFor(transformationMode: TransformationMode): String = transformationMode.actionName
+    override fun getTextFor(baseListPopupStep: EncoderDecoderListPopupStep<*>): String = baseListPopupStep.actionName
 
-    override fun onChosen(transformationMode: TransformationMode, finalChoice: Boolean): PopupStep<*> =
-      EncodeDecodersListPopupStep(text, textRange, editor, transformationMode, encoderDecoders)
+    override fun onChosen(baseListPopupStep: EncoderDecoderListPopupStep<*>, finalChoice: Boolean): PopupStep<*> =
+      baseListPopupStep
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class EncodeDecodersListPopupStep(
+  interface EncoderDecoderListPopupStep<T> : PopupStep<T> {
+
+    val actionName: String
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class EncoderListPopupStep(
     private val text: String,
     private val textRange: TextRange,
-    private val editor: Editor,
-    private val transformationMode: TransformationMode,
-    encoderDecoders: List<EncoderDecoder>
-  ) : BaseListPopupStep<EncoderDecoder>(null, encoderDecoders) {
+    private val editor: Editor
+  ) : BaseListPopupStep<Encoder>(null, encoders), EncoderDecoderListPopupStep<Encoder> {
 
-    override fun getTextFor(encoderDecoder: EncoderDecoder): String = encoderDecoder.title
+    override val actionName: String = "Encode To"
 
-    override fun onChosen(encoderDecoder: EncoderDecoder, finalChoice: Boolean): PopupStep<*>? {
-      executeTransformationInEditor(text, textRange, transformationMode, encoderDecoder, editor)
-      return super.onChosen(encoderDecoder, finalChoice)
+    override fun getTextFor(encoder: Encoder): String = encoder.title
+
+    override fun onChosen(encoder: Encoder, finalChoice: Boolean): PopupStep<*>? {
+      executeEncodingInEditor(text, textRange, encoder, editor)
+      return super.onChosen(encoder, finalChoice)
+    }
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class DecoderListPopupStep(
+    private val text: String,
+    private val textRange: TextRange,
+    private val editor: Editor
+  ) : BaseListPopupStep<Decoder>(null, decoders), EncoderDecoderListPopupStep<Decoder> {
+
+    override val actionName: String = "Decode From"
+
+    override fun getTextFor(decoder: Decoder): String = decoder.title
+
+    override fun onChosen(decoder: Decoder, finalChoice: Boolean): PopupStep<*>? {
+      executeDecodingInEditor(text, textRange, decoder, editor)
+      return super.onChosen(decoder, finalChoice)
     }
   }
 
