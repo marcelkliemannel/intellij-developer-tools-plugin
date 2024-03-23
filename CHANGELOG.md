@@ -15,6 +15,8 @@
 
 ### Fixed
 
+- Editor actions on Java Strings will now preserve the outer String quotations
+
 ## 4.0.0 - 2024-03-10
 
 ### Added

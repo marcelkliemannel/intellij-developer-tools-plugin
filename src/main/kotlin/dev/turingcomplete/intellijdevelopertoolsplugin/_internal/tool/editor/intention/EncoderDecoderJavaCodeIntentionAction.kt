@@ -20,7 +20,7 @@ internal class EncoderDecoderJavaCodeIntentionAction : EncoderDecoderIntentionAc
 
   override fun getSourceText(editor: Editor, file: PsiFile): Pair<String, TextRange>? {
     val psiElement = file.findElementAt(editor.caretModel.offset) ?: return null
-    return PsiJavaUtils.getTextIfStringValueOrIdentifier(psiElement)?.let { it to psiElement.textRange }
+    return PsiJavaUtils.getTextIfStringValueOrIdentifier(psiElement)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
