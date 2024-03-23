@@ -12,8 +12,8 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.Decoder
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.Encoder
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.decoders
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.encoders
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.commonDecoders
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.commonEncoders
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.executeDecodingInEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.executeEncodingInEditor
 
@@ -79,7 +79,7 @@ internal abstract class EncoderDecoderIntentionAction : IntentionAction, LowPrio
     private val text: String,
     private val textRange: TextRange,
     private val editor: Editor
-  ) : BaseListPopupStep<Encoder>(null, encoders), EncoderDecoderListPopupStep<Encoder> {
+  ) : BaseListPopupStep<Encoder>(null, commonEncoders), EncoderDecoderListPopupStep<Encoder> {
 
     override val actionName: String = "Encode To"
 
@@ -97,7 +97,7 @@ internal abstract class EncoderDecoderIntentionAction : IntentionAction, LowPrio
     private val text: String,
     private val textRange: TextRange,
     private val editor: Editor
-  ) : BaseListPopupStep<Decoder>(null, decoders), EncoderDecoderListPopupStep<Decoder> {
+  ) : BaseListPopupStep<Decoder>(null, commonDecoders), EncoderDecoderListPopupStep<Decoder> {
 
     override val actionName: String = "Decode From"
 

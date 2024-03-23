@@ -18,9 +18,9 @@ internal object EncodersDecoders {
 
   private val log = logger<EncodersDecoders>()
 
-  val encoders: List<Encoder>
+  val commonEncoders: List<Encoder>
 
-  val decoders = listOf(
+  val commonDecoders = listOf(
     Decoder("Base32", { Base32().decode(it).decodeToString() }),
     Decoder("Base64", { Base64.getDecoder().decode(it).decodeToString() }),
     Decoder("MIME Base64", { Base64.getMimeDecoder().decode(it).decodeToString() }),
@@ -31,7 +31,7 @@ internal object EncodersDecoders {
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
   init {
-    val encoders = mutableListOf(
+    val commonEncoders = mutableListOf(
       Encoder("Base32", { Base32().encodeToString(it.encodeToByteArray()) }),
       Encoder("Base64", { Base64.getEncoder().encodeToString(it.encodeToByteArray()) }),
       Encoder("MIME Base64", { Base64.getMimeEncoder().encodeToString(it.encodeToByteArray()) }),
@@ -40,10 +40,10 @@ internal object EncodersDecoders {
     )
 
     HashingUtils.commonHashingAlgorithms.forEach { messageDigest ->
-      encoders.add(Encoder(messageDigest.algorithm, { messageDigest.digest(it.encodeToByteArray()).toHexString() }))
+      commonEncoders.add(Encoder(messageDigest.algorithm, { messageDigest.digest(it.encodeToByteArray()).toHexString() }))
     }
 
-    this.encoders = encoders
+    this.commonEncoders = commonEncoders
   }
 
   // -- Exported Methods -------------------------------------------------------------------------------------------- //

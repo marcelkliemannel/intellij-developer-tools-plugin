@@ -9,20 +9,35 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.TextRange
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.getSelectedText
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.Encoder
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.executeDecodingInEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.executeEncodingInEditor
 
 internal open class EncoderDecoderActionGroup : DefaultActionGroup("Encoders/Decoders", false) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val encoderActionGroup = createActionGroup(
-    title = "Encode To",
-    actions = EncodersDecoders.encoders.map { encoder -> EncoderAction(encoder) { getSourceText(it) } }
-  )
-  private val decoderActionGroup = createActionGroup(
-    title = "Decode To",
-    actions = EncodersDecoders.decoders.map { decoder -> DecoderAction(decoder) { getSourceText(it) } }
-  )
+  private val encoderActionGroup by lazy {
+    createActionGroup(
+      title = "Encode To",
+      actions = EncodersDecoders.commonEncoders.map { encoder ->
+        EncoderAction(encoder) { getSourceText(it) }
+      }
+    )
+  }
+  private val decoderActionGroup by lazy {
+    createActionGroup(
+      title = "Decode To",
+      actions = EncodersDecoders.commonDecoders.map { decoder ->
+        DecoderAction(decoder) { getSourceText(it) }
+      }
+    )
+  }
+  private val encoderDecoderActions: Array<AnAction> by lazy {
+    arrayOf(
+      encoderActionGroup,
+      decoderActionGroup
+    )
+  }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -31,11 +46,6 @@ internal open class EncoderDecoderActionGroup : DefaultActionGroup("Encoders/Dec
     val editor = e.getData(EDITOR)
     e.presentation.isVisible = editor != null && editor.document.isWritable && getSourceText(e) != null
   }
-
-  private val encoderDecoderActions: Array<AnAction> = arrayOf(
-    encoderActionGroup,
-    decoderActionGroup
-  )
 
   final override fun getChildren(e: AnActionEvent?): Array<AnAction> = encoderDecoderActions
 
@@ -58,7 +68,7 @@ internal open class EncoderDecoderActionGroup : DefaultActionGroup("Encoders/Dec
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class EncoderAction(
-    val encoder: EncodersDecoders.Encoder,
+    val encoder: Encoder,
     val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?
   ) : DumbAwareAction(encoder.title, encoder.actionName, null) {
 
