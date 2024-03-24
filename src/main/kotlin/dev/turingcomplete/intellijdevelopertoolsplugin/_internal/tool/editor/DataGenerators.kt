@@ -4,7 +4,6 @@ import com.aventrix.jnanoid.jnanoid.NanoIdUtils
 import com.fasterxml.uuid.Generators
 import com.github.f4b6a3.ulid.UlidCreator
 import org.jetbrains.annotations.Nls
-import java.security.MessageDigest
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -31,10 +30,8 @@ internal object DataGenerators {
 
 
   private fun createRandomHashGenerators(): List<DataGenerator> =
-    listOf("MD5", "SHA-1", "SHA-256", "SHA-512").map { algorithm ->
-      object : DataGenerator(algorithm, "Generate random $algorithm") {
-
-        private val messageDigest = MessageDigest.getInstance(algorithm)
+    HashingUtils.commonHashingAlgorithms.map { messageDigest ->
+      object : DataGenerator(messageDigest.algorithm, "Generate random ${messageDigest.algorithm}") {
 
         @OptIn(ExperimentalStdlibApi::class)
         override fun generate(): String =

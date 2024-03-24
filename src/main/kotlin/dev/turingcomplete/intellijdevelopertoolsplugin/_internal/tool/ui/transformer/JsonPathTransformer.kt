@@ -17,6 +17,7 @@ import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.psi.PsiManager
 import com.intellij.testFramework.LightVirtualFile
+import com.intellij.ui.JBColor
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBLabel
@@ -161,6 +162,7 @@ class JsonPathTransformer(
         .createBalloonBuilder(ScrollPaneFactory.createScrollPane(operatorsHelpPanel, true))
         .setDialogMode(true)
         .setFillColor(UIUtil.getPanelBackground())
+        .setBorderColor(JBColor.border())
         .setBlockClicksThroughBalloon(true)
         .setRequestFocus(true)
         .createBalloon()

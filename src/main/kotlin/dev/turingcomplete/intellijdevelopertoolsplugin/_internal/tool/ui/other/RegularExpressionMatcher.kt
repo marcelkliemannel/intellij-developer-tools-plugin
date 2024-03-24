@@ -183,7 +183,7 @@ class RegularExpressionMatcher(
       val pattern = Pattern.compile(regex, selectedRegexOptionFlag.get())
       val matcher = pattern.matcher(inputEditor.text)
 
-      val namedGroups = matcher.namedGroups()
+      val namedGroups = matcher.namedGroupsList()
       val results = mutableListOf<List<Any>>()
       var i = 0
       while (matcher.find()) {
@@ -219,7 +219,7 @@ class RegularExpressionMatcher(
 
       init {
         text = regexText.get()
-        font = JBFont.create(font, false).biggerOn(1.6f)
+        font = JBFont.create(font, false).biggerOn(1.4f)
 
         addDocumentListener(object : DocumentListener {
           override fun documentChanged(event: DocumentEvent) {

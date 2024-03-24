@@ -147,6 +147,9 @@ internal class ToolsMenuTree(
           onSuccess()
         }
       }
+      else {
+        throw IllegalStateException("Can't find developer tool with ID: $developerToolId")
+      }
     }
   }
 

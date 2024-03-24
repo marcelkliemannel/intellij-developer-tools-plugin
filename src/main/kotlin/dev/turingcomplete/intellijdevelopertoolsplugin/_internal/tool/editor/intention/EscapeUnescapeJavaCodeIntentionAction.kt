@@ -9,18 +9,18 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.Psi
  * Some code parts of this class are only available of the optional dependency
  * `com.intellij.java` is available.
  */
-internal class EncoderDecoderJavaCodeIntentionAction : EncoderDecoderIntentionAction() {
+internal class EscapeUnescapeJavaCodeIntentionAction : EscapeUnescapeIntentionAction() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
-  override fun getFamilyName(): String = "Encode or decode Java string or identifier"
+  override fun getFamilyName(): String = "Escape or unescape Java string"
 
-  override fun getText(): String = "Encode or decode"
+  override fun getText(): String = "Escape or unescape"
 
   override fun getSourceText(editor: Editor, file: PsiFile): Pair<String, TextRange>? {
     val psiElement = file.findElementAt(editor.caretModel.offset) ?: return null
-    return PsiJavaUtils.getTextIfStringValueOrIdentifier(psiElement)?.let { it to psiElement.textRange }
+    return PsiJavaUtils.getTextIfStringValue(psiElement)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //

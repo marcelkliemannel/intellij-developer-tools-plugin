@@ -1,24 +1,22 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action
 
-import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.ui.IconManager
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.util.TextRange
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.PsiJavaUtils
 
-internal class DeveloperToolsActionGroup : DefaultActionGroup("Developer Tools", true) {
+/**
+ * Some code parts of this class are only available of the optional dependency
+ * `com.intellij.java` is available.
+ */
+internal class EncodeDecodeJavaCodeActionGroup : EncodeDecodeActionGroup() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
-
-  init {
-    templatePresentation.icon = icon
-    templatePresentation.isHideGroupIfEmpty = true
-  }
-
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
+
+  override fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? =
+    PsiJavaUtils.getPsiElementAtCaret(e)?.let { PsiJavaUtils.getTextIfStringValueOrIdentifier(it) }
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //
-
-  companion object {
-
-    private val icon = IconManager.getInstance().getIcon("dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg", DeveloperToolsActionGroup::class.java.classLoader)
-  }
 }

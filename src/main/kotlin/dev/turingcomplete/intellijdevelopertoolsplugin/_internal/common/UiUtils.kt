@@ -16,6 +16,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.util.PopupUtil
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.popup.PopupState
+import com.intellij.util.ui.ColumnInfo
 import java.awt.event.InputEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -125,6 +126,15 @@ object UiUtils {
       }
     }
   }
+
+  fun <T> simpleColumnInfo(name: String, displayValue: (T) -> String, sortValue: (T) -> Comparable<*>) =
+    object : ColumnInfo<T, String>(name) {
+
+      override fun valueOf(item: T): String = displayValue(item)
+
+      override fun getComparator(): Comparator<T> = compareBy { sortValue(it) }
+    }
+
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

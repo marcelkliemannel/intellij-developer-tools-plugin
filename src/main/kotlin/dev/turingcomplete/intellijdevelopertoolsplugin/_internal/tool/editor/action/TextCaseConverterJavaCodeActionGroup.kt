@@ -14,7 +14,7 @@ internal class TextCaseConverterJavaCodeActionGroup : TextCaseConverterActionGro
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   override fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? =
-    PsiJavaUtils.getTextFromStringValueOrIdentifier(e)
+    PsiJavaUtils.getPsiElementAtCaret(e)?.let { PsiJavaUtils.getTextIfStringValueOrIdentifier(it) }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

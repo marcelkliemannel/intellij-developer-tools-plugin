@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.TextRange
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.executeWriteCommand
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toHexString
 import org.apache.commons.codec.binary.Base32
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -17,57 +18,72 @@ internal object EncodersDecoders {
 
   private val log = logger<EncodersDecoders>()
 
-  val encoderDecoders = listOf(
-    EncoderDecoder(
-      "Base32",
-      { Base32().encodeToString(it.encodeToByteArray()) },
-      { Base32().decode(it).decodeToString() }
-    ),
-    EncoderDecoder(
-      "Base64",
-      { Base64.getEncoder().encodeToString(it.encodeToByteArray()) },
-      { Base64.getDecoder().decode(it).decodeToString() }
-    ),
-    EncoderDecoder(
-      "MIME Base64",
-      { Base64.getMimeEncoder().encodeToString(it.encodeToByteArray()) },
-      { Base64.getMimeDecoder().decode(it).decodeToString() }
-    ),
-    EncoderDecoder(
-      "URL Base64",
-      { Base64.getUrlEncoder().encodeToString(it.encodeToByteArray()) },
-      { Base64.getUrlDecoder().decode(it).decodeToString() }
-    ),
-    EncoderDecoder(
-      "URL Encoding",
-      { URLEncoder.encode(it, StandardCharsets.UTF_8) },
-      { URLDecoder.decode(it, StandardCharsets.UTF_8) }
-    )
+  val commonEncoders: List<Encoder>
+
+  val commonDecoders = listOf(
+    Decoder("Base32", { Base32().decode(it).decodeToString() }),
+    Decoder("Base64", { Base64.getDecoder().decode(it).decodeToString() }),
+    Decoder("MIME Base64", { Base64.getMimeDecoder().decode(it).decodeToString() }),
+    Decoder("URL Base64", { Base64.getUrlDecoder().decode(it).decodeToString() }),
+    Decoder("URL Encoding", { URLDecoder.decode(it, StandardCharsets.UTF_8) })
   )
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
+
+  init {
+    val commonEncoders = mutableListOf(
+      Encoder("Base32", { Base32().encodeToString(it.encodeToByteArray()) }),
+      Encoder("Base64", { Base64.getEncoder().encodeToString(it.encodeToByteArray()) }),
+      Encoder("MIME Base64", { Base64.getMimeEncoder().encodeToString(it.encodeToByteArray()) }),
+      Encoder("URL Base64", { Base64.getUrlEncoder().encodeToString(it.encodeToByteArray()) }),
+      Encoder("URL Encoding", { URLEncoder.encode(it, StandardCharsets.UTF_8) }),
+    )
+
+    HashingUtils.commonHashingAlgorithms.forEach { messageDigest ->
+      commonEncoders.add(Encoder(messageDigest.algorithm, { messageDigest.digest(it.encodeToByteArray()).toHexString() }))
+    }
+
+    this.commonEncoders = commonEncoders
+  }
+
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
-  fun executeTransformationInEditor(
+  fun executeEncodingInEditor(
     text: String,
     textRange: TextRange,
-    transformationMode: TransformationMode,
-    encoderDecoder: EncoderDecoder,
+    encoder: Encoder,
     editor: Editor
   ) {
     try {
-      val (result, actionName) = when (transformationMode) {
-        TransformationMode.ENCODE -> encoderDecoder.encode(text) to "Encode to ${encoderDecoder.title}"
-        TransformationMode.DECODE -> encoderDecoder.decode(text) to "Decode from ${encoderDecoder.title}"
-      }
-      editor.executeWriteCommand(actionName) {
+      val result = encoder.encode(text)
+      editor.executeWriteCommand(encoder.actionName) {
         it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
       }
     }
     catch (e: Exception) {
-      log.warn("Encoding/Decoding failed", e)
+      log.warn("Encoding failed", e)
       ApplicationManager.getApplication().invokeLater {
-        Messages.showErrorDialog(editor.project, "Encoding/Decoding failed: ${e.message}", "Encode/Decode")
+        Messages.showErrorDialog(editor.project, "Encoding failed: ${e.message}", encoder.actionName)
+      }
+    }
+  }
+
+  fun executeDecodingInEditor(
+    text: String,
+    textRange: TextRange,
+    decoder: Decoder,
+    editor: Editor
+  ) {
+    try {
+      val result = decoder.decode(text)
+      editor.executeWriteCommand(decoder.actionName) {
+        it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+      }
+    }
+    catch (e: Exception) {
+      log.warn("Decoding failed", e)
+      ApplicationManager.getApplication().invokeLater {
+        Messages.showErrorDialog(editor.project, "Decoding failed: ${e.message}", decoder.actionName)
       }
     }
   }
@@ -75,13 +91,9 @@ internal object EncodersDecoders {
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  class EncoderDecoder(val title: String, val encode: (String) -> String, val decode: (String) -> String)
+  class Encoder(val title: String, val encode: (String) -> String, val actionName: String = "Encode to $title")
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  enum class TransformationMode(val actionName: String) {
-
-    ENCODE("Encode To"),
-    DECODE("Decode From")
-  }
+  class Decoder(val title: String, val decode: (String) -> String, val actionName: String = "Decode from $title")
 }

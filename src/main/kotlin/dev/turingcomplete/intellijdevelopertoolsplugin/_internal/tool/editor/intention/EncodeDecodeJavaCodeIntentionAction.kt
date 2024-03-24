@@ -1,20 +1,27 @@
-package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action
+package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention
 
-import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.PsiKotlinUtils
+import com.intellij.psi.PsiFile
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.PsiJavaUtils
 
 /**
  * Some code parts of this class are only available of the optional dependency
- * `org.jetbrains.kotlin` is available.
+ * `com.intellij.java` is available.
  */
-internal class EncoderDecoderKotlinCodeActionGroup : EncoderDecoderActionGroup() {
+internal class EncodeDecodeJavaCodeIntentionAction : EncodeDecodeIntentionAction() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
-  override fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? =
-    PsiKotlinUtils.getTextFromStringValueOrIdentifier(e)
+  override fun getFamilyName(): String = "Encode or decode Java string or identifier"
+
+  override fun getText(): String = "Encode or decode"
+
+  override fun getSourceText(editor: Editor, file: PsiFile): Pair<String, TextRange>? {
+    val psiElement = file.findElementAt(editor.caretModel.offset) ?: return null
+    return PsiJavaUtils.getTextIfStringValueOrIdentifier(psiElement)
+  }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

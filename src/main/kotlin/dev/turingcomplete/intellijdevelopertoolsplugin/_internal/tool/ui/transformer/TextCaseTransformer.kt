@@ -12,6 +12,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.bind
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.TextCaseUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.AUTOMATIC_DETECTION
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.FIXED_TEXT_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.INDIVIDUAL_DELIMITER
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextCaseTransformer.TextCase.COBOL_CASE
@@ -44,7 +46,7 @@ class TextCaseTransformer(
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var originalParsingMode = configuration.register("originalParsingMode", FIXED_TEXT_CASE)
+  private var originalParsingMode = configuration.register("originalParsingMode", AUTOMATIC_DETECTION)
   private var individualDelimiter = configuration.register("individualDelimiter", " ")
   private var inputTextCase = configuration.register("inputTextCase", STRICT_CAMEL_CASE)
   private var outputTextCase = configuration.register("outputTextCase", COBOL_CASE)
@@ -59,11 +61,17 @@ class TextCaseTransformer(
   override fun Panel.buildMiddleConfigurationUi() {
     buttonsGroup("Original:") {
       row {
-        radioButton("Fixed text case:")
+        radioButton("Automatic detection")
+          .bind(originalParsingMode, AUTOMATIC_DETECTION)
+      }
+
+      row {
+        val fixedTextCaseRadioButton = radioButton("Fixed text case:")
           .bind(originalParsingMode, FIXED_TEXT_CASE)
           .gap(RightGap.SMALL)
         comboBox(TextCase.entries)
           .bindItem(inputTextCase)
+          .enabledIf(fixedTextCaseRadioButton.selected).component
       }
 
       row {
@@ -102,6 +110,7 @@ class TextCaseTransformer(
 
   private fun getInputWordsSplitter() =
     when (originalParsingMode.get()) {
+      AUTOMATIC_DETECTION -> TextCaseUtils.determineWordsSplitter(sourceText.get(), inputTextCase.get().textCase)
       FIXED_TEXT_CASE -> inputTextCase.get().textCase.wordsSplitter()
       INDIVIDUAL_DELIMITER -> individualDelimiter.get().toWordsSplitter()
     }
@@ -110,20 +119,21 @@ class TextCaseTransformer(
 
   private enum class TextCase(val textCase: StandardTextCase) {
 
-    STRICT_CAMEL_CASE(StandardTextCases.STRICT_CAMEL_CASE),
+    SCREAMING_SNAKE_CASE(StandardTextCases.SCREAMING_SNAKE_CASE),
     SOFT_CAMEL_CASE(StandardTextCases.SOFT_CAMEL_CASE),
-    KEBAB_CASE(StandardTextCases.KEBAB_CASE),
+    STRICT_CAMEL_CASE(StandardTextCases.STRICT_CAMEL_CASE),
+    PASCAL_CASE(StandardTextCases.PASCAL_CASE),
     SNAKE_CASE(StandardTextCases.SNAKE_CASE),
+    KEBAB_CASE(StandardTextCases.KEBAB_CASE),
     TRAIN_CASE(StandardTextCases.TRAIN_CASE),
     COBOL_CASE(StandardTextCases.COBOL_CASE),
-    SCREAMING_SNAKE_CASE(StandardTextCases.SCREAMING_SNAKE_CASE),
-    PASCAL_CASE(StandardTextCases.PASCAL_CASE),
     PASCAL_SNAKE_CASE(StandardTextCases.PASCAL_SNAKE_CASE),
     CAMEL_SNAKE_CASE(StandardTextCases.CAMEL_SNAKE_CASE),
     LOWER_CASE(StandardTextCases.LOWER_CASE),
     UPPER_CASE(StandardTextCases.UPPER_CASE),
     INVERTED_CASE(StandardTextCases.INVERTED_CASE),
-    ALTERNATING_CASE(StandardTextCases.ALTERNATING_CASE);
+    ALTERNATING_CASE(StandardTextCases.ALTERNATING_CASE),
+    DOT_CASE(StandardTextCases.DOT_CASE);
 
     override fun toString(): String = "${textCase.title()} (${textCase.example()})"
   }
@@ -132,6 +142,7 @@ class TextCaseTransformer(
 
   private enum class OriginalParsingMode {
 
+    AUTOMATIC_DETECTION,
     FIXED_TEXT_CASE,
     INDIVIDUAL_DELIMITER
   }

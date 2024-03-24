@@ -2,19 +2,19 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.ac
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.util.TextRange
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.PsiJavaUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.PsiKotlinUtils
 
 /**
  * Some code parts of this class are only available of the optional dependency
- * `com.intellij.java` is available.
+ * `org.jetbrains.kotlin` is available.
  */
-internal class EncoderDecoderJavaCodeActionGroup : EncoderDecoderActionGroup() {
+internal class EncodeDecodeKotlinCodeActionGroup : EncodeDecodeActionGroup() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   override fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? =
-    PsiJavaUtils.getTextFromStringValueOrIdentifier(e)
+    PsiKotlinUtils.getTextFromStringValueOrIdentifier(e)
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

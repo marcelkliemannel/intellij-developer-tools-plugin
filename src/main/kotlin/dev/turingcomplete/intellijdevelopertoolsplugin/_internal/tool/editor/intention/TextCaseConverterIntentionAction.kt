@@ -11,8 +11,8 @@ import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.executeWriteCommand
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.TextCaseUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.TextCaseConverter.allTextCases
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.TextCaseConverter.determineWordsSplitter
 import dev.turingcomplete.textcaseconverter.TextCase
 
 internal abstract class TextCaseConverterIntentionAction : IntentionAction, LowPriorityAction {
@@ -53,7 +53,8 @@ internal abstract class TextCaseConverterIntentionAction : IntentionAction, LowP
     override fun getTextFor(textCase: TextCase): String = textCase.example()
 
     override fun onChosen(textCase: TextCase, finalChoice: Boolean): PopupStep<*>? {
-      val result = textCase.convert(text, determineWordsSplitter(text))
+      val wordsSplitter = TextCaseUtils.determineWordsSplitter(text, textCase)
+      val result = textCase.convert(text, wordsSplitter)
       editor.executeWriteCommand("Convert text case to ${textCase.title().lowercase()}") {
         it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
       }

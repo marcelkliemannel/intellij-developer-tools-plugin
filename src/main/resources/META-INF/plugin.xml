@@ -251,6 +251,10 @@
             id="text-diff"
             groupId="text"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextDiffViewer$Factory"/>
+    <developerUiTool
+            id="text-statistic"
+            groupId="text"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextStatistic$Factory"/>
 
     <!-- root level -->
     <developerUiTool
@@ -303,11 +307,17 @@
       <group id="DataGeneratorActionGroup"
              class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.DataGeneratorActionGroup"/>
 
-      <group id="EncoderDecoderActionGroup"
-             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncoderDecoderActionGroup"/>
-
       <group id="TextCaseConverterActionGroup"
              class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.TextCaseConverterActionGroup"/>
+
+      <group id="EncodeDecodeActionGroup"
+             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncodeDecodeActionGroup"/>
+
+      <group id="EscapeUnescapeActionGroup"
+             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EscapeUnescapeActionGroup"/>
+
+      <action id="EditorTextStatisticAction"
+              class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EditorTextStatisticAction"/>
 
       <add-to-group group-id="EditorPopupMenu" anchor="last"/>
     </group>

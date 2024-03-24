@@ -36,6 +36,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.PluginCommonDataKeys
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.simpleColumnInfo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.setContextMenu
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.uncheckedCastTo
 import org.jetbrains.kotlin.idea.util.application.executeOnPooledThread
@@ -237,17 +238,8 @@ class IntelliJInternals(
     private val log = logger<IntelliJInternals>()
 
     private val pluginOverviewTableColumns: Array<ColumnInfo<IdeaPluginDescriptor, String>> = arrayOf(
-      object : ColumnInfo<IdeaPluginDescriptor, String>("Name") {
-
-        override fun valueOf(item: IdeaPluginDescriptor): String = item.name
-
-        override fun getComparator(): Comparator<IdeaPluginDescriptor> = compareBy { it.name }
-      },
-      object : ColumnInfo<IdeaPluginDescriptor, String>("ID") {
-
-        override fun valueOf(item: IdeaPluginDescriptor): String = item.pluginId.idString
-
-        override fun getComparator(): Comparator<IdeaPluginDescriptor> = compareBy { it.pluginId.idString }
-      })
+      simpleColumnInfo("Name", { it.name }, { it.name }),
+      simpleColumnInfo("ID", { it.pluginId.idString }, { it.pluginId.idString })
+    )
   }
 }

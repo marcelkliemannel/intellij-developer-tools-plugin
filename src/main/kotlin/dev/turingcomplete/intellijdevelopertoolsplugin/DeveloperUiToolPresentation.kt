@@ -3,6 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.ui.JBColor
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
@@ -43,6 +44,7 @@ data class DeveloperUiToolPresentation(
       JBPopupFactory.getInstance().createBalloonBuilder(panel)
         .setDialogMode(true)
         .setFillColor(UIUtil.getPanelBackground())
+        .setBorderColor(JBColor.border())
         .setBlockClicksThroughBalloon(true)
         .setRequestFocus(true)
         .createBalloon()

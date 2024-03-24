@@ -8,14 +8,24 @@
     </intentionAction>
     <intentionAction>
       <language>JAVA</language>
-      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.EncoderDecoderJavaCodeIntentionAction</className>
+      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.EncodeDecodeJavaCodeIntentionAction</className>
+      <bundleName>messages.JavaBundle</bundleName>
+      <categoryKey>intention.category.declaration</categoryKey>
+    </intentionAction>
+    <intentionAction>
+      <language>JAVA</language>
+      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.EscapeUnescapeJavaCodeIntentionAction</className>
       <bundleName>messages.JavaBundle</bundleName>
       <categoryKey>intention.category.declaration</categoryKey>
     </intentionAction>
   </extensions>
   <actions>
     <group id="EncoderDecoderJavaLiteralActionGroup"
-            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncoderDecoderJavaCodeActionGroup">
+           class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncodeDecodeJavaCodeActionGroup">
+      <add-to-group group-id="DeveloperToolsGroup"/>
+    </group>
+    <group id="EscapeUnescapeJavaCodeActionGroup"
+           class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EscapeUnescapeJavaCodeActionGroup">
       <add-to-group group-id="DeveloperToolsGroup"/>
     </group>
     <group id="TextCaseConverterJavaLiteralActionGroup"

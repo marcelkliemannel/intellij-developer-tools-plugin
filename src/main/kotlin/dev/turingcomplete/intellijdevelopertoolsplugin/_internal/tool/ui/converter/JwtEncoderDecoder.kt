@@ -234,7 +234,7 @@ internal class JwtEncoderDecoder(
           .whenTextChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
           .validationInfo(jwt.signature.privateKeyErrorHolder.asValidation())
       }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.requiresPublicPrivateKey ?: false })
-    }
+    }.apply { expanded = false }
   }
 
   private fun Row.buildPayloadEditorUi() {
