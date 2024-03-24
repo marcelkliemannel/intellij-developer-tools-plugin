@@ -13,7 +13,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.Enc
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.executeDecodingInEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.executeEncodingInEditor
 
-internal open class EncoderDecoderActionGroup : DefaultActionGroup("Encoders/Decoders", false) {
+internal open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val encoderActionGroup by lazy {
@@ -26,7 +26,7 @@ internal open class EncoderDecoderActionGroup : DefaultActionGroup("Encoders/Dec
   }
   private val decoderActionGroup by lazy {
     createActionGroup(
-      title = "Decode To",
+      title = "Decode From",
       actions = EncodersDecoders.commonDecoders.map { decoder ->
         DecoderAction(decoder) { getSourceText(it) }
       }

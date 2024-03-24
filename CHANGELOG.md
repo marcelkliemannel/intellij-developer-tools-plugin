@@ -5,9 +5,10 @@
 ### Added
 
 - Add automatic input text case detection to the text case converter 
+- Add escape/unescape as editor actions and code intentions
 - Add new tool: Text Statistic
 - Add support for the "Dot Text Case"
-- Add common hashing algorithms to the editor encoding action
+- Add common hashing algorithms to the encoding editor action and code intention
 - Add common SHA3 algorithms to the random data generator editor action
 
 ### Changed

@@ -8,14 +8,24 @@
     </intentionAction>
     <intentionAction>
       <language>kotlin</language>
-      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.EncoderDecoderKotlinCodeIntentionAction</className>
+      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.EncodeDecodeKotlinCodeIntentionAction</className>
+      <bundleName>messages.KotlinBundle</bundleName>
+      <categoryKey>group.names.kotlin</categoryKey>
+    </intentionAction>
+    <intentionAction>
+      <language>kotlin</language>
+      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.EscapeUnescapeKotlinCodeIntentionAction</className>
       <bundleName>messages.KotlinBundle</bundleName>
       <categoryKey>group.names.kotlin</categoryKey>
     </intentionAction>
   </extensions>
   <actions>
     <group id="EncoderDecoderKotlinLiteralActionGroup"
-           class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncoderDecoderKotlinCodeActionGroup">
+           class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncodeDecodeKotlinCodeActionGroup">
+      <add-to-group group-id="DeveloperToolsGroup"/>
+    </group>
+    <group id="EscapeUnescapeKotlinCodeActionGroup"
+           class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EscapeUnescapeKotlinCodeActionGroup">
       <add-to-group group-id="DeveloperToolsGroup"/>
     </group>
     <group id="TextCaseConverterKotlinLiteralActionGroup"

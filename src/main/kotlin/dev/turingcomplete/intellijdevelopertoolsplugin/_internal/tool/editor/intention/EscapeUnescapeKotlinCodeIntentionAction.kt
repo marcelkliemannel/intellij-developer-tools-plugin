@@ -1,20 +1,27 @@
-package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action
+package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention
 
-import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.PsiJavaUtils
+import com.intellij.psi.PsiFile
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.PsiKotlinUtils
 
 /**
  * Some code parts of this class are only available of the optional dependency
- * `com.intellij.java` is available.
+ * `org.jetbrains.kotlin` is available.
  */
-internal class TextCaseConverterJavaCodeActionGroup : TextCaseConverterActionGroup() {
+internal class EscapeUnescapeKotlinCodeIntentionAction : EncodeDecodeIntentionAction() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
-  override fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? =
-    PsiJavaUtils.getPsiElementAtCaret(e)?.let { PsiJavaUtils.getTextIfStringValueOrIdentifier(it) }
+  override fun getFamilyName(): String = "Escape or unescape Kotlin string"
+
+  override fun getText(): String = "Escape or unescape"
+
+  override fun getSourceText(editor: Editor, file: PsiFile): Pair<String, TextRange>? {
+    val psiElement = file.findElementAt(editor.caretModel.offset) ?: return null
+    return PsiKotlinUtils.getTextFromStringValue(psiElement)?.let { it to psiElement.textRange }
+  }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

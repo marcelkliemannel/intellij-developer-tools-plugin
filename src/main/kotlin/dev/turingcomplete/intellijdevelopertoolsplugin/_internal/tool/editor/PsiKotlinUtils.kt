@@ -40,6 +40,26 @@ internal object PsiKotlinUtils {
     }
   }
 
+  fun getTextFromStringValue(e: AnActionEvent): Pair<String, TextRange>? {
+    val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return null
+    val editor = e.getData(CommonDataKeys.EDITOR) ?: return null
+    if (editor.getSelectedText() != null) {
+      return null
+    }
+
+    val psiElement = psiFile.findElementAt(editor.caretModel.offset) ?: return null
+    return getTextFromStringValue(psiElement)?.let { it to psiElement.textRange }
+  }
+
+  fun getTextFromStringValue(psiElement: PsiElement): String? {
+    return if (psiElement.elementType == KtTokens.REGULAR_STRING_PART) {
+      psiElement.text
+    }
+    else {
+      null
+    }
+  }
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 }

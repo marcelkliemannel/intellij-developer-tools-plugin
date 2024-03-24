@@ -11,7 +11,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.T
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextStatistic.Companion
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.toolwindow.MainToolWindowService
 
-class EditorTextStatisticAction : DumbAwareAction("Text Statistic...") {
+internal class EditorTextStatisticAction : DumbAwareAction("Text Statistic...") {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //

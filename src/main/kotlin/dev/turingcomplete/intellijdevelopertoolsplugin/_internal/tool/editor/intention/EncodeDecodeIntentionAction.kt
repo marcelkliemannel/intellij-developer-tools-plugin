@@ -17,7 +17,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.Enc
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.executeDecodingInEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.EncodersDecoders.executeEncodingInEditor
 
-internal abstract class EncoderDecoderIntentionAction : IntentionAction, LowPriorityAction {
+internal abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -38,7 +38,7 @@ internal abstract class EncoderDecoderIntentionAction : IntentionAction, LowPrio
 
     ApplicationManager.getApplication().invokeLater {
       JBPopupFactory.getInstance()
-        .createListPopup(EncodeDecodersModeSelectionListPopupStep(text, textRange, editor))
+        .createListPopup(EncodersDecodersModeSelectionListPopupStep(text, textRange, editor))
         .showInBestPositionFor(editor)
     }
   }
@@ -48,7 +48,7 @@ internal abstract class EncoderDecoderIntentionAction : IntentionAction, LowPrio
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class EncodeDecodersModeSelectionListPopupStep(
+  private class EncodersDecodersModeSelectionListPopupStep(
     text: String,
     textRange: TextRange,
     editor: Editor
