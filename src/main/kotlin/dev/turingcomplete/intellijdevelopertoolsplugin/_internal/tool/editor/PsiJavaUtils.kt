@@ -9,8 +9,6 @@ import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiJavaToken
 import com.intellij.psi.util.elementType
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.getSelectedText
-import org.jetbrains.kotlin.idea.editor.fixers.end
-import org.jetbrains.kotlin.idea.editor.fixers.start
 
 /**
  * Some code parts of this class are only available of the optional dependency
@@ -44,8 +42,8 @@ internal object PsiJavaUtils {
   fun getTextIfStringValue(psiElement: PsiElement): Pair<String, TextRange>? =
     if (psiElement is PsiJavaToken && psiElement.elementType == JavaTokenType.STRING_LITERAL) {
       // Remove the enclosing quotations
-      val newStart = psiElement.textRange.start + 1
-      val newEnd = psiElement.textRange.end - 1
+      val newStart = psiElement.textRange.startOffset + 1
+      val newEnd = psiElement.textRange.endOffset - 1
       if (newStart > newEnd) {
         null
       }
