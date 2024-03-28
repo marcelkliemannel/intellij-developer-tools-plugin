@@ -27,6 +27,8 @@ import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.table.JBTable
+import com.intellij.ui.treeStructure.Tree
+import com.intellij.util.lang.UrlClassLoader
 import com.intellij.util.ui.ColumnInfo
 import com.intellij.util.ui.ListTableModel
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
@@ -41,11 +43,14 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.setConte
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.uncheckedCastTo
 import org.jetbrains.kotlin.idea.util.application.executeOnPooledThread
 import java.awt.Dimension
+import java.net.URLClassLoader
 import java.nio.file.Files
 import javax.swing.ListSelectionModel
+import javax.swing.tree.DefaultMutableTreeNode
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.extension
 import kotlin.io.path.isRegularFile
+import kotlin.io.path.toPath
 import kotlin.streams.asSequence
 
 class IntelliJInternals(
@@ -104,6 +109,27 @@ class IntelliJInternals(
         }
       }
     }
+
+    group("Plugin Class Loaders") {
+      row {
+        cell(ScrollPaneFactory.createScrollPane(Tree(traverseClassLoader(Thread.currentThread().contextClassLoader)), false))
+          .align(Align.FILL)
+          .resizableColumn()
+      }.resizableRow()
+
+      group("Find Class File Path by Class Name") {
+        row {
+          val classNameTextField = textField()
+            .label("Class name:")
+            .resizableColumn()
+            .align(Align.FILL)
+            .component
+          button("Find") {
+            findClassPathByClassName(classNameTextField.text.trim())
+          }
+        }
+      }
+    }
   }
 
   override fun afterBuildUi() {
@@ -130,7 +156,7 @@ class IntelliJInternals(
   }
 
   private fun findPluginByClassName(className: String) {
-    val messageDialogTitle = "Find IntelliJ Plugin by Class Name"
+    val messageDialogTitle = "Find Plugin by Class Name"
     try {
       val plugin = PluginManager.getPluginByClass(Class.forName(className))
       if (plugin != null) {
@@ -143,6 +169,46 @@ class IntelliJInternals(
       log.warn("Failed to find plugin", e)
       Messages.showErrorDialog(project, "${e.message}: ${e::class.qualifiedName}", messageDialogTitle)
     }
+  }
+
+  private fun findClassPathByClassName(className: String) {
+    val messageDialogTitle = "Find Class File Path by Class Name"
+    try {
+      val aClass = IntelliJInternals::class.java.classLoader.loadClass(className)
+      val classFilePath = aClass.getResource('/' + aClass.getName().replace('.', '/') + ".class")?.toURI()?.toPath()?.toString()
+      if (classFilePath != null) {
+        Messages.showInfoMessage(project, "Class file path: ${classFilePath}.", messageDialogTitle)
+      }
+      else {
+        Messages.showErrorDialog(project, "Unable to resolve the path of the class file for the given class name.", messageDialogTitle)
+      }
+    } catch (e: Exception) {
+      log.warn("Failed to find class file", e)
+      Messages.showErrorDialog(project, "${e.message}: ${e::class.qualifiedName}", messageDialogTitle)
+    }
+  }
+
+  private fun traverseClassLoader(classLoader: ClassLoader): DefaultMutableTreeNode {
+    val classLoaderNode = DefaultMutableTreeNode("Class loader: ${classLoader::class.qualifiedName}")
+
+    if (classLoader is URLClassLoader) {
+      classLoader.urLs.forEach { url ->
+        classLoaderNode.add(DefaultMutableTreeNode("File: ${url.toURI().toPath().fileName.toString()}"))
+      }
+    }
+    else if (classLoader is UrlClassLoader) {
+      classLoader.files.forEach { file ->
+        classLoaderNode.add(DefaultMutableTreeNode("File: ${file.fileName.toString()}"))
+      }
+    }
+
+    val parentClassLoader = classLoader.parent
+    if (parentClassLoader != null) {
+      val parentClassLoaderNode = traverseClassLoader(parentClassLoader)
+      classLoaderNode.add(parentClassLoaderNode)
+    }
+
+    return classLoaderNode
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

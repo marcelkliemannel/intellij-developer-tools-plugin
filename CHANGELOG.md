@@ -10,6 +10,12 @@
 
 ### Fixed
 
+## 4.1.1 - 2024-03-28
+
+### Fixed
+
+- Fix incompatibility problems with IntelliJ 2024.1
+
 ## 4.1.0 - 2024-03-24
 
 ### Added
