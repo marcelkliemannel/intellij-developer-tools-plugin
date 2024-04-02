@@ -6,6 +6,8 @@
 
 ### Changed
 
+- In the tool window, the tools menu is now available through a separated action button.
+
 ### Removed
 
 ### Fixed

@@ -1,10 +1,13 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.toolwindow
 
 import com.intellij.collaboration.ui.CollaborationToolsUIUtil
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -12,10 +15,10 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.openapi.wm.impl.content.ToolWindowContentUi
-import com.intellij.ui.components.ActionLink
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsToolWindowSettings
@@ -25,8 +28,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.too
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.ContentNode
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.DeveloperToolNode
 import java.awt.Dimension
-import java.awt.event.ActionEvent
-import javax.swing.AbstractAction
 import javax.swing.JComponent
 import javax.swing.JLabel
 
@@ -79,17 +80,21 @@ internal class MainToolWindowFactory : ToolWindowFactory, DumbAware {
   ) : DeveloperToolContentPanel(developerToolNode) {
 
     override fun Row.buildTitle(): JComponent {
-      lateinit var toggleMenuActionLink: ActionLink
-      val toggleMenuAction: AbstractAction = object : AbstractAction(developerToolNode.developerUiToolPresentation.contentTitle) {
+      lateinit var toggleMenuActionLink: JComponent
+      val toggleMenuAction: DumbAwareAction = object : DumbAwareAction("Show Developer Tools", null, AllIcons.Actions.ListFiles) {
 
-        override fun actionPerformed(event: ActionEvent) {
+        override fun actionPerformed(e: AnActionEvent) {
           toggleMenu(toggleMenuActionLink)
         }
       }
-      toggleMenuActionLink = ActionLink(toggleMenuAction).apply { formatTitle() }
-      cell(toggleMenuActionLink)
+      toggleMenuActionLink = actionButton(toggleMenuAction)
         .gap(RightGap.SMALL)
-      return toggleMenuActionLink
+        .component
+
+      @Suppress("DialogTitleCapitalization")
+      return label(developerToolNode.developerUiToolPresentation.contentTitle)
+        .applyToComponent { formatTitle() }
+        .component
     }
   }
 
