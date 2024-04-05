@@ -25,6 +25,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.NotBlankInputValidator
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.dumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.castedObject
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolReference
@@ -90,7 +91,8 @@ internal open class DeveloperToolContentPanel(
             configuration.reset()
             instance.reset()
           }
-        }
+        },
+        createNewWorkbenchAction()
       )
       developerToolNode.developerUiToolPresentation.description?.let { description ->
         actions.add(
@@ -113,8 +115,14 @@ internal open class DeveloperToolContentPanel(
     selectedDeveloperToolInstance = AtomicProperty(tabs.selectedInfo!!.castedObject())
 
     tabs.addListener(createTabsChangedListener(), developerToolNode.parentDisposable)
+    syncTabsSelectionVisibility()
 
     return tabs.component
+  }
+
+  private fun syncTabsSelectionVisibility() {
+    tabs.presentation.isHideTabs =
+      DeveloperToolsApplicationSettings.instance.hideWorkbenchTabsOnSingleTab && tabs.tabCount == 1
   }
 
   private fun createTabsChangedListener() = object : TabsListener {
@@ -179,6 +187,7 @@ internal open class DeveloperToolContentPanel(
       {
         tabs.removeTab(tabInfo)
         developerToolNode.destroyDeveloperToolInstance(developerUiTool)
+        syncTabsSelectionVisibility()
       },
       { tabs.tabs.size > 1 }
     )
@@ -188,6 +197,7 @@ internal open class DeveloperToolContentPanel(
 
       override fun actionPerformed(e: AnActionEvent) {
         addWorkbench(developerToolNode.createNewDeveloperToolInstance())
+        syncTabsSelectionVisibility()
       }
 
       override fun getActionUpdateThread() = ActionUpdateThread.BGT

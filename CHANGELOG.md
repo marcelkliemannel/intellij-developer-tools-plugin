@@ -7,6 +7,7 @@
 ### Changed
 
 - In the tool window, the tools menu is now available through a separated action button.
+- The workbench tabs are now hidden by default when there is only one tab. This behaviour can be changed in the settings. Creating a new workbench is now also available from the tools actions popup.
 
 ### Removed
 
