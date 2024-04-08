@@ -105,7 +105,7 @@ internal open class DeveloperToolContentPanel(
         icon = AllIcons.General.GearPlain
       ).align(AlignX.RIGHT).resizableColumn().gap(RightGap.SMALL)
     }.resizableRow()
-  }.apply { border = JBEmptyBorder(0, 8, 4, 8) }
+  }.apply { border = JBEmptyBorder(0, 8, 0, 8) }
 
   private fun createMainContent(): JComponent {
     tabs = JBTabsFactory.createTabs(developerToolNode.project, developerToolNode.parentDisposable)
