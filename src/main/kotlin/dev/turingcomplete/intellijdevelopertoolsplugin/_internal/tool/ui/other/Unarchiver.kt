@@ -1,6 +1,5 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other
 
-import com.intellij.collaboration.ui.CollaborationToolsUIUtil
 import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.CommonActionsManager
@@ -39,6 +38,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.ui.AnimatedIcon
 import com.intellij.ui.DoubleClickListener
 import com.intellij.ui.FilteringTree
 import com.intellij.ui.HyperlinkLabel
@@ -472,7 +472,7 @@ internal class Unarchiver(
 
   private fun createReadingArchiveFilePanel() = panel {
     row {
-      cell(JBLabel("Reading archive...").apply { icon = CollaborationToolsUIUtil.animatedLoadingIcon })
+      cell(JBLabel("Reading archive...").apply { icon = AnimatedIcon.Default.INSTANCE })
         .align(Align.CENTER)
     }.resizableRow()
   }

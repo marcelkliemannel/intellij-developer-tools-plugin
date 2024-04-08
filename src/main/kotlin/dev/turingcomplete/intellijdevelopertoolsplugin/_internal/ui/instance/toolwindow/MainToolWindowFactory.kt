@@ -1,6 +1,5 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.toolwindow
 
-import com.intellij.collaboration.ui.CollaborationToolsUIUtil
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -15,6 +14,7 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.openapi.wm.impl.content.ToolWindowContentUi
+import com.intellij.ui.AnimatedIcon
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
@@ -44,7 +44,7 @@ internal class MainToolWindowFactory : ToolWindowFactory, DumbAware {
 
   override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
     val loaderPanel = BorderLayoutPanel().apply {
-      addToCenter(JLabel(CollaborationToolsUIUtil.animatedLoadingIcon))
+      addToCenter(JLabel(AnimatedIcon.Default.INSTANCE))
     }
     toolWindow.contentManager.addContent(ContentFactory.getInstance().createContent(loaderPanel, "", false))
 
