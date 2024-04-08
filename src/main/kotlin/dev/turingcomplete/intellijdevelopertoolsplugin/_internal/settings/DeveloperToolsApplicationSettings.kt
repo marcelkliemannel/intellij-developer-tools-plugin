@@ -34,7 +34,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   var autoDetectActionHandlingInstance: Boolean by ValueProperty(AUTO_DETECT_ACTION_HANDLING_INSTANCE_DEFAULT)
   var selectedActionHandlingInstance: ActionHandlingInstance by ValueProperty(SELECTED_ACTION_HANDLING_INSTANCE_DEFAULT)
   var showInternalTools: Boolean by ValueProperty(SHOW_INTERNAL_TOOLS_DEFAULT)
-  var hideWorkbenchTabsOnSingleTab: Boolean by ValueProperty(SHOW_INTERNAL_TOOLS_DEFAULT)
+  var hideWorkbenchTabsOnSingleTab: Boolean by ValueProperty(HIDE_WORKBENCH_TABS_ON_SINGLE_TAB)
 
   var modificationCounter = 0
     private set
