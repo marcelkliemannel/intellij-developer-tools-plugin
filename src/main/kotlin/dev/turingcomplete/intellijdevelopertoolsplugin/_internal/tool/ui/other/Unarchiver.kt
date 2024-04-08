@@ -62,7 +62,6 @@ import com.intellij.ui.tree.TreeVisitor
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.PlatformIcons
 import com.intellij.util.SystemProperties
-import com.intellij.util.concurrency.ThreadingAssertions.assertBackgroundThread
 import com.intellij.util.io.URLUtil
 import com.intellij.util.text.DateFormatUtil
 import com.intellij.util.ui.UIUtil
@@ -75,9 +74,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.PluginCommonDataKeys.SELECTED_VALUES
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.NotificationUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.PluginCommonDataKeys.SELECTED_VALUES
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.createContextMenuMouseListener
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.createToggleAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
@@ -101,7 +100,6 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipUtils
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
-import java.util.zip.ZipEntry
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
@@ -125,6 +123,7 @@ import java.nio.file.StandardOpenOption.WRITE
 import java.nio.file.attribute.BasicFileAttributeView
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.attribute.FileTime
+import java.util.zip.ZipEntry
 import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.JTree
@@ -471,7 +470,6 @@ internal class Unarchiver(
     }
   }
 
-  @Suppress("UnstableApiUsage")
   private fun createReadingArchiveFilePanel() = panel {
     row {
       cell(JBLabel("Reading archive...").apply { icon = CollaborationToolsUIUtil.animatedLoadingIcon })
@@ -1447,8 +1445,6 @@ internal class Unarchiver(
   ) {
 
     override fun run(progressIndicator: ProgressIndicator) {
-      assertBackgroundThread()
-
       progressIndicator.checkCanceled()
       progressIndicator.text = "Preparing directory structure..."
 

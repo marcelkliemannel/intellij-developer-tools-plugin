@@ -144,7 +144,7 @@ internal open class ContentPanelHandler(
 
   private class PromoteMainDialogNotificationPanel(
     closeNotification: (Boolean) -> Unit
-  ) : EditorNotificationPanel(Status.Promo) {
+  ) : EditorNotificationPanel(Status.Info) {
 
     init {
       text = "<html>The tools are also available as a standalone window.</html>"

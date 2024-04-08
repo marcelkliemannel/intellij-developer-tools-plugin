@@ -13,7 +13,6 @@ import com.intellij.ui.ScrollPaneFactory.createScrollPane
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
-import com.intellij.ui.dsl.builder.actionsButton
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.tabs.JBTabs
 import com.intellij.ui.tabs.JBTabsFactory
@@ -25,6 +24,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.NotBlankInputValidator
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.dumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.castedObject
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolReference
@@ -90,7 +90,8 @@ internal open class DeveloperToolContentPanel(
             configuration.reset()
             instance.reset()
           }
-        }
+        },
+        createNewWorkbenchAction()
       )
       developerToolNode.developerUiToolPresentation.description?.let { description ->
         actions.add(
@@ -104,7 +105,7 @@ internal open class DeveloperToolContentPanel(
         icon = AllIcons.General.GearPlain
       ).align(AlignX.RIGHT).resizableColumn().gap(RightGap.SMALL)
     }.resizableRow()
-  }.apply { border = JBEmptyBorder(0, 8, 4, 8) }
+  }.apply { border = JBEmptyBorder(0, 8, 0, 8) }
 
   private fun createMainContent(): JComponent {
     tabs = JBTabsFactory.createTabs(developerToolNode.project, developerToolNode.parentDisposable)
@@ -113,8 +114,14 @@ internal open class DeveloperToolContentPanel(
     selectedDeveloperToolInstance = AtomicProperty(tabs.selectedInfo!!.castedObject())
 
     tabs.addListener(createTabsChangedListener(), developerToolNode.parentDisposable)
+    syncTabsSelectionVisibility()
 
     return tabs.component
+  }
+
+  private fun syncTabsSelectionVisibility() {
+    tabs.presentation.isHideTabs =
+      DeveloperToolsApplicationSettings.instance.hideWorkbenchTabsOnSingleTab && tabs.tabCount == 1
   }
 
   private fun createTabsChangedListener() = object : TabsListener {
@@ -179,6 +186,7 @@ internal open class DeveloperToolContentPanel(
       {
         tabs.removeTab(tabInfo)
         developerToolNode.destroyDeveloperToolInstance(developerUiTool)
+        syncTabsSelectionVisibility()
       },
       { tabs.tabs.size > 1 }
     )
@@ -188,6 +196,7 @@ internal open class DeveloperToolContentPanel(
 
       override fun actionPerformed(e: AnActionEvent) {
         addWorkbench(developerToolNode.createNewDeveloperToolInstance())
+        syncTabsSelectionVisibility()
       }
 
       override fun getActionUpdateThread() = ActionUpdateThread.BGT

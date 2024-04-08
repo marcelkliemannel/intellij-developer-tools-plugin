@@ -34,6 +34,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   var autoDetectActionHandlingInstance: Boolean by ValueProperty(AUTO_DETECT_ACTION_HANDLING_INSTANCE_DEFAULT)
   var selectedActionHandlingInstance: ActionHandlingInstance by ValueProperty(SELECTED_ACTION_HANDLING_INSTANCE_DEFAULT)
   var showInternalTools: Boolean by ValueProperty(SHOW_INTERNAL_TOOLS_DEFAULT)
+  var hideWorkbenchTabsOnSingleTab: Boolean by ValueProperty(HIDE_WORKBENCH_TABS_ON_SINGLE_TAB)
 
   var modificationCounter = 0
     private set
@@ -71,7 +72,8 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     toolsMenuTreeShowGroupNodes = toolsMenuTreeShowGroupNodes,
     autoDetectActionHandlingInstance = autoDetectActionHandlingInstance,
     selectedActionHandlingInstance = selectedActionHandlingInstance,
-    showInternalTools = showInternalTools
+    showInternalTools = showInternalTools,
+    hideWorkbenchTabsOnSingleTab = hideWorkbenchTabsOnSingleTab
   )
 
   override fun loadState(state: ApplicationState) {
@@ -89,6 +91,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     autoDetectActionHandlingInstance = (state.autoDetectActionHandlingInstance ?: AUTO_DETECT_ACTION_HANDLING_INSTANCE_DEFAULT)
     selectedActionHandlingInstance = (state.selectedActionHandlingInstance ?: SELECTED_ACTION_HANDLING_INSTANCE_DEFAULT)
     showInternalTools = (state.showInternalTools ?: SHOW_INTERNAL_TOOLS_DEFAULT)
+    hideWorkbenchTabsOnSingleTab = (state.hideWorkbenchTabsOnSingleTab ?: HIDE_WORKBENCH_TABS_ON_SINGLE_TAB)
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
@@ -132,7 +135,9 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     @get:Attribute("selectedActionHandlingInstance")
     var selectedActionHandlingInstance: ActionHandlingInstance? = null,
     @get:Attribute("showInternalTools")
-    var showInternalTools: Boolean? = null
+    var showInternalTools: Boolean? = null,
+    @get:Attribute("hideWorkbenchTabsOnSingleTab")
+    var hideWorkbenchTabsOnSingleTab: Boolean? = null
   )
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
@@ -158,5 +163,6 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     const val AUTO_DETECT_ACTION_HANDLING_INSTANCE_DEFAULT = true
     const val SHOW_INTERNAL_TOOLS_DEFAULT = false
     val SELECTED_ACTION_HANDLING_INSTANCE_DEFAULT = ActionHandlingInstance.TOOL_WINDOW
+    const val HIDE_WORKBENCH_TABS_ON_SINGLE_TAB = true
   }
 }

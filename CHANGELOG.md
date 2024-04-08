@@ -10,6 +10,14 @@
 
 ### Fixed
 
+## 4.2.0 - 2024-04-08
+
+### Changed
+
+- Lower IntelliJ compatibility to 2023.2 to support the latest Android Studio.
+- In the tool window, the tools menu is now available through a separated action button.
+- The workbench tabs are now hidden by default when there is only one tab. This behaviour can be changed in the settings. Creating a new workbench is now also available from the tools actions popup.
+
 ## 4.1.1 - 2024-03-28
 
 ### Fixed

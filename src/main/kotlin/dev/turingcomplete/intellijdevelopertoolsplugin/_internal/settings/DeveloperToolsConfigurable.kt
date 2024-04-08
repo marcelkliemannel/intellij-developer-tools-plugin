@@ -31,6 +31,7 @@ class DeveloperToolsConfigurable : Configurable {
   private lateinit var autoDetectActionHandlingInstance: ValueProperty<Boolean>
   private lateinit var selectedActionHandlingInstance: ValueProperty<ActionHandlingInstance>
   private lateinit var showInternalTools: ValueProperty<Boolean>
+  private lateinit var hideWorkbenchTabsOnSingleTab: ValueProperty<Boolean>
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -68,6 +69,11 @@ class DeveloperToolsConfigurable : Configurable {
       loadExamples = ValueProperty(developerToolsApplicationSettings.loadExamples)
       checkBox("Load examples")
         .bindSelected(loadExamples)
+    }.bottomGap(BottomGap.SMALL)
+    row {
+      hideWorkbenchTabsOnSingleTab = ValueProperty(developerToolsApplicationSettings.hideWorkbenchTabsOnSingleTab)
+      checkBox("Hide workbench tabs if there is only one tab")
+        .bindSelected(hideWorkbenchTabsOnSingleTab)
     }.bottomGap(BottomGap.SMALL)
 
     buttonsGroup("External Action Handling") {
@@ -156,7 +162,8 @@ class DeveloperToolsConfigurable : Configurable {
             developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically != toolsMenuOrderAlphabetically.get() ||
             developerToolsApplicationSettings.autoDetectActionHandlingInstance != autoDetectActionHandlingInstance.get() ||
             developerToolsApplicationSettings.selectedActionHandlingInstance != selectedActionHandlingInstance.get() ||
-            developerToolsApplicationSettings.showInternalTools != showInternalTools.get()
+            developerToolsApplicationSettings.showInternalTools != showInternalTools.get() ||
+            developerToolsApplicationSettings.hideWorkbenchTabsOnSingleTab != hideWorkbenchTabsOnSingleTab.get()
   }
 
   override fun apply() {
@@ -174,6 +181,7 @@ class DeveloperToolsConfigurable : Configurable {
       it.autoDetectActionHandlingInstance = autoDetectActionHandlingInstance.get()
       it.selectedActionHandlingInstance = selectedActionHandlingInstance.get()
       it.showInternalTools = showInternalTools.get()
+      it.hideWorkbenchTabsOnSingleTab = hideWorkbenchTabsOnSingleTab.get()
     }
     DeveloperToolsDialogSettings.instance.dialogIsModal = dialogIsModal.get()
   }
@@ -194,6 +202,7 @@ class DeveloperToolsConfigurable : Configurable {
     autoDetectActionHandlingInstance.set(developerToolsApplicationSettings.autoDetectActionHandlingInstance)
     selectedActionHandlingInstance.set(developerToolsApplicationSettings.selectedActionHandlingInstance)
     showInternalTools.set(developerToolsApplicationSettings.showInternalTools)
+    hideWorkbenchTabsOnSingleTab.set(developerToolsApplicationSettings.hideWorkbenchTabsOnSingleTab)
     apply()
   }
 
