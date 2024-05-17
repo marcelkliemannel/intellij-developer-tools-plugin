@@ -72,7 +72,7 @@ class DatetimeConverter(
   private var selectedTimeZoneId = configuration.register("timeZoneId", ZoneId.systemDefault().id)
   private var formattedStandardFormat = configuration.register("formattedStandardFormat", DEFAULT_FORMATTED_STANDARD_FORMAT)
   private var formattedStandardFormatAddOffset = configuration.register("formattedStandardFormatAddOffset", DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_OFFSET)
-  private var formattedStandardFormatAddTimeZone = configuration.register("formattedStandardFormatAddTimeZone", DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_OFFSET)
+  private var formattedStandardFormatAddTimeZone = configuration.register("formattedStandardFormatAddTimeZone", DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_TIME_ZONE)
   private var formattedIndividual = configuration.register("formattedIndividual", DEFAULT_FORMATTED_INDIVIDUAL)
   private var formattedLocale = configuration.register("formattedLocale", DEFAULT_FORMATTED_LOCALE)
   private var formattedIndividualFormat = configuration.register("formattedIndividualFormat", DEFAULT_INDIVIDUAL_FORMAT)
@@ -288,11 +288,6 @@ class DatetimeConverter(
   }
 
   override fun reset() {
-    formattedIndividual.set(DEFAULT_FORMATTED_INDIVIDUAL)
-    formattedIndividualFormat.set(DEFAULT_INDIVIDUAL_FORMAT)
-    formattedStandardFormat.set(DEFAULT_FORMATTED_STANDARD_FORMAT)
-    formattedStandardFormatAddOffset.set(DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_OFFSET)
-    formattedStandardFormatAddTimeZone.set(DEFAULT_FORMATTED_STANDARD_FORMAT_ADD_TIME_ZONE)
     init()
   }
 

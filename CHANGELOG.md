@@ -4,9 +4,16 @@
 
 ### Added
 
+- Add strict secret/key requirements check to the "JSON Web Token (JWT) Decoder/Encoder" tool.
+- The "JSON Web Token (JWT) Decoder/Encoder" tool interface now includes sliders to flexibly change the size of the editors.
+
 ### Changed
 
+- The tool "JWT Decoder/Encoder" renamed to "JSON Web Token (JWT) Decoder/Encoder".
+
 ### Removed
+
+- The input of a public key for the JWT signature configuration was removed from the "JSON Web Token (JWT) Decoder/Encoder" tool.
 
 ### Fixed
 

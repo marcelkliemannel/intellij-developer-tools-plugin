@@ -38,7 +38,9 @@ abstract class DeveloperUiTool(
     panel.minimumSize = Dimension(0, 0)
     panel.withPreferredWidth(0)
 
-    panel.registerValidators(parentDisposable)
+    findComponentsOfType(panel, DialogPanel::class.java).forEach {
+      it.registerValidators(parentDisposable)
+    }
 
     val wrapper = object : BorderLayoutPanel(), DataProvider {
 

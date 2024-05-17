@@ -22,6 +22,7 @@ class DeveloperToolConfiguration(
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   internal val properties = ConcurrentHashMap<String, PropertyContainer>()
+
   // If false, the `DeveloperToolFactory` never created a `DeveloperTool`
   // instance that could have register the current properties.
   // In this case, the `persistentProperties` need to be persisted again.
@@ -39,6 +40,14 @@ class DeveloperToolConfiguration(
     defaultValue: T,
     propertyType: PropertyType = CONFIGURATION,
     example: T? = null
+  ): ValueProperty<T> =
+    properties[key]?.let { reuseExistingProperty(it) } ?: createNewProperty(defaultValue, propertyType, key, createExampleProvider(example))
+
+  fun <T : Any> registerWithExampleProvider(
+    key: String,
+    defaultValue: T,
+    propertyType: PropertyType = CONFIGURATION,
+    example: (() -> T)? = null
   ): ValueProperty<T> =
     properties[key]?.let { reuseExistingProperty(it) } ?: createNewProperty(defaultValue, propertyType, key, example)
 
@@ -80,6 +89,14 @@ class DeveloperToolConfiguration(
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
+  private fun <T : Any> createExampleProvider(example: T?) =
+    if (example != null) {
+      { example }
+    }
+    else {
+      null
+    }
+
   private fun <T : Any> reuseExistingProperty(property: PropertyContainer): ValueProperty<T> {
     if ((property.type == INPUT && !DeveloperToolsApplicationSettings.instance.saveInputs)
       || (property.type == CONFIGURATION && !DeveloperToolsApplicationSettings.instance.saveConfigurations)
@@ -96,12 +113,12 @@ class DeveloperToolConfiguration(
     defaultValue: T,
     propertyType: PropertyType,
     key: String,
-    example: T?
+    example: (() -> T)?
   ): ValueProperty<T> {
     val type = assertPersistableType(defaultValue::class, propertyType)
     val existingPropertyValue = persistentProperties[key]?.value
     val initialValue: T = type.safeCast(existingPropertyValue) ?: let {
-      if (DeveloperToolsApplicationSettings.instance.loadExamples && example != null) example else defaultValue
+      if (DeveloperToolsApplicationSettings.instance.loadExamples && example != null) example() else defaultValue
     }
     val valueProperty = ValueProperty(initialValue).apply {
       afterChangeConsumeEvent(null, handlePropertyChange(key))
