@@ -1,6 +1,5 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.toolwindow
 
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
@@ -15,6 +14,7 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.openapi.wm.impl.content.ToolWindowContentUi
 import com.intellij.ui.AnimatedIcon
+import com.intellij.ui.IconManager
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
@@ -78,8 +78,9 @@ internal class MainToolWindowFactory : ToolWindowFactory, DumbAware {
   ) : DeveloperToolContentPanel(developerToolNode) {
 
     override fun Row.buildTitle(): JComponent {
+      val menuIcon = IconManager.getInstance().getIcon("dev/turingcomplete/intellijdevelopertoolsplugin/icons/menu.svg", MainToolWindowFactory::class.java.classLoader)
       lateinit var toggleMenuActionLink: JComponent
-      val toggleMenuAction: DumbAwareAction = object : DumbAwareAction("Show Developer Tools", null, AllIcons.Actions.ListFiles) {
+      val toggleMenuAction: DumbAwareAction = object : DumbAwareAction("Show Developer Tools", null, menuIcon) {
 
         override fun actionPerformed(e: AnActionEvent) {
           toggleMenu(toggleMenuActionLink)
