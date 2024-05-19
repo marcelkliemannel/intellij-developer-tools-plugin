@@ -13,10 +13,12 @@ import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.fileTypes.PlainTextLanguage
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.Splitter
 import com.intellij.openapi.util.TextRange
+import com.intellij.ui.IconManager
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.BottomGap
@@ -82,6 +84,9 @@ import org.jose4j.keys.HmacKey
 import java.security.Key
 import java.security.KeyFactory
 import java.security.spec.PKCS8EncodedKeySpec
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.swing.Icon
 import javax.swing.JComponent
@@ -354,28 +359,41 @@ internal class JwtEncoderDecoder(
   }
 
   private fun doHighlightClaims(editor: DeveloperToolEditor) {
-    editor.removeTextRangeHighlighters(CLAIMS_GROUP_ID)
-    CLAIM_REGEX.findAll(editor.text)
-      .mapNotNull {
-        val claimMatchResult = it.groups[1]
-        if (claimMatchResult != null) {
-          val standardClaim = StandardClaim.findByFieldName(claimMatchResult.value)
-          if (standardClaim != null) {
-            return@mapNotNull claimMatchResult.range to standardClaim
-          }
-        }
-        null
-      }
-      .forEach { (claimRange, standardClaim) ->
-        val textRange = TextRange(claimRange.first, claimRange.last + 1)
+    editor.removeTextRangeHighlighters(HEADER_PAYLOAD_HIGHLIGHT_GROUP_ID)
+
+    UNIX_TIMESTAMP_SECONDS_JSON_VALUE_REGEX.findAll(editor.text).forEach {
+      val unixTimestampSecondsMatch = it.groups[1]
+      if (unixTimestampSecondsMatch != null) {
+        val textRange = TextRange(unixTimestampSecondsMatch.range.first, unixTimestampSecondsMatch.range.last + 1)
         editor.highlightTextRange(
           textRange,
-          CLAIM_REGEX_MATCH_HIGHLIGHT_LAYER,
+          UNIX_TIMESTAMP_HIGHLIGHT_LAYER,
           null,
-          CLAIMS_GROUP_ID,
-          StandardClaimGutterIconRenderer(textRange, standardClaim)
+          HEADER_PAYLOAD_HIGHLIGHT_GROUP_ID,
+          ClaimFeatureUnixTimestampGutterIconRenderer(textRange, unixTimestampSecondsMatch.value.toLong())
         )
       }
+    }
+
+    CLAIM_REGEX.findAll(editor.text).mapNotNull {
+      val claimMatch = it.groups[1]
+      if (claimMatch != null) {
+        val standardClaim = StandardClaim.findByFieldName(claimMatch.value)
+        if (standardClaim != null) {
+          return@mapNotNull claimMatch.range to standardClaim
+        }
+      }
+      null
+    }.forEach { (claimRange, standardClaim) ->
+      val textRange = TextRange(claimRange.first, claimRange.last + 1)
+      editor.highlightTextRange(
+        textRange,
+        CLAIM_REGEX_MATCH_HIGHLIGHT_LAYER,
+        null,
+        HEADER_PAYLOAD_HIGHLIGHT_GROUP_ID,
+        StandardClaimGutterIconRenderer(textRange, standardClaim)
+      )
+    }
   }
 
   private fun createEncodedEditor(): DeveloperToolEditor =
@@ -456,7 +474,7 @@ internal class JwtEncoderDecoder(
   private class StandardClaimGutterIconRenderer(
     private val textRange: TextRange,
     private val standardClaim: StandardClaim
-  ) : GutterIconRenderer() {
+  ) : GutterIconRenderer(), DumbAware {
 
     override fun getTooltipText(): String = standardClaim.toString()
 
@@ -472,6 +490,42 @@ internal class JwtEncoderDecoder(
     }
 
     override fun hashCode(): Int = Objects.hash(textRange, standardClaim)
+
+    override fun getAlignment(): Alignment = Alignment.RIGHT
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private class ClaimFeatureUnixTimestampGutterIconRenderer(
+    private val textRange: TextRange,
+    private val unixTimestampSeconds: Long
+  ) : GutterIconRenderer(), DumbAware {
+
+    override fun getTooltipText(): String =
+      Instant.ofEpochSecond(unixTimestampSeconds)
+        .atZone(ZoneId.systemDefault())
+        .format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
+
+    override fun getIcon(): Icon = clockGutterIcon
+
+    override fun equals(other: Any?): Boolean {
+      return if (other != null && other is ClaimFeatureUnixTimestampGutterIconRenderer) {
+        other.textRange == textRange && other.unixTimestampSeconds == unixTimestampSeconds
+      }
+      else {
+        false
+      }
+    }
+
+    override fun hashCode(): Int = Objects.hash(textRange, unixTimestampSeconds)
+
+    override fun getAlignment(): Alignment = Alignment.LEFT
+
+    companion object {
+
+      private val clockGutterIcon =
+        IconManager.getInstance().getIcon("dev/turingcomplete/intellijdevelopertoolsplugin/icons/clock_gutter.svg", JwtEncoderDecoder::class.java.classLoader)
+    }
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -662,7 +716,11 @@ internal class JwtEncoderDecoder(
     val algorithm = configuration.register("algorithm", DEFAULT_SIGNATURE_ALGORITHM)
     val strictSigningKeyValidation = configuration.register("signingKeyValidation", SIGNING_KEY_VALIDATION_DEFAULT, CONFIGURATION)
     val secret = configuration.register("secret", "", SECRET, EXAMPLE_SECRET)
-    val privateKey = configuration.registerWithExampleProvider("privateKey", "", SECRET) { if (algorithm.get().kind == RSA) EXAMPLE_RSA_PRIVATE_KEY else EXAMPLE_EC_PRIVATE_KEY }
+    val privateKey = configuration.registerWithExampleProvider(
+      "privateKey",
+      "",
+      SECRET
+    ) { if (algorithm.get().kind == RSA) EXAMPLE_RSA_PRIVATE_KEY else EXAMPLE_EC_PRIVATE_KEY }
     val secretEncodingMode = configuration.register("secretKeyEncodingMode", RAW, CONFIGURATION)
 
     val privateKeyErrorHolder = ErrorHolder()
@@ -759,7 +817,11 @@ internal class JwtEncoderDecoder(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private enum class StandardClaim(val fieldName: String, val title: String, val description: String) {
+  private enum class StandardClaim(
+    val fieldName: String,
+    val title: String,
+    val description: String
+  ) {
 
     ISSUER("iss", "Issuer", "The issuer of the JWT."),
     SUBJECT("sub", "Subject", "The subject of the JWT (e.g., the user)."),
@@ -829,9 +891,12 @@ internal class JwtEncoderDecoder(
     private val objectMapper = ObjectMapper()
     private val urlEncoder = Base64.getUrlEncoder().withoutPadding()
 
+    private val UNIX_TIMESTAMP_SECONDS_JSON_VALUE_REGEX = Regex(":\\s*(?<unixTimestampSeconds>\\b\\d{1,10}\\b)")
     private val CLAIM_REGEX = Regex("\\s?\"(?<name>[a-zA-Z]+)\":")
-    private const val CLAIM_REGEX_MATCH_HIGHLIGHT_LAYER = HighlighterLayer.SELECTION - 1
-    private const val CLAIMS_GROUP_ID = "claims"
+    private const val UNIX_TIMESTAMP_HIGHLIGHT_LAYER = HighlighterLayer.SELECTION - 1
+    private const val CLAIM_REGEX_MATCH_HIGHLIGHT_LAYER = UNIX_TIMESTAMP_HIGHLIGHT_LAYER - 1
+
+    private const val HEADER_PAYLOAD_HIGHLIGHT_GROUP_ID = "claims"
     private const val ENCODED_DOT_SEPARATOR_GROUP_ID = "encodedDotSeparator"
     private const val ENCODED_DOT_SEPARATOR_HIGHLIGHTER_LAYER = HighlighterLayer.SELECTION - 1
 
