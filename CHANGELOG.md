@@ -12,6 +12,7 @@
 ### Changed
 
 - The tool "JWT Decoder/Encoder" renamed to "JSON Web Token (JWT) Decoder/Encoder".
+- Context menu action "Text Statistic..." was renamed to "Show Text Statistic of Document...".
 
 ### Removed
 
