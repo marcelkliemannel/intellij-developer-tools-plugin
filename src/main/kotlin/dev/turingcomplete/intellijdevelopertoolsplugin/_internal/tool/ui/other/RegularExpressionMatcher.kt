@@ -1,54 +1,31 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other
 
 import com.google.code.regexp.Pattern
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.actionSystem.ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE
-import com.intellij.openapi.actionSystem.ActionUpdateThread
-import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.actionSystem.impl.ActionButton
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors.SEARCH_RESULT_ATTRIBUTES
 import com.intellij.openapi.editor.colors.EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES
 import com.intellij.openapi.editor.colors.EditorColorsManager
-import com.intellij.openapi.editor.event.DocumentEvent
-import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.editor.markup.HighlighterLayer
-import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.observable.util.whenFocusLost
-import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.popup.Balloon
-import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.openapi.ui.popup.JBPopupListener
-import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import com.intellij.openapi.ui.setEmptyState
 import com.intellij.openapi.util.TextRange
 import com.intellij.ui.ColoredTableCellRenderer
-import com.intellij.ui.EditorTextField
-import com.intellij.ui.JBColor
-import com.intellij.ui.LanguageTextField
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.SimpleTextAttributes.GRAY_SMALL_ATTRIBUTES
 import com.intellij.ui.SimpleTextAttributes.REGULAR_ATTRIBUTES
 import com.intellij.ui.SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
 import com.intellij.ui.TableSpeedSearch
-import com.intellij.ui.awt.RelativePoint
-import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBViewport
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.LabelPosition
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.TopGap
-import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.table.JBTable
-import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
-import com.intellij.util.ui.UIUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
@@ -61,20 +38,17 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHol
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.PluginCommonDataKeys
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.allowUiDslLabel
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.regex.RegexTextField
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.regex.SelectRegexOptionsAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.setContextMenu
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RegularExpressionMatcher.MatchResultType.MATCH
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RegularExpressionMatcher.MatchResultType.NAMED_GROUP
-import org.intellij.lang.regexp.RegExpLanguage
-import org.intellij.lang.regexp.intention.CheckRegExpForm
 import java.awt.Dimension
-import java.lang.Boolean.TRUE
 import javax.swing.BorderFactory
-import javax.swing.JComponent
 import javax.swing.JTable
 import javax.swing.ListSelectionModel
 import javax.swing.event.ListSelectionListener
 import javax.swing.table.AbstractTableModel
-import java.util.regex.Pattern as JavaPattern
 
 class RegularExpressionMatcher(
   private val context: DeveloperUiToolContext,
@@ -89,7 +63,6 @@ class RegularExpressionMatcher(
   private val regexText = configuration.register("regexText", "", INPUT, EXAMPLE_REGEX)
   private val inputText = configuration.register("inputText", "", INPUT, EXAMPLE_INPUT_TEXT)
 
-  private val regexInputEditor: EditorTextField by lazy { createRegexInputEditor(project) }
   private val inputEditor: DeveloperToolEditor by lazy { createInputEditor() }
 
   private val regexMatchingAttributes by lazy { EditorColorsManager.getInstance().globalScheme.getAttributes(SEARCH_RESULT_ATTRIBUTES) }
@@ -107,14 +80,14 @@ class RegularExpressionMatcher(
 
   override fun Panel.buildUi() {
     row {
-      cell(regexInputEditor)
+      cell(RegexTextField(project, parentDisposable, regexText))
         .label("Regular expression:", LabelPosition.TOP)
         .validationOnApply(regexInputErrorHolder.asValidation())
         .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
         .align(Align.FILL)
         .resizableColumn()
         .gap(RightGap.SMALL)
-      cell(createSelectRegexOptionsButton())
+      cell(SelectRegexOptionsAction.createActionButton(selectedRegexOptionFlag))
     }.topGap(TopGap.NONE)
 
     row {
@@ -165,7 +138,7 @@ class RegularExpressionMatcher(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   /**
-   * Kotlin and Java does not support the retrieval of all named groups yet:
+   * Kotlin and Java do not support the retrieval of all named groups yet:
    * [KT-51671](https://youtrack.jetbrains.com/issue/KT-51671). Therefore, we
    * are using Google's [com.google.code.regexp.Pattern] for now.
    */
@@ -174,7 +147,7 @@ class RegularExpressionMatcher(
     regexInputErrorHolder.clear()
     matchResultsTableModel.setMatches(emptyList())
 
-    val regex = regexInputEditor.text
+    val regex = regexText.get()
     if (regex.isEmpty()) {
       return
     }
@@ -213,102 +186,6 @@ class RegularExpressionMatcher(
   private fun createInputEditor() =
     DeveloperToolEditor("input", context, configuration, project, "Text", DeveloperToolEditor.EditorMode.INPUT, parentDisposable, inputText)
       .onTextChangeFromUi { match() }
-
-  private fun createRegexInputEditor(project: Project?): EditorTextField =
-    object : LanguageTextField(RegExpLanguage.INSTANCE, project, EXAMPLE_REGEX, true) {
-
-      init {
-        text = regexText.get()
-        font = JBFont.create(font, false).biggerOn(1.4f)
-
-        addDocumentListener(object : DocumentListener {
-          override fun documentChanged(event: DocumentEvent) {
-            if (!isDisposed) {
-              regexText.set(event.document.text, "fromRegexInputEditor")
-              match()
-            }
-          }
-        })
-
-        allowUiDslLabel(this.component)
-
-        regexText.afterChangeConsumeEvent(parentDisposable) { event ->
-          if (event.newValue != event.oldValue && event.id != "fromRegexInputEditor") {
-            text = event.newValue
-          }
-        }
-      }
-
-      override fun onEditorAdded(editor: Editor) {
-        editor.putUserData(CheckRegExpForm.Keys.CHECK_REG_EXP_EDITOR, TRUE)
-      }
-    }
-
-  private fun createSelectRegexOptionsButton(): ActionButton {
-    lateinit var actionButton: ActionButton
-    actionButton = ActionButton(
-      SelectRegexOptionsAction({ actionButton }, selectedRegexOptionFlag),
-      null,
-      RegularExpressionMatcher::class.java.name,
-      DEFAULT_MINIMUM_BUTTON_SIZE
-    )
-    return actionButton
-  }
-
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-
-  private class SelectRegexOptionsAction(
-    val parentComponent: () -> JComponent,
-    val selectedRegexOptionFlag: ObservableMutableProperty<Int>
-  ) : DumbAwareAction("Regular Expression Options", null, AllIcons.General.GearPlain) {
-
-    private var currentDialog: Balloon? = null
-
-    override fun actionPerformed(e: AnActionEvent) {
-      if (currentDialog != null) {
-        return
-      }
-
-      currentDialog = JBPopupFactory.getInstance().createBalloonBuilder(createRegexOptionPanel())
-        .setDialogMode(true)
-        .setFillColor(UIUtil.getPanelBackground())
-        .setBorderColor(JBColor.border())
-        .setBlockClicksThroughBalloon(true)
-        .setRequestFocus(true)
-        .createBalloon()
-        .apply {
-          setAnimationEnabled(false)
-          addListener(object : JBPopupListener {
-            override fun onClosed(event: LightweightWindowEvent) {
-              currentDialog = null
-            }
-          })
-          show(RelativePoint.getSouthOf(parentComponent()), Balloon.Position.below)
-        }
-    }
-
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
-
-    @Suppress("UnstableApiUsage")
-    private fun createRegexOptionPanel() = panel {
-      val regexOptionCheckBox = mutableMapOf<RegexOption, JBCheckBox>()
-
-      val setSelectedRegexOptionFlag: () -> Unit = {
-        selectedRegexOptionFlag.set(regexOptionCheckBox.filter { it.value.isSelected }.map { it.key.patternFlag }.sum())
-      }
-
-      val selectedRegexOptionFlag = selectedRegexOptionFlag.get()
-      RegexOption.entries.forEach { regexOption ->
-        row {
-          regexOptionCheckBox[regexOption] = checkBox(regexOption.title)
-            .comment(regexOption.description)
-            .applyToComponent { isSelected = regexOption.isSelected(selectedRegexOptionFlag) }
-            .whenStateChangedFromUi { setSelectedRegexOptionFlag() }
-            .component
-        }
-      }
-    }
-  }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
@@ -421,54 +298,6 @@ class RegularExpressionMatcher(
 
     MATCH,
     NAMED_GROUP
-  }
-
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-
-  private enum class RegexOption(val patternFlag: Int, val title: String, val description: String? = null) {
-
-    CASE_INSENSITIVE(
-      JavaPattern.CASE_INSENSITIVE,
-      "Case-insensitive",
-      "Case-insensitive matching will use characters for the US-ASCII charset for matching."
-    ),
-    UNICODE_CASE(
-      JavaPattern.UNICODE_CASE,
-      "Unicode-aware",
-      "The <code>case insensitive</code> option will use the Unicode standard."
-    ),
-    MULTILINE(
-      JavaPattern.MULTILINE,
-      "Multiline",
-      "The expressions <code>^</code> and <code>\$</code> match just after or just before, respectively, a line terminator or the end of the input sequence."
-    ),
-    DOTALL(
-      JavaPattern.DOTALL,
-      "Dotall",
-      "The expression <code>.</code> will also match line terminators."
-    ),
-    CANON_EQ(
-      JavaPattern.CANON_EQ,
-      "Canonical equivalence",
-      "Two characters will be considered to match if, and only if, their full canonical decompositions match."
-    ),
-    UNIX_LINES(
-      JavaPattern.UNIX_LINES,
-      "Unix line endings",
-      "Only the <code>\\n</code> line terminator is recognized in the behavior of <code>.</code>, <code>^</code>, and <code>\$</code>."
-    ),
-    LITERAL(
-      JavaPattern.LITERAL,
-      "Literal parsing of the pattern",
-      "The input string that specifies the pattern will be treated as a sequence of literal characters."
-    ),
-    COMMENTS(
-      JavaPattern.COMMENTS,
-      "Permit whitespace and comments in pattern",
-      "Whitespace will be ignored, and embedded comments starting with <code>#</code> are ignored until the end of a line."
-    );
-
-    fun isSelected(regexOptionFlag: Int) = regexOptionFlag.and(patternFlag) != 0
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

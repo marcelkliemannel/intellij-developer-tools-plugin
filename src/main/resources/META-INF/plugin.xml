@@ -20,7 +20,8 @@
     <li>Text Case Transformation</li>
     <li>Text Diff Viewer</li>
     <li>Text Format Conversion</li>
-    <li>Text Escaping:</b> HTML entities, Java Strings, JSON, CSV, and XML</li>
+    <li>Text Escape:</b> HTML entities, Java Strings, JSON, CSV, and XML</li>
+    <li>Text Filter</li>
     <li>JSON Path Parser</li>
     <li>JSON Schema Validator</li>
     <li>Hashing</li>
@@ -255,6 +256,10 @@
             id="text-statistic"
             groupId="text"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextStatistic$Factory"/>
+    <developerUiTool
+            id="text-filter"
+            groupId="text"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextFilterTransformer$Factory"/>
 
     <!-- root level -->
     <developerUiTool

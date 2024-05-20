@@ -152,12 +152,12 @@ class DeveloperToolConfiguration(
     val key: String,
     val reference: ValueProperty<out Any>,
     val defaultValue: Any,
-    val example: Any?,
+    val example: (() -> Any)?,
     val type: PropertyType
   ) {
 
     fun reset(loadExamples: Boolean) {
-      val value = if (example != null && loadExamples) example else defaultValue
+      val value = if (example != null && loadExamples) example.invoke() else defaultValue
       reference.setWithUncheckedCast(value, RESET_CHANGE_ID)
     }
 
