@@ -80,7 +80,7 @@ internal class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     override fun Row.buildTitle(): JComponent {
       val menuIcon = IconManager.getInstance().getIcon("dev/turingcomplete/intellijdevelopertoolsplugin/icons/menu.svg", MainToolWindowFactory::class.java.classLoader)
       lateinit var toggleMenuActionLink: JComponent
-      val toggleMenuAction: DumbAwareAction = object : DumbAwareAction("Show Developer Tools", null, menuIcon) {
+      val toggleMenuAction: DumbAwareAction = object : DumbAwareAction("Show Developer Tool", null, menuIcon) {
 
         override fun actionPerformed(e: AnActionEvent) {
           toggleMenu(toggleMenuActionLink)

@@ -46,6 +46,13 @@ internal class MainDialogService {
     }
   }
 
+  fun showTool(project: Project?, id: String) {
+    openDialog(project)
+    dialogLock.read {
+      dialog.get()?.contentPanelHandler?.showTool(id)
+    }
+  }
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //

@@ -91,17 +91,9 @@
       <bundleName>messages.LangBundle</bundleName>
       <categoryKey>intention.category.other</categoryKey>
     </intentionAction>
-  </extensions>
 
-  <actions>
-    <action id="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.dialog.OpenMainDialogAction"
-            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.dialog.OpenMainDialogAction"
-            text="Developer Tools"
-            description="Provides various developer tools"
-            icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg">
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
-    </action>
-  </actions>
+    <keymapExtension implementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.ShowDeveloperUiToolKeymapExtension"/>
+  </extensions>
 
   <extensionPoints>
     <extensionPoint name="developerUiTool"
@@ -303,12 +295,22 @@
   </extensions>
 
   <actions>
+    <action id="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.dialog.OpenMainDialogAction"
+            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.dialog.OpenMainDialogAction"
+            text="Developer Tools"
+            description="Provides various developer tools"
+            icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+
     <action popup="true" id="dev.turingcomplete.intellijdevelopertoolsplugin.openArchiveFile"
             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.Unarchiver$OpenArchiveFileInUnarchiverAction">
       <add-to-group group-id="RevealGroup" anchor="last"/>
     </action>
 
-    <group id="DeveloperToolsGroup" class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.DeveloperToolsActionGroup">
+    <group id="DeveloperToolsGroup"
+           class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.DeveloperToolsActionGroup">
+
       <group id="DataGeneratorActionGroup"
              class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.DataGeneratorActionGroup"/>
 

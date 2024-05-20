@@ -4,6 +4,7 @@
 
 ### Added
 
+- Add keymap actions to show a developer tool
 - Add optional strict secret/key requirements check to the "JSON Web Token (JWT) Decoder/Encoder" tool.
 - Add gutter icon with readable a readable date/time format for UNIX timestamps in the "JSON Web Token (JWT) Decoder/Encoder" tool.
 - The "JSON Web Token (JWT) Decoder/Encoder" tool interface now includes sliders to flexibly change the size of the editors.
