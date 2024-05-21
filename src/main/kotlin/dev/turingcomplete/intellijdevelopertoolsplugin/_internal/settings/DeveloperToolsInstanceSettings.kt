@@ -272,22 +272,22 @@ internal abstract class DeveloperToolsInstanceSettings {
      * All properties with null values will be filtered in
      * [DeveloperToolsInstanceSettings.loadState].
      */
-    override fun fromString(serializedValue: String): Any? {
-      val valueAndType = serializedValue.split(PROPERTY_TYPE_VALUE_DELIMITER, limit = 2)
-      check(valueAndType.size == 2) { "Malformed serialized value: $serializedValue" }
+    override fun fromString(value: String): Any? {
+      val valueAndType = value.split(PROPERTY_TYPE_VALUE_DELIMITER, limit = 2)
+      check(valueAndType.size == 2) { "Malformed serialized value: $value" }
       val valueType = applyTypeLegacy(valueAndType[0])
-      val value = valueAndType[1]
+      val actualValue = valueAndType[1]
       return when (valueType) {
-        Boolean::class.qualifiedName -> value.toBoolean()
-        Int::class.qualifiedName -> value.toInt()
-        Long::class.qualifiedName -> value.toLong()
-        Float::class.qualifiedName -> value.toFloat()
-        Double::class.qualifiedName -> value.toDouble()
-        String::class.qualifiedName -> value
-        JBColor::class.qualifiedName -> JBColor(value.toInt(), value.toInt())
-        LocaleContainer::class.qualifiedName -> LocaleContainer(Locale.forLanguageTag(value))
-        BigDecimal::class.qualifiedName -> BigDecimal(value)
-        else -> parseValue(valueType, value)
+        Boolean::class.qualifiedName -> actualValue.toBoolean()
+        Int::class.qualifiedName -> actualValue.toInt()
+        Long::class.qualifiedName -> actualValue.toLong()
+        Float::class.qualifiedName -> actualValue.toFloat()
+        Double::class.qualifiedName -> actualValue.toDouble()
+        String::class.qualifiedName -> actualValue
+        JBColor::class.qualifiedName -> JBColor(actualValue.toInt(), actualValue.toInt())
+        LocaleContainer::class.qualifiedName -> LocaleContainer(Locale.forLanguageTag(actualValue))
+        BigDecimal::class.qualifiedName -> BigDecimal(actualValue)
+        else -> parseValue(valueType, actualValue)
       }
     }
 

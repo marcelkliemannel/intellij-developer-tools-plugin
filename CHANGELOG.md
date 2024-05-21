@@ -10,6 +10,12 @@
 
 ### Fixed
 
+## 5.0.0 - 2024-05-21
+
+### Added
+
+- Compatibility with IntelliJ 2024.2 EAP
+
 ## 4.3.0 - 2024-05-20
 
 ### Added

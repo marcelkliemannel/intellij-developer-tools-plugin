@@ -3,13 +3,12 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.ScrollPaneFactory
-import com.intellij.util.ui.HtmlPanel
-import com.intellij.util.ui.StartupUiUtil
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.ToolsMenuTree
-import java.awt.Font
 import javax.swing.Action
 import javax.swing.JComponent
 
@@ -35,17 +34,12 @@ class ChangelogDialog(
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   override fun createCenterPanel(): JComponent = BorderLayoutPanel(0, UIUtil.LARGE_VGAP).apply {
-    addToCenter(object : HtmlPanel() {
-
-      init {
-        text = ToolsMenuTree::class.java.getResource(CHANGELOG_HTML_FILE)?.readText() ?: "Couldn't find 'What's New' text"
-        background = UIUtil.getPanelBackground()
-      }
-
-      override fun getBodyFont(): Font = StartupUiUtil.labelFont
-
-      override fun getBody(): String = ""
-
+    addToCenter(panel {
+      row {
+        text(ToolsMenuTree::class.java.getResource(CHANGELOG_HTML_FILE)?.readText() ?: "Couldn't find 'What's New' text")
+          .resizableColumn()
+          .align(Align.FILL)
+      }.resizableRow()
     }.let { ScrollPaneFactory.createScrollPane(it, true) })
 
     addToBottom(
