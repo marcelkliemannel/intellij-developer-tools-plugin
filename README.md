@@ -55,6 +55,15 @@ To add the "Open Dialog" action to the main toolbar, we can either enable it in 
 
 All inputs and configurations of the dialog will be stored on the application level.
 
+## Versioning
+
+Due to API breaking changes in IntelliJ 2024.2, the plugin will be maintained in two release branches (both will get the same features and bugfixes):
+
+- Release 4.* (maintained in branch `release_4-until-build-2024.1`) until IntelliJ 2024.1.* 
+- Release 5.* (maintained in branch `main`) starting from IntelliJ 2024.2.*
+
+The release 4 will be supported until the latest stable Android Studio uses IntelliJ 2024.2. 
+
 ## Development
 
 This plugin is not seen as a library. Therefore, code changes do not necessarily adhere to the semantics version rules.
