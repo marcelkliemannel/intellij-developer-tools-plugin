@@ -67,6 +67,10 @@ internal open class ContentPanelHandler(
     }
   }
 
+  fun showTool(id: String) {
+    toolsMenuTree.selectDeveloperTool(id) {}
+  }
+
   protected open fun createDeveloperToolContentPanel(developerToolNode: DeveloperToolNode): DeveloperToolContentPanel =
     DeveloperToolContentPanel(developerToolNode)
 

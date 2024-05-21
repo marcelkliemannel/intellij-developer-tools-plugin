@@ -16,14 +16,7 @@ internal class OpenDeveloperToolService(val project: Project) {
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   fun <T : OpenDeveloperToolContext> openTool(context: T, reference: OpenDeveloperToolReference<T>) {
-    val showToolWindow = if (DeveloperToolsApplicationSettings.instance.autoDetectActionHandlingInstance) {
-      !DeveloperToolsApplicationSettings.instance.addOpenMainDialogActionToMainToolbar
-    }
-    else {
-      DeveloperToolsApplicationSettings.instance.selectedActionHandlingInstance == TOOL_WINDOW
-    }
-
-    if (showToolWindow) {
+    if (showToolWindow()) {
       project.service<MainToolWindowService>().openTool(context, reference)
     }
     else {
@@ -31,7 +24,27 @@ internal class OpenDeveloperToolService(val project: Project) {
     }
   }
 
+  fun showTool(id: String) {
+    if (showToolWindow()) {
+      project.service<MainToolWindowService>().showTool(id)
+    }
+    else {
+      ApplicationManager.getApplication().service<MainDialogService>().showTool(project, id)
+    }
+  }
+
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun showToolWindow(): Boolean {
+    val showToolWindow = if (DeveloperToolsApplicationSettings.instance.autoDetectActionHandlingInstance) {
+      !DeveloperToolsApplicationSettings.instance.addOpenMainDialogActionToMainToolbar
+    }
+    else {
+      DeveloperToolsApplicationSettings.instance.selectedActionHandlingInstance == TOOL_WINDOW
+    }
+    return showToolWindow
+  }
+
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 }

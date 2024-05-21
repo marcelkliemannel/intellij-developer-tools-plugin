@@ -10,6 +10,25 @@
 
 ### Fixed
 
+## 4.3.0 - 2024-05-20
+
+### Added
+
+- Add keymap actions to show a developer tool
+- Add optional strict secret/key requirements check to the "JSON Web Token (JWT) Decoder/Encoder" tool.
+- Add gutter icon with readable a readable date/time format for UNIX timestamps in the "JSON Web Token (JWT) Decoder/Encoder" tool.
+- The "JSON Web Token (JWT) Decoder/Encoder" tool interface now includes sliders to flexibly change the size of the editors.
+- Add new tool "Text Filter".
+
+### Changed
+
+- The tool "JWT Decoder/Encoder" renamed to "JSON Web Token (JWT) Decoder/Encoder".
+- Context menu action "Text Statistic..." was renamed to "Show Text Statistic of Document...".
+
+### Removed
+
+- The input of a public key for the JWT signature configuration was removed from the "JSON Web Token (JWT) Decoder/Encoder" tool.
+
 ## 4.2.0 - 2024-04-08
 
 ### Changed

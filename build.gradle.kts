@@ -7,7 +7,7 @@ plugins {
   java
   // See bundled version: https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
   kotlin("jvm") version "1.9.10"
-  id("org.jetbrains.intellij") version "1.17.2"
+  id("org.jetbrains.intellij") version "1.17.3"
   id("org.jetbrains.changelog") version "2.2.0"
   id("com.autonomousapps.dependency-analysis") version "1.30.0"
 }
@@ -27,7 +27,6 @@ dependencies {
   implementation("com.jayway.jsonpath:json-path:2.9.0") {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
-  implementation("com.auth0:java-jwt:4.3.0")
   val jacksonVersion = "2.17.0"
   implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
   implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
@@ -55,6 +54,9 @@ dependencies {
   implementation("com.github.f4b6a3:ulid-creator:5.2.3")
   implementation("org.silentsoft:csscolor4j:1.0.0")
   implementation("commons-io:commons-io:2.15.1")
+  implementation("org.bitbucket.b_c:jose4j:0.9.6") {
+    exclude(group = "org.slf4j", module = "slf4j-api")
+  }
 
   testImplementation("org.assertj:assertj-core:3.25.3")
   val junitVersion = "5.10.2"

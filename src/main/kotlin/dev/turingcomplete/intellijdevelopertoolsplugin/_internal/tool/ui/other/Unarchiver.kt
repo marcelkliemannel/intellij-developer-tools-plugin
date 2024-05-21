@@ -1262,7 +1262,7 @@ internal class Unarchiver(
 
   class OpenArchiveFileInUnarchiverAction : DumbAwareAction(
     "Unarchiver",
-    "Open archive file in the developer tool 'Unarchiver'",
+    "Open archive file in the developer tool 'Unarchiver'.",
     null
   ) {
 

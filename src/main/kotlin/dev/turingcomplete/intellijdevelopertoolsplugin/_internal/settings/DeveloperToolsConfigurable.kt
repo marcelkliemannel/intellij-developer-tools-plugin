@@ -91,7 +91,7 @@ class DeveloperToolsConfigurable : Configurable {
           .enabledIf(autoDetectActionHandlingInstance.not())
       }.bottomGap(BottomGap.NONE)
       row {
-        comment("The plugin provides actions in other places in IntelliJ (e.g. in the editor or the project file tree) that open a developer tool. In these settings you can specify whether these actions open the dialog or the tool window.")
+        comment("The plugin provides actions in other places in IntelliJ (e.g. in the editor or the project file tree) that open a developer tool. With this setting you can specify whether these actions open the dialog or the tool window.")
       }
     }
 

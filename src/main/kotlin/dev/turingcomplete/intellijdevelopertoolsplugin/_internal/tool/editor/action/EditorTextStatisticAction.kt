@@ -9,9 +9,9 @@ import com.intellij.openapi.project.DumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.getSelectedText
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextStatistic
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextStatistic.Companion
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.toolwindow.MainToolWindowService
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolService
 
-internal class EditorTextStatisticAction : DumbAwareAction("Text Statistic...") {
+internal class EditorTextStatisticAction : DumbAwareAction("Show Text Statistic of Document...") {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -25,7 +25,7 @@ internal class EditorTextStatisticAction : DumbAwareAction("Text Statistic...") 
     val project = e.getData(CommonDataKeys.PROJECT) ?: return
     val editor = e.getData(CommonDataKeys.EDITOR) ?: return
     val text = runReadAction { editor.getSelectedText()?.first ?: editor.document.text }
-    project.service<MainToolWindowService>().openTool(
+    project.service<OpenDeveloperToolService>().openTool(
       TextStatistic.OpenTextStatisticContext(text),
       Companion.openTextStatisticReference
     )

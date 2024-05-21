@@ -1,12 +1,16 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.common
 
-import com.intellij.openapi.observable.properties.ObservableProperty
+import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
 import javax.swing.JComponent
 
-class ErrorHolder {
+class ErrorHolder(
+  // Icon must be used in a `text()` cell, a `label()` cell will not work.
+  private val addErrorIconToMessage: Boolean = false,
+  private val surroundMessageWithHtml: Boolean = true
+) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val changeListeners = mutableListOf<(List<String>) -> Unit>()
@@ -16,17 +20,25 @@ class ErrorHolder {
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  fun add(prefix: String, exception: Exception) {
-    errors.add("$prefix ${exception.message ?: exception::class.java.simpleName}")
+  fun add(prefix: String, error: Throwable) {
+    errors.add("$prefix ${error.message ?: error::class.java.simpleName}")
     fireChange()
   }
 
-  fun add(exception: Exception) {
-    errors.add(exception.message ?: exception::class.java.simpleName)
+  fun add(error: Throwable) {
+    errors.add(error.message ?: error::class.java.simpleName)
     fireChange()
   }
 
   fun add(message: String) {
+    errors.add(message)
+    fireChange()
+  }
+
+  fun addIfEmpty(message: String) {
+    if (errors.isNotEmpty()) {
+      return
+    }
     errors.add(message)
     fireChange()
   }
@@ -49,20 +61,29 @@ class ErrorHolder {
     override fun invoke(): Boolean = errors.isNotEmpty()
   }
 
-  fun <T> asValidation(forComponent: JComponent? = null): ValidationInfoBuilder.(T) -> ValidationInfo? =
-    { formatErrors()?.let { ValidationInfo(it, forComponent) } }
+  fun <T> asValidation(forComponent: JComponent? = null): ValidationInfoBuilder.(T) -> ValidationInfo? {
+    return { formatErrors()?.let { ValidationInfo(it, forComponent) } }
+  }
 
   /**
-   * Creates a [ObservableProperty] that will return an empty string if there is
-   * no error.
+   * Creates a [ObservableMutableProperty] that will return an empty string if
+   * there is no error.
+   *
+   * The `set()` operation is not supported but a [com.intellij.ui.dsl.builder.Row.text]
+   * requires [ObservableMutableProperty] and not only a
+   * [com.intellij.openapi.observable.properties.ObservableProperty].
    */
-  fun asObservableNonNullProperty(): ObservableProperty<String> = object : ObservableProperty<String> {
+  fun asPropertyForTextCell(): ObservableMutableProperty<String> = object : ObservableMutableProperty<String> {
 
     override fun afterChange(listener: (String) -> Unit) {
       changeListeners.add { listener(formatErrors() ?: "") }
     }
 
     override fun get(): String = formatErrors() ?: ""
+
+    override fun set(value: String) {
+      throw UnsupportedOperationException()
+    }
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
@@ -70,12 +91,19 @@ class ErrorHolder {
   private fun formatErrors(): String? = errors.let {
     when (it.size) {
       0 -> null
-      1 -> "<html>${it[0]}</html>"
-      else -> it.joinToString(separator = "\n", prefix = "<html><ul>", postfix = "</ul></html>") {
-        error -> "<li>$error</li>"
+      1 -> if (surroundMessageWithHtml) "<html>${formatError(it[0])}</html>" else formatError(it[0])
+      else -> it.joinToString(
+        separator = "\n",
+        prefix = "${if (surroundMessageWithHtml) "<html>" else ""}<ul style='padding: 0; margin: 0'>",
+        postfix = "</ul>${if (surroundMessageWithHtml) "</html>" else ""}"
+      ) { error ->
+        "<li>${formatError(error)}</li>"
       }
     }
   }
+
+  private fun formatError(message: String) =
+    "${if (addErrorIconToMessage) "<icon src='AllIcons.General.Error'>&nbsp;" else ""}$message"
 
   private fun fireChange() {
     changeListeners.forEach { it(errors) }

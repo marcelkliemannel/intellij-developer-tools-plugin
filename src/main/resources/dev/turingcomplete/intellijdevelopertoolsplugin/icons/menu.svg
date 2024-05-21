@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16px"
+     height="16px">
+  <g id="Outlined">
+    <line style="fill:none;stroke:#6C707E;stroke-width:2;stroke-miterlimit:10;" x1="2" y1="12" x2="22" y2="12"/>
+    <line style="fill:none;stroke:#6C707E;stroke-width:2;stroke-miterlimit:10;" x1="2" y1="6" x2="22" y2="6"/>
+    <line style="fill:none;stroke:#6C707E;stroke-width:2;stroke-miterlimit:10;" x1="2" y1="18" x2="22" y2="18"/>
+  </g>
+</svg>
