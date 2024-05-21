@@ -7,7 +7,7 @@ plugins {
   java
   // See bundled version: https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
   kotlin("jvm") version "1.9.10"
-  id("org.jetbrains.intellij") version "1.17.2"
+  id("org.jetbrains.intellij") version "1.17.3"
   id("org.jetbrains.changelog") version "2.2.0"
   id("com.autonomousapps.dependency-analysis") version "1.30.0"
 }
