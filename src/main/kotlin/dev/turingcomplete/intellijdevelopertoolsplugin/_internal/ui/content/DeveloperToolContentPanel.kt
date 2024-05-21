@@ -13,6 +13,7 @@ import com.intellij.ui.ScrollPaneFactory.createScrollPane
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.actionsButton
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.tabs.JBTabs
 import com.intellij.ui.tabs.JBTabsFactory

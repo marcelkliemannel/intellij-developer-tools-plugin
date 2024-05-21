@@ -18,6 +18,7 @@ import com.intellij.ui.IconManager
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsToolWindowSettings

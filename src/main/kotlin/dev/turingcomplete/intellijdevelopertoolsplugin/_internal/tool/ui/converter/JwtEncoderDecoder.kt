@@ -27,6 +27,7 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.TopGap
+import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
@@ -40,7 +41,6 @@ import com.intellij.ui.layout.ComboBoxPredicate
 import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
 import com.intellij.util.ExceptionUtil
-import com.intellij.util.io.decodeBase64
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
@@ -760,7 +760,7 @@ internal class JwtEncoderDecoder(
           when (secretEncodingMode.get()) {
             RAW -> secret.get().encodeToByteArray()
             BASE32 -> Base32().decode(secret.get())
-            BASE64 -> secret.get().decodeBase64()
+            BASE64 -> Base64.getDecoder().decode(secret.get())
           }
         )
 
