@@ -23,15 +23,17 @@
 
 - Compatibility with IntelliJ 2024.2 EAP
 
+- The _Text Diff_ tool UI will no longer add an unnecessary scrollbar if the text is larger than the visible editor.
+
 ## 4.3.0 - 2024-05-20
 
 ### Added
 
 - Add keymap actions to show a developer tool
-- Add optional strict secret/key requirements check to the "JSON Web Token (JWT) Decoder/Encoder" tool.
-- Add gutter icon with readable a readable date/time format for UNIX timestamps in the "JSON Web Token (JWT) Decoder/Encoder" tool.
+- Add optional strict secret/key requirements check to the _JSON Web Token (JWT) Decoder/Encoder_ tool.
+- Add gutter icon with readable a readable date/time format for UNIX timestamps in the _JSON Web Token (JWT) Decoder/Encoder_ tool.
 - The "JSON Web Token (JWT) Decoder/Encoder" tool interface now includes sliders to flexibly change the size of the editors.
-- Add new tool "Text Filter".
+- Add new tool _Text Filter_.
 
 ### Changed
 

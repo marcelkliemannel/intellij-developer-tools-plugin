@@ -9,7 +9,6 @@ import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.Messages.InputDialog
 import com.intellij.ui.RelativeFont
-import com.intellij.ui.ScrollPaneFactory.createScrollPane
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.Row
@@ -138,9 +137,7 @@ internal open class DeveloperToolContentPanel(
   }
 
   private fun addWorkbench(developerToolContainer: DeveloperToolContainer) {
-    val developerToolComponent = developerToolContainer.instance.createComponent().run {
-      createScrollPane(this, true)
-    }
+    val developerToolComponent = developerToolContainer.instance.createComponent()
     val tabInfo = TabInfo(developerToolComponent).apply {
       text = developerToolContainer.configuration.name
       `object` = developerToolContainer
