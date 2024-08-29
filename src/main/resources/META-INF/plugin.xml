@@ -261,9 +261,6 @@
             id="date-time-converter"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter$Factory"/>
     <developerUiTool
-            id="time-conversion"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.TimeConversion$Factory"/>
-    <developerUiTool
             id="json-path"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.JsonPathTransformer$Factory"/>
     <developerUiTool
@@ -284,6 +281,9 @@
     <developerUiTool
             id="notes"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.Notes$Factory"/>
+    <developerUiTool
+            id="units-converter"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.UnitsConverter$Factory"/>
     <developerUiTool
             id="rubber-duck"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RubberDuck$Factory"/>

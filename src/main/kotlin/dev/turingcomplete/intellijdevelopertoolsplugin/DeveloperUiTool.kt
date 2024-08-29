@@ -52,6 +52,10 @@ abstract class DeveloperUiTool(
       override fun getData(dataId: String): Any? = this@DeveloperUiTool.getData(dataId)
     }
 
+    if (wrapComponentInScrollPane) {
+      wrapper = createScrollPane(wrapper, true)
+    }
+
     afterBuildUi()
 
     return wrapper

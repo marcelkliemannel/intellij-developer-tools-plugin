@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.text.StringUtil.stripHtml
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.COLUMNS_MEDIUM
 import com.intellij.ui.dsl.builder.Panel
@@ -38,6 +37,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyActi
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer.Companion.ALL_AVAILABLE_LOCALES
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.bindIntTextImproved
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.bindLongTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.changeFont
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.not
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.validateLongValue
@@ -85,17 +86,18 @@ class DatetimeConverter(
   private val currentUnixTimestampUpdateAlarm by lazy { Alarm(parentDisposable) }
   private val currentUnixTimestampUpdate: Runnable by lazy { createCurrentUnixTimestampUpdate() }
   private val currentUnixTimestampSeconds = ValueProperty(System.currentTimeMillis().div(1000).toString())
-
   private val currentUnixTimestampMillis = ValueProperty(System.currentTimeMillis().toString())
+
   private val convertAlarm by lazy { Alarm(parentDisposable) }
-  private lateinit var unixTimeStampSecondsTextField: JBTextField
-  private lateinit var unixTimeStampMillisTextField: JBTextField
-  private lateinit var dayTextField: JBTextField
-  private lateinit var monthTextField: JBTextField
-  private lateinit var yearTextField: JBTextField
-  private lateinit var hourTextField: JBTextField
-  private lateinit var minuteTextField: JBTextField
-  private lateinit var secondTextField: JBTextField
+
+  private val convertUnixTimeStampSeconds = ValueProperty<Long>(0)
+  private val convertUnixTimeStampMillis = ValueProperty<Long>(0)
+  private val convertDay =  ValueProperty(0)
+  private val convertMonth = ValueProperty(0)
+  private val convertYear = ValueProperty(0)
+  private val convertHour = ValueProperty(0)
+  private val convertMinute = ValueProperty(0)
+  private val convertSecond = ValueProperty(0)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 
@@ -164,19 +166,22 @@ class DatetimeConverter(
             }
         }
         row {
-          yearTextField = textField().label("Year:")
+          textField().label("Year:")
             .text(initialLocalDateTime.year.toString())
+            .bindIntTextImproved(convertYear)
             .columns(5)
             .validateLongValue(LongRange(1970, 9999))
             .whenTextChangedFromUi { convert(YEAR) }
             .component
-          monthTextField = textField().label("Month:")
+          textField().label("Month:")
             .text(initialLocalDateTime.monthValue.toString())
+            .bindIntTextImproved(convertMonth)
             .columns(5)
             .validateLongValue(LongRange(1, 12))
             .whenTextChangedFromUi { convert(MONTH) }
             .component
-          dayTextField = textField().label("Day:")
+          textField().label("Day:")
+            .bindIntTextImproved(convertDay)
             .text(initialLocalDateTime.dayOfMonth.toString())
             .columns(5)
             .validateLongValue(LongRange(1, 31))
@@ -185,19 +190,22 @@ class DatetimeConverter(
             .component
         }.layout(RowLayout.PARENT_GRID)
         row {
-          hourTextField = textField().label("Hour:")
+          textField().label("Hour:")
+            .bindIntTextImproved(convertHour)
             .text(initialLocalDateTime.hour.toString())
             .columns(5)
             .validateLongValue(LongRange(0, 23))
             .whenTextChangedFromUi { convert(HOUR) }
             .component
-          minuteTextField = textField().label("Minute:")
+          textField().label("Minute:")
+            .bindIntTextImproved(convertMinute)
             .text(initialLocalDateTime.minute.toString())
             .columns(5)
             .validateLongValue(LongRange(0, 59))
             .whenTextChangedFromUi { convert(MINUTE) }
             .component
-          secondTextField = textField().label("Second:")
+          textField().label("Second:")
+            .bindIntTextImproved(convertSecond)
             .text(initialLocalDateTime.second.toString())
             .columns(5)
             .validateLongValue(LongRange(0, 59))
@@ -311,13 +319,14 @@ class DatetimeConverter(
 
   private fun Row.createSetToNowButton() {
     button("Set to Now") {
-      unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
+      convertUnixTimeStampMillis.set(System.currentTimeMillis())
       convert(UNIX_TIMESTAMP_MILLIS, 0)
     }
   }
 
   private fun Row.buildUnixTimeStampMillisTextFieldUi(initialInstant: Instant) {
-    unixTimeStampMillisTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
+    textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
+      .bindLongTextImproved(convertUnixTimeStampMillis)
       .label("Milliseconds:")
       .text(initialInstant.toEpochMilli().toString())
       .columns(12)
@@ -326,7 +335,8 @@ class DatetimeConverter(
   }
 
   private fun Row.buildUnixTimeStampSecondsTextFieldUi(initialInstant: Instant) {
-    unixTimeStampSecondsTextField = textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
+    textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
+      .bindLongTextImproved(convertUnixTimeStampSeconds)
       .label("Seconds:")
       .text(initialInstant.epochSecond.toString())
       .columns(12)
@@ -351,7 +361,7 @@ class DatetimeConverter(
   private fun init() {
     syncFormattedStandardFormatPattern()
 
-    unixTimeStampMillisTextField.text = System.currentTimeMillis().toString()
+    convertUnixTimeStampMillis.set(System.currentTimeMillis())
     convert(UNIX_TIMESTAMP_MILLIS, 0)
   }
 
@@ -380,8 +390,8 @@ class DatetimeConverter(
 
     // Take a snapshot of the input fields since the alarm gets execute with
     // some delay.
-    val unixTimeStampSeconds = unixTimeStampSecondsTextField.text.toLong()
-    val unixTimeStampMillis = unixTimeStampMillisTextField.text.toLong()
+    val unixTimeStampSeconds = convertUnixTimeStampSeconds.get()
+    val unixTimeStampMillis = convertUnixTimeStampMillis.get()
 
     val convert: () -> Unit = {
       when (conversionOrigin) {
@@ -398,12 +408,12 @@ class DatetimeConverter(
         }
 
         DAY, MONTH, YEAR, HOUR, MINUTE, SECOND -> {
-          val year = yearTextField.text.toInt()
-          val month = monthTextField.text.toInt()
-          val day = dayTextField.text.toInt()
-          val hour = hourTextField.text.toInt()
-          val minute = minuteTextField.text.toInt()
-          val second = secondTextField.text.toInt()
+          val year = convertYear.get()
+          val month = convertMonth.get()
+          val day = convertDay.get()
+          val hour = convertHour.get()
+          val minute = convertMinute.get()
+          val second = convertSecond.get()
 
           val localDateTime = ZonedDateTime.of(year, month, day, hour, minute, second, 0, selectedTimeZoneId())
           setConvertedValues(localDateTime, conversionOrigin)
@@ -422,28 +432,29 @@ class DatetimeConverter(
   private fun setConvertedValues(localDateTime: ZonedDateTime, conversionOrigin: ConversionOrigin) {
     val millis = localDateTime.withZoneSameInstant(ZoneOffset.UTC).toInstant().toEpochMilli()
     if (conversionOrigin != UNIX_TIMESTAMP_SECONDS) {
-      unixTimeStampSecondsTextField.text = millis.div(1000).toString()
+      convertUnixTimeStampSeconds.set(millis.div(1000))
     }
     if (conversionOrigin != UNIX_TIMESTAMP_MILLIS) {
-      unixTimeStampMillisTextField.text = millis.toString()
+      convertUnixTimeStampMillis.set(millis)
     }
+    // todo: somethign is wrong here (it is 0 in the UI)
     if (conversionOrigin != YEAR) {
-      yearTextField.text = localDateTime.year.toString()
+      convertYear.set(localDateTime.year)
     }
     if (conversionOrigin != MONTH) {
-      monthTextField.text = localDateTime.monthValue.toString()
+      convertMonth.set(localDateTime.monthValue)
     }
     if (conversionOrigin != DAY) {
-      dayTextField.text = localDateTime.dayOfMonth.toString()
+      convertDay.set(localDateTime.dayOfMonth)
     }
     if (conversionOrigin != HOUR) {
-      hourTextField.text = localDateTime.hour.toString()
+      convertHour.set(localDateTime.hour)
     }
     if (conversionOrigin != MINUTE) {
-      minuteTextField.text = localDateTime.minute.toString()
+      convertMinute.set(localDateTime.minute)
     }
     if (conversionOrigin != SECOND) {
-      secondTextField.text = localDateTime.second.toString()
+      convertSecond.set(localDateTime.second)
     }
 
     val dayOfYear = localDateTime.get(ChronoField.DAY_OF_YEAR).toLong()

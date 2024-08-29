@@ -64,7 +64,6 @@ fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) = this.apply {
   }
 }
 
-
 @Suppress("UnstableApiUsage")
 fun Cell<JBTextField>.validateBigDecimalValue(
   minInclusive: BigDecimal? = null,

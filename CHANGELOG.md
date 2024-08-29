@@ -4,7 +4,11 @@
 
 ### Added
 
+- New tool "Units Converter" that supports data sizes and transfer rates conversion.
+
 ### Changed
+
+- Tool "Time Conversion" moved into the new "Units Converter" tool
 
 ### Removed
 
