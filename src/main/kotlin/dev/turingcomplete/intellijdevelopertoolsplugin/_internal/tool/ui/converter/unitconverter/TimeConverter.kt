@@ -2,8 +2,8 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.conver
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
@@ -27,21 +27,21 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.convert
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.SECONDS
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.WEEKS
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.YEARS
-import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 import java.math.BigDecimal
 import java.math.BigDecimal.TEN
 import java.math.BigDecimal.ZERO
 import java.math.MathContext
 import java.text.DecimalFormat
 import java.time.Duration
+import javax.swing.JComponent
 
 internal class TimeConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
-) : UnitConverter("time", configuration, parentDisposable, "Time") {
+) : UnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Time") {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val nanoseconds = configuration.register("timeNanoseconds", ZERO, INPUT, NANOSECONDS_EXAMPLE)
+  private val nanoseconds = configuration.register("${CONFIGURATION_KEY_PREFIX}timeNanoseconds", ZERO, INPUT, NANOSECONDS_EXAMPLE)
 
   private val nanosecondsFormatted = ValueProperty("0")
   private val millisecondsFormatted = ValueProperty("0")
@@ -64,118 +64,62 @@ internal class TimeConverter(
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
-    row {
-      textField()
-        .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal() }
-        .label("Nanoseconds:")
-        .bindText(nanosecondsFormatted)
-        .whenTextChangedFromUi { convert(NANOSECONDS) }
-        .columns(15)
-    }.layout(RowLayout.PARENT_GRID)
-    row {
-      textField()
-        .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal() }
-        .label("Milliseconds:")
-        .bindText(millisecondsFormatted)
-        .whenTextChangedFromUi { convert(MILLISECONDS) }
-        .columns(15)
-    }.layout(RowLayout.PARENT_GRID)
-    row {
-      textField()
-        .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal() }
-        .label("Seconds:")
-        .bindText(secondsFormatted)
-        .whenTextChangedFromUi { convert(SECONDS) }
-        .columns(15)
-    }.layout(RowLayout.PARENT_GRID)
-    row {
-      textField()
-        .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal() }
-        .label("Minutes:")
-        .bindText(minutesFormatted)
-        .whenTextChangedFromUi { convert(MINUTES) }
-        .columns(15)
-        .gap(RightGap.SMALL)
-      comment("")
-        .bindText(minutesDetail)
-        .visibleIf(PropertyComponentPredicate(minutesDetail, "").not())
-    }.layout(RowLayout.PARENT_GRID)
-    row {
-      textField()
-        .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal() }
-        .label("Hours:")
-        .bindText(hoursFormatted)
-        .whenTextChangedFromUi { convert(HOURS) }
-        .columns(15)
-        .gap(RightGap.SMALL)
-      comment("")
-        .bindText(hoursDetail)
-        .visibleIf(PropertyComponentPredicate(hoursDetail, "").not())
-    }.layout(RowLayout.PARENT_GRID)
-    row {
-      textField()
-        .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal() }
-        .label("Days:")
-        .bindText(daysFormatted)
-        .whenTextChangedFromUi { convert(DAYS) }
-        .columns(15)
-        .gap(RightGap.SMALL)
-      comment("")
-        .bindText(daysDetail)
-        .visibleIf(PropertyComponentPredicate(daysDetail, "").not())
-    }.layout(RowLayout.PARENT_GRID)
-    row {
-      textField()
-        .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal() }
-        .label("Months:")
-        .bindText(monthsFormatted)
-        .whenTextChangedFromUi { convert(MONTHS) }
-        .columns(15)
-        .gap(RightGap.SMALL)
-      contextHelp("One month is equal to 30.416 days (365/12).")
-    }.layout(RowLayout.PARENT_GRID)
-    row {
-      textField()
-        .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal() }
-        .label("Years:")
-        .bindText(yearsFormatted)
-        .whenTextChangedFromUi { convert(YEARS) }
-        .columns(15)
-    }.layout(RowLayout.PARENT_GRID)
-    row {
-      textField()
-        .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal() }
-        .label("Decades:")
-        .bindText(decadesFormatted)
-        .whenTextChangedFromUi { convert(DECADES) }
-        .columns(15)
-    }.layout(RowLayout.PARENT_GRID)
-    row {
-      textField()
-        .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal() }
-        .label("Centuries:")
-        .bindText(centuriesFormatted)
-        .whenTextChangedFromUi { convert(CENTURIES) }
-        .columns(15)
-    }.layout(RowLayout.PARENT_GRID)
-    row {
-      textField()
-        .validateBigDecimalValue(ZERO, FIXED_MATH_CONTEXT) { it.parseBigDecimal() }
-        .label("Millenniums:")
-        .bindText(millenniumsFormatted)
-        .whenTextChangedFromUi { convert(MILLENNIUMS) }
-        .columns(15)
-    }.layout(RowLayout.PARENT_GRID)
+    data class TimeField(
+      val title: String,
+      val valueProperty: ValueProperty<String>,
+      val changeOrigin: ChangeOrigin,
+      val contextHelp: String? = null,
+      val detail: ValueProperty<String>? = null
+    )
+
+    listOf(
+      TimeField("Nanoseconds", nanosecondsFormatted, NANOSECONDS),
+      TimeField("Milliseconds", millisecondsFormatted, MILLISECONDS),
+      TimeField("Seconds", secondsFormatted, SECONDS),
+      TimeField("Minutes", minutesFormatted, MINUTES, null, minutesDetail),
+      TimeField("Hours", hoursFormatted, HOURS, null, hoursDetail),
+      TimeField("Days", daysFormatted, DAYS, null, daysDetail),
+      TimeField("Months", monthsFormatted, MONTHS, "One month is equal to 30.416 days (365/12)."),
+      TimeField("Years", yearsFormatted, YEARS),
+      TimeField("Decades", decadesFormatted, DECADES),
+      TimeField("Centuries", centuriesFormatted, CENTURIES),
+      TimeField("Millenniums", millenniumsFormatted, MILLENNIUMS),
+    ).forEach { (title, valueProperty, changeOrigin, contextHelp, detail) ->
+      row {
+        lateinit var textField: JBTextField
+        textField = textField()
+          .validateBigDecimalValue(ZERO, mathContext) { it.parseBigDecimal() }
+          .label("$title:")
+          .bindText(valueProperty)
+          .whenTextChangedFromUi { convert(changeOrigin, textField) }
+          .columns(15)
+          .component
+        if (detail != null) {
+          comment("")
+            .bindText(detail)
+            .visibleIf(PropertyComponentPredicate(detail, "").not())
+        }
+        if (contextHelp != null) {
+          contextHelp(contextHelp)
+        }
+      }.layout(RowLayout.PARENT_GRID)
+    }
   }
 
   override fun doSync() {
-    convert(null, nanoseconds.get())
+    convert(null, null, nanoseconds.get())
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
-  private fun convert(changeOrigin: ChangeOrigin? = null, changeOriginAsNanoseconds: BigDecimal? = null) {
-    validate().ifNotEmpty { return } // todo: check if work
+  private fun convert(
+    changeOrigin: ChangeOrigin? = null,
+    changeOriginComponent: JComponent? = null,
+    changeOriginAsNanoseconds: BigDecimal? = null
+  ) {
+    if (changeOriginComponent != null && validate().any { it.component == changeOriginComponent }) {
+      return
+    }
 
     try {
       val monthToNanoseconds = BigDecimal.valueOf(365L).divide(BigDecimal.valueOf(12L), mathContext).multiply(
@@ -341,6 +285,8 @@ internal class TimeConverter(
   companion object {
 
     private val log = logger<TimeConverter>()
+
+    private const val CONFIGURATION_KEY_PREFIX = "timeConverter_"
 
     private val NANOSECONDS_EXAMPLE = BigDecimal.valueOf(123460000000000)
 

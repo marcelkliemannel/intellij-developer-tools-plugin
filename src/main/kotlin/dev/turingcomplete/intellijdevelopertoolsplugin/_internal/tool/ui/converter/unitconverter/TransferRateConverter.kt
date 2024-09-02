@@ -230,7 +230,7 @@ internal class TransferRateConverter(
     private const val CONFIGURATION_KEY_PREFIX = "transferRateConverter_"
     private const val DEFAULT_SHOW_LARGE_DATA_UNITS = false
     private const val DEFAULT_USE_COMBINED_ABBREVIATION_NOTATION = true
-    private val DEFAULT_BIT_TRANSFER_RATE_VALUE = BigDecimal.valueOf(134218000)
+    private val DEFAULT_BIT_TRANSFER_RATE_VALUE = BigDecimal.valueOf(1073741824)
     private val DEFAULT_TIME_DIMENSION = TransferRateTimeDimension.SECONDS
   }
 }

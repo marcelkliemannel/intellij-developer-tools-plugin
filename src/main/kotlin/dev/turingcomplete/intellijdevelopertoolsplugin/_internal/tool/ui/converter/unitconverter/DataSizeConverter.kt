@@ -142,7 +142,7 @@ class DataSizeConverter(
   companion object {
 
     private const val CONFIGURATION_KEY_PREFIX = "dataSizeConverter_"
-    private val DEFAULT_BIT_DATA_SIZE_VALUE = BigDecimal(1234567890)
+    private val DEFAULT_BIT_DATA_SIZE_VALUE = BigDecimal(1073740000)
     private const val DEFAULT_SHOW_LARGE_DATA_UNITS = false
   }
 }

@@ -8,11 +8,14 @@
 
 ### Changed
 
-- Tool "Time Conversion" moved into the new "Units Converter" tool
+- Tool "Time Conversion" moved into the new "Units Converter" tool.
 
 ### Removed
 
 ### Fixed
+- 
+- The _Text Diff_ tool UI will no longer add an unnecessary scrollbar if the text is larger than the visible editor.
+- Errors in the “Date Time” tool only block the conversion if this error occurs in the last active input field.
 
 ## 5.0.0 - 2024-05-21
 
