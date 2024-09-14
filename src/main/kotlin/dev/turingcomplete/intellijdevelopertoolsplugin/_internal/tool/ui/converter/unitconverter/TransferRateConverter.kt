@@ -11,8 +11,10 @@ import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.validateBigDecimalValue
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.DataUnits.DataUnit
@@ -32,8 +34,9 @@ internal class TransferRateConverter(
 
   private val timeDimension = configuration.register("${CONFIGURATION_KEY_PREFIX}timeDimension", DEFAULT_TIME_DIMENSION)
   private val showLargeDataUnits = configuration.register("${CONFIGURATION_KEY_PREFIX}showLargeDataUnits", DEFAULT_SHOW_LARGE_DATA_UNITS)
-  private val useCombinedAbbreviationNotation = configuration.register("${CONFIGURATION_KEY_PREFIX}useCombinedAbbreviationNotation", DEFAULT_USE_COMBINED_ABBREVIATION_NOTATION)
-  private val bitTransferRateValue = configuration.register("${CONFIGURATION_KEY_PREFIX}bitTransferRateValue", DEFAULT_BIT_TRANSFER_RATE_VALUE)
+  private val useCombinedAbbreviationNotation =
+    configuration.register("${CONFIGURATION_KEY_PREFIX}useCombinedAbbreviationNotation", DEFAULT_USE_COMBINED_ABBREVIATION_NOTATION)
+  private val bitTransferRateValue = configuration.register("${CONFIGURATION_KEY_PREFIX}bitTransferRateValue", ZERO, INPUT, DEFAULT_BIT_TRANSFER_RATE_VALUE)
 
   private val transferRateProperties: List<TransferRateProperty> = createTransferRateProperties()
   private val bitTransferRateProperty = transferRateProperties.first { it.dataUnit == bitDataUnit }
@@ -83,18 +86,25 @@ internal class TransferRateConverter(
     }
   }
 
+  @Suppress("UnstableApiUsage")
   override fun Panel.buildAdditionalSettingsUi() {
     row {
       checkBox("Show large data units")
         .bindSelected(showLargeDataUnits)
+        .whenStateChangedFromUi { sync() }
     }
     row {
       checkBox("Use combined abbreviation notation")
         .bindSelected(useCombinedAbbreviationNotation)
+        .whenStateChangedFromUi { sync() }
     }
   }
 
   override fun doSync() {
+    // During a reset, only the `bitTransferRateValue` will be changed but
+    // `convertByInputFieldChange` would overwrite the value with the old
+    // formatted value.
+    bitTransferRateProperty.formattedValue.set(bitTransferRateValue.get().toFormatted())
     convertByInputFieldChange(null, bitTransferRateProperty)
 
     transferRateProperties.forEach {
@@ -145,7 +155,7 @@ internal class TransferRateConverter(
 
   private fun createTransferRateProperties() = dataUnits.map {
     if (it == bitDataUnit) {
-      TransferRateProperty(it, bitTransferRateValue) { createTitle(it, timeDimension) }
+      TransferRateProperty(it, bitTransferRateValue, bitTransferRateValue.get().toFormatted()) { createTitle(it, timeDimension) }
         .apply { formattedValue.set(bitTransferRateValue.get().toFormatted()) }
     }
     else {
@@ -182,10 +192,11 @@ internal class TransferRateConverter(
   private class TransferRateProperty(
     val dataUnit: DataUnit,
     val rawValue: ValueProperty<BigDecimal>? = null,
+    initialFormattedValue: String = "0",
     val createTitle: () -> String
   ) {
 
-    val formattedValue: ValueProperty<String> = ValueProperty("0")
+    val formattedValue: ValueProperty<String> = ValueProperty(initialFormattedValue)
     val inputTitle: ValueProperty<String> = ValueProperty(createTitle())
 
     fun sync() {

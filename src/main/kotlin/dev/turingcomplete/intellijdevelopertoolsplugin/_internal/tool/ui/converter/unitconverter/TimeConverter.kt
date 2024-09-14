@@ -30,7 +30,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.convert
 import java.math.BigDecimal
 import java.math.BigDecimal.TEN
 import java.math.BigDecimal.ZERO
-import java.math.MathContext
 import java.text.DecimalFormat
 import java.time.Duration
 import javax.swing.JComponent
@@ -291,7 +290,6 @@ internal class TimeConverter(
     private val NANOSECONDS_EXAMPLE = BigDecimal.valueOf(123460000000000)
 
     private val DETAILS_FORMAT = DecimalFormat("0")
-    private val FIXED_MATH_CONTEXT = MathContext(10, java.math.RoundingMode.HALF_UP)
 
     private val MILLISECONDS_TO_NANOSECONDS = BigDecimal.valueOf(Duration.ofMillis(1).toNanos())
     private val SECONDS_TO_NANOSECONDS = BigDecimal.valueOf(Duration.ofSeconds(1).toNanos())

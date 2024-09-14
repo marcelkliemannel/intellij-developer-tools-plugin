@@ -9,21 +9,20 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.util.ui.JBUI.Borders
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.ChangeListener
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.ResetListener
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ScrollPaneBuilder
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import javax.swing.ScrollPaneConstants
 import javax.swing.event.ChangeEvent
+import javax.swing.event.ChangeListener
 
 class UnitsConverter(
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
-) : DeveloperUiTool(parentDisposable), ResetListener, ChangeListener, javax.swing.event.ChangeListener {
+) : DeveloperUiTool(parentDisposable), ResetListener, ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val unitConverters: List<UnitConverter> = listOf(
@@ -68,7 +67,6 @@ class UnitsConverter(
   override fun activated() {
     selectedUnitConverter.activate()
 
-    configuration.addChangeListener(parentDisposable, this)
     configuration.addResetListener(parentDisposable, this)
 
     unitConvertersTabbedPanel.addChangeListener(this)
@@ -77,14 +75,9 @@ class UnitsConverter(
   override fun deactivated() {
     selectedUnitConverter.deactivate()
 
-    configuration.removeChangeListener(this)
     configuration.removeResetListener(this)
 
     unitConvertersTabbedPanel.removeChangeListener(this)
-  }
-
-  override fun configurationChanged(property: ValueProperty<out Any>) {
-    sync()
   }
 
   override fun stateChanged(e: ChangeEvent?) {

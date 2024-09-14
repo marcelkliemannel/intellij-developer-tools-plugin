@@ -14,6 +14,8 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
+import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer.Companion.ALL_AVAILABLE_LOCALES
@@ -48,38 +50,6 @@ abstract class UnitConverter(
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
-
-  fun getDecimalSeparator(): String =
-    DecimalFormatSymbols.getInstance(parsingLocale.get().locale).decimalSeparator.toString()
-
-  fun Panel.buildSettingsUi() {
-    collapsibleGroup("Settings") {
-      buildAdditionalSettingsUi()
-      row {
-        comboBox(ALL_AVAILABLE_LOCALES)
-          .label("Locale for parsing:")
-          .bindItem(parsingLocale)
-          .columns(COLUMNS_MEDIUM)
-      }.layout(RowLayout.PARENT_GRID).bottomGap(BottomGap.NONE)
-      row {
-        cell()
-        label("")
-          .bindText(parsingDecimalSeparatorInfo)
-      }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE)
-      row {
-        textField()
-          .label("Decimal places:")
-          .bindIntTextImproved(decimalPlaces)
-          .validateLongValue(LongRange(1, 50))
-          .columns(COLUMNS_TINY)
-      }.layout(RowLayout.PARENT_GRID)
-      row {
-        comboBox(RoundingMode.entries)
-          .label("Rounding mode:")
-          .bindItem(roundingMode)
-      }.layout(RowLayout.PARENT_GRID)
-    }.topGap(TopGap.NONE)
-  }
 
   open fun Panel.buildAdditionalSettingsUi() {
     // Override if needed
@@ -155,6 +125,42 @@ abstract class UnitConverter(
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun getDecimalSeparator(): String =
+    DecimalFormatSymbols.getInstance(parsingLocale.get().locale).decimalSeparator.toString()
+
+  @Suppress("UnstableApiUsage")
+  private fun Panel.buildSettingsUi() {
+    collapsibleGroup("Settings") {
+      buildAdditionalSettingsUi()
+      row {
+        comboBox(ALL_AVAILABLE_LOCALES)
+          .label("Locale for parsing:")
+          .bindItem(parsingLocale)
+          .columns(COLUMNS_MEDIUM)
+          .whenItemSelectedFromUi { sync() }
+      }.layout(RowLayout.PARENT_GRID).bottomGap(BottomGap.NONE)
+      row {
+        cell()
+        label("")
+          .bindText(parsingDecimalSeparatorInfo)
+      }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE)
+      row {
+        textField()
+          .label("Decimal places:")
+          .bindIntTextImproved(decimalPlaces)
+          .validateLongValue(LongRange(1, 50))
+          .columns(COLUMNS_TINY)
+          .whenTextChangedFromUi { sync() }
+      }.layout(RowLayout.PARENT_GRID)
+      row {
+        comboBox(RoundingMode.entries)
+          .label("Rounding mode:")
+          .bindItem(roundingMode)
+          .whenItemSelectedFromUi { sync() }
+      }.layout(RowLayout.PARENT_GRID)
+    }.topGap(TopGap.NONE)
+  }
 
   private fun createMathContext() =
     MathContext(decimalPlaces.get() + 1, roundingMode.get().javaMathRoundingMode)

@@ -11,8 +11,10 @@ import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.validateBigDecimalValue
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.DataUnits.DataUnit
@@ -28,7 +30,7 @@ class DataSizeConverter(
 ) : UnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Data Size") {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private val bitDataSizeValue = configuration.register("${CONFIGURATION_KEY_PREFIX}bitDataSizeValue", DEFAULT_BIT_DATA_SIZE_VALUE)
+  private val bitDataSizeValue = configuration.register("${CONFIGURATION_KEY_PREFIX}bitDataSizeValue", ZERO, INPUT, DEFAULT_BIT_DATA_SIZE_VALUE)
   private val showLargeDataUnits = configuration.register("${CONFIGURATION_KEY_PREFIX}showLargeDataUnits", DEFAULT_SHOW_LARGE_DATA_UNITS)
 
   private val dataSizeProperties: List<DataSizeProperty> = createDataProperties()
@@ -54,7 +56,7 @@ class DataSizeConverter(
                 .resizableColumn()
                 .align(Align.FILL)
                 .whenTextChangedFromUi {
-                  convert(formattedFieldTextField.component, transferRateDataUnitProperty)
+                  convertByInputFieldChange(formattedFieldTextField.component, transferRateDataUnitProperty)
                 }
 
               if (transferRateDataUnitProperty.dataUnit.isLarge) {
@@ -67,7 +69,7 @@ class DataSizeConverter(
     }
   }
 
-  private fun convert(
+  private fun convertByInputFieldChange(
     inputFieldComponent: JBTextField?,
     dataSizeProperty: DataSizeProperty
   ) {
@@ -90,13 +92,20 @@ class DataSizeConverter(
   }
 
   override fun doSync() {
-    convert(null, bitDataSizeProperty)
+    // During a reset, only the `bitDataSizeValue` will be changed but
+    // `convertByInputFieldChange` would overwrite the value with the old
+    // formatted value.
+    bitDataSizeProperty.formattedValue.set(bitDataSizeValue.get().toFormatted())
+
+    convertByInputFieldChange(null, bitDataSizeProperty)
   }
 
+  @Suppress("UnstableApiUsage")
   override fun Panel.buildAdditionalSettingsUi() {
     row {
       checkBox("Show large data units")
         .bindSelected(showLargeDataUnits)
+        .whenStateChangedFromUi { sync() }
     }
   }
 
