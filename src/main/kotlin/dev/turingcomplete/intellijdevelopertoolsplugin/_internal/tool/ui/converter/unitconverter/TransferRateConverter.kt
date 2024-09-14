@@ -2,17 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.conver
 
 import com.intellij.openapi.Disposable
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.Align
-import com.intellij.ui.dsl.builder.BottomGap
-import com.intellij.ui.dsl.builder.Cell
-import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.RightGap
-import com.intellij.ui.dsl.builder.RowLayout
-import com.intellij.ui.dsl.builder.TopGap
-import com.intellij.ui.dsl.builder.bindSelected
-import com.intellij.ui.dsl.builder.bindText
-import com.intellij.ui.dsl.builder.whenStateChangedFromUi
-import com.intellij.ui.dsl.builder.whenTextChangedFromUi
+import com.intellij.ui.dsl.builder.*
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
@@ -49,7 +39,7 @@ internal class TransferRateConverter(
   @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
     row {
-      segmentedButton(TransferRateTimeDimension.entries) { it.title }
+      segmentedButton(TransferRateTimeDimension.entries) { text = it.title }
         .bind(timeDimension)
         .whenItemSelectedFromUi {
           convertByTimeDimensionChange(Pair(lastTimeDimension, it))

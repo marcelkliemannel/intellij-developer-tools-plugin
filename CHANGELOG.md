@@ -5,6 +5,7 @@
 ### Added
 
 - New tool "Units Converter" that supports data sizes and transfer rates conversion.
+- Add characters count to the "Text Statistic" tool.
 
 ### Changed
 
@@ -13,7 +14,7 @@
 ### Removed
 
 ### Fixed
-- 
+
 - The _Text Diff_ tool UI will no longer add an unnecessary scrollbar if the text is larger than the visible editor.
 - Errors in the “Date Time” tool only block the conversion if this error occurs in the last active input field.
 

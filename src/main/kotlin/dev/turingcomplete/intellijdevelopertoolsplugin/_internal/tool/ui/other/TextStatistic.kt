@@ -41,6 +41,7 @@ internal class TextStatistic(
   private lateinit var uniqueWordsTable: SimpleTable<Pair<String, Int>>
   private lateinit var uniqueCharactersTable: SimpleTable<Pair<Char, Int>>
 
+  private val charactersCounter = TextMetric("Characters")
   private val wordsCounter = TextMetric("Words")
   private val uniqueWordsCounter = TextMetric("Unique words")
   private val averageWordLengthCounter = TextMetric("Average word length")
@@ -117,6 +118,7 @@ internal class TextStatistic(
 
   private fun createMetricsTable() = SimpleTable(
     items = listOf(
+      charactersCounter,
       wordsCounter,
       uniqueWordsCounter,
       averageWordLengthCounter,
@@ -182,6 +184,7 @@ internal class TextStatistic(
 
   private fun updateCounter() {
     with(TextStatisticUtils.gatherStatistic(text.get())) {
+      charactersCounter.value = charactersCount.toString()
       wordsCounter.value = wordsCount.toString()
       uniqueWordsCounter.value = uniqueWords.size.toString()
       averageWordLengthCounter.value = "%.2f".format(averageWordLength)
