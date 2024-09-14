@@ -29,8 +29,8 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 - JSON Schema Validator
 - Hashing
 - Archive (ZIP, TAR, JAR, 7z, ...) viewer and extractor
-- Date Time Converter
-- Time Conversion
+- Date Time Handling (Unix Timestamp, Formatting, ...)
+- Units converters for time, data size and transfer rate
 - Code Style Formatting
 - SQL Formatting
 - Color Picker

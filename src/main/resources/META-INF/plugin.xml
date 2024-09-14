@@ -26,8 +26,8 @@
     <li>JSON Schema Validator</li>
     <li>Hashing</li>
     <li>Archive (ZIP, TAR, JAR, 7z, ...) viewer and extractor</li>
-    <li>Date Time Converter</li>
-    <li>Time Conversion</li>
+    <li>Date Time Handling (Unix Timestamp, Formatting, ...)</li>
+    <li>Units converters for time, data size and transfer rate</li>
     <li>Code Style Formatting</li>
     <li>SQL Formatting</li>
     <li>Color Picker</li>
