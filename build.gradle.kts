@@ -1,4 +1,11 @@
 import org.jetbrains.changelog.Changelog
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.COMPATIBILITY_PROBLEMS
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INTERNAL_API_USAGES
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INVALID_PLUGIN
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.MISSING_DEPENDENCIES
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.NON_EXTENDABLE_API_USAGES
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.OVERRIDE_ONLY_API_USAGES
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun properties(key: String) = project.findProperty(key).toString()
@@ -7,7 +14,7 @@ plugins {
   java
   // See bundled version: https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
   kotlin("jvm") version "1.9.10"
-  id("org.jetbrains.intellij") version "1.17.3"
+  id("org.jetbrains.intellij.platform") version "2.0.0"
   id("org.jetbrains.changelog") version "2.2.0"
   id("com.autonomousapps.dependency-analysis") version "1.30.0"
 }
@@ -17,10 +24,28 @@ version = properties("pluginVersion")
 
 repositories {
   mavenLocal()
+
   mavenCentral()
+
+  intellijPlatform {
+    defaultRepositories()
+  }
 }
 
 dependencies {
+  intellijPlatform {
+    val platformVersion = properties("platformVersion")
+    create(properties("platform"), platformVersion, platformVersion == "LATEST-EAP-SNAPSHOT")
+
+    bundledPlugins(properties("platformBundledPlugins").split(','))
+
+    instrumentationTools()
+    pluginVerifier()
+    zipSigner()
+
+    testFramework(TestFrameworkType.Bundled)
+  }
+
   implementation("com.fasterxml.uuid:java-uuid-generator:5.0.0") {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
@@ -65,12 +90,41 @@ dependencies {
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
 }
 
-intellij {
-  version.set(properties("platformVersion"))
-  type.set(properties("platformType"))
-  downloadSources.set(properties("platformDownloadSources").toBoolean())
-  updateSinceUntilBuild.set(true)
-  plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
+intellijPlatform {
+  pluginConfiguration {
+    version = providers.gradleProperty("pluginVersion")
+    ideaVersion {
+      sinceBuild = properties("pluginSinceBuild")
+      untilBuild = provider { null }
+    }
+    changeNotes.set(provider { changelog.renderItem(changelog.get(project.version as String), Changelog.OutputType.HTML) })
+  }
+
+  signing {
+    val jetbrainsDir = File(System.getProperty("user.home"), ".jetbrains")
+    certificateChain.set(project.provider { File(jetbrainsDir, "plugin-sign-chain.crt").readText() })
+    privateKey.set(project.provider { File(jetbrainsDir, "plugin-sign-private-key.pem").readText() })
+    password.set(project.provider { properties("jetbrains.sign-plugin.password") })
+  }
+
+  publishing {
+    //        dependsOn("patchChangelog")
+    token.set(project.provider { properties("jetbrains.marketplace.token") })
+    channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+  }
+
+  pluginVerification {
+    failureLevel.set(
+      listOf(
+        COMPATIBILITY_PROBLEMS, INTERNAL_API_USAGES, NON_EXTENDABLE_API_USAGES,
+        OVERRIDE_ONLY_API_USAGES, MISSING_DEPENDENCIES, INVALID_PLUGIN
+      )
+    )
+
+    ides {
+      recommended()
+    }
+  }
 }
 
 changelog {
@@ -113,31 +167,6 @@ dependencyAnalysis {
 }
 
 tasks {
-  patchPluginXml {
-    version.set(properties("pluginVersion"))
-    sinceBuild.set(properties("pluginSinceBuild"))
-    untilBuild.set(properties("pluginUntilBuild"))
-    changeNotes.set(provider { changelog.renderItem(changelog.get(project.version as String), Changelog.OutputType.HTML) })
-  }
-
-  runPluginVerifier {
-    ideVersions.set(properties("pluginVerifierIdeVersions").split(",").map(String::trim).filter(String::isNotEmpty))
-  }
-
-  publishPlugin {
-    dependsOn("patchChangelog")
-    token.set(project.provider { properties("jetbrains.marketplace.token") })
-    channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
-  }
-
-  signPlugin {
-    val jetbrainsDir = File(System.getProperty("user.home"), ".jetbrains")
-    certificateChain.set(project.provider { File(jetbrainsDir, "plugin-sign-chain.crt").readText() })
-    privateKey.set(project.provider { File(jetbrainsDir, "plugin-sign-private-key.pem").readText() })
-
-    password.set(project.provider { properties("jetbrains.sign-plugin.password") })
-  }
-
   withType<KotlinCompile> {
     kotlinOptions {
       freeCompilerArgs = listOf("-Xjsr305=strict")
