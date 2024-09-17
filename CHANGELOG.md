@@ -12,6 +12,7 @@
 
 - Tool "Time Conversion" moved into the new "Units Converter" tool.
 - Setting _save secret inputs_ renamed to _save sensitive inputs_.
+- The minimum required IntelliJ version is now 2024.1. Drop of support for the major release version 4.
 
 ### Removed
 
