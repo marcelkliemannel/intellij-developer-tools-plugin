@@ -4,7 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SECRET
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SENSITIVE
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty.Companion.RESET_CHANGE_ID
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
@@ -100,7 +100,7 @@ class DeveloperToolConfiguration(
   private fun <T : Any> reuseExistingProperty(property: PropertyContainer): ValueProperty<T> {
     if ((property.type == INPUT && !DeveloperToolsApplicationSettings.instance.saveInputs)
       || (property.type == CONFIGURATION && !DeveloperToolsApplicationSettings.instance.saveConfigurations)
-      || (property.type == SECRET && !DeveloperToolsApplicationSettings.instance.saveSecrets)
+      || (property.type == SENSITIVE && !DeveloperToolsApplicationSettings.instance.saveSensitiveInputs)
     ) {
       property.reset(DeveloperToolsApplicationSettings.instance.loadExamples)
     }
@@ -115,7 +115,7 @@ class DeveloperToolConfiguration(
     key: String,
     example: (() -> T)?
   ): ValueProperty<T> {
-    val type = assertPersistableType(defaultValue::class, propertyType)
+    val type = assertPersistableType(defaultValue::class)
     val existingPropertyValue = persistentProperties[key]?.value
     val initialValue: T = type.safeCast(existingPropertyValue) ?: let {
       if (DeveloperToolsApplicationSettings.instance.loadExamples && example != null) example() else defaultValue
@@ -161,7 +161,7 @@ class DeveloperToolConfiguration(
       reference.setWithUncheckedCast(value, RESET_CHANGE_ID)
     }
 
-    fun valueIsNotDefaultOrExample(): Boolean {
+    fun valueWasChanged(): Boolean {
       val value = reference.get()
       return defaultValue != value && example != value
     }
@@ -173,7 +173,7 @@ class DeveloperToolConfiguration(
 
     CONFIGURATION,
     INPUT,
-    SECRET,
+    SENSITIVE
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

@@ -11,8 +11,11 @@
 ### Changed
 
 - Tool "Time Conversion" moved into the new "Units Converter" tool.
+- Setting _save secret inputs_ renamed to _save sensitive inputs_.
 
 ### Removed
+
+- Remove support to store secret inputs in the system password store.
 
 ### Fixed
 

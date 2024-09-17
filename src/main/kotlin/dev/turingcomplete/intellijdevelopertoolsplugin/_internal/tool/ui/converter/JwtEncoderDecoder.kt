@@ -44,7 +44,7 @@ import com.intellij.util.ExceptionUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SECRET
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SENSITIVE
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
@@ -55,6 +55,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHol
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.SimpleToggleAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.registerDynamicToolTip
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.setValidationResultBorder
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toPrettyStringWithDefaultObjectMapper
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
@@ -249,6 +250,7 @@ internal class JwtEncoderDecoder(
           .setValidationResultBorder()
           .whenTextChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
           .validationInfo(jwt.signature.privateKeyErrorHolder.asValidation())
+          .registerDynamicToolTip({ DeveloperToolsApplicationSettings.instance.createSensitiveInputsHandlingToolTipText() })
       }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.keyFactory != null })
 
       row {
@@ -715,12 +717,10 @@ internal class JwtEncoderDecoder(
 
     val algorithm = configuration.register("algorithm", DEFAULT_SIGNATURE_ALGORITHM)
     val strictSigningKeyValidation = configuration.register("signingKeyValidation", SIGNING_KEY_VALIDATION_DEFAULT, CONFIGURATION)
-    val secret = configuration.register("secret", "", SECRET, EXAMPLE_SECRET)
-    val privateKey = configuration.registerWithExampleProvider(
-      "privateKey",
-      "",
-      SECRET
-    ) { if (algorithm.get().kind == RSA) EXAMPLE_RSA_PRIVATE_KEY else EXAMPLE_EC_PRIVATE_KEY }
+    val secret = configuration.register("secret", "", SENSITIVE, EXAMPLE_SECRET)
+    val privateKey = configuration.registerWithExampleProvider("privateKey", "", SENSITIVE) {
+      if (algorithm.get().kind == RSA) EXAMPLE_RSA_PRIVATE_KEY else EXAMPLE_EC_PRIVATE_KEY
+    }
     val secretEncodingMode = configuration.register("secretKeyEncodingMode", RAW, CONFIGURATION)
 
     val privateKeyErrorHolder = ErrorHolder()

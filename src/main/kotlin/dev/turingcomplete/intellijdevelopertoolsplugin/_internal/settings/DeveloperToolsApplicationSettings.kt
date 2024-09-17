@@ -1,5 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings
 
+import com.intellij.CommonBundle
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.SettingsCategory
@@ -25,7 +26,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
   var loadExamples: Boolean by ValueProperty(LOAD_EXAMPLES_DEFAULT)
   var saveConfigurations: Boolean by ValueProperty(SAVE_CONFIGURATIONS_DEFAULT)
   var saveInputs: Boolean by ValueProperty(SAVE_INPUTS_DEFAULT)
-  var saveSecrets: Boolean by ValueProperty(SAVE_SECRETS_DEFAULT)
+  var saveSensitiveInputs: Boolean by ValueProperty(SAVE_SENSITIVE_INPUTS_DEFAULT)
   var editorSoftWraps: Boolean by ValueProperty(EDITOR_SOFT_WRAPS_DEFAULT)
   var editorShowSpecialCharacters: Boolean by ValueProperty(EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
   var editorShowWhitespaces: Boolean by ValueProperty(EDITOR_SHOW_WHITESPACES_DEFAULT)
@@ -64,7 +65,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     loadExamples = loadExamples,
     saveConfigurations = saveConfigurations,
     saveInputs = saveInputs,
-    saveSecrets = saveSecrets,
+    saveSensitiveInputs = saveSensitiveInputs,
     editorSoftWraps = editorSoftWraps,
     editorShowSpecialCharacters = editorShowSpecialCharacters,
     editorShowWhitespaces = editorShowWhitespaces,
@@ -82,7 +83,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     loadExamples = (state.loadExamples ?: LOAD_EXAMPLES_DEFAULT)
     saveConfigurations = (state.saveConfigurations ?: SAVE_CONFIGURATIONS_DEFAULT)
     saveInputs = (state.saveInputs ?: SAVE_INPUTS_DEFAULT)
-    saveSecrets = (state.saveSecrets ?: SAVE_SECRETS_DEFAULT)
+    saveSensitiveInputs = (state.saveSensitiveInputs ?: SAVE_SENSITIVE_INPUTS_DEFAULT)
     editorSoftWraps = (state.editorSoftWraps ?: EDITOR_SOFT_WRAPS_DEFAULT)
     editorShowSpecialCharacters = (state.editorShowSpecialCharacters ?: EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT)
     editorShowWhitespaces = (state.editorShowWhitespaces ?: EDITOR_SHOW_WHITESPACES_DEFAULT)
@@ -93,6 +94,15 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     showInternalTools = (state.showInternalTools ?: SHOW_INTERNAL_TOOLS_DEFAULT)
     hideWorkbenchTabsOnSingleTab = (state.hideWorkbenchTabsOnSingleTab ?: HIDE_WORKBENCH_TABS_ON_SINGLE_TAB)
   }
+
+  fun createSensitiveInputsHandlingToolTipText(): String? =
+    if (saveInputs && !saveSensitiveInputs) {
+      "<html>This sensitive input field will be cleared after the application is closed.<br />" +
+              "You can deactivate this behavior in the ${CommonBundle.settingsTitle().lowercase()}.</html>"
+    }
+    else {
+      null
+    }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -118,8 +128,8 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     var saveConfigurations: Boolean? = null,
     @get:Attribute("saveInputs")
     var saveInputs: Boolean? = null,
-    @get:Attribute("saveSecrets")
-    var saveSecrets: Boolean? = null,
+    @get:Attribute("saveSensitiveInputs")
+    var saveSensitiveInputs: Boolean? = null,
     @get:Attribute("editorSoftWraps")
     var editorSoftWraps: Boolean? = null,
     @get:Attribute("editorShowSpecialCharacters")
@@ -153,7 +163,7 @@ internal class DeveloperToolsApplicationSettings : PersistentStateComponent<Appl
     const val PROMOTE_ADD_OPEN_MAIN_DIALOG_ACTION_TO_MAIN_TOOLBAR = true
     const val LOAD_EXAMPLES_DEFAULT = true
     const val SAVE_INPUTS_DEFAULT = true
-    const val SAVE_SECRETS_DEFAULT = true
+    const val SAVE_SENSITIVE_INPUTS_DEFAULT = false
     const val SAVE_CONFIGURATIONS_DEFAULT = true
     const val EDITOR_SOFT_WRAPS_DEFAULT = true
     const val EDITOR_SHOW_SPECIAL_CHARACTERS_DEFAULT = false

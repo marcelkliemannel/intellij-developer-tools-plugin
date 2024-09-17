@@ -1,10 +1,5 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings
 
-import com.intellij.credentialStore.CredentialAttributes
-import com.intellij.credentialStore.Credentials
-import com.intellij.credentialStore.generateServiceName
-import com.intellij.ide.passwordSafe.PasswordSafe
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.ui.JBColor
 import com.intellij.util.xmlb.Converter
@@ -19,7 +14,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguratio
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SECRET
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SENSITIVE
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import java.math.BigDecimal
@@ -90,20 +85,11 @@ internal abstract class DeveloperToolsInstanceSettings {
           id = UUID.fromString(developerToolsConfigurationState.id!!),
           persistentProperties = developerToolsConfigurationState.properties
             ?.asSequence()
-            ?.filter { it.key != null && it.type != null }
-            ?.filter { it.type != INPUT || DeveloperToolsApplicationSettings.instance.saveInputs }
-            ?.filter { it.type != CONFIGURATION || DeveloperToolsApplicationSettings.instance.saveConfigurations }
-            ?.mapNotNull { property ->
-              restorePropertyValue(
-                developerToolId = developerToolsConfigurationState.developerToolId!!,
-                key = property.key!!,
-                value = property.value,
-                type = property.type!!
-              )?.let {
-                val key = property.key!!
-                key to PersistentProperty(key, it, property.type!!)
-              }
-            }
+            // The `type` property can be `null` in cases in which a type was
+            // removed from the `PropertyType` enum.
+            ?.filter { it.key != null && it.type != null && it.value != null }
+            ?.filter { shouldSavePropertyType(it.type) }
+            ?.map { it.key!! to PersistentProperty(it.key!!, it.value!!, it.type!!) }
             ?.toMap() ?: emptyMap()
         )
 
@@ -115,13 +101,21 @@ internal abstract class DeveloperToolsInstanceSettings {
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
+  private fun shouldSavePropertyType(propertyType: PropertyType?): Boolean =
+    when (propertyType) {
+      CONFIGURATION -> DeveloperToolsApplicationSettings.instance.saveConfigurations
+      INPUT -> DeveloperToolsApplicationSettings.instance.saveInputs
+      SENSITIVE -> DeveloperToolsApplicationSettings.instance.saveSensitiveInputs
+      null -> false
+    }
+
   private fun createDeveloperToolConfigurationState(
     developerToolId: String,
     developerToolConfiguration: DeveloperToolConfiguration
   ): DeveloperToolConfigurationState? {
     val properties = if (developerToolConfiguration.wasConsumedByDeveloperTool) {
       developerToolConfiguration.properties
-        .filter { (_, property) -> property.valueIsNotDefaultOrExample() }
+        .filter { (_, property) -> property.valueWasChanged() }
         .map { PersistentProperty(key = it.key, value = it.value.reference.get(), it.value.type) }
     }
     else {
@@ -136,73 +130,8 @@ internal abstract class DeveloperToolsInstanceSettings {
       id = developerToolConfiguration.id.toString(),
       name = developerToolConfiguration.name,
       properties = properties
-        .filter { !(!DeveloperToolsApplicationSettings.instance.saveInputs && it.type != INPUT) }
-        .filter { !(!DeveloperToolsApplicationSettings.instance.saveSecrets && it.type != SECRET) }
-        .map { storeProperty(developerToolId = developerToolId, key = it.key, property = it) }
-    )
-  }
-
-  private fun storeProperty(
-    developerToolId: String,
-    key: String,
-    property: PersistentProperty
-  ): DeveloperToolConfigurationProperty {
-    return when (property.type) {
-      CONFIGURATION, INPUT ->
-        DeveloperToolConfigurationProperty(key = key, value = property.value, type = property.type)
-
-      SECRET -> {
-        val credentialAttribute = createPropertyCredentialAttribute(developerToolId = developerToolId, propertyKey = key)
-        ApplicationManager.getApplication().executeOnPooledThread {
-          // Not allowed to be executed on the EDT
-          PasswordSafe.instance.set(credentialAttribute, Credentials(null, property.value as String))
-        }
-        // The value is not stored in the XML file, but we still need the
-        // `DeveloperToolConfigurationProperty` to represent the property.
-        // Therefore, we use `SAVED_IN_KEYSTORE` as a placeholder value.
-        DeveloperToolConfigurationProperty(key = key, value = "SAVED_IN_KEYSTORE", type = property.type)
-      }
-    }
-  }
-
-  private fun restorePropertyValue(
-    developerToolId: String,
-    key: String,
-    value: Any?,
-    type: PropertyType
-  ): Any? {
-    return when (type) {
-      CONFIGURATION, INPUT ->
-        value
-
-      SECRET -> {
-        val credentialAttribute = createPropertyCredentialAttribute(developerToolId = developerToolId, propertyKey = key)
-        val secretValue = PasswordSafe.instance.getPassword(credentialAttribute)
-
-        if (!DeveloperToolsApplicationSettings.instance.saveSecrets) {
-          if (secretValue != null) {
-            // Remove the secret from the password safe
-            PasswordSafe.instance.set(credentialAttribute, null)
-          }
-          else {
-            null
-          }
-        }
-        else {
-          secretValue
-        }
-      }
-    }
-  }
-
-  private fun createPropertyCredentialAttribute(
-    developerToolId: String,
-    propertyKey: String
-  ): CredentialAttributes {
-    val credentialKey = "$developerToolId-$propertyKey"
-    return CredentialAttributes(
-      serviceName = generateServiceName("Developer Tools Plugin", credentialKey),
-      userName = credentialKey
+        .filter { shouldSavePropertyType(it.type) }
+        .map { DeveloperToolConfigurationProperty(key = it.key, value = it.value, type = it.type) }
     )
   }
 
@@ -239,9 +168,25 @@ internal abstract class DeveloperToolsInstanceSettings {
     var key: String? = null,
     @get:Attribute("value", converter = StatePropertyValueConverter::class)
     var value: Any? = null,
-    @get:Attribute("type")
+    @get:Attribute("type", converter = PropertyTypeConverter::class)
     var type: PropertyType? = null
   )
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  /**
+   * Using a dedicated converter to handle removed values from the [PropertyType].
+   */
+  class PropertyTypeConverter : Converter<PropertyType>() {
+
+    override fun fromString(value: String): PropertyType? {
+      return PropertyType.entries.firstOrNull { it.name == value }
+    }
+
+    override fun toString(value: PropertyType): String {
+      return value.name
+    }
+  }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
@@ -337,21 +282,10 @@ internal abstract class DeveloperToolsInstanceSettings {
       BigDecimal::class
     )
 
-    fun <T : Any> assertPersistableType(type: KClass<T>, propertyType: PropertyType): KClass<T> {
-      when (propertyType) {
-        CONFIGURATION, INPUT -> {
-          check(type.java.isEnum || SUPPORTED_TYPES.contains(type)) {
-            "Unsupported configuration/input property type: ${type.qualifiedName}"
-          }
-        }
-
-        SECRET -> {
-          check(type::class != String::class) {
-            "Unsupported secret property type: ${type.qualifiedName}"
-          }
-        }
+    fun <T : Any> assertPersistableType(type: KClass<T>): KClass<T> {
+      check(type.java.isEnum || SUPPORTED_TYPES.contains(type)) {
+        "Unsupported configuration/input property type: ${type.qualifiedName}"
       }
-
       return type
     }
   }

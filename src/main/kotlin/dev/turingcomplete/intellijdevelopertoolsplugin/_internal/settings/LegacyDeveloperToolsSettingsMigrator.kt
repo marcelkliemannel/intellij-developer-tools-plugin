@@ -34,7 +34,7 @@ internal class LegacyDeveloperToolsSettingsMigrator : PersistentStateComponent<L
         loadExamples = state.loadExamples,
         saveConfigurations = state.saveConfigurations,
         saveInputs = state.saveInputs,
-        saveSecrets = state.saveSecrets,
+        saveSensitiveInputs = state.saveSensitiveInputs,
         editorSoftWraps = state.editorSoftWraps,
         editorShowSpecialCharacters = state.editorShowSpecialCharacters,
         editorShowWhitespaces = state.editorShowWhitespaces
@@ -57,7 +57,7 @@ internal class LegacyDeveloperToolsSettingsMigrator : PersistentStateComponent<L
     @get:Attribute("saveInputs")
     var saveInputs: Boolean? = null,
     @get:Attribute("saveSecrets")
-    var saveSecrets: Boolean? = null,
+    var saveSensitiveInputs: Boolean? = null,
     @get:Attribute("dialogIsModal")
     var dialogIsModal: Boolean? = null,
     @get:Attribute("editorSoftWraps")

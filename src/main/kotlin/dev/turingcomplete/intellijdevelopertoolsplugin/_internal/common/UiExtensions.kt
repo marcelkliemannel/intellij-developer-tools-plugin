@@ -35,6 +35,7 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JTable
 import javax.swing.JTextField
+import javax.swing.ToolTipManager
 import javax.swing.border.CompoundBorder
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
@@ -247,6 +248,17 @@ operator fun ObservableMutableProperty<Boolean>.not(): ObservableMutableProperty
   transform({ !it }) { !it }
 
 fun BigDecimal.isWithinLongRange(): Boolean = (this <= longMaxValue) && (this >= longMinValue)
+
+fun Cell<JComponent>.registerDynamicToolTip(toolTipText: () -> String?) {
+  this.component.toolTipText = null
+  ToolTipManager.sharedInstance().registerComponent(this.component)
+
+  this.component.addMouseListener(object : MouseAdapter() {
+    override fun mouseEntered(e: MouseEvent?) {
+      this@registerDynamicToolTip.component.toolTipText = toolTipText()
+    }
+  })
+}
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

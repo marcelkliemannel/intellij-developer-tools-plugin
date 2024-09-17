@@ -139,14 +139,14 @@ internal open class DeveloperToolContentPanel(
   private fun addWorkbench(developerToolContainer: DeveloperToolContainer) {
     val developerToolComponent = developerToolContainer.instance.createComponent()
     val tabInfo = TabInfo(developerToolComponent).apply {
-      text = developerToolContainer.configuration.name
-      `object` = developerToolContainer
+      setText(developerToolContainer.configuration.name)
+      setObject(developerToolContainer)
 
       val destroyAction = createDestroyWorkbenchAction(developerToolContainer.instance, this)
       setTabLabelActions(DefaultActionGroup(destroyAction), DeveloperToolContentPanel::class.java.name)
 
       val newWorkbenchAction = createNewWorkbenchAction()
-      tabPaneActions = DefaultActionGroup(newWorkbenchAction)
+      setTabPaneActions(DefaultActionGroup(newWorkbenchAction))
     }
     tabs.addTab(tabInfo)
     tabs.select(tabInfo, false)
@@ -172,7 +172,7 @@ internal open class DeveloperToolContentPanel(
         inputDialog.show()
         inputDialog.inputString?.let { newName ->
           developerToolConfiguration.name = newName
-          tabs.selectedInfo?.let { it.text = newName }
+          tabs.selectedInfo?.setText(newName)
         }
       }
 
