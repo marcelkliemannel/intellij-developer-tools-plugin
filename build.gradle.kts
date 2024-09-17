@@ -1,5 +1,6 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.COMPATIBILITY_PROBLEMS
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INTERNAL_API_USAGES
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INVALID_PLUGIN
@@ -180,5 +181,12 @@ tasks {
 
   named("check") {
     dependsOn("buildHealth")
+  }
+
+  named<RunIdeTask>("runIde") {
+    jvmArgumentProviders += CommandLineArgumentProvider {
+      // https://kotlin.github.io/analysis-api/testing-in-k2-locally.html
+      listOf("-Didea.kotlin.plugin.use.k2=false")
+    }
   }
 }

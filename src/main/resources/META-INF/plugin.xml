@@ -94,6 +94,11 @@
 
     <keymapExtension implementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.ShowDeveloperUiToolKeymapExtension"/>
   </extensions>
+  <!-- must be declared in the main `plugin.xml´, see `KotlinK2ModeCompatibilityCheckerKt` -->
+  <extensions defaultExtensionNs="org.jetbrains.kotlin">
+    <supportsKotlinPluginMode supportsK2="true"/>
+    <supportsKotlinK2Mode/>
+  </extensions>
 
   <extensionPoints>
     <extensionPoint name="developerUiTool"
