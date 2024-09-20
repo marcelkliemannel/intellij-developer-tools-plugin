@@ -4,6 +4,16 @@
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## [5.1.0] - 2024-09-20
+
+### Added
+
 - New tool _Units Converter_ that supports data sizes and transfer rates conversion.
 - Add characters count to the _Text Statistic_ tool.
 - Add support for Kotlin K2 compiler.
