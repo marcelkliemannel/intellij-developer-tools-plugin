@@ -7,8 +7,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguratio
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SENSITIVE
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty.Companion.RESET_CHANGE_ID
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsInstanceSettings.Companion.assertPersistableType
+import java.math.BigDecimal
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -163,7 +165,13 @@ class DeveloperToolConfiguration(
 
     fun valueWasChanged(): Boolean {
       val value = reference.get()
-      return defaultValue != value && example != value
+      val b = if (defaultValue is BigDecimal) {
+        defaultValue.compareTo(value as BigDecimal) != 0 && example?.invoke()?.uncheckedCastTo<BigDecimal>()?.compareTo(value)?.equals(0)?.not() ?: true
+      }
+      else {
+        defaultValue != value && example?.invoke()?.equals(value)?.not() ?: true
+      }
+      return b
     }
   }
 

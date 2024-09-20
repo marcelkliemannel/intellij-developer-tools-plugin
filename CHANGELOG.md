@@ -28,7 +28,6 @@
 ### Added
 
 - Compatibility with IntelliJ 2024.2 EAP
-
 - The _Text Diff_ tool UI will no longer add an unnecessary scrollbar if the text is larger than the visible editor.
 
 ## 4.3.0 - 2024-05-20

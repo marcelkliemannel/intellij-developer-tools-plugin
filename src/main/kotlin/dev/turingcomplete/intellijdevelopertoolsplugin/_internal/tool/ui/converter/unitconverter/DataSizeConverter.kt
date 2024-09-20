@@ -71,24 +71,23 @@ class DataSizeConverter(
 
   private fun convertByInputFieldChange(
     inputFieldComponent: JBTextField?,
-    dataSizeProperty: DataSizeProperty
+    inputDataSizeProperty: DataSizeProperty
   ) {
     if (inputFieldComponent != null && validate().any { it.component == inputFieldComponent }) {
       return
     }
 
-    if (dataSizeProperty != bitDataSizeProperty) {
-      val inputValue = dataSizeProperty.formattedValue.get().parseBigDecimal()
-      val inputDataUnit = dataSizeProperty.dataUnit
-      bitDataSizeProperty.convert(inputValue, inputDataUnit, this)
+    if (inputDataSizeProperty != bitDataSizeProperty) {
+      val inputValue = inputDataSizeProperty.formattedValue.get().parseBigDecimal()
+      bitDataSizeValue.set(inputDataSizeProperty.dataUnit.toBits(inputValue, mathContext))
     }
     else {
       bitDataSizeValue.set(bitDataSizeProperty.formattedValue.get().parseBigDecimal())
     }
 
     dataSizeProperties
-      .filter { it != dataSizeProperty && it != bitDataSizeProperty }
-      .forEach { it.convert(bitDataSizeValue.get(), bitDataUnit, this) }
+      .filter { it != inputDataSizeProperty }
+      .forEach { it.setFromBits(bitDataSizeValue.get(), this) }
   }
 
   override fun doSync() {
@@ -124,23 +123,19 @@ class DataSizeConverter(
 
   private class DataSizeProperty(
     val dataUnit: DataUnit,
-    val rawValue: ValueProperty<BigDecimal>? = null
+    val rawValueReference: ValueProperty<BigDecimal>? = null
   ) {
 
     val formattedValue: ValueProperty<String> = ValueProperty("0")
     var inputTitle: String = "${dataUnit.name}:"
 
-    fun convert(
-      inputValue: BigDecimal,
-      inputDataUnit: DataUnit,
+    fun setFromBits(
+      bits: BigDecimal,
       unitConverter: UnitConverter
     ) {
-      val mathContext = unitConverter.mathContext
-      val result = inputValue
-        .multiply(inputDataUnit.conversationFactor(mathContext), mathContext)
-        .divide(dataUnit.conversationFactor(mathContext), mathContext)
+      val result = dataUnit.fromBits(bits, unitConverter.mathContext)
       formattedValue.set(with(unitConverter) { result.toFormatted() })
-      rawValue?.set(result)
+      rawValueReference?.set(result)
     }
 
     override fun toString(): String = dataUnit.name

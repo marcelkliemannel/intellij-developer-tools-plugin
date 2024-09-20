@@ -41,6 +41,7 @@ abstract class UnitConverter(
   private var parsingLocale = configuration.register("${configurationKeyPrefix}parsingLocale", DEFAULT_PARSING_LOCALE)
   private val roundingMode = configuration.register("${configurationKeyPrefix}roundingMode", DEFAULT_ROUNDING_MODE)
   private val decimalPlaces = configuration.register("${configurationKeyPrefix}decimalPlaces", DEFAULT_DECIMAL_PLACES)
+  private val precision = configuration.register("${configurationKeyPrefix}precision", DEFAULT_PRECISION)
 
   private val parsingDecimalSeparatorInfo = ValueProperty("")
   var mathContext = createMathContext()
@@ -159,11 +160,19 @@ abstract class UnitConverter(
           .bindItem(roundingMode)
           .whenItemSelectedFromUi { sync() }
       }.layout(RowLayout.PARENT_GRID)
+      row {
+        textField()
+          .label("Precision:")
+          .bindIntTextImproved(precision)
+          .validateLongValue(LongRange(1, 100))
+          .columns(COLUMNS_TINY)
+          .whenTextChangedFromUi { sync() }
+      }.layout(RowLayout.PARENT_GRID)
     }.topGap(TopGap.NONE)
   }
 
   private fun createMathContext() =
-    MathContext(decimalPlaces.get() + 1, roundingMode.get().javaMathRoundingMode)
+    MathContext(precision.get(), roundingMode.get().javaMathRoundingMode)
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
@@ -186,6 +195,7 @@ abstract class UnitConverter(
 
     private val DEFAULT_ROUNDING_MODE = RoundingMode.HALF_UP
     private const val DEFAULT_DECIMAL_PLACES = 5
+    private const val DEFAULT_PRECISION = 50
     private val DEFAULT_PARSING_LOCALE = LocaleContainer(Locale.getDefault())
   }
 }

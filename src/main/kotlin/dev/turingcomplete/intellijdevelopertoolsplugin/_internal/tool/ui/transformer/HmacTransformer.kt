@@ -85,11 +85,17 @@ internal class HmacTransformer(
       return
     }
 
+    val secretKeyValue = secretKey.get()
+    if (secretKeyValue.isEmpty()) {
+      resultText.set("")
+      return
+    }
+
     val hmac: ByteArray = Mac.getInstance(selectedAlgorithm.get()).run {
       val secretKey = when (secretKeyEncodingMode.get()) {
-        RAW -> secretKey.get()
-        BASE32 -> Base32().decode(secretKey.get()).decodeToString()
-        BASE64 -> secretKey.get().decodeBase64String()
+        RAW -> secretKeyValue
+        BASE32 -> Base32().decode(secretKeyValue).decodeToString()
+        BASE64 -> secretKeyValue.decodeBase64String()
       }
       init(SecretKeySpec(secretKey.encodeToByteArray(), selectedAlgorithm.get()))
       doFinal(sourceText.get().encodeToByteArray())

@@ -2,7 +2,17 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.conver
 
 import com.intellij.openapi.Disposable
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.BottomGap
+import com.intellij.ui.dsl.builder.Cell
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.RowLayout
+import com.intellij.ui.dsl.builder.TopGap
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.whenStateChangedFromUi
+import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
@@ -28,8 +38,8 @@ internal class TransferRateConverter(
     configuration.register("${CONFIGURATION_KEY_PREFIX}useCombinedAbbreviationNotation", DEFAULT_USE_COMBINED_ABBREVIATION_NOTATION)
   private val bitTransferRateValue = configuration.register("${CONFIGURATION_KEY_PREFIX}bitTransferRateValue", ZERO, INPUT, DEFAULT_BIT_TRANSFER_RATE_VALUE)
 
-  private val transferRateProperties: List<TransferRateProperty> = createTransferRateProperties()
-  private val bitTransferRateProperty = transferRateProperties.first { it.dataUnit == bitDataUnit }
+  val transferRateProperties: List<TransferRateProperty> = createTransferRateProperties()
+  val bitTransferRateProperty = transferRateProperties.first { it.dataUnit == bitDataUnit }
 
   private var lastTimeDimension: TransferRateTimeDimension = timeDimension.get()
 
@@ -42,7 +52,7 @@ internal class TransferRateConverter(
       segmentedButton(TransferRateTimeDimension.entries) { text = it.title }
         .bind(timeDimension)
         .whenItemSelectedFromUi {
-          convertByTimeDimensionChange(Pair(lastTimeDimension, it))
+          convertByTimeDimensionChange(lastTimeDimension, it)
           lastTimeDimension = it
         }
     }
@@ -114,33 +124,28 @@ internal class TransferRateConverter(
 
     if (inputFieldTransferRateProperty != bitTransferRateProperty) {
       val inputValue = inputFieldTransferRateProperty.formattedValue.get().parseBigDecimal()
-      val inputDataUnit = inputFieldTransferRateProperty.dataUnit
-      bitTransferRateProperty.convert(inputValue, inputDataUnit, null, this)
+      bitTransferRateValue.set(inputFieldTransferRateProperty.dataUnit.toBits(inputValue, mathContext))
     }
     else {
       bitTransferRateValue.set(bitTransferRateProperty.formattedValue.get().parseBigDecimal())
     }
 
     transferRateProperties
-      .filter { it != inputFieldTransferRateProperty && it != bitTransferRateProperty }
-      .forEach {
-        it.convert(bitTransferRateValue.get(), bitDataUnit, null, this)
-      }
+      .filter { it != inputFieldTransferRateProperty }
+      .forEach { it.setFromBits(bitTransferRateValue.get(), this) }
   }
 
   private fun convertByTimeDimensionChange(
-    inputOutputTransferRateTimeDimension: Pair<TransferRateTimeDimension, TransferRateTimeDimension>?
+    originTimeDimension: TransferRateTimeDimension,
+    targetTimeDimension: TransferRateTimeDimension
   ) {
-    if (validate().isNotEmpty()) {
-      return
-    }
+    // No validation, always use the last value bits value
 
-    val inputValue = bitTransferRateProperty.formattedValue.get().parseBigDecimal()
-    val inputDataUnit = bitTransferRateProperty.dataUnit
-    transferRateProperties
-      .forEach {
-        it.convert(inputValue, inputDataUnit, inputOutputTransferRateTimeDimension, this)
-      }
+    val bits = bitTransferRateValue.get()
+    transferRateProperties.forEach {
+      it.setFromTimeDimensionChange(bits, originTimeDimension, targetTimeDimension, this)
+      it.sync()
+    }
   }
 
   private fun createTransferRateProperties() = dataUnits.map {
@@ -158,30 +163,30 @@ internal class TransferRateConverter(
     timeDimensionProperty: ValueProperty<TransferRateTimeDimension>
   ): String {
     val timeDimension = timeDimensionProperty.get()
-    val timeDimensionTitle = timeDimension.title.lowercase()
     val abbreviationSeparator = if (useCombinedAbbreviationNotation.get()) "p" else "/"
-    return "${dataUnit.name}s per $timeDimensionTitle (${dataUnit.abbreviation}$abbreviationSeparator${timeDimension.abbreviation})"
+    return "${dataUnit.name}s per ${timeDimension.shortTitle} (${dataUnit.abbreviation}$abbreviationSeparator${timeDimension.abbreviation})"
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private enum class TransferRateTimeDimension(
+  enum class TransferRateTimeDimension(
     val title: String,
+    val shortTitle: String,
     val abbreviation: String,
     val seconds: BigDecimal
   ) {
 
-    SECONDS("Seconds", "s", ONE),
-    MINUTES("Minutes", "m", TimeUnit.MINUTES.toSeconds(1).toBigDecimal()),
-    HOURS("Hours", "h", TimeUnit.HOURS.toSeconds(1).toBigDecimal()),
-    DAYS("Days", "d", TimeUnit.DAYS.toSeconds(1).toBigDecimal())
+    SECONDS("Seconds", "sec.", "s", ONE),
+    MINUTES("Minutes", "min.", "m", TimeUnit.MINUTES.toSeconds(1).toBigDecimal()),
+    HOURS("Hours", "hours", "h", TimeUnit.HOURS.toSeconds(1).toBigDecimal()),
+    DAYS("Days", "days", "d", TimeUnit.DAYS.toSeconds(1).toBigDecimal())
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class TransferRateProperty(
+  class TransferRateProperty(
     val dataUnit: DataUnit,
-    val rawValue: ValueProperty<BigDecimal>? = null,
+    private val rawValueReference: ValueProperty<BigDecimal>? = null,
     initialFormattedValue: String = "0",
     val createTitle: () -> String
   ) {
@@ -193,32 +198,24 @@ internal class TransferRateConverter(
       inputTitle.set("${createTitle()}:")
     }
 
-    fun convert(
-      inputValue: BigDecimal,
-      inputDataUnit: DataUnit,
-      inputOutputTransferRateTimeDimension: Pair<TransferRateTimeDimension, TransferRateTimeDimension>?,
+    fun setFromBits(
+      bits: BigDecimal,
       unitConverter: UnitConverter
     ) {
-      // R₂ = R₁ * (U₁ / U₂) * (T₁ / T₂)
-      // Given:
-      //  - Input transfer rate: R₁ in units U₁/T₁
-      //  - Desired output: R₂ in units U₂/T₂
-      // Where:
-      //  - U₁ and U₂ are any data units
-      //  - T₁ and T₂ are any time units
-      //  - (U₁ / U₂) is the conversion factor from U₁ to U₂
-      //  - (T₁ / T₂) is the conversion factor from T₁ to T₂
-      val mathContext = unitConverter.mathContext
-      val dataUnitConversationFactor = inputDataUnit.conversationFactor(mathContext).divide(dataUnit.conversationFactor(mathContext), mathContext)
-      var result = inputValue.multiply(dataUnitConversationFactor, mathContext)
-      if (inputOutputTransferRateTimeDimension != null) {
-        val inputTimeDimension = inputOutputTransferRateTimeDimension.first
-        val outputTimeDimension = inputOutputTransferRateTimeDimension.second
-        val timeDimensionConversationFactor = inputTimeDimension.seconds.divide(outputTimeDimension.seconds, mathContext)
-        result = result.multiply(timeDimensionConversationFactor, mathContext)
-      }
+      val result = dataUnit.fromBits(bits, unitConverter.mathContext)
       formattedValue.set(with(unitConverter) { result.toFormatted() })
-      rawValue?.set(result)
+      rawValueReference?.set(result)
+    }
+
+    fun setFromTimeDimensionChange(
+      bits: BigDecimal,
+      originTimeDimension: TransferRateTimeDimension,
+      targetTimeDimension: TransferRateTimeDimension,
+      unitConverter: UnitConverter
+    ) {
+      val mathContext = unitConverter.mathContext
+      val timeFactor = originTimeDimension.seconds.divide(targetTimeDimension.seconds, mathContext)
+      setFromBits(bits.multiply(timeFactor, mathContext), unitConverter)
     }
 
     override fun toString(): String = dataUnit.name

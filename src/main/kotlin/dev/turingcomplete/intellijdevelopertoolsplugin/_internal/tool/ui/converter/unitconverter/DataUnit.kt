@@ -6,7 +6,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.convert
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.DataUnits.NumberSystem.BINARY
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.DataUnits.NumberSystem.DECIMAL
 import java.math.BigDecimal
-import java.math.BigDecimal.ONE
 import java.math.MathContext
 
 internal object DataUnits {
@@ -20,8 +19,7 @@ internal object DataUnits {
     isLarge = false,
     baseDataUnit = BIT,
     numberSystem = BASE,
-    power = 1,
-    fixedConversationFactor = ONE
+    exponent = 0
   )
 
   val dataUnits: List<DataUnit> = listOf(
@@ -31,9 +29,9 @@ internal object DataUnits {
         name = "Byte",
         abbreviation = "B",
         isLarge = false,
-        baseDataUnit = BYTE,
+        baseDataUnit = BIT,
         numberSystem = BASE,
-        power = 3
+        exponent = 3
       )
     ),
     createDataUnits(
@@ -41,8 +39,8 @@ internal object DataUnits {
       binaryPrefix = "Kibi",
       decimalAbbreviationFirstLetter = 'k',
       binaryAbbreviationFirstLetter = 'K',
-      decimalPower = 3,
-      binaryPower = 10,
+      decimalExponent = 3,
+      binaryExponent = 10,
       isLarge = false
     ),
     createDataUnits(
@@ -50,8 +48,8 @@ internal object DataUnits {
       binaryPrefix = "Mebi",
       decimalAbbreviationFirstLetter = 'M',
       binaryAbbreviationFirstLetter = 'M',
-      decimalPower = 6,
-      binaryPower = 20,
+      decimalExponent = 6,
+      binaryExponent = 20,
       isLarge = false
     ),
     createDataUnits(
@@ -59,8 +57,8 @@ internal object DataUnits {
       binaryPrefix = "Gibi",
       decimalAbbreviationFirstLetter = 'G',
       binaryAbbreviationFirstLetter = 'G',
-      decimalPower = 9,
-      binaryPower = 30,
+      decimalExponent = 9,
+      binaryExponent = 30,
       isLarge = false
     ),
     createDataUnits(
@@ -68,8 +66,8 @@ internal object DataUnits {
       binaryPrefix = "Tebi",
       decimalAbbreviationFirstLetter = 'T',
       binaryAbbreviationFirstLetter = 'T',
-      decimalPower = 12,
-      binaryPower = 40,
+      decimalExponent = 12,
+      binaryExponent = 40,
       isLarge = false
     ),
     createDataUnits(
@@ -77,8 +75,8 @@ internal object DataUnits {
       binaryPrefix = "Pebi",
       decimalAbbreviationFirstLetter = 'P',
       binaryAbbreviationFirstLetter = 'P',
-      decimalPower = 15,
-      binaryPower = 50,
+      decimalExponent = 15,
+      binaryExponent = 50,
       isLarge = true
     ),
     createDataUnits(
@@ -86,8 +84,8 @@ internal object DataUnits {
       binaryPrefix = "Exbi",
       decimalAbbreviationFirstLetter = 'E',
       binaryAbbreviationFirstLetter = 'E',
-      decimalPower = 18,
-      binaryPower = 60,
+      decimalExponent = 18,
+      binaryExponent = 60,
       isLarge = true
     ),
     createDataUnits(
@@ -95,8 +93,8 @@ internal object DataUnits {
       binaryPrefix = "Zebi",
       decimalAbbreviationFirstLetter = 'Z',
       binaryAbbreviationFirstLetter = 'Z',
-      decimalPower = 21,
-      binaryPower = 70,
+      decimalExponent = 21,
+      binaryExponent = 70,
       isLarge = true
     ),
     createDataUnits(
@@ -104,8 +102,8 @@ internal object DataUnits {
       binaryPrefix = "Yobi",
       decimalAbbreviationFirstLetter = 'Y',
       binaryAbbreviationFirstLetter = 'Y',
-      decimalPower = 24,
-      binaryPower = 80,
+      decimalExponent = 24,
+      binaryExponent = 80,
       isLarge = true
     )
   ).flatten()
@@ -119,14 +117,14 @@ internal object DataUnits {
     binaryPrefix: String,
     decimalAbbreviationFirstLetter: Char,
     binaryAbbreviationFirstLetter: Char,
-    decimalPower: Int,
-    binaryPower: Int,
+    decimalExponent: Int,
+    binaryExponent: Int,
     isLarge: Boolean
   ): List<DataUnit> = listOf(
-    DataUnit("${decimalPrefix}bit", "${decimalAbbreviationFirstLetter}b", isLarge, BIT, DECIMAL, decimalPower),
-    DataUnit("${binaryPrefix}bit", "${decimalAbbreviationFirstLetter}ib", isLarge, BIT, BINARY, binaryPower),
-    DataUnit("${decimalPrefix}byte", "${binaryAbbreviationFirstLetter}B", isLarge, BYTE, DECIMAL, decimalPower),
-    DataUnit("${binaryPrefix}byte", "${binaryAbbreviationFirstLetter}iB", isLarge, BYTE, BINARY, binaryPower)
+    DataUnit("${decimalPrefix}bit", "${decimalAbbreviationFirstLetter}b", isLarge, BIT, DECIMAL, decimalExponent),
+    DataUnit("${binaryPrefix}bit", "${decimalAbbreviationFirstLetter}ib", isLarge, BIT, BINARY, binaryExponent),
+    DataUnit("${decimalPrefix}byte", "${binaryAbbreviationFirstLetter}B", isLarge, BYTE, DECIMAL, decimalExponent),
+    DataUnit("${binaryPrefix}byte", "${binaryAbbreviationFirstLetter}iB", isLarge, BYTE, BINARY, binaryExponent)
   )
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
@@ -154,17 +152,23 @@ internal object DataUnits {
     val isLarge: Boolean,
     val baseDataUnit: BaseDataUnit,
     val numberSystem: NumberSystem,
-    private val power: Int,
-    private val fixedConversationFactor: BigDecimal? = null
+    private val exponent: Int
   ) {
 
-    fun conversationFactor(mathContext: MathContext): BigDecimal {
-      fixedConversationFactor?.let { return it }
-
-      return when (baseDataUnit) {
-        BIT -> numberSystem.base.pow(power, mathContext).divide(bigDecimalEight, mathContext)
-        BYTE -> numberSystem.base.pow(power, mathContext)
+    fun toBits(value: BigDecimal, mathContext: MathContext): BigDecimal {
+      val conversationFactor = when (baseDataUnit) {
+        BIT -> numberSystem.base.pow(exponent, mathContext)
+        BYTE -> numberSystem.base.pow(exponent, mathContext).multiply(bigDecimalEight)
       }
+      return value.multiply(conversationFactor, mathContext)
+    }
+
+    fun fromBits(value: BigDecimal, mathContext: MathContext): BigDecimal {
+      val conversationFactor = when (baseDataUnit) {
+        BIT -> numberSystem.base.pow(exponent, mathContext)
+        BYTE -> numberSystem.base.pow(exponent, mathContext).multiply(bigDecimalEight)
+      }
+      return value.divide(conversationFactor, mathContext)
     }
 
     override fun toString(): String = name
