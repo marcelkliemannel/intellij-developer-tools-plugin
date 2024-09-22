@@ -36,7 +36,7 @@ repositories {
 dependencies {
   intellijPlatform {
     val platformVersion = properties("platformVersion")
-    create(properties("platform"), platformVersion, platformVersion == "LATEST-EAP-SNAPSHOT")
+    create(properties("platform"), platformVersion, false)
 
     bundledPlugins(properties("platformBundledPlugins").split(','))
 
@@ -97,7 +97,7 @@ intellijPlatform {
     version = providers.gradleProperty("pluginVersion")
     ideaVersion {
       sinceBuild = properties("pluginSinceBuild")
-      untilBuild = provider { null }
+      untilBuild = properties("pluginUntilBuild")
     }
     changeNotes.set(provider { changelog.renderItem(changelog.get(project.version as String), Changelog.OutputType.HTML) })
   }

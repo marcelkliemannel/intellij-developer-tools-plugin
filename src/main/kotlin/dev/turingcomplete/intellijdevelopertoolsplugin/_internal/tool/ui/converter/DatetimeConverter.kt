@@ -138,7 +138,7 @@ class DatetimeConverter(
       val initialInstant = Instant.ofEpochMilli(System.currentTimeMillis())
       val initialLocalDateTime = LocalDateTime.ofInstant(initialInstant, selectedTimeZoneId())
 
-      group("Unix Timestamp as Seconds") {
+      group("Unix Timestamp") {
         if (context.prioritizeVerticalLayout) {
           row {
             buildUnixTimeStampSecondsTextFieldUi(initialInstant)
