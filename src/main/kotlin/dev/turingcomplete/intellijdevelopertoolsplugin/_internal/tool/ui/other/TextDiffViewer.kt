@@ -11,12 +11,12 @@ import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 
 class TextDiffViewer(
@@ -30,6 +30,11 @@ class TextDiffViewer(
   private val secondText = configuration.register("secondText", "", INPUT, SECOND_TEXT_EXAMPLE)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
+
+  init {
+    wrapComponentInScrollPane = false
+  }
+
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun Panel.buildUi() {

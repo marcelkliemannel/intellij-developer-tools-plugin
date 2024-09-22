@@ -22,7 +22,6 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.layout.not
-import com.intellij.ui.util.preferredWidth
 import com.intellij.util.ui.UIUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType
@@ -32,6 +31,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.Develope
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import java.awt.Dimension
 import javax.swing.JComponent
 
 abstract class TextTransformer(
@@ -145,7 +145,7 @@ abstract class TextTransformer(
         val debugComponent = panel {
           buildDebugComponent()
         }.apply {
-          preferredWidth = 300
+          preferredSize = Dimension(300, preferredSize.height)
         }
         JBPopupFactory.getInstance()
           .createBalloonBuilder(createScrollPane(debugComponent, true))

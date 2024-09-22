@@ -1,0 +1,125 @@
+package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter
+
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.project.Project
+import com.intellij.ui.TabbedPaneWrapper
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.BottomGap
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.util.ui.JBUI.Borders
+import com.intellij.util.ui.components.BorderLayoutPanel
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.ResetListener
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ScrollPaneBuilder
+import javax.swing.ScrollPaneConstants
+import javax.swing.event.ChangeEvent
+import javax.swing.event.ChangeListener
+
+class UnitsConverter(
+  private val configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable
+) : DeveloperUiTool(parentDisposable), ResetListener, ChangeListener {
+  // -- Properties -------------------------------------------------------------------------------------------------- //
+
+  private val unitConverters: List<UnitConverter> = listOf(
+    TimeConverter(configuration, parentDisposable),
+    DataSizeConverter(configuration, parentDisposable),
+    TransferRateConverter(configuration, parentDisposable)
+  )
+  private var selectedUnitConverter: UnitConverter = unitConverters[0]
+
+  private lateinit var unitConvertersTabbedPanel: TabbedPaneWrapper
+
+  // -- Initialization ---------------------------------------------------------------------------------------------- //
+
+  init {
+    wrapComponentInScrollPane = false
+  }
+
+  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+
+  override fun Panel.buildUi() {
+    unitConvertersTabbedPanel = TabbedPaneWrapper(parentDisposable).apply {
+      val tabBorder = Borders.emptyTop(12)
+      unitConverters.forEach { converter ->
+        val component = converter.createComponent().apply {
+          border = tabBorder
+        }
+        addTab(
+          converter.title,
+          ScrollPaneBuilder(component)
+            .horizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
+            .build()
+        )
+      }
+    }
+    row {
+      cell(BorderLayoutPanel().apply { addToCenter(unitConvertersTabbedPanel.component) })
+        .resizableColumn()
+        .align(Align.FILL)
+    }.bottomGap(BottomGap.SMALL).resizableRow()
+  }
+
+  override fun activated() {
+    selectedUnitConverter.activate()
+
+    configuration.addResetListener(parentDisposable, this)
+
+    unitConvertersTabbedPanel.addChangeListener(this)
+  }
+
+  override fun deactivated() {
+    selectedUnitConverter.deactivate()
+
+    configuration.removeResetListener(this)
+
+    unitConvertersTabbedPanel.removeChangeListener(this)
+  }
+
+  override fun stateChanged(e: ChangeEvent?) {
+    val oldSelectedUnitConverter = selectedUnitConverter
+    val newSelectedUnitConverter = unitConverters[unitConvertersTabbedPanel.selectedIndex]
+    if (oldSelectedUnitConverter != newSelectedUnitConverter) {
+      oldSelectedUnitConverter.deactivate()
+      newSelectedUnitConverter.activate()
+      selectedUnitConverter = newSelectedUnitConverter
+    }
+  }
+
+  override fun configurationReset() {
+    sync()
+  }
+
+  override fun afterBuildUi() {
+    sync()
+  }
+
+  // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun sync() {
+    unitConverters.forEach { it.sync() }
+  }
+
+  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  class Factory : DeveloperUiToolFactory<UnitsConverter> {
+
+    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
+      menuTitle = "Units Converter",
+      contentTitle = "Units Converter"
+    )
+
+    override fun getDeveloperUiToolCreator(
+      project: Project?,
+      parentDisposable: Disposable,
+      context: DeveloperUiToolContext
+    ): ((DeveloperToolConfiguration) -> UnitsConverter) =
+      { configuration -> UnitsConverter(configuration, parentDisposable) }
+  }
+
+  // -- Companion Object -------------------------------------------------------------------------------------------- //
+}

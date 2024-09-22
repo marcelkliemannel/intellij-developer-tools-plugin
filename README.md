@@ -29,8 +29,8 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 - JSON Schema Validator
 - Hashing
 - Archive (ZIP, TAR, JAR, 7z, ...) viewer and extractor
-- Date Time Converter
-- Time Conversion
+- Date Time Handling (Unix Timestamp, Formatting, ...)
+- Units converters for time, data size and transfer rate
 - Code Style Formatting
 - SQL Formatting
 - Color Picker
@@ -54,15 +54,6 @@ The action to access the dialog is available through IntelliJ's main menu under 
 To add the "Open Dialog" action to the main toolbar, we can either enable it in IntelliJ's settings/preferences under **Tools | Developer Tools**, or manually add the action via **Customize Toolbar... | Add Actions... | Developer Tools**.
 
 All inputs and configurations of the dialog will be stored on the application level.
-
-## Versioning
-
-Due to API breaking changes in IntelliJ 2024.2, the plugin will be maintained in two release branches (both will get the same features and bugfixes):
-
-- Release 4.* (maintained in branch `release_4-until-build-2024.1`) until IntelliJ 2024.1.*
-- Release 5.* (maintained in branch `main`) starting from IntelliJ 2024.2.*
-
-The release 4 will be supported until the latest stable Android Studio uses IntelliJ 2024.2.
 
 ## Development
 

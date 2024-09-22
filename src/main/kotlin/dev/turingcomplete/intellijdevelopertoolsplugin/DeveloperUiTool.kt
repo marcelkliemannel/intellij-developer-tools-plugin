@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.validation.DialogValidationRequestor
 import com.intellij.ui.ComponentUtil.findComponentsOfType
+import com.intellij.ui.ScrollPaneFactory.createScrollPane
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBEmptyBorder
@@ -18,16 +19,18 @@ abstract class DeveloperUiTool(
 ) : DataProvider, Disposable {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private lateinit var panel: DialogPanel
+  private lateinit var component: DialogPanel
   private val validationListeners = mutableSetOf<(List<ValidationInfo>) -> Unit>()
   var isDisposed = false
     private set
+
+  protected var wrapComponentInScrollPane = true
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   fun createComponent(): JComponent {
-    panel = panel {
+    component = panel {
       buildUi()
     }
     // This prevents the `Editor` from increasing the size of the dialog if the
@@ -35,24 +38,32 @@ abstract class DeveloperUiTool(
     // reason for this behavior is that the UI DSL always sets the minimum size
     // to the preferred size. But the preferred size gets calculated as if the
     // whole text gets displayed on the screen.
-    panel.minimumSize = Dimension(0, 0)
-    panel.withPreferredWidth(0)
+    component.minimumSize = Dimension(0, 0)
+    component.withPreferredWidth(0)
 
-    findComponentsOfType(panel, DialogPanel::class.java).forEach {
+    findComponentsOfType(component, DialogPanel::class.java).forEach {
       it.registerValidators(parentDisposable)
     }
 
-    val wrapper = object : BorderLayoutPanel(), DataProvider {
+    var wrapper: JComponent = object : BorderLayoutPanel(), DataProvider {
 
       init {
         border = JBEmptyBorder(12, 16, 16, 16)
-        addToCenter(panel)
+        addToCenter(component)
       }
 
       override fun getData(dataId: String): Any? = this@DeveloperUiTool.getData(dataId)
     }
 
+    if (wrapComponentInScrollPane) {
+      wrapper = createScrollPane(wrapper, true)
+    }
+
     afterBuildUi()
+
+    if (wrapComponentInScrollPane) {
+      wrapper = createScrollPane(wrapper, true)
+    }
 
     return wrapper
   }
@@ -90,7 +101,7 @@ abstract class DeveloperUiTool(
   }
 
   fun validate(): List<ValidationInfo> {
-    val result = findComponentsOfType(panel, DialogPanel::class.java).flatMap {
+    val result = findComponentsOfType(component, DialogPanel::class.java).flatMap {
       it.validateAll()
     }.toList()
     validationListeners.forEach { it(result) }

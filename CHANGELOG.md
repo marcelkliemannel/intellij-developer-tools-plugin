@@ -10,21 +10,45 @@
 
 ### Fixed
 
+## [5.1.0] - 2024-09-20
+
+### Added
+
+- New tool _Units Converter_ that supports data sizes and transfer rates conversion.
+- Add characters count to the _Text Statistic_ tool.
+- Add support for Kotlin K2 compiler.
+
+### Changed
+
+- Tool "Time Conversion" moved into the new "Units Converter" tool.
+- Setting _save secret inputs_ renamed to _save sensitive inputs_.
+- The minimum required IntelliJ version is now 2024.1. Drop of support for the major release version 4.
+
+### Removed
+
+- Remove support to store secret inputs in the system password store.
+
+### Fixed
+
+- The _Text Diff_ tool UI will no longer add an unnecessary scrollbar if the text is larger than the visible editor.
+- Errors in the _Date Time_ tool only block the conversion if this error occurs in the last active input field.
+
 ## 5.0.0 - 2024-05-21
 
 ### Added
 
 - Compatibility with IntelliJ 2024.2 EAP
+- The _Text Diff_ tool UI will no longer add an unnecessary scrollbar if the text is larger than the visible editor.
 
 ## 4.3.0 - 2024-05-20
 
 ### Added
 
 - Add keymap actions to show a developer tool
-- Add optional strict secret/key requirements check to the "JSON Web Token (JWT) Decoder/Encoder" tool.
-- Add gutter icon with readable a readable date/time format for UNIX timestamps in the "JSON Web Token (JWT) Decoder/Encoder" tool.
+- Add optional strict secret/key requirements check to the _JSON Web Token (JWT) Decoder/Encoder_ tool.
+- Add gutter icon with readable a readable date/time format for UNIX timestamps in the _JSON Web Token (JWT) Decoder/Encoder_ tool.
 - The "JSON Web Token (JWT) Decoder/Encoder" tool interface now includes sliders to flexibly change the size of the editors.
-- Add new tool "Text Filter".
+- Add new tool _Text Filter_.
 
 ### Changed
 

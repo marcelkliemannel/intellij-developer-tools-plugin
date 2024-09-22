@@ -37,11 +37,11 @@ import com.intellij.ui.dsl.builder.actionsButton
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.columns
-import com.intellij.ui.dsl.builder.listCellRenderer
 import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
+import com.intellij.ui.dsl.listCellRenderer.textListCellRenderer
 import com.intellij.ui.layout.ComboBoxPredicate
 import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.not
@@ -222,7 +222,7 @@ internal class BarcodeGenerator private constructor(
   }
 
   private fun createContentEditor(parentDisposable: Disposable) =
-    DeveloperToolEditor("content", context, configuration, project,"Content", DeveloperToolEditor.EditorMode.INPUT, parentDisposable, contentText)
+    DeveloperToolEditor("content", context, configuration, project, "Content", DeveloperToolEditor.EditorMode.INPUT, parentDisposable, contentText)
       .onTextChangeFromUi { generate() }
 
   private fun exportToFile(fileFormat: String) {
@@ -519,8 +519,8 @@ internal class BarcodeGenerator private constructor(
           .onChanged { onConfigurationChange() }
           .gap(RightGap.SMALL)
 
-        val compactionRenderer = listCellRenderer<Compaction> { value ->
-          text = value.name.lowercase().replaceFirstChar { it.titlecase(Locale.ROOT) }
+        val compactionRenderer = textListCellRenderer<Compaction?> {
+          it?.name?.lowercase()?.replaceFirstChar { char -> char.titlecase(Locale.ROOT) } ?: throw IllegalArgumentException()
         }
         comboBox(Compaction.entries, compactionRenderer)
           .bindItem(compactModeType)
@@ -608,14 +608,15 @@ internal class BarcodeGenerator private constructor(
     @Suppress("UnstableApiUsage")
     override fun Panel.buildAdditionalConfigurationUi(visible: ComponentPredicate, onConfigurationChange: () -> Unit) {
       row {
-        val layersRenderer = listCellRenderer<Int> { value ->
-          text = when {
-            value < 0 -> "$value (compact)"
-            value == 0 -> "Minimum"
-            else -> value.toString()
+        val renderer = textListCellRenderer<Int?> {
+          when {
+            it == null -> throw IllegalArgumentException()
+            it < 0 -> "$it (compact)"
+            it == 0 -> "Minimum"
+            else -> it.toString()
           }
         }
-        comboBox(IntRange(-4, 32).toList(), layersRenderer)
+        comboBox(IntRange(-4, 32).toList(), renderer)
           .label("Layers:")
           .bindItem(layers)
           .whenItemSelectedFromUi { onConfigurationChange() }
@@ -660,13 +661,13 @@ internal class BarcodeGenerator private constructor(
           .whenStateChangedFromUi { onConfigurationChange() }
           .enabledIf(compactModeCheckBox.selected)
 
-        val versionRenderer = listCellRenderer { value -> text = if (value == 0) "Minimum" else value.toString() }
+        val versionRenderer = textListCellRenderer<Int?> { if (it == 0) "Minimum" else it?.toString() ?: throw IllegalArgumentException() }
         comboBox(IntRange(0, 40).toList(), versionRenderer)
           .label("Version:")
           .bindItem(version)
           .whenItemSelectedFromUi { onConfigurationChange() }
 
-        val maskPatternRenderer = listCellRenderer { value -> text = if (value == -1) "Best" else value.toString() }
+        val maskPatternRenderer = textListCellRenderer<Int?> { if (it == -1) "Best" else it?.toString() ?: throw IllegalArgumentException() }
         comboBox(IntRange(-1, QRCode.NUM_MASK_PATTERNS - 1).toList(), maskPatternRenderer)
           .label("Mask pattern:")
           .bindItem(maskPattern)
@@ -732,11 +733,12 @@ internal class BarcodeGenerator private constructor(
           .whenStateChangedFromUi { onConfigurationChange() }
           .enabledIf(compactModeCheckBox.selected.not())
 
-        val symbolShapeRenderer = listCellRenderer<SymbolShapeHint> { value ->
-          text = when (value) {
+        val symbolShapeRenderer = textListCellRenderer<SymbolShapeHint?> {
+          when (it) {
             SymbolShapeHint.FORCE_NONE -> "Automatically"
             SymbolShapeHint.FORCE_SQUARE -> "Square"
             SymbolShapeHint.FORCE_RECTANGLE -> "Rectangle"
+            else -> throw IllegalArgumentException()
           }
         }
         comboBox(SymbolShapeHint.entries, symbolShapeRenderer)

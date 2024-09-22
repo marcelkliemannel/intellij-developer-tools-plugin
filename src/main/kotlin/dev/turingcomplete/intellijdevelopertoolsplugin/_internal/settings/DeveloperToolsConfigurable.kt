@@ -1,6 +1,5 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings
 
-import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.options.Configurable
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.RightGap
@@ -20,7 +19,7 @@ class DeveloperToolsConfigurable : Configurable {
   private lateinit var addOpenMainDialogActionToMainToolbar: ValueProperty<Boolean>
   private lateinit var saveConfigurations: ValueProperty<Boolean>
   private lateinit var saveInputs: ValueProperty<Boolean>
-  private lateinit var saveSecrets: ValueProperty<Boolean>
+  private lateinit var saveSensitiveInputs: ValueProperty<Boolean>
   private lateinit var loadExamples: ValueProperty<Boolean>
   private lateinit var dialogIsModal: ValueProperty<Boolean>
   private lateinit var editorSoftWraps: ValueProperty<Boolean>
@@ -59,12 +58,10 @@ class DeveloperToolsConfigurable : Configurable {
         .bindSelected(saveInputs)
     }
     row {
-      saveSecrets = ValueProperty(developerToolsApplicationSettings.saveSecrets)
-      checkBox("Remember secrets")
-        .bindSelected(saveSecrets)
-    }.comment("Secrets are stored in the <a href='https://plugins.jetbrains.com/docs/intellij/persisting-sensitive-data.html#storage'>system keychain</a>.") {
-      BrowserUtil.browse(it.url)
-    }
+      saveSensitiveInputs = ValueProperty(developerToolsApplicationSettings.saveSensitiveInputs)
+      checkBox("Remember sensitive inputs")
+        .bindSelected(saveSensitiveInputs)
+    }.comment("Sensitive inputs will be stored in plaintext.")
     row {
       loadExamples = ValueProperty(developerToolsApplicationSettings.loadExamples)
       checkBox("Load examples")
@@ -76,7 +73,7 @@ class DeveloperToolsConfigurable : Configurable {
         .bindSelected(hideWorkbenchTabsOnSingleTab)
     }.bottomGap(BottomGap.SMALL)
 
-    buttonsGroup("External Action Handling") {
+    buttonsGroup("External action handling") {
       row("Open tools in:") {
         autoDetectActionHandlingInstance = ValueProperty(developerToolsApplicationSettings.autoDetectActionHandlingInstance)
         radioButton("Auto detect")
@@ -152,7 +149,7 @@ class DeveloperToolsConfigurable : Configurable {
     return developerToolsApplicationSettings.addOpenMainDialogActionToMainToolbar != addOpenMainDialogActionToMainToolbar.get() ||
             developerToolsApplicationSettings.saveConfigurations != saveConfigurations.get() ||
             developerToolsApplicationSettings.saveInputs != saveInputs.get() ||
-            developerToolsApplicationSettings.saveSecrets != saveSecrets.get() ||
+            developerToolsApplicationSettings.saveSensitiveInputs != saveSensitiveInputs.get() ||
             developerToolsApplicationSettings.loadExamples != loadExamples.get() ||
             DeveloperToolsDialogSettings.instance.dialogIsModal != dialogIsModal.get() ||
             developerToolsApplicationSettings.editorSoftWraps != editorSoftWraps.get() ||
@@ -171,7 +168,7 @@ class DeveloperToolsConfigurable : Configurable {
       it.addOpenMainDialogActionToMainToolbar = addOpenMainDialogActionToMainToolbar.get()
       it.saveConfigurations = saveConfigurations.get()
       it.saveInputs = saveInputs.get()
-      it.saveSecrets = saveSecrets.get()
+      it.saveSensitiveInputs = saveSensitiveInputs.get()
       it.loadExamples = loadExamples.get()
       it.editorSoftWraps = editorSoftWraps.get()
       it.editorShowWhitespaces = editorShowWhitespaces.get()
@@ -191,7 +188,7 @@ class DeveloperToolsConfigurable : Configurable {
     addOpenMainDialogActionToMainToolbar.set(developerToolsApplicationSettings.addOpenMainDialogActionToMainToolbar)
     saveConfigurations.set(developerToolsApplicationSettings.saveConfigurations)
     saveInputs.set(developerToolsApplicationSettings.saveInputs)
-    saveSecrets.set(developerToolsApplicationSettings.saveSecrets)
+    saveSensitiveInputs.set(developerToolsApplicationSettings.saveSensitiveInputs)
     loadExamples.set(developerToolsApplicationSettings.loadExamples)
     dialogIsModal.set(DeveloperToolsDialogSettings.instance.dialogIsModal)
     editorSoftWraps.set(developerToolsApplicationSettings.editorSoftWraps)

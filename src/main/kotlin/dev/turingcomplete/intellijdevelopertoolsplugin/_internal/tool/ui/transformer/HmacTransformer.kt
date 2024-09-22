@@ -12,14 +12,16 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SECRET
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SENSITIVE
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.SimpleToggleAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.registerDynamicToolTip
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.validateNonEmpty
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE32
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE64
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.RAW
@@ -49,7 +51,7 @@ internal class HmacTransformer(
 
   private var selectedAlgorithm = configuration.register("algorithm", DEFAULT_ALGORITHM)
 
-  private val secretKey = configuration.register("secretKey", SECRET_KEY_DEFAULT, SECRET, EXAMPLE_SECRET)
+  private val secretKey = configuration.register("secretKey", SECRET_KEY_DEFAULT, SENSITIVE, EXAMPLE_SECRET)
   private val secretKeyEncodingMode = configuration.register("secretKeyEncodingMode", RAW, CONFIGURATION)
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
@@ -83,11 +85,17 @@ internal class HmacTransformer(
       return
     }
 
+    val secretKeyValue = secretKey.get()
+    if (secretKeyValue.isEmpty()) {
+      resultText.set("")
+      return
+    }
+
     val hmac: ByteArray = Mac.getInstance(selectedAlgorithm.get()).run {
       val secretKey = when (secretKeyEncodingMode.get()) {
-        RAW -> secretKey.get()
-        BASE32 -> Base32().decode(secretKey.get()).decodeToString()
-        BASE64 -> secretKey.get().decodeBase64String()
+        RAW -> secretKeyValue
+        BASE32 -> Base32().decode(secretKeyValue).decodeToString()
+        BASE64 -> secretKeyValue.decodeBase64String()
       }
       init(SecretKeySpec(secretKey.encodeToByteArray(), selectedAlgorithm.get()))
       doFinal(sourceText.get().encodeToByteArray())
@@ -114,6 +122,7 @@ internal class HmacTransformer(
         .validateNonEmpty("A secret key must be provided")
         .gap(RightGap.SMALL)
         .resizableColumn()
+        .registerDynamicToolTip({ DeveloperToolsApplicationSettings.instance.createSensitiveInputsHandlingToolTipText() })
 
       val encodingActions = mutableListOf<AnAction>().apply {
         SecretKeyEncodingMode.entries.forEach { secretKeyEncodingModeValue ->

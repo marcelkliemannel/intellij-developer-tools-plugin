@@ -147,8 +147,14 @@ class JsonPathTransformer(
       project: Project?,
       parentDisposable: Disposable,
       context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> JsonPathTransformer) = { configuration ->
-      JsonPathTransformer(context, configuration, parentDisposable, project)
+    ): ((DeveloperToolConfiguration) -> JsonPathTransformer)? {
+      if (project == null) {
+        return null
+      }
+
+      return { configuration ->
+        JsonPathTransformer(context, configuration, parentDisposable, project)
+      }
     }
   }
 
