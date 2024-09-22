@@ -44,7 +44,8 @@ dependencies {
     pluginVerifier()
     zipSigner()
 
-    testFramework(TestFrameworkType.Bundled)
+    testFramework(TestFrameworkType.Platform)
+    testFramework(TestFrameworkType.JUnit5)
   }
 
   implementation("com.fasterxml.uuid:java-uuid-generator:5.0.0") {
@@ -177,6 +178,7 @@ tasks {
 
   withType<Test> {
     useJUnitPlatform()
+    systemProperty("java.awt.headless", "false")
   }
 
   named("check") {

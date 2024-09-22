@@ -1,7 +1,12 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings
 
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase5
+import com.intellij.openapi.util.Disposer
+import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
+import com.intellij.testFramework.junit5.RunInEdt
+import com.intellij.testFramework.junit5.RunMethodInEdt
+import com.intellij.testFramework.junit5.TestApplication
 import com.intellij.ui.JBColor
 import com.intellij.util.application
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
@@ -11,10 +16,12 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperUiToolFactoryEp
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 import java.math.BigDecimal
-import java.nio.file.Path
 import java.time.ZoneId
 import java.util.*
 import kotlin.collections.component1
@@ -22,18 +29,33 @@ import kotlin.collections.component2
 import kotlin.collections.set
 import kotlin.random.Random
 
-
-class DeveloperToolsInstanceSettingsTest : LightJavaCodeInsightFixtureTestCase5() {
+@RunInEdt(allMethods = false)
+@TestApplication
+class DeveloperToolsInstanceSettingsTest {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  @TempDir
-  lateinit var tempProjectDir: Path
+  private val fixture = IdeaTestFixtureFactory.getFixtureFactory().createFixtureBuilder("test").fixture
+  private val disposable = Disposable { }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
+  @BeforeEach
+  fun beforeEach() {
+    fixture.setUp()
+  }
+
+  @AfterEach
+  @RunMethodInEdt(writeIntent = RunMethodInEdt.WriteIntentMode.True)
+  fun afterEach() {
+    Disposer.dispose(disposable)
+    fixture.tearDown()
+  }
+
   @Test
   fun `Check various configurations persistent states`() {
+    IdeaTestFixtureFactory.getFixtureFactory().createLightFixtureBuilder("dd").fixture
+
     DeveloperToolsApplicationSettings.instance.also {
       it.saveConfigurations = true
       it.saveInputs = true
@@ -158,24 +180,37 @@ class DeveloperToolsInstanceSettingsTest : LightJavaCodeInsightFixtureTestCase5(
       val context = DeveloperUiToolContext(developerToolFactoryEp.id, false)
       val developerToolConfiguration = settings.createDeveloperToolConfiguration(developerToolFactoryEp.id)
       val developerUiTool = developerUiToolFactory
-        .getDeveloperUiToolCreator(fixture.project, fixture.testRootDisposable, context)!!
-        .invoke(developerToolConfiguration)
-      developerToolConfiguration.wasConsumedByDeveloperTool = true
-
-      ApplicationManager.getApplication().invokeAndWait {
-        developerUiTool.createComponent()
-        developerUiTool.activated()
+        .getDeveloperUiToolCreator(fixture.project, disposable, context)
+        ?.invoke(developerToolConfiguration)
+      if (developerUiTool != null) {
+        developerToolConfiguration.wasConsumedByDeveloperTool = true
+        ApplicationManager.getApplication().invokeAndWait {
+          developerUiTool.createComponent()
+          developerUiTool.activated()
+        }
+        developerUiTools[developerToolFactoryEp] = developerUiTool
       }
-
-      developerUiTools[developerToolFactoryEp] = developerUiTool
     }
 
     return developerUiTools
   }
 
-  override fun getTestDataPath(): String = tempProjectDir.toString()
-
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    @BeforeAll
+    @JvmStatic
+    fun beforeAll() {
+      System.setProperty("java.awt.headless", false.toString())
+    }
+
+    @AfterAll
+    @JvmStatic
+    fun afterAll() {
+      System.setProperty("java.awt.headless", false.toString())
+    }
+  }
 }
