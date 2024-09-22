@@ -4,15 +4,19 @@
 
 ### Added
 
-- Compatibility with IntelliJ 2024.3 EAP
-
 ### Changed
 
 ### Removed
 
 ### Fixed
 
-## [5.1.0] - 2024-09-20
+## [6.0.0] - 2024-09-22
+
+### Added
+
+- Compatibility with IntelliJ 2024.3 EAP
+
+## 5.1.0 - 2024-09-20
 
 ### Added
 
