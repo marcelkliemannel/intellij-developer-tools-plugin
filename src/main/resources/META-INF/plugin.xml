@@ -56,6 +56,7 @@
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.modules.json</depends>
   <depends optional="true" config-file="dev.turingcomplete.intellijdevelopertoolsplugins-withJava.xml">
     com.intellij.java
   </depends>
@@ -66,12 +67,6 @@
   <extensions defaultExtensionNs="com.intellij">
     <postStartupActivity
             implementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperToolsPluginProjectActivity"/>
-    <applicationService
-            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings"/>
-    <applicationService
-            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsDialogSettings"/>
-    <applicationService
-            serviceImplementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.LegacyDeveloperToolsSettingsMigrator"/>
     <applicationConfigurable
             parentId="tools"
             instance="dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsConfigurable"

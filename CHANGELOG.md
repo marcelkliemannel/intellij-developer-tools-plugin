@@ -4,6 +4,8 @@
 
 ### Added
 
+- Compatibility with IntelliJ 2024.3 EAP
+
 ### Changed
 
 ### Removed

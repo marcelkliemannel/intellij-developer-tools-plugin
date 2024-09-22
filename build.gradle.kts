@@ -1,3 +1,4 @@
+
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
@@ -97,7 +98,7 @@ intellijPlatform {
     version = providers.gradleProperty("pluginVersion")
     ideaVersion {
       sinceBuild = properties("pluginSinceBuild")
-      untilBuild = properties("pluginUntilBuild")
+      untilBuild = null
     }
     changeNotes.set(provider { changelog.renderItem(changelog.get(project.version as String), Changelog.OutputType.HTML) })
   }

@@ -2,6 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.SettingsCategory
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
@@ -10,6 +11,7 @@ import com.intellij.util.xmlb.annotations.Property
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsDialogSettings.DialogState
 
+@Service
 @State(
   name = "DeveloperToolsDialogSettingsV1",
   storages = [Storage("developer-tools.xml")],
