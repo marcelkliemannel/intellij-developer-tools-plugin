@@ -27,7 +27,7 @@ import java.math.BigDecimal.ZERO
 class DataSizeConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
-) : UnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Data Size") {
+) : MathContextUnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Data Size") {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val bitDataSizeValue = configuration.register("${CONFIGURATION_KEY_PREFIX}bitDataSizeValue", ZERO, INPUT, DEFAULT_BIT_DATA_SIZE_VALUE)
@@ -131,7 +131,7 @@ class DataSizeConverter(
 
     fun setFromBits(
       bits: BigDecimal,
-      unitConverter: UnitConverter
+      unitConverter: MathContextUnitConverter
     ) {
       val result = dataUnit.fromBits(bits, unitConverter.mathContext)
       formattedValue.set(with(unitConverter) { result.toFormatted() })

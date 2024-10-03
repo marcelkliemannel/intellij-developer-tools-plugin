@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add number base converter to the tool _Units Converter_.
+
 ### Changed
 
 ### Removed
