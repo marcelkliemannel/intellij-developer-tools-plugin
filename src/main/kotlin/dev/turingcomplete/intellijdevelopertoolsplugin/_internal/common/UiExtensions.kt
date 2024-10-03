@@ -78,7 +78,7 @@ fun Cell<JBTextField>.validateBigDecimalValue(
     val value: BigDecimal? = try {
       toBigDecimal(this@validateBigDecimalValue.component.text)
     } catch (e: Exception) {
-      return@validationInfo error("Please enter a number")
+      return@validationInfo error("Please enter a valid number")
     }
     when {
       value == null -> error("Please enter a number")
