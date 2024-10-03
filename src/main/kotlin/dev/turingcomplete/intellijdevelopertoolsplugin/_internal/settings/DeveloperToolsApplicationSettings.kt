@@ -3,6 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings
 import com.intellij.CommonBundle
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.SettingsCategory
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
@@ -13,6 +14,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.Develo
 import java.security.Provider
 import java.security.Security
 
+@Service
 @State(
   name = "DeveloperToolsApplicationSettingsV1",
   storages = [Storage("developer-tools.xml")],

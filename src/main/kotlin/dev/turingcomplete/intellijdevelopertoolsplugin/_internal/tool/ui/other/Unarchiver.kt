@@ -836,7 +836,7 @@ internal class Unarchiver(
 
         override fun createCenterPanel(): JComponent = panel {
           row {
-            textFieldWithBrowseButton("Select Target Directory", project, FileChooserDescriptorFactory.createSingleFolderDescriptor())
+            textFieldWithBrowseButton(FileChooserDescriptorFactory.createSingleFolderDescriptor().withTitle("Select Target Directory"), project)
               .label("Target directory:")
               .bindText(lastSelectedTargetDirectoryPath)
               .resizableColumn()

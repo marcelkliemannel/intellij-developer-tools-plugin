@@ -2,7 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.conver
 
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.DataUnits.BaseDataUnit.BIT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.DataUnits.BaseDataUnit.BYTE
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.DataUnits.NumberSystem.BASE
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.DataUnits.NumberSystem.BASIC
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.DataUnits.NumberSystem.BINARY
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.DataUnits.NumberSystem.DECIMAL
 import java.math.BigDecimal
@@ -18,7 +18,7 @@ internal object DataUnits {
     abbreviation = "b",
     isLarge = false,
     baseDataUnit = BIT,
-    numberSystem = BASE,
+    numberSystem = BASIC,
     exponent = 0
   )
 
@@ -30,7 +30,7 @@ internal object DataUnits {
         abbreviation = "B",
         isLarge = false,
         baseDataUnit = BIT,
-        numberSystem = BASE,
+        numberSystem = BASIC,
         exponent = 3
       )
     ),
@@ -131,7 +131,7 @@ internal object DataUnits {
 
   enum class NumberSystem(val title: String, val base: BigDecimal) {
 
-    BASE("Base", BigDecimal.valueOf(2)),
+    BASIC("Basic", BigDecimal.valueOf(2)),
     BINARY("Binary", BigDecimal.valueOf(2)),
     DECIMAL("Decimal", BigDecimal.valueOf(10))
   }
