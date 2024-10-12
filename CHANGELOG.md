@@ -4,19 +4,18 @@
 
 ### Added
 
-- Add number base converter to the tool _Units Converter_.
-
 ### Changed
 
 ### Removed
 
 ### Fixed
 
-## [6.0.0] - 2024-09-22
+## [6.0.0] - 2024-11-14
 
 ### Added
 
-- Compatibility with IntelliJ 2024.3 EAP
+- Add number base converter to the tool _Units Converter_.
+- Compatibility with IntelliJ 2024.3
 
 ## 5.1.0 - 2024-09-20
 

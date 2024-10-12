@@ -8,6 +8,7 @@ import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLeve
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.MISSING_DEPENDENCIES
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.NON_EXTENDABLE_API_USAGES
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.OVERRIDE_ONLY_API_USAGES
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun properties(key: String) = project.findProperty(key).toString()
@@ -15,8 +16,8 @@ fun properties(key: String) = project.findProperty(key).toString()
 plugins {
   java
   // See bundled version: https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-  kotlin("jvm") version "1.9.10"
-  id("org.jetbrains.intellij.platform") version "2.0.0"
+  kotlin("jvm") version "2.0.21"
+  id("org.jetbrains.intellij.platform") version "2.1.0"
   id("org.jetbrains.changelog") version "2.2.0"
   id("com.autonomousapps.dependency-analysis") version "1.30.0"
 }
@@ -91,6 +92,8 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
   testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+  // This is a workaround, see: https://youtrack.jetbrains.com/issue/IJPL-159134/JUnit5-Test-Framework-refers-to-JUnit4-java.lang.NoClassDefFoundError-junit-framework-TestCase
+  testRuntimeOnly("junit:junit:4.13.2")
 }
 
 intellijPlatform {
@@ -98,7 +101,7 @@ intellijPlatform {
     version = providers.gradleProperty("pluginVersion")
     ideaVersion {
       sinceBuild = properties("pluginSinceBuild")
-      untilBuild = null
+      untilBuild = provider { null }
     }
     changeNotes.set(provider { changelog.renderItem(changelog.get(project.version as String), Changelog.OutputType.HTML) })
   }
@@ -169,12 +172,21 @@ dependencyAnalysis {
   }
 }
 
+java {
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
+}
+
 tasks {
   withType<KotlinCompile> {
-    kotlinOptions {
+    compilerOptions {
       freeCompilerArgs = listOf("-Xjsr305=strict")
-      jvmTarget = "17"
+      jvmTarget.set(JvmTarget.JVM_21)
     }
+  }
+
+  named("buildSearchableOptions") {
+    enabled = false
   }
 
   withType<Test> {
