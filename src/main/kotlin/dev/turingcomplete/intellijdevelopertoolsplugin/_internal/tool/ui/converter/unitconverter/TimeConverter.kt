@@ -37,7 +37,7 @@ import javax.swing.JComponent
 internal class TimeConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
-) : UnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Time") {
+) : MathContextUnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Time") {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val nanoseconds = configuration.register("${CONFIGURATION_KEY_PREFIX}timeNanoseconds", ZERO, INPUT, NANOSECONDS_EXAMPLE)

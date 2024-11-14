@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit
 internal class TransferRateConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-) : UnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Transfer Rate") {
+) : MathContextUnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Transfer Rate") {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private val timeDimension = configuration.register("${CONFIGURATION_KEY_PREFIX}timeDimension", DEFAULT_TIME_DIMENSION)
@@ -38,8 +38,8 @@ internal class TransferRateConverter(
     configuration.register("${CONFIGURATION_KEY_PREFIX}useCombinedAbbreviationNotation", DEFAULT_USE_COMBINED_ABBREVIATION_NOTATION)
   private val bitTransferRateValue = configuration.register("${CONFIGURATION_KEY_PREFIX}bitTransferRateValue", ZERO, INPUT, DEFAULT_BIT_TRANSFER_RATE_VALUE)
 
-  val transferRateProperties: List<TransferRateProperty> = createTransferRateProperties()
-  val bitTransferRateProperty = transferRateProperties.first { it.dataUnit == bitDataUnit }
+  private val transferRateProperties: List<TransferRateProperty> = createTransferRateProperties()
+  private val bitTransferRateProperty = transferRateProperties.first { it.dataUnit == bitDataUnit }
 
   private var lastTimeDimension: TransferRateTimeDimension = timeDimension.get()
 
@@ -200,7 +200,7 @@ internal class TransferRateConverter(
 
     fun setFromBits(
       bits: BigDecimal,
-      unitConverter: UnitConverter
+      unitConverter: MathContextUnitConverter
     ) {
       val result = dataUnit.fromBits(bits, unitConverter.mathContext)
       formattedValue.set(with(unitConverter) { result.toFormatted() })
@@ -211,7 +211,7 @@ internal class TransferRateConverter(
       bits: BigDecimal,
       originTimeDimension: TransferRateTimeDimension,
       targetTimeDimension: TransferRateTimeDimension,
-      unitConverter: UnitConverter
+      unitConverter: MathContextUnitConverter
     ) {
       val mathContext = unitConverter.mathContext
       val timeFactor = originTimeDimension.seconds.divide(targetTimeDimension.seconds, mathContext)

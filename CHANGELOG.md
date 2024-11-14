@@ -10,7 +10,14 @@
 
 ### Fixed
 
-## [5.1.0] - 2024-09-20
+## [6.0.0] - 2024-11-14
+
+### Added
+
+- Add number base converter to the tool _Units Converter_.
+- Compatibility with IntelliJ 2024.3
+
+## 5.1.0 - 2024-09-20
 
 ### Added
 

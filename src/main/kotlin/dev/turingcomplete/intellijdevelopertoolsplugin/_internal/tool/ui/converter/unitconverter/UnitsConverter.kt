@@ -25,10 +25,13 @@ class UnitsConverter(
 ) : DeveloperUiTool(parentDisposable), ResetListener, ChangeListener {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
+  private var lastSelectedUnitConverterIndex by configuration.register("lastSelectedUnitConverterIndex", DEFAULT_LAST_SELECTED_UNIT_CONVERTER_INDEX)
+
   private val unitConverters: List<UnitConverter> = listOf(
     TimeConverter(configuration, parentDisposable),
     DataSizeConverter(configuration, parentDisposable),
-    TransferRateConverter(configuration, parentDisposable)
+    TransferRateConverter(configuration, parentDisposable),
+    BaseConverter(configuration, parentDisposable)
   )
   private var selectedUnitConverter: UnitConverter = unitConverters[0]
 
@@ -56,6 +59,14 @@ class UnitsConverter(
             .build()
         )
       }
+
+      val initialSelectedUnitConverterIndex = if (lastSelectedUnitConverterIndex < this.tabCount) {
+        lastSelectedUnitConverterIndex
+      }
+      else {
+        DEFAULT_LAST_SELECTED_UNIT_CONVERTER_INDEX
+      }
+      this.selectedIndex = initialSelectedUnitConverterIndex
     }
     row {
       cell(BorderLayoutPanel().apply { addToCenter(unitConvertersTabbedPanel.component) })
@@ -87,6 +98,7 @@ class UnitsConverter(
       oldSelectedUnitConverter.deactivate()
       newSelectedUnitConverter.activate()
       selectedUnitConverter = newSelectedUnitConverter
+      lastSelectedUnitConverterIndex = unitConverters.indexOf(newSelectedUnitConverter)
     }
   }
 
@@ -122,4 +134,9 @@ class UnitsConverter(
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
+
+  companion object {
+
+    private const val DEFAULT_LAST_SELECTED_UNIT_CONVERTER_INDEX = 0
+  }
 }
