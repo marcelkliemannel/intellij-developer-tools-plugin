@@ -1,5 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter
 
+import ai.grazie.utils.capitalize
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -41,6 +42,7 @@ import com.intellij.ui.layout.ComboBoxPredicate
 import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
 import com.intellij.util.ExceptionUtil
+import com.intellij.util.text.DateFormatUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
@@ -126,7 +128,7 @@ internal class JwtEncoderDecoder(
 
     jwt.signature.secretEncodingMode.afterChangeConsumeEvent(null) { e ->
       if (e.valueChanged()) {
-        convert(SIGNATURE_CONFIGURATION)
+        convertFromUi(SIGNATURE_CONFIGURATION)
       }
     }
   }
@@ -207,7 +209,7 @@ internal class JwtEncoderDecoder(
         signatureAlgorithmComboBox = comboBox(SignatureAlgorithm.entries)
           .label("Algorithm:")
           .bindItem(jwt.signature.algorithm)
-          .whenItemSelectedFromUi { convert(SIGNATURE_CONFIGURATION) }
+          .whenItemSelectedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
           .component
       }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE)
 
@@ -218,9 +220,10 @@ internal class JwtEncoderDecoder(
         expandableTextField()
           .align(AlignX.FILL)
           .bindText(jwt.signature.secret)
-          .whenTextChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
+          .whenTextChangedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
           .gap(RightGap.SMALL)
           .resizableColumn()
+          .registerDynamicToolTip({ DeveloperToolsApplicationSettings.instance.createSensitiveInputsHandlingToolTipText() })
 
         val encodingActions = mutableListOf<AnAction>().apply {
           SecretKeyEncodingMode.entries.forEach { secretKeyEncodingModeValue ->
@@ -248,7 +251,7 @@ internal class JwtEncoderDecoder(
           .label(label = "Private key:", position = LabelPosition.TOP)
           .bindText(jwt.signature.privateKey)
           .setValidationResultBorder()
-          .whenTextChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
+          .whenTextChangedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
           .validationInfo(jwt.signature.privateKeyErrorHolder.asValidation())
           .registerDynamicToolTip({ DeveloperToolsApplicationSettings.instance.createSensitiveInputsHandlingToolTipText() })
       }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.keyFactory != null })
@@ -256,7 +259,7 @@ internal class JwtEncoderDecoder(
       row {
         checkBox("Strict key requirements validation")
           .bindSelected(jwt.signature.strictSigningKeyValidation)
-          .whenStateChangedFromUi { convert(SIGNATURE_CONFIGURATION) }
+          .whenStateChangedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
           .gap(RightGap.SMALL)
         contextHelp("The RFC 7518 for the JSON Web Algorithms (JWA) specifies some restrictions that a key or secret should fulfill for the computation of a signature (e.g., a minimum length). This option can be used to enforce these restrictions.")
       }
@@ -292,6 +295,14 @@ internal class JwtEncoderDecoder(
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
+
+  private fun convertFromUi(changeOrigin: ChangeOrigin) {
+    if (!liveConversion.get()) {
+      return
+    }
+
+    convert(changeOrigin)
+  }
 
   private fun convert(changeOrigin: ChangeOrigin) {
     if (configuration.isResetting) {
@@ -448,9 +459,7 @@ internal class JwtEncoderDecoder(
     }
     this.onTextChangeFromUi { _ ->
       lastActiveInput = this
-      if (liveConversion.get()) {
-        convert(changeOrigin)
-      }
+      convertFromUi(changeOrigin)
       onTextChangeFromUi?.invoke()
     }
   }
@@ -503,10 +512,20 @@ internal class JwtEncoderDecoder(
     private val unixTimestampSeconds: Long
   ) : GutterIconRenderer(), DumbAware {
 
-    override fun getTooltipText(): String =
-      Instant.ofEpochSecond(unixTimestampSeconds)
-        .atZone(ZoneId.systemDefault())
-        .format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
+    override fun getTooltipText(): String {
+      val tooltipText = StringJoiner("<br /><br />")
+
+      tooltipText.add(
+        Instant.ofEpochSecond(unixTimestampSeconds)
+          .atZone(ZoneId.systemDefault())
+          .format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
+      )
+
+      val diff = DateFormatUtil.formatBetweenDates(unixTimestampSeconds.times(1000), System.currentTimeMillis())
+      tooltipText.add("${diff.capitalize()}.")
+
+      return tooltipText.toString()
+    }
 
     override fun getIcon(): Icon = clockGutterIcon
 
@@ -641,11 +660,20 @@ internal class JwtEncoderDecoder(
     fun encodeJwt() {
       clearErrorHolders()
 
-      parseAsJson(header.get(), { error -> headerErrorHolder.add(error) }) {
-        parseHeader(it)
+      val headerJson = try {
+        val headerJson = objectMapper.readTree(header.get())
+        parseHeader(headerJson)
+        headerJson
+      } catch (e: Exception) {
+        headerErrorHolder.add(e)
+        null
       }
-      parseAsJson(payload.get(), { error -> payloadErrorHolder.add(error) }) {
-        // Nothing to do. This just validates that the payload is valid JSON.
+
+      val payloadJson = try {
+        objectMapper.readTree(payload.get())
+      } catch (e: Exception) {
+        payloadErrorHolder.add(e)
+        null
       }
 
       if (headerErrorHolder.isSet() || payloadErrorHolder.isSet()) {
@@ -653,8 +681,8 @@ internal class JwtEncoderDecoder(
         signatureErrorHolder.add("Unable to compute signature due to header or payload errors")
       }
       else {
-        val encodedHeader = urlEncoder.encode(header.get().encodeToByteArray()).decodeToString()
-        val encodedPayload = urlEncoder.encode(payload.get().encodeToByteArray()).decodeToString()
+        val encodedHeader = urlEncoder.encode(objectMapper.writeValueAsString(headerJson!!).encodeToByteArray()).decodeToString()
+        val encodedPayload = urlEncoder.encode(objectMapper.writeValueAsString(payloadJson!!).encodeToByteArray()).decodeToString()
         val encodedSignature = signature.compute(encodedHeader, encodedPayload)
         if (encodedSignature == null) {
           encoded.set("")
@@ -739,14 +767,14 @@ internal class JwtEncoderDecoder(
 
       return try {
         val signingKey = createSigningKey() ?: return null
-        val signature: String = ExtendedJsonWebSignature().apply {
+        ExtendedJsonWebSignature().apply {
           // The algorithm gets derivative from the header property `alg`
           setEncodedHeader(encodedHeader)
           setEncodedPayload(encodedPayload)
           setKey(signingKey)
           isDoKeyValidation = strictSigningKeyValidation.get()
-        }.getDetachedContentCompactSerialization()
-        urlEncoder.encodeToString(signature.encodeToByteArray())
+          sign()
+        }.encodedSignature
       } catch (e: Exception) {
         signatureErrorHolder.add("Failed to compute signature:", ExceptionUtil.getRootCause(e))
         null
