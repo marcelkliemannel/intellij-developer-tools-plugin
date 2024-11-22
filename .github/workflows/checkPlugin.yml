@@ -2,9 +2,12 @@ name: Check Plugin
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - release/*
 
   workflow_dispatch:
 
