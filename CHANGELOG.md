@@ -10,7 +10,13 @@
 
 ### Fixed
 
-## [5.1.0] - 2024-09-20
+## [5.1.1] - 2024-11-22
+
+### Fixed
+
+- Fix the validation and generation of the signature part of JWT encoder/decoder.
+
+## 5.1.0 - 2024-09-20
 
 ### Added
 
