@@ -188,6 +188,46 @@ internal class MimeBase64EncoderDecoder(
       { configuration -> MimeBase64EncoderDecoder(configuration, parentDisposable, context, project) }
   }
 }
+// -- Type ---------------------------------------------------------------------------------------------------------- //
+
+internal class AsciiEncoderDecoder(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable,
+  context: DeveloperUiToolContext,
+  project: Project?
+) :
+  TextConverter(
+    textConverterContext = encoderDecoderTextConverterContext,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    context = context,
+    project = project
+  ) {
+
+  override fun toTarget(text: String) {
+    targetText.set(text.encodeToAscii())
+  }
+
+  override fun toSource(text: String) {
+    sourceText.set(text.decodeFromAscii())
+  }
+
+  class Factory : DeveloperUiToolFactory<AsciiEncoderDecoder> {
+
+    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
+      menuTitle = "ASCII Encoding",
+      groupedMenuTitle = "ASCII",
+      contentTitle = "ASCII Encoder/Decoder"
+    )
+
+    override fun getDeveloperUiToolCreator(
+      project: Project?,
+      parentDisposable: Disposable,
+      context: DeveloperUiToolContext
+    ): ((DeveloperToolConfiguration) -> AsciiEncoderDecoder) =
+      { configuration -> AsciiEncoderDecoder(configuration, parentDisposable, context, project) }
+  }
+}
 
 // -- Type ---------------------------------------------------------------------------------------------------------- //
 

@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add ASCII Encoder/Decoder tool
+
 ### Changed
 
 - Improve menu title of tools
