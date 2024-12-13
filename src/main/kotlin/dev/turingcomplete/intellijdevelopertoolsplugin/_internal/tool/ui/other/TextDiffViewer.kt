@@ -75,7 +75,7 @@ class TextDiffViewer(
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
         menuTitle = "Text Diff",
-        "Text Diff Viewer"
+        contentTitle = "Text Diff Viewer"
       )
 
     override fun getDeveloperUiToolCreator(

@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Improve menu title of tools
+
 ### Removed
 
 ### Fixed

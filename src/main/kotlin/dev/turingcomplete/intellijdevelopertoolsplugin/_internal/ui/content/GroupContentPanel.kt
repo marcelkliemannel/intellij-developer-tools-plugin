@@ -16,7 +16,6 @@ import org.jdesktop.swingx.VerticalLayout
 import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants
 
-@Suppress("DialogTitleCapitalization")
 internal class GroupContentPanel(groupNode: GroupNode, private val onContentNodeSelection: (ContentNode) -> Unit) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
@@ -41,7 +40,7 @@ internal class GroupContentPanel(groupNode: GroupNode, private val onContentNode
   private fun createDeveloperToolLinksPanel(groupNode: GroupNode) = object : JPanel(VerticalLayout(UIUtil.DEFAULT_VGAP)) {
     init {
       groupNode.children().asSequence().filterIsInstance(DeveloperToolNode::class.java).forEach { developerToolNode ->
-        add(ActionLink(developerToolNode.developerUiToolPresentation.menuTitle) { onContentNodeSelection(developerToolNode) })
+        add(ActionLink(developerToolNode.developerUiToolPresentation.groupedMenuTitle) { onContentNodeSelection(developerToolNode) })
       }
     }
   }
