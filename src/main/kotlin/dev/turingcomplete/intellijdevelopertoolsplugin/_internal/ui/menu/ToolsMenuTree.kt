@@ -275,12 +275,13 @@ internal class ToolsMenuTree(
 
   private fun createTreeNodes(): Triple<RootNode, List<GroupNode>, ContentNode?> {
     val applicationSettings = DeveloperToolsApplicationSettings.instance
+    val toolsMenuTreeShowGroupNodes = applicationSettings.toolsMenuTreeShowGroupNodes
 
     val rootNode = RootNode()
 
     val defaultGroupNodesToExpand = mutableListOf<GroupNode>()
     val groupNodes = mutableMapOf<String, GroupNode>()
-    if (applicationSettings.toolsMenuTreeShowGroupNodes) {
+    if (toolsMenuTreeShowGroupNodes) {
       DeveloperUiToolGroup.EP_NAME.extensions.forEach { developerToolGroup ->
         val groupNode = GroupNode(developerToolGroup)
         groupNodes[developerToolGroup.id] = groupNode
@@ -302,7 +303,7 @@ internal class ToolsMenuTree(
       val developerUiToolFactory: DeveloperUiToolFactory<*> = developerToolFactoryEp.createInstance(application)
       val context = DeveloperUiToolContext(developerToolFactoryEp.id, prioritizeVerticalLayout)
       developerUiToolFactory.getDeveloperUiToolCreator(project, parentDisposable, context)?.let { developerToolCreator ->
-        val groupId: String? = if (applicationSettings.toolsMenuTreeShowGroupNodes) developerToolFactoryEp.groupId else null
+        val groupId: String? = if (toolsMenuTreeShowGroupNodes) developerToolFactoryEp.groupId else null
         val parentNode = if (groupId != null) (groupNodes[groupId] ?: error("Unknown group: $groupId")) else rootNode
         val developerToolNode = DeveloperToolNode(
           developerToolId = developerToolFactoryEp.id,
@@ -310,6 +311,7 @@ internal class ToolsMenuTree(
           settings = settings,
           parentDisposable = parentDisposable,
           developerUiToolPresentation = developerUiToolFactory.getDeveloperUiToolPresentation(),
+          showGrouped = toolsMenuTreeShowGroupNodes,
           developerUiToolCreator = developerToolCreator
         )
         parentNode.add(developerToolNode)

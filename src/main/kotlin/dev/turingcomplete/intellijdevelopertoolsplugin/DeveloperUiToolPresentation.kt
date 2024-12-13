@@ -15,6 +15,9 @@ data class DeveloperUiToolPresentation(
   val menuTitle: String,
 
   @Nls(capitalization = Nls.Capitalization.Title)
+  val groupedMenuTitle: String = menuTitle,
+
+  @Nls(capitalization = Nls.Capitalization.Title)
   val contentTitle: String,
 
   @Nls(capitalization = Nls.Capitalization.Sentence)
