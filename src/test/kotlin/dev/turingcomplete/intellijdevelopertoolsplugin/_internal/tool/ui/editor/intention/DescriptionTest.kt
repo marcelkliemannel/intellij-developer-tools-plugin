@@ -51,18 +51,15 @@ class DescriptionTest {
 
   companion object {
     
-    private const val PACKAGE = "dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention"
+    private const val INTENTION_CLASSES_PACKAGE = "dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention"
 
     @JvmStatic
     fun intentionActionSimpleClassNames(): List<Arguments> {
-      val classLoader = Thread.currentThread().contextClassLoader
-      val packageResource = classLoader.getResource(PACKAGE.replace(".", "/"))
-      assertThat(packageResource).isNotNull()
-      val intentionActionSimpleClassName = Paths.get(packageResource!!.path)
+      val intentionActionSimpleClassName = Paths.get("src/main/kotlin").resolve(Paths.get(INTENTION_CLASSES_PACKAGE.replace(".", "/")))
         .let { println(it); it }
         .listDirectoryEntries()
         .filter { it.isRegularFile() && !it.fileName.toString().contains("$") }
-        .map { Class.forName("${PACKAGE}.${it.nameWithoutExtension}") }
+        .map { Class.forName("${INTENTION_CLASSES_PACKAGE}.${it.nameWithoutExtension}") }
         .filter { !Modifier.isAbstract(it.modifiers) }
         .map { it.simpleName }
       assertThat(intentionActionSimpleClassName).hasSizeGreaterThan(1)
