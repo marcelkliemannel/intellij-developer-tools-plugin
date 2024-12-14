@@ -234,12 +234,16 @@ fun Cell<JLabel>.changeFont(scale: Float = 1.0f, style: Int = Font.PLAIN) = this
   font = JBFont.create(this.font.deriveFont(style), false).biggerOn(scale)
 }
 
+fun Cell<JLabel>.monospaceFont(scale: Float = 1.0f, style: Int = Font.PLAIN) = this.applyToComponent {
+  font = JBFont.create(Font(Font.MONOSPACED, style, this.font.size)).biggerOn(scale)
+}
+
 fun EditorEx.setLanguage(language: Language) {
   val syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(language, project, null)
   highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(syntaxHighlighter, EditorColorsManager.getInstance().globalScheme)
 }
 
-fun Color.toJBColor() = if (this is JBColor) this else JBColor(this, this)
+fun Color.toJBColor() = this as? JBColor ?: JBColor(this, this)
 
 @Suppress("UNCHECKED_CAST")
 fun <T> TabInfo.castedObject(): T = this.`object` as T

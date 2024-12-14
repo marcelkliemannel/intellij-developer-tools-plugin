@@ -14,10 +14,11 @@ internal class DeveloperToolNode(
   val project: Project?,
   val settings: DeveloperToolsInstanceSettings,
   val developerUiToolPresentation: DeveloperUiToolPresentation,
+  showGrouped: Boolean,
   private val developerUiToolCreator: (DeveloperToolConfiguration) -> DeveloperUiTool
 ) : ContentNode(
   id = developerToolId,
-  title = developerUiToolPresentation.menuTitle,
+  title = if (showGrouped) developerUiToolPresentation.groupedMenuTitle else developerUiToolPresentation.menuTitle,
   toolTipText = developerUiToolPresentation.contentTitle
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //

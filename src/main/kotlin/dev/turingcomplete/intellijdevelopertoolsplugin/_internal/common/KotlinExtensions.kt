@@ -7,9 +7,12 @@ import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
+
+private val asciiEncodedRegex = "\\\\u([0-9a-fA-F]{4})".toRegex()
+
 // -- Exposed Methods ----------------------------------------------------------------------------------------------- //
 
-inline fun <reified T> Any.safeCastTo(): T? = if (this is T) this else null
+inline fun <reified T> Any.safeCastTo(): T? = this as? T
 
 fun <T : Any> Any.uncheckedCastTo(type: KClass<T>): T = type.cast(this)
 
@@ -34,7 +37,7 @@ fun Comparator<String>.makeCaseInsensitive(): Comparator<String> {
   }
 }
 
-fun Long?.compareTo(other: Long?) : Int {
+fun Long?.compareTo(other: Long?): Int {
   return if (this == null && other == null) {
     0
   }
@@ -48,6 +51,17 @@ fun Long?.compareTo(other: Long?) : Int {
     this.compareTo(other)
   }
 }
+
+fun String.encodeToAscii() =
+  this.map {
+    if (it.code > 127) "\\u%04x".format(it.code) else it.toString()
+  }.joinToString("")
+
+fun String.decodeFromAscii() =
+  asciiEncodedRegex.replace(this) { matchResult ->
+    val charCode = matchResult.groupValues[1].toInt(16)
+    charCode.toChar().toString()
+  }
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //
