@@ -6,6 +6,8 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.TextRange
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.executeWriteCommand
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.decodeFromAscii
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.encodeToAscii
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toHexString
 import org.apache.commons.codec.binary.Base32
 import java.net.URLDecoder
@@ -25,7 +27,8 @@ internal object EncodersDecoders {
     Decoder("Base64", { Base64.getDecoder().decode(it).decodeToString() }),
     Decoder("MIME Base64", { Base64.getMimeDecoder().decode(it).decodeToString() }),
     Decoder("URL Base64", { Base64.getUrlDecoder().decode(it).decodeToString() }),
-    Decoder("URL Encoding", { URLDecoder.decode(it, StandardCharsets.UTF_8) })
+    Decoder("URL", { URLDecoder.decode(it, StandardCharsets.UTF_8) }),
+    Decoder("ASCII", { it.decodeFromAscii() })
   )
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
@@ -36,7 +39,8 @@ internal object EncodersDecoders {
       Encoder("Base64", { Base64.getEncoder().encodeToString(it.encodeToByteArray()) }),
       Encoder("MIME Base64", { Base64.getMimeEncoder().encodeToString(it.encodeToByteArray()) }),
       Encoder("URL Base64", { Base64.getUrlEncoder().encodeToString(it.encodeToByteArray()) }),
-      Encoder("URL Encoding", { URLEncoder.encode(it, StandardCharsets.UTF_8) }),
+      Encoder("URL", { URLEncoder.encode(it, StandardCharsets.UTF_8) }),
+      Encoder("ASCII", { it.encodeToAscii() }),
     )
 
     HashingUtils.commonHashingAlgorithms.forEach { messageDigest ->

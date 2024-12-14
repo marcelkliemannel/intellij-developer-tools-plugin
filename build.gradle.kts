@@ -17,9 +17,8 @@ plugins {
   java
   // See bundled version: https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
   kotlin("jvm") version "2.0.21"
-  id("org.jetbrains.intellij.platform") version "2.1.0"
+  id("org.jetbrains.intellij.platform") version "2.2.1"
   id("org.jetbrains.changelog") version "2.2.0"
-  id("com.autonomousapps.dependency-analysis") version "1.30.0"
 }
 
 group = properties("pluginGroup")
@@ -42,7 +41,6 @@ dependencies {
 
     bundledPlugins(properties("platformBundledPlugins").split(','))
 
-    instrumentationTools()
     pluginVerifier()
     zipSigner()
 
@@ -159,19 +157,6 @@ sourceSets {
   }
 }
 
-dependencyAnalysis {
-  issues {
-    all {
-      onUsedTransitiveDependencies {
-        severity("fail")
-      }
-      onUnusedDependencies {
-        severity("fail")
-      }
-    }
-  }
-}
-
 java {
   sourceCompatibility = JavaVersion.VERSION_21
   targetCompatibility = JavaVersion.VERSION_21
@@ -194,14 +179,10 @@ tasks {
     systemProperty("java.awt.headless", "false")
   }
 
-  named("check") {
-    dependsOn("buildHealth")
-  }
-
   named<RunIdeTask>("runIde") {
     jvmArgumentProviders += CommandLineArgumentProvider {
       // https://kotlin.github.io/analysis-api/testing-in-k2-locally.html
-      listOf("-Didea.kotlin.plugin.use.k2=false")
+      listOf("-Didea.kotlin.plugin.use.k2=true")
     }
   }
 }

@@ -6,6 +6,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguratio
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.decodeFromAscii
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.encodeToAscii
 import org.apache.commons.codec.binary.Base32
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -50,7 +52,8 @@ internal class Base32EncoderDecoder(
   class Factory : DeveloperUiToolFactory<Base32EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Base32",
+      menuTitle = "Base32 Encoding",
+      groupedMenuTitle = "Base32",
       contentTitle = "Base32 Encoder/Decoder"
     )
 
@@ -90,7 +93,8 @@ internal class Base64EncoderDecoder(
   class Factory : DeveloperUiToolFactory<Base64EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Base64",
+      menuTitle = "Base64 Encoding",
+      groupedMenuTitle = "Base64",
       contentTitle = "Base64 Encoder/Decoder"
     )
 
@@ -130,7 +134,8 @@ internal class UrlBase64EncoderDecoder(
   class Factory : DeveloperUiToolFactory<UrlBase64EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "URL Base64",
+      menuTitle = "URL Base64 Encoding",
+      groupedMenuTitle = "URL Base64",
       contentTitle = "URL Base64 Encoder/Decoder"
     )
 
@@ -170,7 +175,8 @@ internal class MimeBase64EncoderDecoder(
   class Factory : DeveloperUiToolFactory<MimeBase64EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "MIME Base64",
+      menuTitle = "MIME Base64 Encoding",
+      groupedMenuTitle = "MIME Base64",
       contentTitle = "MIME Base64 Encoder/Decoder"
     )
 
@@ -180,6 +186,46 @@ internal class MimeBase64EncoderDecoder(
       context: DeveloperUiToolContext
     ): ((DeveloperToolConfiguration) -> MimeBase64EncoderDecoder) =
       { configuration -> MimeBase64EncoderDecoder(configuration, parentDisposable, context, project) }
+  }
+}
+// -- Type ---------------------------------------------------------------------------------------------------------- //
+
+internal class AsciiEncoderDecoder(
+  configuration: DeveloperToolConfiguration,
+  parentDisposable: Disposable,
+  context: DeveloperUiToolContext,
+  project: Project?
+) :
+  TextConverter(
+    textConverterContext = encoderDecoderTextConverterContext,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    context = context,
+    project = project
+  ) {
+
+  override fun toTarget(text: String) {
+    targetText.set(text.encodeToAscii())
+  }
+
+  override fun toSource(text: String) {
+    sourceText.set(text.decodeFromAscii())
+  }
+
+  class Factory : DeveloperUiToolFactory<AsciiEncoderDecoder> {
+
+    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
+      menuTitle = "ASCII Encoding",
+      groupedMenuTitle = "ASCII",
+      contentTitle = "ASCII Encoder/Decoder"
+    )
+
+    override fun getDeveloperUiToolCreator(
+      project: Project?,
+      parentDisposable: Disposable,
+      context: DeveloperUiToolContext
+    ): ((DeveloperToolConfiguration) -> AsciiEncoderDecoder) =
+      { configuration -> AsciiEncoderDecoder(configuration, parentDisposable, context, project) }
   }
 }
 
@@ -211,6 +257,7 @@ internal class UrlEncodingEncoderDecoder(
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
       menuTitle = "URL Encoding",
+      groupedMenuTitle = "URL",
       contentTitle = "URL Encoding Encoder/Decoder"
     )
 

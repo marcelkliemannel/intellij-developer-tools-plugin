@@ -224,7 +224,7 @@ internal class TextStatistic(
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
         menuTitle = "Text Statistic",
-        "Text Statistic"
+        contentTitle = "Text Statistic"
       )
 
     override fun getDeveloperUiToolCreator(

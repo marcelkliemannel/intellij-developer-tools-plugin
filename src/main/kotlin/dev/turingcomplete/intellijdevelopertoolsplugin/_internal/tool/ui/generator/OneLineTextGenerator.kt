@@ -8,7 +8,6 @@ import com.intellij.openapi.observable.properties.AtomicBooleanProperty
 import com.intellij.openapi.observable.properties.AtomicProperty
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.COLUMNS_TINY
@@ -27,9 +26,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyActi
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.changeFont
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.monospaceFont
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.not
-import org.apache.commons.text.StringEscapeUtils
 import java.awt.Font
 
 abstract class OneLineTextGenerator(
@@ -90,7 +88,7 @@ abstract class OneLineTextGenerator(
   }
 
   override fun getData(dataId: String): Any? = when {
-    CONTENT_DATA_KEY.`is`(dataId) -> StringUtil.stripHtml(generatedText.get(), false)
+    CONTENT_DATA_KEY.`is`(dataId) -> generatedText.get()
     else -> super.getData(dataId)
   }
 
@@ -99,7 +97,7 @@ abstract class OneLineTextGenerator(
   private fun doGenerate() {
     val generate: () -> Unit = {
       if (validate().isEmpty()) {
-        generatedText.set("<html><code>${StringEscapeUtils.escapeHtml4(generate())}</code></html>")
+        generatedText.set(generate())
         invalidConfiguration.set(false)
       }
       else {
@@ -146,7 +144,7 @@ abstract class OneLineTextGenerator(
     row {
       label("")
         .bindText(generatedText)
-        .changeFont(scale = 1.7f, style = Font.BOLD)
+        .monospaceFont(scale = 1.7f, style = Font.BOLD)
         .gap(RightGap.SMALL)
       actionButton(CopyAction()).gap(RightGap.SMALL)
       actionButton(RegenerateAction { doGenerate() })
@@ -174,6 +172,8 @@ abstract class OneLineTextGenerator(
   companion object {
 
     private const val DEFAULT_NUMBER_OF_VALUES = "10"
+
+    //val codeFont: Font = JBFont.MONOSPACED EditorColorsManager.getInstance().globalScheme.editorFontName
   }
 }
 

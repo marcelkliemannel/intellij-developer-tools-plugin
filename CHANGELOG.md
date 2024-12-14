@@ -10,7 +10,21 @@
 
 ### Fixed
 
-## [6.0.1] - 2024-11-22
+## 6.1.0 - 2024-12-14
+
+### Added
+
+- Add ASCII Encoder/Decoder tool
+
+### Changed
+
+- Improve title of tools in the menu
+
+### Fixed
+
+- Copy action in the Password Generator tool contained escaped HTML entities
+
+## 6.0.1 - 2024-11-22
 
 ### Fixed
 

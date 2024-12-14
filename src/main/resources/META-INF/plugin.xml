@@ -87,7 +87,8 @@
       <categoryKey>intention.category.other</categoryKey>
     </intentionAction>
 
-    <keymapExtension implementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.ShowDeveloperUiToolKeymapExtension"/>
+    <keymapExtension
+            implementation="dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.ShowDeveloperUiToolKeymapExtension"/>
   </extensions>
   <!-- must be declared in the main `plugin.xml´, see `KotlinK2ModeCompatibilityCheckerKt` -->
   <extensions defaultExtensionNs="org.jetbrains.kotlin">
@@ -156,6 +157,10 @@
             id="mime-base64-encoder-decoder"
             groupId="encoder-decoder"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.MimeBase64EncoderDecoder$Factory"/>
+    <developerUiTool
+            id="ascii-encoder-decoder"
+            groupId="encoder-decoder"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.AsciiEncoderDecoder$Factory"/>
     <developerUiTool
             id="url-encoding-encoder-decoder"
             groupId="encoder-decoder"
@@ -291,7 +296,6 @@
             id="intellij-internals"
             internalTool="true"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.IntelliJInternals$Factory"/>
-
   </extensions>
 
   <actions>
