@@ -43,7 +43,7 @@ internal object EncodersDecoders {
       Encoder("ASCII", { it.encodeToAscii() }),
     )
 
-    HashingUtils.commonHashingAlgorithms.forEach { messageDigest ->
+    HashingUtils.commonMessageDigests.forEach { messageDigest ->
       commonEncoders.add(Encoder(messageDigest.algorithm, { messageDigest.digest(it.encodeToByteArray()).toHexString() }))
     }
 

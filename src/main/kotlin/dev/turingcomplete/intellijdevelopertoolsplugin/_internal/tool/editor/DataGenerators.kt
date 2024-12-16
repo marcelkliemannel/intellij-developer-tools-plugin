@@ -30,7 +30,7 @@ internal object DataGenerators {
 
 
   private fun createRandomHashGenerators(): List<DataGenerator> =
-    HashingUtils.commonHashingAlgorithms.map { messageDigest ->
+    HashingUtils.commonMessageDigests.map { messageDigest ->
       object : DataGenerator(messageDigest.algorithm, "Generate random ${messageDigest.algorithm}") {
 
         @OptIn(ExperimentalStdlibApi::class)
