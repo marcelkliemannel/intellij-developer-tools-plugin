@@ -84,6 +84,7 @@ dependencies {
   implementation("org.bitbucket.b_c:jose4j:0.9.6") {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
+  implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
   testImplementation("org.assertj:assertj-core:3.25.3")
   val junitVersion = "5.10.2"

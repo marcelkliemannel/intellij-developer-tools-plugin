@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add tool "Server Certificates" to fetch, analyse and export certificates from a given URL.
+
 ### Changed
 
 ### Removed

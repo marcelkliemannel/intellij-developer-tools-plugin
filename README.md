@@ -34,6 +34,7 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 - Code Style Formatting
 - SQL Formatting
 - Color Picker
+- Server certificates fetching, analyse and export
 - QR Code/Barcode Generator
 - Lorem Ipsum Generator
 

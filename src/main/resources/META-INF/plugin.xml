@@ -31,6 +31,7 @@
     <li>Code Style Formatting</li>
     <li>SQL Formatting</li>
     <li>Color Picker</li>
+    <li>Server certificates fetching, analyse and export</li>
     <li>QR Code/Barcode Generator</li>
     <li>Lorem Ipsum Generator</li>
 </ul>
@@ -289,6 +290,9 @@
     <developerUiTool
             id="units-converter"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.UnitsConverter$Factory"/>
+    <developerUiTool
+            id="certificates-download"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.ServerCertificates$Factory"/>
     <developerUiTool
             id="rubber-duck"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RubberDuck$Factory"/>
