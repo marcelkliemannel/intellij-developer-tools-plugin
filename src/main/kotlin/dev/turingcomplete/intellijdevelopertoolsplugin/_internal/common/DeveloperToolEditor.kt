@@ -77,10 +77,11 @@ internal class DeveloperToolEditor(
   private val diffSupport: DiffSupport? = null,
   private val supportsExpand: Boolean = true,
   private val minimumSizeHeight: Int = DEFAULT_MINIMUM_SIZE_HEIGHT,
+  private val fixedEditorSoftWraps: Boolean? = null
 ) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
-  private var softWraps = configuration.register("${context.id}-${id}-softWraps", DeveloperToolsApplicationSettings.instance.editorSoftWraps, CONFIGURATION)
+  private var softWraps = configuration.register("${context.id}-${id}-softWraps", fixedEditorSoftWraps ?: DeveloperToolsApplicationSettings.instance.editorSoftWraps, CONFIGURATION)
   private var showSpecialCharacters = configuration.register("${context.id}-${id}-showSpecialCharacters", DeveloperToolsApplicationSettings.instance.editorShowSpecialCharacters, CONFIGURATION)
   private var showWhitespaces = configuration.register("${context.id}-${id}-showWhitespaces", DeveloperToolsApplicationSettings.instance.editorShowWhitespaces, CONFIGURATION)
 
@@ -115,12 +116,14 @@ internal class DeveloperToolEditor(
       }
     }
 
-    softWraps.afterChangeConsumeEvent(parentDisposable) {
-      if (it.oldValue != it.newValue) {
-        editor.settings.apply {
-          isUseSoftWraps = it.newValue
-          isPaintSoftWraps = it.newValue
-          editor.component.repaint()
+    if (fixedEditorSoftWraps != null) {
+      softWraps.afterChangeConsumeEvent(parentDisposable) {
+        if (it.oldValue != it.newValue) {
+          editor.settings.apply {
+            isUseSoftWraps = it.newValue
+            isPaintSoftWraps = it.newValue
+            editor.component.repaint()
+          }
         }
       }
     }
@@ -230,7 +233,8 @@ internal class DeveloperToolEditor(
         text = "Soft-Wrap",
         icon = AllIcons.Actions.ToggleSoftWrap,
         isSelected = { softWraps.get() },
-        setSelected = { softWraps.set(it) }
+        setSelected = { softWraps.set(it) },
+        isEnabled = fixedEditorSoftWraps?.let { { fixedEditorSoftWraps } }
       ))
       add(SimpleToggleAction(
         text = "Show Special Characters",
@@ -340,8 +344,8 @@ internal class DeveloperToolEditor(
         isIndentGuidesShown = true
         isLineNumbersShown = true
         isFoldingOutlineShown = false
-        isUseSoftWraps = softWraps.get()
-        isPaintSoftWraps = softWraps.get()
+        isUseSoftWraps = fixedEditorSoftWraps ?: softWraps.get()
+        isPaintSoftWraps = fixedEditorSoftWraps ?: softWraps.get()
         isShowingSpecialChars = showSpecialCharacters.get()
         isWhitespacesShown = showWhitespaces.get()
         isBlinkCaret = editorMode.editable

@@ -34,6 +34,7 @@
     <li>Server certificates fetching, analyse and export</li>
     <li>QR Code/Barcode Generator</li>
     <li>Lorem Ipsum Generator</li>
+    <li>ASCII Art</li>
 </ul>
 
 <h2>Integration</h2>
@@ -293,6 +294,9 @@
     <developerUiTool
             id="certificates-download"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.ServerCertificates$Factory"/>
+    <developerUiTool
+            id="ascii-art"
+            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.AsciiArtCreator$Factory"/>
     <developerUiTool
             id="rubber-duck"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.RubberDuck$Factory"/>

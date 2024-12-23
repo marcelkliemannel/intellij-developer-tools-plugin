@@ -5,6 +5,7 @@
 ### Added
 
 - Add tool "Server Certificates" to fetch, analyse and export certificates from a given URL.
+- Add tool "ASCII Art".
 
 ### Changed
 

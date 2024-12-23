@@ -37,6 +37,7 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 - Server certificates fetching, analyse and export
 - QR Code/Barcode Generator
 - Lorem Ipsum Generator
+- ASCII Art
 
 ## Integration
 

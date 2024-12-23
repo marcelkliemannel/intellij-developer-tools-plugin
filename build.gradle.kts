@@ -85,6 +85,7 @@ dependencies {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
   implementation("com.squareup.okhttp3:okhttp:4.12.0")
+  implementation("com.github.lalyos:jfiglet:0.0.9")
 
   testImplementation("org.assertj:assertj-core:3.25.3")
   val junitVersion = "5.10.2"
