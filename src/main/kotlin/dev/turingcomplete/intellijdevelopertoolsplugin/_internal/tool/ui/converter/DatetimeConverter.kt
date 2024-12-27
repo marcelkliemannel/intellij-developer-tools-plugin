@@ -54,6 +54,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.convert
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.UNIX_TIMESTAMP_MILLIS
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.UNIX_TIMESTAMP_SECONDS
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.YEAR
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 import java.awt.Font
 import java.time.Duration
 import java.time.Instant
@@ -117,28 +118,28 @@ class DatetimeConverter(
   // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
   override fun Panel.buildUi() {
-    group("Current Unix Timestamp") {
+    group(I18nUtils.message("DatetimeConverter.Timestamp.title")) {
       if (context.prioritizeVerticalLayout) {
         row {
-          buildTimestampLabelUi("Seconds:", currentUnixTimestampSeconds, TIMESTAMP_SECONDS_CONTENT_DATA_KEY)
+          buildTimestampLabelUi(I18nUtils.message("DatetimeConverter.Timestamp.Seconds"), currentUnixTimestampSeconds, TIMESTAMP_SECONDS_CONTENT_DATA_KEY)
         }
         row {
-          buildTimestampLabelUi("Milliseconds:", currentUnixTimestampMillis, TIMESTAMP_MILLIS_CONTENT_DATA_KEY)
+          buildTimestampLabelUi(I18nUtils.message("DatetimeConverter.Timestamp.Milliseconds"), currentUnixTimestampMillis, TIMESTAMP_MILLIS_CONTENT_DATA_KEY)
         }
       }
       else {
         row {
-          buildTimestampLabelUi("Seconds:", currentUnixTimestampSeconds, TIMESTAMP_SECONDS_CONTENT_DATA_KEY)
-          buildTimestampLabelUi("Milliseconds:", currentUnixTimestampMillis, TIMESTAMP_MILLIS_CONTENT_DATA_KEY)
+          buildTimestampLabelUi(I18nUtils.message("DatetimeConverter.Timestamp.Seconds"), currentUnixTimestampSeconds, TIMESTAMP_SECONDS_CONTENT_DATA_KEY)
+          buildTimestampLabelUi(I18nUtils.message("DatetimeConverter.Timestamp.Milliseconds"), currentUnixTimestampMillis, TIMESTAMP_MILLIS_CONTENT_DATA_KEY)
         }
       }
     }
 
-    group("Convert") {
+    group(I18nUtils.message("DatetimeConverter.Convert")) {
       val initialInstant = Instant.ofEpochMilli(System.currentTimeMillis())
       val initialLocalDateTime = LocalDateTime.ofInstant(initialInstant, selectedTimeZoneId())
 
-      group("Unix Timestamp") {
+      group(I18nUtils.message("DatetimeConverter.Convert.Timestamp")) {
         if (context.prioritizeVerticalLayout) {
           row {
             buildUnixTimeStampSecondsTextFieldUi(initialInstant)
@@ -159,10 +160,10 @@ class DatetimeConverter(
         }
       }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
-      group("Date and Time") {
+      group(I18nUtils.message("DatetimeConverter.Convert.date_time")) {
         row {
           comboBox(ZoneId.getAvailableZoneIds().sorted())
-            .label("Time zone:")
+            .label(I18nUtils.message("DatetimeConverter.Convert.time_zone"))
             .bindItem(selectedTimeZoneId)
             .whenItemSelectedFromUi { convert(TIME_ZONE) }
             .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, TIME_ZONE) }
@@ -176,9 +177,9 @@ class DatetimeConverter(
         )
         row {
           listOf(
-            DateField("Year", initialLocalDateTime.year, convertYear, LongRange(1970, 9999), YEAR),
-            DateField("Month", initialLocalDateTime.monthValue, convertMonth, LongRange(1, 12), MONTH),
-            DateField("Day", initialLocalDateTime.dayOfMonth, convertDay, LongRange(1, 31), DAY)
+            DateField(I18nUtils.message("DatetimeConverter.Convert.Year"), initialLocalDateTime.year, convertYear, LongRange(1970, 9999), YEAR),
+            DateField(I18nUtils.message("DatetimeConverter.Convert.Month"), initialLocalDateTime.monthValue, convertMonth, LongRange(1, 12), MONTH),
+            DateField(I18nUtils.message("DatetimeConverter.Convert.Day"), initialLocalDateTime.dayOfMonth, convertDay, LongRange(1, 31), DAY)
           ).forEach { (title, initialValue, valueProperty, range, changeOrigin) ->
             textField().label("$title:")
               .text(initialValue.toString())
@@ -191,9 +192,9 @@ class DatetimeConverter(
         }.layout(RowLayout.PARENT_GRID)
         row {
           listOf(
-            DateField("Hour", initialLocalDateTime.hour, convertHour, LongRange(0, 23), HOUR),
-            DateField("Minute", initialLocalDateTime.minute, convertMinute, LongRange(0, 59), MINUTE),
-            DateField("Second", initialLocalDateTime.second, convertSecond, LongRange(0, 59), SECOND)
+            DateField(I18nUtils.message("DatetimeConverter.Convert.Hour"), initialLocalDateTime.hour, convertHour, LongRange(0, 23), HOUR),
+            DateField(I18nUtils.message("DatetimeConverter.Convert.Minute"), initialLocalDateTime.minute, convertMinute, LongRange(0, 59), MINUTE),
+            DateField(I18nUtils.message("DatetimeConverter.Convert.Second"), initialLocalDateTime.second, convertSecond, LongRange(0, 59), SECOND)
           ).forEach { (title, initialValue, valueProperty, range, changeOrigin) ->
             textField().label("$title:")
               .text(initialValue.toString())
@@ -210,11 +211,11 @@ class DatetimeConverter(
         }
       }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
 
-      group("Formatted") {
+      group(I18nUtils.message("DatetimeConverter.Convert.Formatted")) {
         buttonsGroup {
           lateinit var formattedStandardFormatComboBox: ComboBox<StandardFormat>
           row {
-            radioButton("Standard format:")
+            radioButton(I18nUtils.message("DatetimeConverter.Convert.Standard"))
               .bindSelected(formattedIndividual.not())
               .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
               .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
@@ -245,7 +246,7 @@ class DatetimeConverter(
           }.topGap(TopGap.NONE).layout(RowLayout.PARENT_GRID)
 
           row {
-            radioButton("Individual format:")
+            radioButton(I18nUtils.message("DatetimeConverter.Convert.Individual"))
               .bindSelected(formattedIndividual)
               .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
               .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
@@ -262,7 +263,7 @@ class DatetimeConverter(
                   }
                   return@validationInfo null
                 } catch (e: Exception) {
-                  return@validationInfo ValidationInfo("Invalid individual format", it)
+                  return@validationInfo ValidationInfo(I18nUtils.message("DatetimeConverter.Convert.invalid_individual"), it)
                 }
               }
               .enabledIf(formattedIndividual)
@@ -271,7 +272,7 @@ class DatetimeConverter(
 
         row {
           comboBox(ALL_AVAILABLE_LOCALES)
-            .label("Locale:")
+            .label(I18nUtils.message("DatetimeConverter.Convert.Locale"))
             .bindItem(formattedLocale)
             .columns(COLUMNS_MEDIUM)
             .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
@@ -315,7 +316,7 @@ class DatetimeConverter(
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun Row.buildSetToNowButtonUi() {
-    button("Set to Now") {
+    button(I18nUtils.message("DatetimeConverter.Convert.set_to_now")) {
       convertUnixTimeStampMillis.set(System.currentTimeMillis())
       convert(UNIX_TIMESTAMP_MILLIS, 0)
     }
@@ -324,7 +325,7 @@ class DatetimeConverter(
   private fun Row.buildUnixTimeStampMillisTextFieldUi(initialInstant: Instant) {
     textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
       .bindLongTextImproved(convertUnixTimeStampMillis)
-      .label("Milliseconds:")
+      .label(I18nUtils.message("DatetimeConverter.Convert.Milliseconds"))
       .text(initialInstant.toEpochMilli().toString())
       .columns(12)
       .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
@@ -334,7 +335,7 @@ class DatetimeConverter(
   private fun Row.buildUnixTimeStampSecondsTextFieldUi(initialInstant: Instant) {
     textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
       .bindLongTextImproved(convertUnixTimeStampSeconds)
-      .label("Seconds:")
+      .label(I18nUtils.message("DatetimeConverter.Convert.Seconds"))
       .text(initialInstant.epochSecond.toString())
       .columns(12)
       .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_SECONDS) }
@@ -342,14 +343,14 @@ class DatetimeConverter(
   }
 
   private fun Row.buildStandardFormatConfigurationUi(formattedStandardFormatComboBox: ComboBox<StandardFormat>) {
-    checkBox("Add offset")
+    checkBox(I18nUtils.message("DatetimeConverter.Convert.Add_offset"))
       .bindSelected(formattedStandardFormatAddOffset)
       .whenStateChangedFromUi { syncFormattedStandardFormatPattern(); convert(UNIX_TIMESTAMP_MILLIS) }
       .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_SECONDS) }
       .enabledIf(formattedIndividual.not())
       .visibleIf(ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsOffset ?: false })
       .gap(RightGap.SMALL)
-    checkBox("Add time zone")
+    checkBox(I18nUtils.message("DatetimeConverter.Convert.Add_time_zone"))
       .bindSelected(formattedStandardFormatAddTimeZone)
       .whenStateChangedFromUi { syncFormattedStandardFormatPattern(); convert(UNIX_TIMESTAMP_MILLIS) }
       .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_SECONDS) }
@@ -522,8 +523,8 @@ class DatetimeConverter(
   class Factory : DeveloperUiToolFactory<DatetimeConverter> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Date Time",
-      contentTitle = "Date Time Converter"
+      menuTitle = I18nUtils.message("DatetimeConverter.menuTitle"),
+      contentTitle = I18nUtils.message("DatetimeConverter.contentTitle")
     )
 
     override fun getDeveloperUiToolCreator(

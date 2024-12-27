@@ -3,6 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils
 import com.fasterxml.uuid.Generators
 import com.github.f4b6a3.ulid.UlidCreator
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 import org.jetbrains.annotations.Nls
 import java.time.Instant
 import java.time.ZoneId
@@ -19,9 +20,9 @@ internal object DataGenerators {
     uuidV7Generator,
     UlidGenerator(),
     NanoIdGenerator(),
-    DataGeneratorsGroup("Current Date and Time", createCurrentDateAndTimeGenerators()),
-    DataGeneratorsGroup("Current Unix Timestamp", createUnixTimestampGenerators()),
-    DataGeneratorsGroup("Random Hash", createRandomHashGenerators())
+    DataGeneratorsGroup(I18nUtils.message("pop.DataGeneratorIntentionAction.current_date_and_time"), createCurrentDateAndTimeGenerators()),
+    DataGeneratorsGroup(I18nUtils.message("pop.DataGeneratorIntentionAction.current_unix_timestamp"), createUnixTimestampGenerators()),
+    DataGeneratorsGroup(I18nUtils.message("pop.DataGeneratorIntentionAction.random_hash"), createRandomHashGenerators())
   )
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //

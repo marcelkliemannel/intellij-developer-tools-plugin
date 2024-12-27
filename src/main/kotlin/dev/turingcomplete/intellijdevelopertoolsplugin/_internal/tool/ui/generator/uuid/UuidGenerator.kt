@@ -13,6 +13,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toMessageDigest
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.OneLineTextGenerator
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 
 internal class UuidGenerator(
   project: Project?,
@@ -48,7 +49,7 @@ internal class UuidGenerator(
     lateinit var selectedVersionComboBox: ComboBox<UuidVersion>
     row {
       selectedVersionComboBox = comboBox(UuidVersion.entries)
-        .label("Version:")
+        .label(I18nUtils.message("UuidGenerator.Version"))
         .bindItem(selectedUuidVersion)
         .component
     }
@@ -145,8 +146,8 @@ internal class UuidGenerator(
   class Factory : DeveloperUiToolFactory<UuidGenerator> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "UUID",
-      contentTitle = "UUID Generator"
+      menuTitle = I18nUtils.message("UuidGenerator.menuTitle"),
+      contentTitle = I18nUtils.message("UuidGenerator.contentTitle")
     )
 
     override fun getDeveloperUiToolCreator(

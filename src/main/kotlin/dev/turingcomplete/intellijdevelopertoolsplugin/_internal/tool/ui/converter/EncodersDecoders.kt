@@ -8,6 +8,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.decodeFromAscii
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.encodeToAscii
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 import org.apache.commons.codec.binary.Base32
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -17,10 +18,10 @@ import java.util.*
 // -- Properties ---------------------------------------------------------------------------------------------------- //
 
 internal val encoderDecoderTextConverterContext = TextConverter.TextConverterContext(
-  convertActionTitle = "Encode",
-  revertActionTitle = "Decode",
-  sourceTitle = "Decoded",
-  targetTitle = "Encoded"
+  convertActionTitle = I18nUtils.message("DecoderTextConverterContext.convertActionTitle"),
+  revertActionTitle = I18nUtils.message("DecoderTextConverterContext.revertActionTitle"),
+  sourceTitle = I18nUtils.message("DecoderTextConverterContext.sourceTitle"),
+  targetTitle = I18nUtils.message("DecoderTextConverterContext.targetTitle")
 )
 
 // -- Exposed Methods ----------------------------------------------------------------------------------------------- //
@@ -52,9 +53,9 @@ internal class Base32EncoderDecoder(
   class Factory : DeveloperUiToolFactory<Base32EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Base32 Encoding",
-      groupedMenuTitle = "Base32",
-      contentTitle = "Base32 Encoder/Decoder"
+      menuTitle = I18nUtils.message("Base32EncoderDecoder.menuTitle"),
+      groupedMenuTitle = I18nUtils.message("Base32EncoderDecoder.menuTitle"),
+      contentTitle = I18nUtils.message("Base32EncoderDecoder.contentTitle")
     )
 
     override fun getDeveloperUiToolCreator(
@@ -93,9 +94,9 @@ internal class Base64EncoderDecoder(
   class Factory : DeveloperUiToolFactory<Base64EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Base64 Encoding",
-      groupedMenuTitle = "Base64",
-      contentTitle = "Base64 Encoder/Decoder"
+      menuTitle = I18nUtils.message("Base64EncoderDecoder.menuTitle"),
+      groupedMenuTitle = I18nUtils.message("Base64EncoderDecoder.menuTitle"),
+      contentTitle = I18nUtils.message("Base64EncoderDecoder.contentTitle")
     )
 
     override fun getDeveloperUiToolCreator(
@@ -134,9 +135,9 @@ internal class UrlBase64EncoderDecoder(
   class Factory : DeveloperUiToolFactory<UrlBase64EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "URL Base64 Encoding",
-      groupedMenuTitle = "URL Base64",
-      contentTitle = "URL Base64 Encoder/Decoder"
+      menuTitle = I18nUtils.message("UrlBase64EncoderDecoder.menuTitle"),
+      groupedMenuTitle = I18nUtils.message("UrlBase64EncoderDecoder.menuTitle"),
+      contentTitle = I18nUtils.message("UrlBase64EncoderDecoder.contentTitle")
     )
 
     override fun getDeveloperUiToolCreator(
@@ -175,9 +176,9 @@ internal class MimeBase64EncoderDecoder(
   class Factory : DeveloperUiToolFactory<MimeBase64EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "MIME Base64 Encoding",
-      groupedMenuTitle = "MIME Base64",
-      contentTitle = "MIME Base64 Encoder/Decoder"
+      menuTitle = I18nUtils.message("MimeBase64EncoderDecoder.menuTitle"),
+      groupedMenuTitle = I18nUtils.message("MimeBase64EncoderDecoder.menuTitle"),
+      contentTitle = I18nUtils.message("MimeBase64EncoderDecoder.contentTitle")
     )
 
     override fun getDeveloperUiToolCreator(
@@ -215,9 +216,9 @@ internal class AsciiEncoderDecoder(
   class Factory : DeveloperUiToolFactory<AsciiEncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "ASCII Encoding",
-      groupedMenuTitle = "ASCII",
-      contentTitle = "ASCII Encoder/Decoder"
+      menuTitle = I18nUtils.message("AsciiEncoderDecoder.menuTitle"),
+      groupedMenuTitle = I18nUtils.message("AsciiEncoderDecoder.menuTitle"),
+      contentTitle = I18nUtils.message("AsciiEncoderDecoder.contentTitle")
     )
 
     override fun getDeveloperUiToolCreator(
@@ -256,9 +257,9 @@ internal class UrlEncodingEncoderDecoder(
   class Factory : DeveloperUiToolFactory<UrlEncodingEncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "URL Encoding",
-      groupedMenuTitle = "URL",
-      contentTitle = "URL Encoding Encoder/Decoder"
+      menuTitle = I18nUtils.message("UrlEncodingEncoderDecoder.menuTitle"),
+      groupedMenuTitle = I18nUtils.message("UrlEncodingEncoderDecoder.menuTitle"),
+      contentTitle = I18nUtils.message("UrlEncodingEncoderDecoder.contentTitle")
     )
 
     override fun getDeveloperUiToolCreator(

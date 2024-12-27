@@ -71,6 +71,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.convert
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.ECDSA
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.HMAC
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.RSA
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 import io.ktor.util.*
 import org.apache.commons.codec.binary.Base32
 import org.jose4j.jws.AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256
@@ -156,7 +157,7 @@ internal class JwtEncoderDecoder(
     }.resizableRow().bottomGap(BottomGap.NONE)
     val signatureErrors = jwt.signatureErrorHolder.asComponentPredicate()
     row {
-      text("<icon src='AllIcons.General.InspectionsOK'>&nbsp;Valid signature")
+      text("<icon src='AllIcons.General.InspectionsOK'>&nbsp;${I18nUtils.message("JwtEncoderDecoder.valid")}")
         .visibleIf(signatureErrors.not())
         .resizableColumn()
       text("")
@@ -169,14 +170,14 @@ internal class JwtEncoderDecoder(
   @Suppress("UnstableApiUsage")
   private fun createEncodingDecodingComponent(): JComponent = panel {
     row {
-      val liveConversionCheckBox = checkBox("Live conversion")
+      val liveConversionCheckBox = checkBox(I18nUtils.message("editor.live_conversion"))
         .bindSelected(liveConversion)
         .gap(RightGap.SMALL)
 
-      button("▼ Decode") { convert(ENCODED) }
+      button(I18nUtils.message("editor.btn_decode")) { convert(ENCODED) }
         .enabledIf(liveConversionCheckBox.selected.not())
         .gap(RightGap.SMALL)
-      button("▲ Encode") {
+      button(I18nUtils.message("editor.btn_encode")) {
         // This will set the signature algorithm in the header and will run the encoding.
         convert(SIGNATURE_CONFIGURATION)
       }.enabledIf(liveConversionCheckBox.selected.not())
@@ -203,7 +204,7 @@ internal class JwtEncoderDecoder(
       }.resizableRow().bottomGap(BottomGap.NONE)
     }
 
-    collapsibleGroup("Signature Algorithm Configuration") {
+    collapsibleGroup(I18nUtils.message("JwtEncoderDecoder.signature_configuration")) {
       lateinit var signatureAlgorithmComboBox: ComboBox<SignatureAlgorithm>
       row {
         signatureAlgorithmComboBox = comboBox(SignatureAlgorithm.entries)
@@ -216,7 +217,7 @@ internal class JwtEncoderDecoder(
       row {
         // Bug: The label from `expandableTextField().label(...)` disappears
         // if the encoding selection gets changed
-        label("Secret key:")
+        label(I18nUtils.message("JwtEncoderDecoder.secret_key"))
         expandableTextField()
           .align(AlignX.FILL)
           .bindText(jwt.signature.secret)
@@ -227,12 +228,13 @@ internal class JwtEncoderDecoder(
 
         val encodingActions = mutableListOf<AnAction>().apply {
           SecretKeyEncodingMode.entries.forEach { secretKeyEncodingModeValue ->
-            add(SimpleToggleAction(
-              text = secretKeyEncodingModeValue.title,
-              icon = AllIcons.Actions.ToggleSoftWrap,
-              isSelected = { jwt.signature.secretEncodingMode.get() == secretKeyEncodingModeValue },
-              setSelected = { jwt.signature.secretEncodingMode.set(secretKeyEncodingModeValue) }
-            ))
+            add(
+              SimpleToggleAction(
+                text = secretKeyEncodingModeValue.title,
+                icon = AllIcons.Actions.ToggleSoftWrap,
+                isSelected = { jwt.signature.secretEncodingMode.get() == secretKeyEncodingModeValue },
+                setSelected = { jwt.signature.secretEncodingMode.set(secretKeyEncodingModeValue) }
+              ))
           }
         }
         actionButton(
@@ -248,7 +250,7 @@ internal class JwtEncoderDecoder(
         textArea()
           .rows(5)
           .align(Align.FILL)
-          .label(label = "Private key:", position = LabelPosition.TOP)
+          .label(label = I18nUtils.message("JwtEncoderDecoder.private_key"), position = LabelPosition.TOP)
           .bindText(jwt.signature.privateKey)
           .setValidationResultBorder()
           .whenTextChangedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
@@ -257,11 +259,11 @@ internal class JwtEncoderDecoder(
       }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.keyFactory != null })
 
       row {
-        checkBox("Strict key requirements validation")
+        checkBox(I18nUtils.message("JwtEncoderDecoder.requirements"))
           .bindSelected(jwt.signature.strictSigningKeyValidation)
           .whenStateChangedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
           .gap(RightGap.SMALL)
-        contextHelp("The RFC 7518 for the JSON Web Algorithms (JWA) specifies some restrictions that a key or secret should fulfill for the computation of a signature (e.g., a minimum length). This option can be used to enforce these restrictions.")
+        contextHelp(I18nUtils.message("JwtEncoderDecoder.requirements.desc"))
       }
     }.apply { expanded = false }.topGap(TopGap.NONE)
   }
@@ -413,7 +415,7 @@ internal class JwtEncoderDecoder(
     createEditor(
       id = "jwt-encoder-decoder-encoded",
       changeOrigin = ENCODED,
-      title = "Encoded",
+      title = I18nUtils.message("JwtEncoderDecoder.encoded"),
       language = PlainTextLanguage.INSTANCE,
       textProperty = encodedText
     ) { highlightDotSeparator() }
@@ -422,7 +424,7 @@ internal class JwtEncoderDecoder(
     createEditor(
       id = "jwt-encoder-decoder-header",
       changeOrigin = HEADER_OR_PAYLOAD,
-      title = "Header",
+      title = I18nUtils.message("JwtEncoderDecoder.header"),
       language = JsonLanguage.INSTANCE,
       textProperty = headerText
     ) { highlightHeaderClaims() }
@@ -431,7 +433,7 @@ internal class JwtEncoderDecoder(
     createEditor(
       id = "jwt-encoder-decoder-payload",
       changeOrigin = HEADER_OR_PAYLOAD,
-      title = "Payload",
+      title = I18nUtils.message("JwtEncoderDecoder.payload"),
       language = JsonLanguage.INSTANCE,
       textProperty = payloadText
     ) { highlightPayloadClaims() }
@@ -648,12 +650,12 @@ internal class JwtEncoderDecoder(
         signature.compute(jwtParts[0], jwtParts[1])?.let { expectedSignature ->
           val actualSignature = jwtParts[2]
           if (expectedSignature != actualSignature) {
-            signatureErrorHolder.add("Invalid signature. Check the configuration in the 'Signature Algorithm Configuration' section.")
+            signatureErrorHolder.add(I18nUtils.message("JwtEncoderDecoder.error.invalid_signature"))
           }
         }
       }
       else {
-        signatureErrorHolder.add("Encoded JWT does not have a signature part")
+        signatureErrorHolder.add(I18nUtils.message("JwtEncoderDecoder.error.no_signature"))
       }
     }
 
@@ -678,7 +680,7 @@ internal class JwtEncoderDecoder(
 
       if (headerErrorHolder.isSet() || payloadErrorHolder.isSet()) {
         encoded.set("")
-        signatureErrorHolder.add("Unable to compute signature due to header or payload errors")
+        signatureErrorHolder.add(I18nUtils.message("JwtEncoderDecoder.error.unable_compute"))
       }
       else {
         val encodedHeader = urlEncoder.encode(objectMapper.writeValueAsString(headerJson!!).encodeToByteArray()).decodeToString()
@@ -686,7 +688,7 @@ internal class JwtEncoderDecoder(
         val encodedSignature = signature.compute(encodedHeader, encodedPayload)
         if (encodedSignature == null) {
           encoded.set("")
-          signatureErrorHolder.addIfEmpty("Unable to compute signature due signature configuration errors")
+          signatureErrorHolder.addIfEmpty(I18nUtils.message("JwtEncoderDecoder.error.unable_compute"))
         }
         else {
           encoded.set("${encodedHeader}.${encodedPayload}.$encodedSignature")
@@ -718,11 +720,11 @@ internal class JwtEncoderDecoder(
           signature.algorithm.set(algorithm)
         }
         else {
-          headerErrorHolder.add("Unsupported algorithm: '$algFieldValue'")
+          headerErrorHolder.add(I18nUtils.message("JwtEncoderDecoder.error.unsupported_algorithm", algFieldValue))
         }
       }
       else {
-        headerErrorHolder.add("Missing algorithm header field: 'alg'")
+        headerErrorHolder.add(I18nUtils.message("JwtEncoderDecoder.error.missing_alg"))
       }
     }
 
@@ -776,7 +778,7 @@ internal class JwtEncoderDecoder(
           sign()
         }.encodedSignature
       } catch (e: Exception) {
-        signatureErrorHolder.add("Failed to compute signature:", ExceptionUtil.getRootCause(e))
+        signatureErrorHolder.add(I18nUtils.message("JwtEncoderDecoder.error.failed_compute_signature"), ExceptionUtil.getRootCause(e))
         null
       }
     }
@@ -799,7 +801,7 @@ internal class JwtEncoderDecoder(
     private fun readPrivateKey(keyFactory: KeyFactory) = try {
       val privateKeyValue = privateKey.get()
       if (privateKeyValue.isBlank()) {
-        privateKeyErrorHolder.add("A private key must be provided")
+        privateKeyErrorHolder.add(I18nUtils.message("JwtEncoderDecoder.error.private_key_must_provided"))
         null
       }
       else {
@@ -879,8 +881,8 @@ internal class JwtEncoderDecoder(
   class Factory : DeveloperUiToolFactory<JwtEncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "JSON Web Token (JWT)",
-      contentTitle = "JSON Web Token (JWT) Decoder/Encoder"
+      menuTitle = I18nUtils.message("JwtEncoderDecoder.menuTitle"),
+      contentTitle = I18nUtils.message("JwtEncoderDecoder.contentTitle")
     )
 
     override fun getDeveloperUiToolCreator(

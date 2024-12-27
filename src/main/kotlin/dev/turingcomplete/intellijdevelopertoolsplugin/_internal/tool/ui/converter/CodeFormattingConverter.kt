@@ -17,6 +17,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 
 internal class CodeFormattingConverter(
   configuration: DeveloperToolConfiguration,
@@ -25,14 +26,14 @@ internal class CodeFormattingConverter(
   project: Project?
 ) : TextConverter(
   textConverterContext = TextConverterContext(
-    convertActionTitle = "Convert",
-    revertActionTitle = "Convert",
-    sourceTitle = "First",
-    targetTitle = "Second",
+    convertActionTitle = I18nUtils.message("CodeFormattingConverter.convertActionTitle"),
+    revertActionTitle = I18nUtils.message("CodeFormattingConverter.revertActionTitle"),
+    sourceTitle = I18nUtils.message("CodeFormattingConverter.sourceTitle"),
+    targetTitle = I18nUtils.message("CodeFormattingConverter.targetTitle"),
     sourceErrorHolder = ErrorHolder(),
     targetErrorHolder = ErrorHolder(),
     diffSupport = DiffSupport(
-      title = "Text Format Converter"
+      title = I18nUtils.message("CodeFormattingConverter.diffSupport.title")
     )
   ),
   configuration = configuration,
@@ -58,7 +59,7 @@ internal class CodeFormattingConverter(
   override fun Panel.buildTopConfigurationUi() {
     row {
       comboBox(Language.entries)
-        .label("First language:")
+        .label(I18nUtils.message("CodeFormattingConverter.First"))
         .bindItem(firstLanguage)
     }
   }
@@ -66,7 +67,7 @@ internal class CodeFormattingConverter(
   override fun Panel.buildMiddleSecondConfigurationUi() {
     row {
       comboBox(Language.entries)
-        .label("Second language:")
+        .label(I18nUtils.message("CodeFormattingConverter.Second"))
         .bindItem(secondLanguage)
     }
   }

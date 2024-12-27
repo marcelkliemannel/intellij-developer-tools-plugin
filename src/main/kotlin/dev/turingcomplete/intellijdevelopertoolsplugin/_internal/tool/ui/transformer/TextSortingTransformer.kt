@@ -17,6 +17,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentati
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.makeCaseInsensitive
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextSortingTransformer.WordsDelimiter.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.TextSortingTransformer.WordsDelimiter.LINE_BREAK
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 
 internal class TextSortingTransformer(
   context: DeveloperUiToolContext,
@@ -143,9 +144,9 @@ internal class TextSortingTransformer(
 
   private enum class SortingOrder(private val title: String, val comparator: Comparator<String>) {
 
-    NATURAL("Natural", NaturalComparator()),
-    LEXICOGRAPHIC("Lexicographic", { a, b -> a.compareTo(b) }),
-    WORD_LENGTH("Word length", Comparator { a, b -> a.length - b.length });
+    NATURAL(I18nUtils.message("SortingOrder.NATURAL"), NaturalComparator()),
+    LEXICOGRAPHIC(I18nUtils.message("SortingOrder.LEXICOGRAPHIC"), { a, b -> a.compareTo(b) }),
+    WORD_LENGTH(I18nUtils.message("SortingOrder.WORD_LENGTH"), Comparator { a, b -> a.length - b.length });
 
     override fun toString(): String = title
   }
@@ -154,13 +155,13 @@ internal class TextSortingTransformer(
 
   private enum class WordsDelimiter(private val title: String, val splitPattern: Regex?, val joinDelimiter: String?) {
 
-    LINE_BREAK("Line break", Regex("\\R+"), System.lineSeparator()),
-    SPACE("Whitespace", Regex("\\s+"), " "),
-    COMMA("Comma", Regex(",+"), ","),
-    SEMICOLON("Semicolon", Regex(";+"), ";"),
-    DASH("Dash", Regex("-+"), "-"),
-    UNDERSCORE("Underscore", Regex("_+"), "_"),
-    INDIVIDUAL("Individual", null, null);
+    LINE_BREAK(I18nUtils.message("WordsDelimiter.LINE_BREAK"), Regex("\\R+"), System.lineSeparator()),
+    SPACE(I18nUtils.message("WordsDelimiter.SPACE"), Regex("\\s+"), " "),
+    COMMA(I18nUtils.message("WordsDelimiter.COMMA"), Regex(",+"), ","),
+    SEMICOLON(I18nUtils.message("WordsDelimiter.SEMICOLON"), Regex(";+"), ";"),
+    DASH(I18nUtils.message("WordsDelimiter.DASH"), Regex("-+"), "-"),
+    UNDERSCORE(I18nUtils.message("WordsDelimiter.UNDERSCORE"), Regex("_+"), "_"),
+    INDIVIDUAL(I18nUtils.message("WordsDelimiter.INDIVIDUAL"), null, null);
 
     override fun toString(): String = title
   }

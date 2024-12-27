@@ -55,6 +55,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.actionsPopup
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.dumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 import java.awt.datatransfer.StringSelection
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
@@ -81,8 +82,10 @@ internal class DeveloperToolEditor(
   // -- Properties -------------------------------------------------------------------------------------------------- //
 
   private var softWraps = configuration.register("${context.id}-${id}-softWraps", DeveloperToolsApplicationSettings.instance.editorSoftWraps, CONFIGURATION)
-  private var showSpecialCharacters = configuration.register("${context.id}-${id}-showSpecialCharacters", DeveloperToolsApplicationSettings.instance.editorShowSpecialCharacters, CONFIGURATION)
-  private var showWhitespaces = configuration.register("${context.id}-${id}-showWhitespaces", DeveloperToolsApplicationSettings.instance.editorShowWhitespaces, CONFIGURATION)
+  private var showSpecialCharacters =
+    configuration.register("${context.id}-${id}-showSpecialCharacters", DeveloperToolsApplicationSettings.instance.editorShowSpecialCharacters, CONFIGURATION)
+  private var showWhitespaces =
+    configuration.register("${context.id}-${id}-showWhitespaces", DeveloperToolsApplicationSettings.instance.editorShowWhitespaces, CONFIGURATION)
 
   private var onTextChangeFromUi = mutableListOf<((String) -> Unit)>()
   private var onFocusGained: (() -> Unit)? = null
@@ -226,20 +229,23 @@ internal class DeveloperToolEditor(
     addSeparator()
 
     val settingsActions = mutableListOf<AnAction>().apply {
-      add(SimpleToggleAction(
-        text = "Soft-Wrap",
+      add(
+        SimpleToggleAction(
+        text = I18nUtils.message("editor.soft_wrap"),
         icon = AllIcons.Actions.ToggleSoftWrap,
         isSelected = { softWraps.get() },
         setSelected = { softWraps.set(it) }
       ))
-      add(SimpleToggleAction(
-        text = "Show Special Characters",
+      add(
+        SimpleToggleAction(
+        text = I18nUtils.message("editor.show_special_characters"),
         icon = null,
         isSelected = { showSpecialCharacters.get() },
         setSelected = { showSpecialCharacters.set(it) }
       ))
-      add(SimpleToggleAction(
-        text = "Show Whitespaces",
+      add(
+        SimpleToggleAction(
+        text = I18nUtils.message("editor.show_whitespaces"),
         icon = null,
         isSelected = { showWhitespaces.get() },
         setSelected = { showWhitespaces.set(it) }
@@ -247,7 +253,7 @@ internal class DeveloperToolEditor(
     }
     add(
       actionsPopup(
-        title = "Settings",
+        title = I18nUtils.message("editor.settings"),
         icon = AllIcons.General.Settings,
         actions = settingsActions
       )
@@ -269,7 +275,7 @@ internal class DeveloperToolEditor(
     }
     add(
       actionsPopup(
-        title = "Additional Actions",
+        title = I18nUtils.message("editor.additional_actions"),
         icon = AllIcons.Actions.MoreHorizontal,
         actions = additionalActions
       )
@@ -281,24 +287,24 @@ internal class DeveloperToolEditor(
 
     val firstTitle = title ?: "Content"
 
-    actions.add(dumbAwareAction("Show Diff with Clipboard", AllIcons.Actions.DiffWithClipboard) { e ->
+    actions.add(dumbAwareAction(I18nUtils.message("editor.more_show_diff_clipboard"), AllIcons.Actions.DiffWithClipboard) { e ->
       val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
       val firstText = runReadAction { editor.document.text }
       UiUtils.showDiffDialog(
-        title = "Show Diff with Clipboard",
+        title = I18nUtils.message("editor.more_show_diff_clipboard"),
         firstTitle = firstTitle,
-        secondTitle = "Clipboard",
+        secondTitle = I18nUtils.message("editor.more_show_diff_clipboard_title"),
         firstText = firstText,
         secondText = ClipboardUtil.getTextInClipboard() ?: ""
       )
     })
 
     diffSupport?.let {
-      actions.add(dumbAwareAction("Show Diff with ${it.secondTitle}", AllIcons.Actions.Diff) { e ->
+      actions.add(dumbAwareAction(I18nUtils.message("editor.more_show_diff_other", it.secondTitle), AllIcons.Actions.Diff) { e ->
         val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
         val firstText = runReadAction { editor.document.text }
         UiUtils.showDiffDialog(
-          title = "Show Diff with ${it.secondTitle}",
+          title = I18nUtils.message("editor.more_show_diff_other", it.secondTitle),
           firstTitle = firstTitle,
           secondTitle = it.secondTitle,
           firstText = firstText,
@@ -401,7 +407,7 @@ internal class DeveloperToolEditor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class ClearContentAction
-    : DumbAwareAction("Clear", "Clear the content", AllIcons.Actions.GC) {
+    : DumbAwareAction(I18nUtils.message("ClearContentAction.title"), I18nUtils.message("ClearContentAction.description"), AllIcons.Actions.GC) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
@@ -418,7 +424,7 @@ internal class DeveloperToolEditor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class CopyContentAction
-    : DumbAwareAction("Copy to Clipboard", "Copy the text into the system clipboard", AllIcons.Actions.Copy) {
+    : DumbAwareAction(I18nUtils.message("CopyContentAction.title"), I18nUtils.message("CopyContentAction.description"), AllIcons.Actions.Copy) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
@@ -432,7 +438,7 @@ internal class DeveloperToolEditor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class SaveContentToFileAction
-    : DumbAwareAction("Save to File", "Save the text into a file", AllIcons.Actions.MenuSaveall) {
+    : DumbAwareAction(I18nUtils.message("SaveContentToFileAction.title"), I18nUtils.message("SaveContentToFileAction.description"), AllIcons.Actions.MenuSaveall) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
@@ -453,7 +459,7 @@ internal class DeveloperToolEditor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class OpenContentFromFileAction
-    : DumbAwareAction("Open from File", "Replaces the text with the content of a file", AllIcons.Actions.MenuOpen) {
+    : DumbAwareAction(I18nUtils.message("OpenContentFromFileAction.title"), I18nUtils.message("OpenContentFromFileAction.description"), AllIcons.Actions.MenuOpen) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
@@ -475,18 +481,18 @@ internal class DeveloperToolEditor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class ExpandEditorAction(private val originalEditor: DeveloperToolEditor) :
-    AnActionButton("Expand Editor", null, AllIcons.Actions.MoveToWindow), DumbAware {
+    AnActionButton(I18nUtils.message("ExpandEditorAction.title"), null, AllIcons.Actions.MoveToWindow), DumbAware {
 
     override fun actionPerformed(e: AnActionEvent) {
       val expandedText = ValueProperty(originalEditor.text)
       val expandedEditor = createExpandedEditor(originalEditor, expandedText)
-      val apply = object: DialogWrapper(originalEditor.component, true) {
+      val apply = object : DialogWrapper(originalEditor.component, true) {
 
         init {
           setSize(700, 550)
           init()
 
-          setOKButtonText("Apply")
+          setOKButtonText(I18nUtils.message("ExpandEditorAction.apply"))
         }
 
         override fun createCenterPanel(): JComponent = expandedEditor.component
@@ -531,9 +537,9 @@ internal class DeveloperToolEditor(
 
   enum class EditorMode(val title: String, val editable: Boolean) {
 
-    INPUT("input", true),
-    OUTPUT("output", false),
-    INPUT_OUTPUT("input/output", true),
+    INPUT(I18nUtils.message("editor.input"), true),
+    OUTPUT(I18nUtils.message("editor.output"), false),
+    INPUT_OUTPUT(I18nUtils.message("editor.input_output"), true),
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //

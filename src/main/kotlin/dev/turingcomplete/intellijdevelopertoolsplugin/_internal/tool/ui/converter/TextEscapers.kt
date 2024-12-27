@@ -7,16 +7,17 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.TextConverter.TextConverterContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 import org.apache.commons.text.StringEscapeUtils
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
 // -- Exposed Methods ----------------------------------------------------------------------------------------------- //
 
 internal fun createEscapeUnescapeContext(title: String) = TextConverterContext(
-  convertActionTitle = "Escape",
-  revertActionTitle = "Unescape",
-  sourceTitle = "Unescaped",
-  targetTitle = "Escaped",
+  convertActionTitle = I18nUtils.message("EscapeUnescapeContext.convertActionTitle"),
+  revertActionTitle = I18nUtils.message("EscapeUnescapeContext.revertActionTitle"),
+  sourceTitle = I18nUtils.message("EscapeUnescapeContext.sourceTitle"),
+  targetTitle = I18nUtils.message("EscapeUnescapeContext.targetTitle"),
   diffSupport = TextConverter.DiffSupport(
     title = title
   )
@@ -32,7 +33,7 @@ internal class HtmlEntitiesEscape(
   project: Project?
 ) :
   TextConverter(
-    textConverterContext = createEscapeUnescapeContext("HTML Entities Escape/Unescape"),
+    textConverterContext = createEscapeUnescapeContext(I18nUtils.message("HtmlEntitiesEscape.contentTitle")),
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
@@ -50,10 +51,10 @@ internal class HtmlEntitiesEscape(
   class Factory : DeveloperUiToolFactory<HtmlEntitiesEscape> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "HTML Entities Escaping",
+      menuTitle = I18nUtils.message("HtmlEntitiesEscape.menuTitle"),
       groupedMenuTitle = "HTML Entities",
-      contentTitle = "HTML Entities Escape/Unescape",
-      description = DeveloperUiToolPresentation.contextHelp("This tool will use <code>StringEscapeUtils.escapeHtml4(text)</code> and <code>StringEscapeUtils.unescapeHtml4(text)</code> from the 'Apache Commons Text' library.")
+      contentTitle = I18nUtils.message("HtmlEntitiesEscape.contentTitle"),
+      description = DeveloperUiToolPresentation.contextHelp(I18nUtils.message("HtmlEntitiesEscape.description"))
     )
 
     override fun getDeveloperUiToolCreator(
@@ -74,7 +75,7 @@ internal class JavaStringEscape(
   project: Project?
 ) :
   TextConverter(
-    textConverterContext = createEscapeUnescapeContext("Java String Escape/Unescape"),
+    textConverterContext = createEscapeUnescapeContext(I18nUtils.message("JavaStringEscape.contentTitle")),
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
@@ -92,10 +93,10 @@ internal class JavaStringEscape(
   class Factory : DeveloperUiToolFactory<JavaStringEscape> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Java String Escaping",
+      menuTitle = I18nUtils.message("JavaStringEscape.menuTitle"),
       groupedMenuTitle = "Java String",
-      contentTitle = "Java String Escape/Unescape",
-      description = DeveloperUiToolPresentation.contextHelp("This tool will use <code>StringEscapeUtils.escapeJava(text)</code> and <code>StringEscapeUtils.unescapeJava(text)</code> from the 'Apache Commons Text' library.")
+      contentTitle = I18nUtils.message("JavaStringEscape.contentTitle"),
+      description = DeveloperUiToolPresentation.contextHelp(I18nUtils.message("JavaStringEscape.description"))
     )
 
     override fun getDeveloperUiToolCreator(
@@ -116,7 +117,7 @@ internal class JsonTextEscape(
   project: Project?
 ) :
   TextConverter(
-    textConverterContext = createEscapeUnescapeContext("JSON Text Escape/Unescape"),
+    textConverterContext = createEscapeUnescapeContext(I18nUtils.message("JsonTextEscape.contentTitle")),
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
@@ -134,10 +135,10 @@ internal class JsonTextEscape(
   class Factory : DeveloperUiToolFactory<JsonTextEscape> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "JSON Text Escaping",
+      menuTitle = I18nUtils.message("JsonTextEscape.menuTitle"),
       groupedMenuTitle = "JSON Text",
-      contentTitle = "JSON Text Escape/Unescape",
-      description = DeveloperUiToolPresentation.contextHelp("This tool will use <code>StringEscapeUtils.escapeJson(text)</code> and <code>StringEscapeUtils.unescapeJson(text)</code> from the 'Apache Commons Text' library.")
+      contentTitle = I18nUtils.message("JsonTextEscape.contentTitle"),
+      description = DeveloperUiToolPresentation.contextHelp(I18nUtils.message("JsonTextEscape.description"))
     )
 
     override fun getDeveloperUiToolCreator(
@@ -158,7 +159,7 @@ internal class CsvTextEscape(
   project: Project?
 ) :
   TextConverter(
-    textConverterContext = createEscapeUnescapeContext("CSV Text Escape/Unescape"),
+    textConverterContext = createEscapeUnescapeContext(I18nUtils.message("CsvTextEscape.contentTitle")),
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
@@ -176,10 +177,10 @@ internal class CsvTextEscape(
   class Factory : DeveloperUiToolFactory<CsvTextEscape> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "CSV Text Escaping",
+      menuTitle = I18nUtils.message("CsvTextEscape.menuTitle"),
       groupedMenuTitle = "CSV Text",
-      contentTitle = "CSV Text Escape/Unescape",
-      description = DeveloperUiToolPresentation.contextHelp("This tool will use <code>StringEscapeUtils.escapeCsv(text)</code> and <code>StringEscapeUtils.unescapeCsv(text)</code> from the 'Apache Commons Text' library.")
+      contentTitle = I18nUtils.message("CsvTextEscape.contentTitle"),
+      description = DeveloperUiToolPresentation.contextHelp(I18nUtils.message("CsvTextEscape.description"))
     )
 
     override fun getDeveloperUiToolCreator(
@@ -200,7 +201,7 @@ internal class XmlTextEscape(
   project: Project?
 ) :
   TextConverter(
-    textConverterContext = createEscapeUnescapeContext("XML Text Escape/Unescape"),
+    textConverterContext = createEscapeUnescapeContext(I18nUtils.message("XmlTextEscape.contentTitle")),
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
@@ -218,9 +219,9 @@ internal class XmlTextEscape(
   class Factory : DeveloperUiToolFactory<XmlTextEscape> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "XML Text Escaping",
-      contentTitle = "XML Text Escape/Unescape",
-      description = DeveloperUiToolPresentation.contextHelp("This tool will use <code>StringEscapeUtils.escapeXml11(text)</code> and <code>StringEscapeUtils.unescapeXml(text)</code> from the 'Apache Commons Text' library.")
+      menuTitle = I18nUtils.message("XmlTextEscape.menuTitle"),
+      contentTitle = I18nUtils.message("XmlTextEscape.contentTitle"),
+      description = DeveloperUiToolPresentation.contextHelp(I18nUtils.message("XmlTextEscape.description"))
     )
 
     override fun getDeveloperUiToolCreator(

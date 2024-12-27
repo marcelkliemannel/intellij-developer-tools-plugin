@@ -10,8 +10,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUt
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextStatistic
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextStatistic.Companion
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolService
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 
-internal class EditorTextStatisticAction : DumbAwareAction("Show Text Statistic of Document...") {
+internal class EditorTextStatisticAction : DumbAwareAction(I18nUtils.message("pop.EditorTextStatisticAction.text")) {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //

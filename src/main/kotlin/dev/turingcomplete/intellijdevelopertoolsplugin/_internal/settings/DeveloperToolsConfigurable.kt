@@ -11,6 +11,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.not
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings.ActionHandlingInstance
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 import javax.swing.JComponent
 
 class DeveloperToolsConfigurable : Configurable {
@@ -42,44 +43,44 @@ class DeveloperToolsConfigurable : Configurable {
 
     row {
       addOpenMainDialogActionToMainToolbar = ValueProperty(developerToolsApplicationSettings.addOpenMainDialogActionToMainToolbar)
-      checkBox("Add 'Developer Tools' action to the main toolbar during startup")
-        .comment("If the action was removed manually in the past, this automatic mechanism will not work. The 'Developer Tools' action must first be manually added to the 'Main Toolbar Right' again (or 'Main Toolbar' in the old UI).")
+      checkBox(I18nUtils.message("DeveloperToolsConfigurable.add_to_main_toolbar"))
+        .comment(I18nUtils.message("DeveloperToolsConfigurable.add_to_main_toolbar.desc"))
         .bindSelected(addOpenMainDialogActionToMainToolbar)
     }
 
     row {
       saveConfigurations = ValueProperty(developerToolsApplicationSettings.saveConfigurations)
-      checkBox("Remember configurations")
+      checkBox(I18nUtils.message("DeveloperToolsConfigurable.remember_configurations"))
         .bindSelected(saveConfigurations)
     }
     row {
       saveInputs = ValueProperty(developerToolsApplicationSettings.saveInputs)
-      checkBox("Remember inputs")
+      checkBox(I18nUtils.message("DeveloperToolsConfigurable.remember_inputs"))
         .bindSelected(saveInputs)
     }
     row {
       saveSensitiveInputs = ValueProperty(developerToolsApplicationSettings.saveSensitiveInputs)
-      checkBox("Remember sensitive inputs")
+      checkBox(I18nUtils.message("DeveloperToolsConfigurable.remember_sensitive_inputs"))
         .bindSelected(saveSensitiveInputs)
-    }.comment("Sensitive inputs will be stored in plaintext.")
+    }.comment(I18nUtils.message("DeveloperToolsConfigurable.remember_sensitive.desc"))
     row {
       loadExamples = ValueProperty(developerToolsApplicationSettings.loadExamples)
-      checkBox("Load examples")
+      checkBox(I18nUtils.message("DeveloperToolsConfigurable.load_examples"))
         .bindSelected(loadExamples)
     }.bottomGap(BottomGap.SMALL)
     row {
       hideWorkbenchTabsOnSingleTab = ValueProperty(developerToolsApplicationSettings.hideWorkbenchTabsOnSingleTab)
-      checkBox("Hide workbench tabs if there is only one tab")
+      checkBox(I18nUtils.message("DeveloperToolsConfigurable.hide_workbench"))
         .bindSelected(hideWorkbenchTabsOnSingleTab)
     }.bottomGap(BottomGap.SMALL)
 
-    buttonsGroup("External action handling") {
-      row("Open tools in:") {
+    buttonsGroup(I18nUtils.message("DeveloperToolsConfigurable.external")) {
+      row(I18nUtils.message("DeveloperToolsConfigurable.external.open")) {
         autoDetectActionHandlingInstance = ValueProperty(developerToolsApplicationSettings.autoDetectActionHandlingInstance)
-        radioButton("Auto detect")
+        radioButton(I18nUtils.message("DeveloperToolsConfigurable.external.auto"))
           .bindSelected(autoDetectActionHandlingInstance)
 
-        radioButton("Use:")
+        radioButton(I18nUtils.message("DeveloperToolsConfigurable.external.use"))
           .bindSelected(autoDetectActionHandlingInstance.not())
           .gap(RightGap.SMALL)
         selectedActionHandlingInstance = ValueProperty(developerToolsApplicationSettings.selectedActionHandlingInstance)
@@ -88,56 +89,56 @@ class DeveloperToolsConfigurable : Configurable {
           .enabledIf(autoDetectActionHandlingInstance.not())
       }.bottomGap(BottomGap.NONE)
       row {
-        comment("The plugin provides actions in other places in IntelliJ (e.g. in the editor or the project file tree) that open a developer tool. With this setting you can specify whether these actions open the dialog or the tool window.")
+        comment(I18nUtils.message("DeveloperToolsConfigurable.external.desc"))
       }
     }
 
-    groupRowsRange("Default Editor Settings") {
+    groupRowsRange(I18nUtils.message("DeveloperToolsConfigurable.editor_settings")) {
       row {
         editorSoftWraps = ValueProperty(developerToolsApplicationSettings.editorSoftWraps)
-        checkBox("Soft-wrap")
+        checkBox(I18nUtils.message("editor.soft_wrap"))
           .bindSelected(editorSoftWraps)
       }
       row {
         editorShowSpecialCharacters = ValueProperty(developerToolsApplicationSettings.editorShowSpecialCharacters)
-        checkBox("Show special characters")
+        checkBox(I18nUtils.message("editor.show_special_characters"))
           .bindSelected(editorShowSpecialCharacters)
       }
       row {
         editorShowWhitespaces = ValueProperty(developerToolsApplicationSettings.editorShowWhitespaces)
-        checkBox("Show whitespaces")
+        checkBox(I18nUtils.message("editor.show_whitespaces"))
           .bindSelected(editorShowWhitespaces)
       }
     }
 
-    groupRowsRange("Advanced") {
+    groupRowsRange(I18nUtils.message("DeveloperToolsConfigurable.advanced")) {
       row {
         dialogIsModal = ValueProperty(DeveloperToolsDialogSettings.instance.dialogIsModal)
-        checkBox("Dialog is modal and must be closed before continuing to work with IntelliJ")
+        checkBox(I18nUtils.message("DeveloperToolsConfigurable.advanced.1"))
           .bindSelected(dialogIsModal)
       }
       row {
         toolsMenuShowGroupNodes = ValueProperty(developerToolsApplicationSettings.toolsMenuTreeShowGroupNodes)
-        checkBox("Group tools in the menu")
+        checkBox(I18nUtils.message("DeveloperToolsConfigurable.advanced.2"))
           .bindSelected(toolsMenuShowGroupNodes)
       }
       row {
         toolsMenuOrderAlphabetically = ValueProperty(developerToolsApplicationSettings.toolsMenuTreeOrderAlphabetically)
-        checkBox("Order tools in the menu alphabetically")
+        checkBox(I18nUtils.message("DeveloperToolsConfigurable.advanced.3"))
           .bindSelected(toolsMenuOrderAlphabetically)
       }
       row {
         showInternalTools = ValueProperty(developerToolsApplicationSettings.showInternalTools)
-        checkBox("Show internal tools")
+        checkBox(I18nUtils.message("DeveloperToolsConfigurable.advanced.4"))
           .bindSelected(showInternalTools)
-          .comment("Enables additional developer tools that are only useful for special applications, such as supporting IntelliJ plugin development.")
+          .comment(I18nUtils.message("DeveloperToolsConfigurable.advanced.4.desc"))
       }
     }
 
     row {
       cell(
         UiUtils.createLink(
-          title = "Make a feature request or report an issue",
+          title = I18nUtils.message("DeveloperToolsConfigurable.issue"),
           url = "https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues"
         )
       )

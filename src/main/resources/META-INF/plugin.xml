@@ -6,6 +6,8 @@
     Marcel Kliemannel
   </vendor>
 
+  <resource-bundle>messages.local</resource-bundle>
+
   <description><![CDATA[
 <p>This plugin is a powerful and versatile set of tools designed to enhance the development experience for software engineers. With its extensive collection of features, developers can increase their productivity and simplify complex operations without leaving their coding environment.</p>
 

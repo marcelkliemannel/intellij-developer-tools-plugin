@@ -23,6 +23,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.Property
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.TextConverter.ActiveInput.SOURCE
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.TextConverter.ActiveInput.TARGET
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 
 internal abstract class TextConverter(
   protected val textConverterContext: TextConverterContext,
@@ -128,7 +129,7 @@ internal abstract class TextConverter(
   private fun Panel.buildActionsUi() {
     buttonsGroup {
       row {
-        val liveConversionCheckBox = checkBox("Live conversion")
+        val liveConversionCheckBox = checkBox(I18nUtils.message("editor.live_conversion"))
           .bindSelected(liveConversion)
           .gap(RightGap.SMALL)
         icon(AllIcons.General.ArrowUp)

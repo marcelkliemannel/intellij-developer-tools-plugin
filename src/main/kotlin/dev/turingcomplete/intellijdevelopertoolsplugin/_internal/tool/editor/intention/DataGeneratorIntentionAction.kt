@@ -14,6 +14,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.Dat
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.DataGenerators.DataGeneratorBase
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.DataGenerators.DataGeneratorsGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.DataGenerators.dataGenerators
+import dev.turingcomplete.intellijdevelopertoolsplugin.i18n.I18nUtils
 
 internal class DataGeneratorIntentionAction : IntentionAction, LowPriorityAction {
   // -- Properties -------------------------------------------------------------------------------------------------- //
