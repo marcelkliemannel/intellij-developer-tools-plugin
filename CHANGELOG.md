@@ -4,10 +4,12 @@
 
 ### Added
 
-- Add tool "Server Certificates" to fetch, analyse and export certificates from a given URL.
-- Add tool "ASCII Art".
+- Add tool "Server Certificates" to fetch, analyse and export server certificates
+- Add tool "ASCII Art"
 
 ### Changed
+
+- Tool "Date Time" renamed to "Date and Time"
 
 ### Removed
 
