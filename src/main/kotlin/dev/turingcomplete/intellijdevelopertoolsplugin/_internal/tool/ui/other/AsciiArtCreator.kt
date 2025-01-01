@@ -28,6 +28,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.GitHubUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.clearDirectory
@@ -54,6 +55,7 @@ class AsciiArtCreator(
   private val textInput = configuration.register("textInput", "", INPUT, "Awesome")
   private val selectedFontFileName = configuration.register("selectedFontFileName", DEFAULT_BUILT_IN_FILE_NAME, CONFIGURATION)
 
+  private val asciiArtOutputErrorHolder = ErrorHolder()
   private val asciiArtOutput = ValueProperty("")
 
   private val downloadedFontsPath: Path = PathManager.getSystemPath().asPath().resolve("plugins").resolve("developer-tools").resolve("ascii-fonts")
@@ -86,11 +88,20 @@ class AsciiArtCreator(
     }
 
     row {
-      cell(
-        DeveloperToolEditor("asciiArtOutput", context, configuration, project, "ASCII Art", OUTPUT, parentDisposable, asciiArtOutput, fixedEditorSoftWraps = false)
-          .onTextChangeFromUi { createAsciiArt() }
-          .component
-      ).resizableColumn().align(Align.FILL)
+      val editor = DeveloperToolEditor(
+        id = "asciiArtOutput",
+        context = context,
+        configuration = configuration,
+        project = project,
+        title = "ASCII Art",
+        editorMode = OUTPUT,
+        parentDisposable = parentDisposable,
+        textProperty = asciiArtOutput,
+        fixedEditorSoftWraps = false
+      ).onTextChangeFromUi { createAsciiArt() }
+      cell(editor.component)
+        .validationOnApply(editor.bindValidator(asciiArtOutputErrorHolder.asValidation()))
+        .resizableColumn().align(Align.FILL)
     }.resizableRow().topGap(TopGap.MEDIUM).bottomGap(BottomGap.MEDIUM)
 
     row {
@@ -156,13 +167,20 @@ class AsciiArtCreator(
       createAsciiArtAlarm.cancelAllRequests()
 
       val request = {
-        var fontResource = fontResources[selectedFontFileName.get()]
-        if (fontResource == null) {
-          selectedFontFileName.set(DEFAULT_BUILT_IN_FILE_NAME)
-          fontResource = fontResources[DEFAULT_BUILT_IN_FILE_NAME]
-        }
+        asciiArtOutputErrorHolder.clear()
 
-        asciiArtOutput.set(createAsciiArt(fontResource!!.invoke(), textInput.get()))
+        try {
+          var fontResource = fontResources[selectedFontFileName.get()]
+          if (fontResource == null) {
+            selectedFontFileName.set(DEFAULT_BUILT_IN_FILE_NAME)
+            fontResource = fontResources[DEFAULT_BUILT_IN_FILE_NAME]
+          }
+
+          asciiArtOutput.set(createAsciiArt(fontResource!!.invoke(), textInput.get()))
+        }
+        catch (e: Exception) {
+          asciiArtOutputErrorHolder.add(e)
+        }
       }
       createAsciiArtAlarm.addRequest(request, 100)
     }
