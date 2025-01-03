@@ -44,6 +44,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.OkHttpCl
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.createPopup
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.safeCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.message.UiToolsBundle
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.awt.datatransfer.StringSelection
@@ -91,24 +92,24 @@ class ServerCertificates(
   override fun Panel.buildUi() {
     row {
       expandableTextField()
-        .label("URL:")
+        .label(UiToolsBundle.message("server-certificates.url"))
         .bindText(url)
         .resizableColumn()
         .align(Align.FILL)
     }.bottomGap(BottomGap.NONE)
     row {
-      checkBox("Follow redirects")
+      checkBox(UiToolsBundle.message("server-certificates.follow-redirects"))
         .bindSelected(followRedirects)
     }.topGap(TopGap.NONE)
     row {
-      checkBox("Allow insecure connections")
+      checkBox(UiToolsBundle.message("server-certificates.allow-insecure-connection"))
         .bindSelected(allowInsecureConnection)
         .gap(RightGap.SMALL)
-      contextHelp("Enabling this option permits connections to servers that have invalid server certificates.<br /><br/>Use this option if you get any <i>SSLHandshakeException</i> errors.")
+      contextHelp(UiToolsBundle.message("server-certificates.allow-insecure-connection-help"))
     }.topGap(TopGap.NONE)
 
     row {
-      button("Fetch Server Certificates") {
+      button(UiToolsBundle.message("server-certificates.fetch-server-certificates")) {
         val url = url.get()
         fetchCertificates(
           project = project,
@@ -147,7 +148,7 @@ class ServerCertificates(
 
   private fun createFetchingUi(): JComponent = panel {
     row {
-      label("Retrieving server certificates...")
+      label(UiToolsBundle.message("server-certificates.fetch-server-certificates-in-progress"))
         .align(Align.FILL)
         .resizableColumn()
     }
@@ -156,16 +157,16 @@ class ServerCertificates(
   private fun createFetchingFailedUi(e: Throwable): JComponent = panel {
     row {
       icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
-      label("<html>Failed to retrieve server certificates: <i>${e::class.simpleName}: ${e.message}</i></html>")
+      label(UiToolsBundle.message(UiToolsBundle.message("server-certificates.fetch-server-certificates-failed", "${e::class.simpleName}: ${e.message}")))
         .align(Align.FILL)
         .resizableColumn()
     }
   }
 
   private fun createCertificatesUi(httpResponse: HttpResponse): JComponent = panel {
-    group("Server Certificates", false) {
+    group(UiToolsBundle.message("server-certificates.result"), false) {
       row {
-        cell(HyperlinkLabel("Response: ${httpResponse.statusCode} ${httpResponse.statusMessage}").apply {
+        cell(HyperlinkLabel(UiToolsBundle.message("server-certificates.response", httpResponse.statusCode, httpResponse.statusMessage)).apply {
           addHyperlinkListener(createShowHttpResponseHyperlinkHandler(httpResponse, this))
         })
       }
@@ -185,7 +186,7 @@ class ServerCertificates(
       }
       else {
         row {
-          label("<html>Connection didn't use any server certificates</html>")
+          label("<html>${UiToolsBundle.message("server-certificates.no-result")}</html>")
         }
       }
     }
@@ -209,7 +210,7 @@ class ServerCertificates(
               parentDisposable = parentDisposable
             ).apply {
               text = with(StringJoiner(System.lineSeparator())) {
-                add("${httpResponse.protocol} ${httpResponse.statusCode}${httpResponse.statusMessage?.let { " $it" }}")
+                add("${httpResponse.protocol} ${httpResponse.statusCode} ${httpResponse.statusMessage}")
                 httpResponse.headers.forEach {
                   add("${it.key}: ${it.value.joinToString(", ") { it ?: "" }}")
                 }
@@ -232,9 +233,9 @@ class ServerCertificates(
       lateinit var exportActionsButton: JComponent
       exportActionsButton = AnActionOptionButton(
         ShowAsPemAction(certificates, context, configuration, project, parentDisposable) { exportActionsButton },
-        SaveAsPemAction(certificates, url.get()),
-        SaveAsDerAction(certificates, url.get()),
-        SaveAsJksAction(certificates, url.get()),
+        ExportAsPemAction(certificates, url.get()),
+        ExportAsDerAction(certificates, url.get()),
+        ExportAsJksAction(certificates, url.get()),
         CopyAsPemToClipboardAction(certificates),
         ShowCertificateDetailsAction(certificates, context, configuration, project, parentDisposable) { exportActionsButton }
       )
@@ -244,12 +245,12 @@ class ServerCertificates(
 
   private fun Panel.buildCertificatePropertiesUi(certificate: X509Certificate) {
     listOf<Pair<String, Any>>(
-      "Subject" to certificate.subjectX500Principal,
-      "Issuer" to certificate.issuerX500Principal,
-      "Serial Number" to certificate.serialNumber,
-      "Valid From" to certificate.notBefore,
-      "Valid To" to certificate.notAfter,
-      "Signature Algo." to certificate.sigAlgName
+      UiToolsBundle.message("server-certificates.certificate-subject") to certificate.subjectX500Principal,
+      UiToolsBundle.message("server-certificates.certificate-issuer") to certificate.issuerX500Principal,
+      UiToolsBundle.message("server-certificates.certificate-serial-number") to certificate.serialNumber,
+      UiToolsBundle.message("server-certificates.certificate-valid-from") to certificate.notBefore,
+      UiToolsBundle.message("server-certificates.certificate-valid-to") to certificate.notAfter,
+      UiToolsBundle.message("server-certificates.certificate-signature-algorithm") to certificate.sigAlgName
     ).forEach { (title, value) ->
       row("$title:") {
         val stringValue = when (value) {
@@ -274,10 +275,10 @@ class ServerCertificates(
         certificate.checkValidity()
       } catch (_: CertificateExpiredException) {
         icon(AllIcons.General.Warning).gap(RightGap.SMALL)
-        label("Certificate is expired")
+        label(UiToolsBundle.message("server-certificates.certificate-expired"))
       } catch (_: CertificateNotYetValidException) {
         icon(AllIcons.General.Warning).gap(RightGap.SMALL)
-        label("Certificate not yet valid")
+        label(UiToolsBundle.message("server-certificates.certificate-not-valid-yet"))
       }
     }
   }
@@ -291,9 +292,9 @@ class ServerCertificates(
     onCancel: () -> Unit,
     onThrowable: (Throwable) -> Unit
   ) {
-    object : Task.Backgroundable(project, "Fetching server certificates", true) {
+    object : Task.Backgroundable(project, UiToolsBundle.message("server-certificates.fetch-server-certificates-in-progress-title"), true) {
       override fun run(indicator: ProgressIndicator) {
-        indicator.text = "Fetching server certificates..."
+        indicator.text = UiToolsBundle.message("server-certificates.fetch-server-certificates-in-progress")
         onStarted()
 
         val httpClientBuilder = OkHttpClient.Builder()
@@ -314,7 +315,7 @@ class ServerCertificates(
           certificates = certificateCapturingTrustManager.serverCertificates,
           protocol = OkHttpClientUtils.toDisplayableString(response.protocol),
           statusCode = response.code,
-          statusMessage = OkHttpClientUtils.toStatusMessage(response.code),
+          statusMessage = OkHttpClientUtils.toStatusMessage(response.code) ?: "",
           headers = response.headers.toMultimap(),
           body = response.body?.string()
         )
@@ -333,15 +334,15 @@ class ServerCertificates(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private abstract class SaveCertificateAction(
+  private abstract class ExportCertificateAction(
     private val formatName: String,
     private val certificates: List<Certificate>,
     private val url: String
-  ) : AnAction("Save${if (certificates.size > 1) " Chain" else ""} as ${formatName.uppercase()}", null, AllIcons.Actions.MenuSaveall) {
+  ) : AnAction(UiToolsBundle.message("server-certificates.export-action-title", formatName.uppercase()), null, AllIcons.Actions.MenuSaveall) {
 
     override fun actionPerformed(e: AnActionEvent) {
       try {
-        val fileSaverDescriptor = FileSaverDescriptor("Save As $formatName", "")
+        val fileSaverDescriptor = FileSaverDescriptor(e.presentation.text, "")
         val saveFileDialog: FileSaverDialog = FileChooserFactory.getInstance().createSaveFileDialog(fileSaverDescriptor, e.project)
         val defaultFileName = createDefaultCertificateFileName()
         saveFileDialog.save(defaultFileName)
@@ -349,7 +350,11 @@ class ServerCertificates(
           ?.writeBytes(createFileContent(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)
         onSuccess(e)
       } catch (exception: Exception) {
-        Messages.showErrorDialog(e.project, "Failed to save certificate(s): ${exception.message}", "Error")
+        Messages.showErrorDialog(
+          e.project,
+          UiToolsBundle.message("server-certificates.export-failed", exception.message ?: ""),
+          e.presentation.text
+        )
       }
     }
 
@@ -387,10 +392,10 @@ class ServerCertificates(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class SaveAsPemAction(
+  private class ExportAsPemAction(
     private val certificates: List<Certificate>,
     url: String
-  ) : SaveCertificateAction("PEM", certificates, url) {
+  ) : ExportCertificateAction("PEM", certificates, url) {
 
     override fun createFileContent(): ByteArray =
       certificates.flatMap { cert ->
@@ -404,10 +409,10 @@ class ServerCertificates(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class SaveAsDerAction(
+  private class ExportAsDerAction(
     private val certificates: List<Certificate>,
     url: String
-  ) : SaveCertificateAction("DER", certificates, url) {
+  ) : ExportCertificateAction("DER", certificates, url) {
 
     override fun createFileContent(): ByteArray =
       certificates.flatMap { it.encoded.asList() }.toByteArray()
@@ -415,10 +420,10 @@ class ServerCertificates(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class SaveAsJksAction(
+  private class ExportAsJksAction(
     private val certificates: List<Certificate>,
     url: String
-  ) : SaveCertificateAction("JKS", certificates, url) {
+  ) : ExportCertificateAction("JKS", certificates, url) {
 
     private val password = "changeit"
 
@@ -439,7 +444,11 @@ class ServerCertificates(
     }
 
     override fun onSuccess(e: AnActionEvent) {
-      Messages.showInfoMessage(e.project, "Certificate${if (certificates.size > 1) "s" else ""} exported as JKS with password: <i>$password</i>", "Save as JKS")
+      Messages.showInfoMessage(
+        e.project,
+        UiToolsBundle.message("server-certificates.export-jks-result", password),
+        e.presentation.text
+      )
     }
   }
 
@@ -447,7 +456,7 @@ class ServerCertificates(
 
   private class CopyAsPemToClipboardAction(
     private val certificates: List<Certificate>
-  ) : AnAction("Copy${if (certificates.size > 1) " Chain" else ""} as PEM to Clipboard", null, AllIcons.Actions.Copy) {
+  ) : AnAction(UiToolsBundle.message("server-certificates.copy-pem-to-clipboard-action-title"), null, AllIcons.Actions.Copy) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val pemFile = toPemFile(certificates)
@@ -464,7 +473,7 @@ class ServerCertificates(
     private val project: Project?,
     private val parentDisposable: Disposable,
     private val parentComponent: () -> JComponent
-  ) : AnAction("Show${if (certificates.size > 1) " Chain" else ""} as PEM", null, null) {
+  ) : AnAction(UiToolsBundle.message("server-certificates.show-as-pem-action-title"), null, null) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val content = panel {
@@ -497,7 +506,7 @@ class ServerCertificates(
     private val project: Project?,
     private val parentDisposable: Disposable,
     private val parentComponent: () -> JComponent
-  ) : AnAction("Show Certificate Details", null, null) {
+  ) : AnAction(UiToolsBundle.message("server-certificates.show-certificate-details-action-title"), null, null) {
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
 
@@ -533,7 +542,7 @@ class ServerCertificates(
     val certificates: List<Certificate>?,
     val protocol: String,
     val statusCode: Int,
-    val statusMessage: String?,
+    val statusMessage: String,
     val headers: Map<String, List<String?>>,
     val body: String?
   )
@@ -546,7 +555,7 @@ class ServerCertificates(
     val serverCertificates = mutableListOf<Certificate>()
 
     override fun checkClientTrusted(chain: Array<X509Certificate>?, authType: String?) {
-      println(chain)
+      // Nothing to do
     }
 
     override fun checkServerTrusted(chain: Array<X509Certificate>?, authType: String?) {
@@ -580,8 +589,8 @@ class ServerCertificates(
   class Factory : DeveloperUiToolFactory<ServerCertificates> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Server Certificates",
-      contentTitle = "Server Certificates"
+      menuTitle = UiToolsBundle.message("server-certificates.menu-title"),
+      contentTitle = UiToolsBundle.message("server-certificates.content-title")
     )
 
     override fun getDeveloperUiToolCreator(

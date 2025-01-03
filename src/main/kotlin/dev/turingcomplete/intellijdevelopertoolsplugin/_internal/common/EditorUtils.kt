@@ -1,5 +1,7 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.common
 
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
@@ -25,6 +27,9 @@ object EditorUtils {
       }
     }, actionName, null, this.document)
   }
+
+  fun AnActionEvent.getEditor(): Editor =
+    this.getData(CommonDataKeys.EDITOR) ?: error("Editor not found")
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 

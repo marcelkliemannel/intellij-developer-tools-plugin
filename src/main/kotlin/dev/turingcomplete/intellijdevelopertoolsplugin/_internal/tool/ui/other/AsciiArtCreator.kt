@@ -32,6 +32,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHol
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.GitHubUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.clearDirectory
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.message.UiToolsBundle
 import org.jetbrains.kotlin.tools.projectWizard.core.asPath
 import java.io.InputStream
 import java.nio.file.Files
@@ -80,11 +81,11 @@ class AsciiArtCreator(
 
     row {
       comboBox(fontFileNamesComboBoxModel)
-        .label("Font:")
+        .label(UiToolsBundle.message("ascii-art.font"))
         .bindItem(selectedFontFileName)
         .whenItemSelectedFromUi { createAsciiArt() }
         .gap(RightGap.SMALL)
-      hyperLink("Examples", "https://github.com/xero/figlet-fonts/blob/master/Examples.md")
+      hyperLink(UiToolsBundle.message("ascii-art.examples"), "https://github.com/xero/figlet-fonts/blob/master/Examples.md")
     }
 
     row {
@@ -93,25 +94,24 @@ class AsciiArtCreator(
         context = context,
         configuration = configuration,
         project = project,
-        title = "ASCII Art",
+        title = UiToolsBundle.message("ascii-art.output-title"),
         editorMode = OUTPUT,
         parentDisposable = parentDisposable,
         textProperty = asciiArtOutput,
         fixedEditorSoftWraps = false
       ).onTextChangeFromUi { createAsciiArt() }
       cell(editor.component)
+        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
         .validationOnApply(editor.bindValidator(asciiArtOutputErrorHolder.asValidation()))
         .resizableColumn().align(Align.FILL)
     }.resizableRow().topGap(TopGap.MEDIUM).bottomGap(BottomGap.MEDIUM)
 
     row {
       lateinit var downloadFontsButton: JButton
-      downloadFontsButton = button("Download ASCII Art Fonts From GitHub") {
+      downloadFontsButton = button(UiToolsBundle.message("ascii-art.download-additional-ascii-art-fonts")) {
         downloadAdditionalAsciiArtFonts(downloadFontsButton)
       }.gap(RightGap.SMALL).component
-      contextHelp("Download additional ASCII font files from the <i>xero/figlet-fonts</i> GitHub repository.<br /><br />" +
-                          "Some font files may not work correctly and will be filtered out.<br /><br />" +
-                          "These additional font files are not part of this plugin and are subject to individual licences.")
+      contextHelp(UiToolsBundle.message("ascii-art.download-additional-ascii-art-fonts-help"))
     }
   }
 
@@ -140,10 +140,10 @@ class AsciiArtCreator(
         preDownloadFilter = { fileName -> fileName.endsWith(".flf") },
         afterDownloadFilter = { file ->
           try {
-            createAsciiArt(file.inputStream(), "Example")
+            createAsciiArt(file.inputStream(), UiToolsBundle.message("ascii-art.example"))
             true
           } catch (e: Exception) {
-            log.warn("Failed to render example ASCII art using file: $file", e)
+            log.warn("Failed to render example ASCII art using font file: $file. Font file will be ignored.", e)
             false
           }
         },
@@ -151,7 +151,11 @@ class AsciiArtCreator(
         onSuccess = { },
         onThrowable = {
           ApplicationManager.getApplication().invokeLater {
-            Messages.showErrorDialog(project, "Not all files could be downloaded. See idea.log for more details.", "Download GitHub Repository Files")
+            Messages.showErrorDialog(
+              project,
+              UiToolsBundle.message("ascii-art.download-additional-ascii-art-fonts-failed-details"),
+              UiToolsBundle.message("ascii-art.download-additional-ascii-art-fonts-failed-title"),
+            )
           }
         },
         onFinished = {
@@ -201,7 +205,7 @@ class AsciiArtCreator(
     builtInFonts.forEach {
       val fontResource = getBuiltInFontResource(it)
       if (fontResource != null) {
-        fontResources.put(it, { getBuiltInFontResource(it)!! })
+        fontResources.put(it) { getBuiltInFontResource(it)!! }
       }
       else {
         log.warn("Built-in font $it not found")
@@ -211,7 +215,7 @@ class AsciiArtCreator(
     if (downloadedFontsPath.exists()) {
       Files.list(downloadedFontsPath)
         .filter { it.isRegularFile() }
-        .forEach { fontResources.put(it.fileName.toString(), { it.inputStream() }) }
+        .forEach { fontResources.put(it.fileName.toString()) { it.inputStream() } }
     }
 
     this.fontResources.clear()
@@ -256,8 +260,8 @@ class AsciiArtCreator(
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "ASCII Art",
-        contentTitle = "ASCII Art"
+        menuTitle = UiToolsBundle.message("ascii-art.menu-title"),
+        contentTitle = UiToolsBundle.message("ascii-art.content-title")
       )
 
     override fun getDeveloperUiToolCreator(

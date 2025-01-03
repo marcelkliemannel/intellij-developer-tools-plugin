@@ -52,8 +52,10 @@ import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.getEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.actionsPopup
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.dumbAwareAction
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.message.GeneralBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import java.awt.datatransfer.StringSelection
 import java.nio.file.Files
@@ -230,20 +232,20 @@ internal class DeveloperToolEditor(
 
     val settingsActions = mutableListOf<AnAction>().apply {
       add(SimpleToggleAction(
-        text = "Soft-Wrap",
+        text = GeneralBundle.message("editor.soft-wrap"),
         icon = AllIcons.Actions.ToggleSoftWrap,
         isSelected = { softWraps.get() },
         setSelected = { softWraps.set(it) },
         isEnabled = fixedEditorSoftWraps?.let { { fixedEditorSoftWraps } }
       ))
       add(SimpleToggleAction(
-        text = "Show Special Characters",
+        text = GeneralBundle.message("editor.show-special-characters"),
         icon = null,
         isSelected = { showSpecialCharacters.get() },
         setSelected = { showSpecialCharacters.set(it) }
       ))
       add(SimpleToggleAction(
-        text = "Show Whitespaces",
+        text = GeneralBundle.message("editor.show-whitespaces"),
         icon = null,
         isSelected = { showWhitespaces.get() },
         setSelected = { showWhitespaces.set(it) }
@@ -251,7 +253,7 @@ internal class DeveloperToolEditor(
     }
     add(
       actionsPopup(
-        title = "Settings",
+        title = GeneralBundle.message("editor.settings"),
         icon = AllIcons.General.Settings,
         actions = settingsActions
       )
@@ -273,7 +275,7 @@ internal class DeveloperToolEditor(
     }
     add(
       actionsPopup(
-        title = "Additional Actions",
+        title = GeneralBundle.message("editor.additional-actions"),
         icon = AllIcons.Actions.MoreHorizontal,
         actions = additionalActions
       )
@@ -283,26 +285,26 @@ internal class DeveloperToolEditor(
   private fun createDiffAction(): List<AnAction> {
     val actions = mutableListOf<AnAction>()
 
-    val firstTitle = title ?: "Content"
+    val firstTitle = title ?: GeneralBundle.message("editor.diff-no-title-fallback")
 
-    actions.add(dumbAwareAction("Show Diff with Clipboard", AllIcons.Actions.DiffWithClipboard) { e ->
-      val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
+    actions.add(dumbAwareAction(GeneralBundle.message("editor.show-diff-with-clipboard"), AllIcons.Actions.DiffWithClipboard) { e ->
+      val editor = e.getEditor()
       val firstText = runReadAction { editor.document.text }
       UiUtils.showDiffDialog(
-        title = "Show Diff with Clipboard",
+        title = GeneralBundle.message("editor.show-diff-with-clipboard"),
         firstTitle = firstTitle,
-        secondTitle = "Clipboard",
+        secondTitle = GeneralBundle.message("editor.clipboard"),
         firstText = firstText,
         secondText = ClipboardUtil.getTextInClipboard() ?: ""
       )
     })
 
     diffSupport?.let {
-      actions.add(dumbAwareAction("Show Diff with ${it.secondTitle}", AllIcons.Actions.Diff) { e ->
-        val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
+      actions.add(dumbAwareAction(GeneralBundle.message("editor.show-diff-with-title", it.secondTitle), AllIcons.Actions.Diff) { e ->
+        val editor = e.getEditor()
         val firstText = runReadAction { editor.document.text }
         UiUtils.showDiffDialog(
-          title = "Show Diff with ${it.secondTitle}",
+          title = GeneralBundle.message("editor.show-diff-with-title", it.secondTitle),
           firstTitle = firstTitle,
           secondTitle = it.secondTitle,
           firstText = firstText,
@@ -405,10 +407,10 @@ internal class DeveloperToolEditor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class ClearContentAction
-    : DumbAwareAction("Clear", "Clear the content", AllIcons.Actions.GC) {
+    : DumbAwareAction(GeneralBundle.message("editor.clear-content-action-title"), null, AllIcons.Actions.GC) {
 
     override fun actionPerformed(e: AnActionEvent) {
-      val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
+      val editor = e.getEditor()
       editor.contentComponent.grabFocus()
       runWriteAction {
         editor.putUserData(editorActiveKey, true)
@@ -422,10 +424,10 @@ internal class DeveloperToolEditor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class CopyContentAction
-    : DumbAwareAction("Copy to Clipboard", "Copy the text into the system clipboard", AllIcons.Actions.Copy) {
+    : DumbAwareAction(GeneralBundle.message("editor.copy-to-clipboard-action-title"), null, AllIcons.Actions.Copy) {
 
     override fun actionPerformed(e: AnActionEvent) {
-      val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
+      val editor = e.getEditor()
       val content = runReadAction { editor.document.text }
       CopyPasteManager.getInstance().setContents(StringSelection(content))
     }
@@ -435,12 +437,15 @@ internal class DeveloperToolEditor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class SaveContentToFileAction
-    : DumbAwareAction("Save to File", "Save the text into a file", AllIcons.Actions.MenuSaveall) {
+  private class SaveContentToFileAction : DumbAwareAction(
+    GeneralBundle.message("editor.save-to-file-action-title"), 
+    null, 
+    AllIcons.Actions.MenuSaveall
+  ) {
 
     override fun actionPerformed(e: AnActionEvent) {
-      val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
-      val fileSaverDescriptor = FileSaverDescriptor("Save Content As", "")
+      val editor = e.getEditor()
+      val fileSaverDescriptor = FileSaverDescriptor(GeneralBundle.message("editor.file-saver-description"), "")
       val timeStamp = LocalDateTime.now().format(timestampFormat)
       val defaultFilename = "$timeStamp.txt"
       FileChooserFactory.getInstance()
@@ -456,11 +461,14 @@ internal class DeveloperToolEditor(
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
-  private class OpenContentFromFileAction
-    : DumbAwareAction("Open from File", "Replaces the text with the content of a file", AllIcons.Actions.MenuOpen) {
+  private class OpenContentFromFileAction : DumbAwareAction(
+    GeneralBundle.message("editor.open-file-action-title"),
+    null,
+    AllIcons.Actions.MenuOpen
+  ) {
 
     override fun actionPerformed(e: AnActionEvent) {
-      val editor = e.getData(CommonDataKeys.EDITOR) ?: error("snh: Editor not found")
+      val editor = e.getEditor()
       val fileChooserDescriptor = FileChooserDescriptor(true, true, false, false, false, false)
       FileChooserFactory.getInstance()
         .createFileChooser(fileChooserDescriptor, e.project, editor.component)
@@ -479,7 +487,7 @@ internal class DeveloperToolEditor(
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class ExpandEditorAction(private val originalEditor: DeveloperToolEditor) :
-    AnActionButton("Expand Editor", null, AllIcons.Actions.MoveToWindow), DumbAware {
+    AnActionButton(GeneralBundle.message("editor.expand-editor-action-title"), null, AllIcons.Actions.MoveToWindow), DumbAware {
 
     override fun actionPerformed(e: AnActionEvent) {
       val expandedText = ValueProperty(originalEditor.text)
@@ -490,7 +498,7 @@ internal class DeveloperToolEditor(
           setSize(700, 550)
           init()
 
-          setOKButtonText("Apply")
+          setOKButtonText(GeneralBundle.message("editor.apply"))
         }
 
         override fun createCenterPanel(): JComponent = expandedEditor.component
@@ -535,9 +543,9 @@ internal class DeveloperToolEditor(
 
   enum class EditorMode(val title: String, val editable: Boolean) {
 
-    INPUT("input", true),
-    OUTPUT("output", false),
-    INPUT_OUTPUT("input/output", true),
+    INPUT(GeneralBundle.message("editor.mode.input"), true),
+    OUTPUT(GeneralBundle.message("editor.mode.output"), false),
+    INPUT_OUTPUT(GeneralBundle.message("editor.mode.input-output"), true),
   }
 
   // -- Companion Object -------------------------------------------------------------------------------------------- //
