@@ -522,8 +522,8 @@ class DatetimeConverter(
   class Factory : DeveloperUiToolFactory<DatetimeConverter> {
 
     override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Date Time",
-      contentTitle = "Date Time Converter"
+      menuTitle = "Date and Time",
+      contentTitle = "Date and Time Converter"
     )
 
     override fun getDeveloperUiToolCreator(

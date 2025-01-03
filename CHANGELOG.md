@@ -10,6 +10,17 @@
 
 ### Fixed
 
+## 6.2.0 - 2025-01-03
+
+### Added
+
+- Add tool "Server Certificates" to fetch, analyse and export server certificates
+- Add tool "ASCII Art"
+
+### Changed
+
+- Tool "Date Time" renamed to "Date and Time"
+
 ## 6.1.0 - 2024-12-14
 
 ### Added

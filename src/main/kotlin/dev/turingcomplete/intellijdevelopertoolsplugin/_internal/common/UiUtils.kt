@@ -12,15 +12,21 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.ToggleAction
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.util.PopupUtil
 import com.intellij.ui.HyperlinkLabel
+import com.intellij.ui.JBColor
+import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.popup.PopupState
 import com.intellij.util.ui.ColumnInfo
+import com.intellij.util.ui.UIUtil
+import java.awt.Dimension
 import java.awt.event.InputEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.Icon
+import javax.swing.JComponent
 
 object UiUtils {
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -121,7 +127,7 @@ object UiUtils {
         actionGroup(e)?.let {
           ActionManager.getInstance()
             .createActionPopupMenu(place, it).component
-            .show(e.getComponent(), e.x, e.y)
+            .show(e.component, e.x, e.y)
         }
       }
     }
@@ -134,6 +140,21 @@ object UiUtils {
 
       override fun getComparator(): Comparator<T> = compareBy { sortValue(it) }
     }
+
+  fun createPopup(content: JComponent, width: Int = 600, height: Int = 450): Balloon =
+    JBPopupFactory.getInstance()
+      .createBalloonBuilder(ScrollPaneFactory.createScrollPane(content, true).apply {
+        preferredSize = Dimension(width, height)
+      })
+      .setDialogMode(true)
+      .setFillColor(UIUtil.getPanelBackground())
+      .setBorderColor(JBColor.border())
+      .setBlockClicksThroughBalloon(true)
+      .setRequestFocus(true)
+      .createBalloon()
+      .apply {
+        setAnimationEnabled(false)
+      }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

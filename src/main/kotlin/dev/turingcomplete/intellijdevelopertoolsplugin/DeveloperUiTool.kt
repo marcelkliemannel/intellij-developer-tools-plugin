@@ -61,10 +61,6 @@ abstract class DeveloperUiTool(
 
     afterBuildUi()
 
-    if (wrapComponentInScrollPane) {
-      wrapper = createScrollPane(wrapper, true)
-    }
-
     return wrapper
   }
 

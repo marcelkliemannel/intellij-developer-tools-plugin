@@ -1,8 +1,12 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.common
 
 import io.ktor.util.*
+import java.nio.file.Files
+import java.nio.file.Path
 import java.security.MessageDigest
 import java.util.*
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
@@ -62,6 +66,22 @@ fun String.decodeFromAscii() =
     val charCode = matchResult.groupValues[1].toInt(16)
     charCode.toChar().toString()
   }
+
+fun Path.clearDirectory() {
+  if (!this.exists() || !this.isDirectory()) {
+    return
+  }
+  Files.newDirectoryStream(this).use { stream ->
+    for (path in stream) {
+      if (path.isDirectory()) {
+        path.clearDirectory()
+        Files.delete(path)
+      } else {
+        Files.delete(path)
+      }
+    }
+  }
+}
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

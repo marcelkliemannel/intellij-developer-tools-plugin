@@ -9,7 +9,8 @@ class SimpleToggleAction(
         text: String,
         icon: Icon?,
         private val isSelected: () -> Boolean,
-        private val setSelected: (Boolean) -> Unit
+        private val setSelected: (Boolean) -> Unit,
+        private val isEnabled: (() -> Boolean)? = null,
 ) : DumbAwareToggleAction(text, "", icon) {
 
   // -- Properties -------------------------------------------------------------------------------------------------- //
@@ -21,6 +22,13 @@ class SimpleToggleAction(
   override fun setSelected(e: AnActionEvent, state: Boolean) = setSelected.invoke(state)
 
   override fun getActionUpdateThread() = ActionUpdateThread.EDT
+
+  override fun update(e: AnActionEvent) {
+    super.update(e)
+    if (isEnabled != null) {
+      e.presentation.isEnabled = isEnabled()
+    }
+  }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
