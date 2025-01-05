@@ -9,29 +9,12 @@ import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
-import com.intellij.ui.dsl.builder.Align
-import com.intellij.ui.dsl.builder.BottomGap
-import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.RightGap
-import com.intellij.ui.dsl.builder.TopGap
-import com.intellij.ui.dsl.builder.bindItem
-import com.intellij.ui.dsl.builder.bindText
-import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
-import com.intellij.ui.dsl.builder.whenTextChangedFromUi
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
+import com.intellij.ui.dsl.builder.*
+import dev.turingcomplete.intellijdevelopertoolsplugin.*
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.AsyncTaskExecutor
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.*
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.GitHubUtils
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.clearDirectory
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.message.UiToolsBundle
 import java.io.InputStream
 import java.nio.file.Files
@@ -85,7 +68,7 @@ class AsciiArtCreator(
         .bindItem(selectedFontFileName)
         .whenItemSelectedFromUi { createAsciiArt() }
         .gap(RightGap.SMALL)
-        .applyToComponent { prototypeDisplayValue = "x".repeat(20) }
+        .applyToComponent { prototypeDisplayValue = "x".repeat(30) }
       hyperLink(UiToolsBundle.message("ascii-art.examples"), "https://github.com/xero/figlet-fonts/blob/master/Examples.md")
     }
 
