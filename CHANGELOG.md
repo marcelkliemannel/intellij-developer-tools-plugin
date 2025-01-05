@@ -10,6 +10,8 @@
 
 ### Fixed
 
+- The "ASCII Art" tool was incompatible with non-IntelliJ IDEs
+
 ## 6.2.0 - 2025-01-03
 
 ### Added

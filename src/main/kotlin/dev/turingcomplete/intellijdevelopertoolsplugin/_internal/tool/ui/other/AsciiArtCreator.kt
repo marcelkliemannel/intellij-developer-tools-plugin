@@ -18,7 +18,6 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
-import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
@@ -26,6 +25,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.AsyncTaskExecutor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
@@ -33,10 +33,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.GitHubUt
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.clearDirectory
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.message.UiToolsBundle
-import org.jetbrains.kotlin.tools.projectWizard.core.asPath
 import java.io.InputStream
 import java.nio.file.Files
-import java.nio.file.Path
+import java.nio.file.Paths
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JButton
 import kotlin.io.path.exists
@@ -59,11 +58,11 @@ class AsciiArtCreator(
   private val asciiArtOutputErrorHolder = ErrorHolder()
   private val asciiArtOutput = ValueProperty("")
 
-  private val downloadedFontsPath: Path = PathManager.getSystemPath().asPath().resolve("plugins").resolve("developer-tools").resolve("ascii-fonts")
-  private val fontFileNamesComboBoxModel = FontFileNamesComboBoxModel()
+  private lateinit var fontFileNamesComboBoxModel: FontFileNamesComboBoxModel
   private val fontResources: MutableMap<String, () -> InputStream> = mutableMapOf()
 
-  private val createAsciiArtAlarm by lazy { Alarm(parentDisposable) }
+  private val syncFontsAlarm by lazy { AsyncTaskExecutor.onEdt(parentDisposable) }
+  private val createAsciiArtAlarm by lazy { AsyncTaskExecutor.onEdt(parentDisposable) }
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
@@ -80,11 +79,13 @@ class AsciiArtCreator(
     }
 
     row {
+      fontFileNamesComboBoxModel = FontFileNamesComboBoxModel()
       comboBox(fontFileNamesComboBoxModel)
         .label(UiToolsBundle.message("ascii-art.font"))
         .bindItem(selectedFontFileName)
         .whenItemSelectedFromUi { createAsciiArt() }
         .gap(RightGap.SMALL)
+        .applyToComponent { prototypeDisplayValue = "x".repeat(20) }
       hyperLink(UiToolsBundle.message("ascii-art.examples"), "https://github.com/xero/figlet-fonts/blob/master/Examples.md")
     }
 
@@ -117,7 +118,6 @@ class AsciiArtCreator(
 
   override fun afterBuildUi() {
     syncFonts()
-    createAsciiArt()
   }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
@@ -167,27 +167,27 @@ class AsciiArtCreator(
   }
 
   private fun createAsciiArt() {
-    if (!isDisposed && !createAsciiArtAlarm.isDisposed) {
-      createAsciiArtAlarm.cancelAllRequests()
-
-      val request = {
-        asciiArtOutputErrorHolder.clear()
-
-        try {
-          var fontResource = fontResources[selectedFontFileName.get()]
-          if (fontResource == null) {
-            selectedFontFileName.set(DEFAULT_BUILT_IN_FILE_NAME)
-            fontResource = fontResources[DEFAULT_BUILT_IN_FILE_NAME]
-          }
-
-          asciiArtOutput.set(createAsciiArt(fontResource!!.invoke(), textInput.get()))
-        }
-        catch (e: Exception) {
-          asciiArtOutputErrorHolder.add(e)
-        }
-      }
-      createAsciiArtAlarm.addRequest(request, 100)
+    if (isDisposed || createAsciiArtAlarm.isDisposed) {
+      return
     }
+    createAsciiArtAlarm.cancelAll()
+
+    val request = {
+      asciiArtOutputErrorHolder.clear()
+
+      try {
+        var fontResource = fontResources[selectedFontFileName.get()]
+        if (fontResource == null) {
+          selectedFontFileName.set(DEFAULT_BUILT_IN_FILE_NAME)
+          fontResource = fontResources[DEFAULT_BUILT_IN_FILE_NAME]
+        }
+
+        asciiArtOutput.set(createAsciiArt(fontResource!!.invoke(), textInput.get()))
+      } catch (e: Exception) {
+        asciiArtOutputErrorHolder.add(e)
+      }
+    }
+    createAsciiArtAlarm.enqueueTask(request, 50)
   }
 
   private fun createAsciiArt(fontResource: InputStream, text: String): String =
@@ -200,31 +200,41 @@ class AsciiArtCreator(
     }
 
   private fun syncFonts() {
-    val fontResources = mutableMapOf<String, () -> InputStream>()
+    if (isDisposed || syncFontsAlarm.isDisposed) {
+      return
+    }
+    syncFontsAlarm.cancelAll()
 
-    builtInFonts.forEach {
-      val fontResource = getBuiltInFontResource(it)
-      if (fontResource != null) {
-        fontResources.put(it) { getBuiltInFontResource(it)!! }
+    val request = {
+      val fontResources = mutableMapOf<String, () -> InputStream>()
+
+      builtInFonts.forEach {
+        val fontResource = getBuiltInFontResource(it)
+        if (fontResource != null) {
+          fontResources.put(it) { getBuiltInFontResource(it)!! }
+        }
+        else {
+          log.warn("Built-in font $it not found")
+        }
       }
-      else {
-        log.warn("Built-in font $it not found")
+
+      if (downloadedFontsPath.exists()) {
+        Files.list(downloadedFontsPath)
+          .filter { it.isRegularFile() }
+          .forEach { fontResources.put(it.fileName.toString()) { it.inputStream() } }
       }
-    }
 
-    if (downloadedFontsPath.exists()) {
-      Files.list(downloadedFontsPath)
-        .filter { it.isRegularFile() }
-        .forEach { fontResources.put(it.fileName.toString()) { it.inputStream() } }
-    }
+      this.fontResources.clear()
+      this.fontResources.putAll(fontResources)
+      fontFileNamesComboBoxModel.setFileNames(fontResources.keys)
 
-    this.fontResources.clear()
-    this.fontResources.putAll(fontResources)
-    fontFileNamesComboBoxModel.setFileNames(fontResources.keys)
+      if (!fontResources.containsKey(selectedFontFileName.get())) {
+        selectedFontFileName.set(DEFAULT_BUILT_IN_FILE_NAME)
+      }
 
-    if (!fontResources.containsKey(selectedFontFileName.get())) {
-      selectedFontFileName.set(DEFAULT_BUILT_IN_FILE_NAME)
+      createAsciiArt()
     }
+    syncFontsAlarm.enqueueTask(request, 0)
   }
 
   private fun getBuiltInFontResource(fontFileName: String): InputStream? =
@@ -285,5 +295,6 @@ class AsciiArtCreator(
 
     const val DEFAULT_BUILT_IN_FILE_NAME = "standard.flf"
     private val builtInFonts = listOf<String>(DEFAULT_BUILT_IN_FILE_NAME, "slant.flf")
+    private val downloadedFontsPath = PathManager.getSystemDir().resolve(Paths.get("plugins", "developer-tools", "ascii-fonts"))
   }
 }
