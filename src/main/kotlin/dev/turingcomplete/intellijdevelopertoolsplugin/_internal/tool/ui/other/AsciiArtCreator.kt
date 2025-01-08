@@ -9,21 +9,35 @@ import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
-import com.intellij.ui.dsl.builder.*
-import dev.turingcomplete.intellijdevelopertoolsplugin.*
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.BottomGap
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.TopGap
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
+import com.intellij.ui.dsl.builder.whenTextChangedFromUi
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.*
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.AsyncTaskExecutor
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.OUTPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.GitHubUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.clearDirectory
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.message.UiToolsBundle
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Paths
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JButton
-import kotlin.io.path.exists
-import kotlin.io.path.inputStream
-import kotlin.io.path.isRegularFile
 
 class AsciiArtCreator(
   private val configuration: DeveloperToolConfiguration,
@@ -123,7 +137,7 @@ class AsciiArtCreator(
         preDownloadFilter = { fileName -> fileName.endsWith(".flf") },
         afterDownloadFilter = { file ->
           try {
-            createAsciiArt(file.inputStream(), UiToolsBundle.message("ascii-art.example"))
+            createAsciiArt(Files.newInputStream(file), UiToolsBundle.message("ascii-art.example"))
             true
           } catch (e: Exception) {
             log.warn("Failed to render example ASCII art using font file: $file. Font file will be ignored.", e)
@@ -201,10 +215,10 @@ class AsciiArtCreator(
         }
       }
 
-      if (downloadedFontsPath.exists()) {
+      if (Files.exists(downloadedFontsPath)) {
         Files.list(downloadedFontsPath)
-          .filter { it.isRegularFile() }
-          .forEach { fontResources.put(it.fileName.toString()) { it.inputStream() } }
+          .filter { Files.isRegularFile(it) }
+          .forEach { fontResources.put(it.fileName.toString()) { Files.newInputStream(it) } }
       }
 
       this.fontResources.clear()

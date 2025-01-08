@@ -5,8 +5,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
 import java.util.*
-import kotlin.io.path.exists
-import kotlin.io.path.isDirectory
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
@@ -68,12 +66,12 @@ fun String.decodeFromAscii() =
   }
 
 fun Path.clearDirectory() {
-  if (!this.exists() || !this.isDirectory()) {
+  if (!Files.exists(this) || !Files.isDirectory(this)) {
     return
   }
   Files.newDirectoryStream(this).use { stream ->
     for (path in stream) {
-      if (path.isDirectory()) {
+      if (Files.isDirectory(path)) {
         path.clearDirectory()
         Files.delete(path)
       } else {
@@ -82,6 +80,10 @@ fun Path.clearDirectory() {
     }
   }
 }
+
+fun Path.nameWithoutExtension() = fileName.toString().substringBeforeLast('.')
+
+fun Path.extension() = fileName.toString().substringAfterLast('.')
 
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

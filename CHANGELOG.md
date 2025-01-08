@@ -10,7 +10,13 @@
 
 ### Fixed
 
-## [6.2.1] - 2025-01-05
+## 6.2.2 - 2025-01-08
+
+### Fixed
+
+- Improve compatibility with non-IntelliJ IDEs
+
+## 6.2.1 - 2025-01-05
 
 ### Fixed
 

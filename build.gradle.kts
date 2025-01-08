@@ -36,8 +36,7 @@ repositories {
 
 dependencies {
   intellijPlatform {
-    val platformVersion = properties("platformVersion")
-    create(properties("platform"), platformVersion, false)
+    create(properties("platform"), properties("platformVersion"), false)
 
     bundledPlugins(properties("platformBundledPlugins").split(','))
 
@@ -136,16 +135,16 @@ intellijPlatform {
 changelog {
   val projectVersion = project.version as String
   version.set(projectVersion)
-  header.set("[$projectVersion] - ${org.jetbrains.changelog.date()}")
+  header.set("$projectVersion - ${org.jetbrains.changelog.date()}")
   groups.set(listOf("Added", "Changed", "Removed", "Fixed"))
 }
 
 val writeChangelogToFileTask = tasks.create("writeChangelogToFile") {
-  outputs.dir("${buildDir}/generated-resources/changelog")
+  outputs.dir("${layout.buildDirectory}/generated-resources/changelog")
 
   doLast {
     val renderResult = changelog.instance.get().releasedItems.joinToString("\n") { changelog.renderItem(it, Changelog.OutputType.HTML) }
-    val baseDir = "${buildDir}/generated-resources/changelog/dev/turingcomplete/intellijdevelopertoolsplugin"
+    val baseDir = "${layout.buildDirectory}/generated-resources/changelog/dev/turingcomplete/intellijdevelopertoolsplugin"
     file(baseDir).mkdirs()
     file("${baseDir}/changelog.html").writeText(renderResult)
   }

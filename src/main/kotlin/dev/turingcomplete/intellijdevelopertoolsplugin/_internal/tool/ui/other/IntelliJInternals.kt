@@ -31,26 +31,16 @@ import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.lang.UrlClassLoader
 import com.intellij.util.ui.ColumnInfo
 import com.intellij.util.ui.ListTableModel
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyValuesAction
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.PluginCommonDataKeys
+import dev.turingcomplete.intellijdevelopertoolsplugin.*
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.*
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.simpleColumnInfo
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.setContextMenu
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.uncheckedCastTo
 import org.jetbrains.kotlin.idea.util.application.executeOnPooledThread
 import java.awt.Dimension
 import java.net.URLClassLoader
 import java.nio.file.Files
+import java.nio.file.Paths
 import javax.swing.ListSelectionModel
 import javax.swing.tree.DefaultMutableTreeNode
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.extension
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.toPath
 import kotlin.streams.asSequence
 
 class IntelliJInternals(
@@ -175,7 +165,7 @@ class IntelliJInternals(
     val messageDialogTitle = "Find Class File Path by Class Name"
     try {
       val aClass = IntelliJInternals::class.java.classLoader.loadClass(className)
-      val classFilePath = aClass.getResource('/' + aClass.getName().replace('.', '/') + ".class")?.toURI()?.toPath()?.toString()
+      val classFilePath = aClass.getResource('/' + aClass.getName().replace('.', '/') + ".class")?.toURI()?.path?.toString()
       if (classFilePath != null) {
         Messages.showInfoMessage(project, "Class file path: ${classFilePath}.", messageDialogTitle)
       }
@@ -193,12 +183,12 @@ class IntelliJInternals(
 
     if (classLoader is URLClassLoader) {
       classLoader.urLs.forEach { url ->
-        classLoaderNode.add(DefaultMutableTreeNode("File: ${url.toURI().toPath().fileName.toString()}"))
+        classLoaderNode.add(DefaultMutableTreeNode("File: ${Paths.get(url.toURI().path).fileName}"))
       }
     }
     else if (classLoader is UrlClassLoader) {
       classLoader.files.forEach { file ->
-        classLoaderNode.add(DefaultMutableTreeNode("File: ${file.fileName.toString()}"))
+        classLoaderNode.add(DefaultMutableTreeNode("File: ${file.fileName}"))
       }
     }
 
@@ -251,9 +241,9 @@ class IntelliJInternals(
         val pluginDescriptorFiles = pluginDescriptors.flatMap { pluginDescriptor ->
           Files.list(pluginDescriptor.pluginPath.resolve("lib")).use { files ->
             files.asSequence()
-              .filter { it.isRegularFile() && it.extension == "jar" }
+              .filter { Files.isRegularFile(it) && it.extension() == "jar" }
               .mapNotNull {
-                virtualFileManager.findFileByUrl("jar://${it.absolutePathString()}!/${PluginManagerCore.PLUGIN_XML_PATH}")
+                virtualFileManager.findFileByUrl("jar://${it.toAbsolutePath()}!/${PluginManagerCore.PLUGIN_XML_PATH}")
               }
               .toList()
           }
