@@ -20,7 +20,6 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.EditorDropHandler
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.fileChooser.FileTypeDescriptor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.fileEditor.impl.EditorWindow
@@ -81,6 +80,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.createToggleAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.compareTo
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.nameWithoutExtension
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.Unarchiver.OpenUnarchiverContext
@@ -134,11 +134,6 @@ import javax.swing.table.DefaultTableModel
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreePath
-import kotlin.io.path.exists
-import kotlin.io.path.extension
-import kotlin.io.path.isDirectory
-import kotlin.io.path.nameWithoutExtension
-import kotlin.io.path.outputStream
 
 
 internal class Unarchiver(
@@ -640,7 +635,7 @@ internal class Unarchiver(
 
           e.presentation.isVisible = selectedValues.singleOrNull()?.let {
             it is RootNode || (it is ArchiveNode && it.archiveEntry != null)
-          } ?: false
+          } == true
         }
 
         override fun actionPerformed(e: AnActionEvent) {
@@ -819,7 +814,7 @@ internal class Unarchiver(
               rootNode = rootNode,
               archiveNodes = archiveNodesToExtract.archiveNodes,
               targetDirectoryPath = if (createArchiveFilenameSubDirectory.get()) {
-                Paths.get(lastSelectedTargetDirectoryPath.get()).resolve(rootNode.archiveFilePath.nameWithoutExtension)
+                Paths.get(lastSelectedTargetDirectoryPath.get()).resolve(rootNode.archiveFilePath.nameWithoutExtension())
               }
               else {
                 Paths.get(lastSelectedTargetDirectoryPath.get())
@@ -843,7 +838,7 @@ internal class Unarchiver(
               .align(Align.FILL)
           }
           row {
-            checkBox("Create a sub-directory with the archive name '${rootNode.archiveFilePath.nameWithoutExtension}'")
+            checkBox("Create a sub-directory with the archive name '${rootNode.archiveFilePath.nameWithoutExtension()}'")
               .bindSelected(createArchiveFilenameSubDirectory)
           }
           row {
@@ -1238,8 +1233,9 @@ internal class Unarchiver(
         val startPath = VirtualFileManager.getInstance().findFileByUrl(lastSelectedOpenedDirectoryPath.get())
 
         ApplicationManager.getApplication().invokeLater {
-          val descriptor = FileTypeDescriptor("Open Archive File", *supportedArchiveExtensions)
-
+          val descriptor = FileChooserDescriptorFactory.createSingleFileDescriptor()
+            .withTitle("Open Archive File")
+            .withExtensionFilter("Archive files", *supportedArchiveExtensions)
           val fileToOpen = FileChooser.chooseFile(descriptor, project, startPath)
           if (fileToOpen != null) {
             openArchiveCallback(fileToOpen.toNioPath())
@@ -1448,11 +1444,11 @@ internal class Unarchiver(
       progressIndicator.checkCanceled()
       progressIndicator.text = "Preparing directory structure..."
 
-      if (!extractionContext.targetDirectoryPath.exists()) {
+      if (!Files.exists(extractionContext.targetDirectoryPath)) {
         Files.createDirectories(extractionContext.targetDirectoryPath)
       }
       else {
-        if (!extractionContext.targetDirectoryPath.isDirectory()) {
+        if (!Files.isDirectory(extractionContext.targetDirectoryPath)) {
           throw IllegalArgumentException("The target path '${extractionContext.targetDirectoryPath}' already exists but it is not a directory")
         }
         else if (extractionContext.clearTargetDirectory) {
@@ -1491,7 +1487,7 @@ internal class Unarchiver(
           progressIndicator.fraction = (numOfFileNodesToExtract - archiveEntryToTargetFilePathToCopy.size.toDouble()) / numOfFileNodesToExtract
 
           val targetPath = archiveEntryToTargetFilePathToCopy[archiveEntry.name]!!
-          targetPath.outputStream(WRITE, CREATE_NEW, TRUNCATE_EXISTING).use { outputStream ->
+          Files.newOutputStream(targetPath, WRITE, CREATE_NEW, TRUNCATE_EXISTING).use { outputStream ->
             IOUtils.copy(archiveInputStream(), outputStream)
           }
           archiveEntryToTargetFilePathToCopy.remove(archiveEntry.name)

@@ -52,6 +52,7 @@ import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.net.URI
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 import java.nio.file.StandardOpenOption
 import java.security.KeyStore
 import java.security.SecureRandom
@@ -69,7 +70,6 @@ import javax.net.ssl.X509TrustManager
 import javax.security.auth.x500.X500Principal
 import javax.swing.JComponent
 import javax.swing.event.HyperlinkEvent
-import kotlin.io.path.writeBytes
 
 class ServerCertificates(
   private val project: Project?,
@@ -347,7 +347,9 @@ class ServerCertificates(
         val defaultFileName = createDefaultCertificateFileName()
         saveFileDialog.save(defaultFileName)
           ?.file?.toPath()
-          ?.writeBytes(createFileContent(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)
+          ?.let { targetPath ->
+            Files.write(targetPath, createFileContent(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)
+          }
         onSuccess(e)
       } catch (exception: Exception) {
         Messages.showErrorDialog(
