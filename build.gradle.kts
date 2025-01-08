@@ -135,7 +135,7 @@ intellijPlatform {
 changelog {
   val projectVersion = project.version as String
   version.set(projectVersion)
-  header.set("[$projectVersion] - ${org.jetbrains.changelog.date()}")
+  header.set("$projectVersion - ${org.jetbrains.changelog.date()}")
   groups.set(listOf("Added", "Changed", "Removed", "Fixed"))
 }
 
