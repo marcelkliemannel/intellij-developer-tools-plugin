@@ -10,21 +10,21 @@ import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.SENSITIVE
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.SimpleToggleAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.registerDynamicToolTip
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.validateNonEmpty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE32
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE64
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.RAW
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.toHexString
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration.PropertyType.CONFIGURATION
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration.PropertyType.SENSITIVE
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolPresentation
 import io.ktor.util.*
 import org.apache.commons.codec.binary.Base32
 import java.security.Security
@@ -122,7 +122,7 @@ internal class HmacTransformer(
         .validateNonEmpty("A secret key must be provided")
         .gap(RightGap.SMALL)
         .resizableColumn()
-        .registerDynamicToolTip({ DeveloperToolsApplicationSettings.instance.createSensitiveInputsHandlingToolTipText() })
+        .registerDynamicToolTip { DeveloperToolsApplicationSettings.instance.createSensitiveInputsHandlingToolTipText() }
 
       val encodingActions = mutableListOf<AnAction>().apply {
         SecretKeyEncodingMode.entries.forEach { secretKeyEncodingModeValue ->

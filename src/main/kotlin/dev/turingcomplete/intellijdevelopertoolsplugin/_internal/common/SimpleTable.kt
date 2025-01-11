@@ -12,6 +12,7 @@ import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.ColumnInfo
 import com.intellij.util.ui.ListTableModel
 import com.intellij.util.ui.UIUtil
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
 import java.awt.Dimension
 import javax.swing.ListSelectionModel
 import javax.swing.SortOrder

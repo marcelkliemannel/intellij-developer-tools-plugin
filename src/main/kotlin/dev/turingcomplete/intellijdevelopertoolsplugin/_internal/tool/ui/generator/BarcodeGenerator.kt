@@ -47,16 +47,9 @@ import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
 import com.intellij.util.ui.JBUI
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValidateMinIntValueSide
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.allowUiDslLabel
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toJBColor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.validateLongValue
@@ -64,6 +57,12 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.validate
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.LEVEL_BITS
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.LEVEL_ENUM_NAME
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.UNSUPPORTED
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolPresentation
 import java.awt.Container
 import java.awt.Graphics
 import java.lang.Integer.toHexString
@@ -175,7 +174,6 @@ internal class BarcodeGenerator private constructor(
       cell(ScrollPaneFactory.createScrollPane(drawPanel, true))
         .label("Generated image:", LabelPosition.TOP)
         .align(AlignY.TOP)
-        .applyToComponent { allowUiDslLabel(this) }
     }.visibleIf(contentErrorHolder.asComponentPredicate().not()).resizableRow()
   }
 
@@ -212,7 +210,7 @@ internal class BarcodeGenerator private constructor(
         formatConfiguration.createHints()
       )
       drawPanel.matrix.set(newMatrix)
-    } catch (e: NumberFormatException) {
+    } catch (_: NumberFormatException) {
       contentErrorHolder.add("Input must be a number")
     } catch (e: Exception) {
       contentErrorHolder.add(e)

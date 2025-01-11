@@ -11,10 +11,6 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.layout.ComboBoxPredicate
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValidateMinIntValueSide.MAX
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValidateMinIntValueSide.MIN
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.bindIntTextImproved
@@ -23,6 +19,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.validate
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.LoremIpsumGenerator.TextMode.BULLETS
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.LoremIpsumGenerator.TextMode.PARAGRAPHS
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.LoremIpsumGenerator.TextMode.WORDS
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolPresentation
 import java.security.SecureRandom
 import kotlin.math.max
 import kotlin.math.min

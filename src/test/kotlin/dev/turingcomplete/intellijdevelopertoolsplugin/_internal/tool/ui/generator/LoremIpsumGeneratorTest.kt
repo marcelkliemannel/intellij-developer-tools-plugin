@@ -1,8 +1,8 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator
 
 import com.intellij.testFramework.junit5.TestApplication
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource

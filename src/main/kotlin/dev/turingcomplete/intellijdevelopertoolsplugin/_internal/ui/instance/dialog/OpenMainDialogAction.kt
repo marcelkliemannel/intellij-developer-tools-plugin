@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAwareAction
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.safeCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.safeCastTo
 
 class OpenMainDialogAction : DumbAwareAction() {
   // -- Properties -------------------------------------------------------------------------------------------------- //

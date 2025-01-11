@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 private const val OBJECT_MAPPER_INDENT = "  "
 private val indenter = DefaultIndenter(OBJECT_MAPPER_INDENT, System.lineSeparator())
 private val prettyPrinter = DefaultPrettyPrinter()
-  .withoutSpacesInObjectEntries()
   .withObjectIndenter(indenter)
   .withArrayIndenter(indenter)
 val objectMapper: ObjectMapper = ObjectMapper()

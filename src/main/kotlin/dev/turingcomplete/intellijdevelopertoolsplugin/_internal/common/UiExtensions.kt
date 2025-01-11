@@ -10,6 +10,7 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.JBColor
 import com.intellij.ui.UIBundle
 import com.intellij.ui.components.JBLabel
@@ -17,7 +18,7 @@ import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Cell
-import com.intellij.ui.dsl.builder.DslComponentProperty
+import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.tabs.TabInfo
 import com.intellij.util.ui.JBEmptyBorder
@@ -77,7 +78,7 @@ fun Cell<JBTextField>.validateBigDecimalValue(
     }
     val value: BigDecimal? = try {
       toBigDecimal(this@validateBigDecimalValue.component.text)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
       return@validationInfo error("Please enter a valid number")
     }
     when {
@@ -204,10 +205,6 @@ fun JComponent.wrapWithToolBar(actionEventPlace: String, actions: ActionGroup, t
   }
 }
 
-fun JComponent.allowUiDslLabel(component: JComponent = this) {
-  putClientProperty(DslComponentProperty.LABEL_FOR, component)
-}
-
 fun JTable.setContextMenu(place: String, actionGroup: ActionGroup) {
   val mouseAdapter = object : MouseAdapter() {
 
@@ -241,6 +238,12 @@ fun Cell<JLabel>.monospaceFont(scale: Float = 1.0f, style: Int = Font.PLAIN) = t
 fun EditorEx.setLanguage(language: Language) {
   val syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(language, project, null)
   highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(syntaxHighlighter, EditorColorsManager.getInstance().globalScheme)
+}
+
+fun Row.hyperLink(title: String, url: String) {
+  cell(HyperlinkLabel(title).apply {
+    setHyperlinkTarget(url)
+  })
 }
 
 fun Color.toJBColor() = this as? JBColor ?: JBColor(this, this)

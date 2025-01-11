@@ -9,11 +9,11 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.psi.PsiFile
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.executeWriteCommand
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.DataGenerators.DataGenerator
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.DataGenerators.DataGeneratorBase
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.DataGenerators.DataGeneratorsGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.DataGenerators.dataGenerators
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.executeWriteCommand
 
 internal class DataGeneratorIntentionAction : IntentionAction, LowPriorityAction {
   // -- Properties -------------------------------------------------------------------------------------------------- //

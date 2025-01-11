@@ -3,10 +3,10 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings.DeveloperToolsInstanceSettings
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolPresentation
 
 internal class DeveloperToolNode(
   private val developerToolId: String,

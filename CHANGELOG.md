@@ -4,11 +4,15 @@
 
 ### Added
 
+- Tool "Regular Expression" now supports substitution and extraction
+
 ### Changed
 
 ### Removed
 
 ### Fixed
+
+- Overhaul of the internal plugin structure to fix compatibility with non-IntelliJ IDEs
 
 ## 6.2.2 - 2025-01-08
 

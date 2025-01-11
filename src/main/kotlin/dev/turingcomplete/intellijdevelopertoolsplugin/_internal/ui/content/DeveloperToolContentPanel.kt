@@ -20,7 +20,6 @@ import com.intellij.ui.tabs.TabInfo
 import com.intellij.ui.tabs.TabsListener
 import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.components.BorderLayoutPanel
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.NotBlankInputValidator
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.dumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.castedObject
@@ -30,6 +29,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.han
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.DeveloperToolNode
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu.DeveloperToolNode.DeveloperToolContainer
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiTool
 import javax.swing.Icon
 import javax.swing.JComponent
 import kotlin.reflect.cast

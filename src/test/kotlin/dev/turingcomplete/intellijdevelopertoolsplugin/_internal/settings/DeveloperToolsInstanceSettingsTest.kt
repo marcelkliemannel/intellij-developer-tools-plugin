@@ -2,6 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.settings
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.junit5.RunInEdt
@@ -9,13 +10,14 @@ import com.intellij.testFramework.junit5.RunMethodInEdt
 import com.intellij.testFramework.junit5.TestApplication
 import com.intellij.ui.JBColor
 import com.intellij.util.application
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperUiToolFactoryEp
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -24,9 +26,6 @@ import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.ZoneId
 import java.util.*
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 import kotlin.random.Random
 
 @RunInEdt(allMethods = false)
@@ -139,41 +138,43 @@ class DeveloperToolsInstanceSettingsTest {
 
     // Expect: All configurations (with properties) have been persisted
     assertThat(settings.getState().developerToolsConfigurations)
-      .hasSize(developerUiTools.filter { settings.getDeveloperToolConfigurations(it.key.id)[0].properties.isNotEmpty() }.size)
+      .hasSize(developerUiTools.filter {
+        settings.getDeveloperToolConfigurations(it.developerToolFactoryEp.id)[0].properties.isNotEmpty()
+      }.size)
   }
 
   private fun resetAllConfigurations(
-    developerUiTools: Map<DeveloperUiToolFactoryEp<*>, DeveloperUiTool>,
+    developerUiTools: List<DeveloperUiToolWrapper<*>>,
     settings: DeveloperToolsInstanceSettings,
     loadExamples: Boolean
   ) {
-    developerUiTools.forEach { (developerUiToolEp, _) ->
+    developerUiTools.forEach { (developerUiToolEp, _, _) ->
       settings.getDeveloperToolConfigurations(developerUiToolEp.id).forEach {
-        ApplicationManager.getApplication().invokeAndWait {
+        ApplicationManager.getApplication().invokeAndWait({
           it.reset(null, loadExamples)
-        }
+        }, ModalityState.any())
       }
     }
   }
 
   private fun modifyAllConfigurationProperties(
-    developerUiTools: Map<DeveloperUiToolFactoryEp<*>, DeveloperUiTool>,
+    developerUiTools: List<DeveloperUiToolWrapper<*>>,
     settings: DeveloperToolsInstanceSettings,
     modify: (DeveloperToolConfiguration.PropertyContainer) -> Unit
   ) {
     developerUiTools.forEach { (developerUiToolEp, _) ->
       settings.getDeveloperToolConfigurations(developerUiToolEp.id).forEach {
-        ApplicationManager.getApplication().invokeAndWait {
+        ApplicationManager.getApplication().invokeAndWait({
           it.properties.values.forEach { property ->
             modify(property)
           }
-        }
+        }, ModalityState.any())
       }
     }
   }
 
-  private fun instantiateAllDeveloperUiTools(settings: DeveloperToolsInstanceSettings): Map<DeveloperUiToolFactoryEp<*>, DeveloperUiTool> {
-    val developerUiTools = mutableMapOf<DeveloperUiToolFactoryEp<*>, DeveloperUiTool>()
+  private fun instantiateAllDeveloperUiTools(settings: DeveloperToolsInstanceSettings): List<DeveloperUiToolWrapper<*>> {
+    val developerUiTools = mutableListOf<DeveloperUiToolWrapper<*>>()
 
     DeveloperUiToolFactoryEp.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
       val developerUiToolFactory: DeveloperUiToolFactory<*> = developerToolFactoryEp.createInstance(application)
@@ -184,11 +185,18 @@ class DeveloperToolsInstanceSettingsTest {
         ?.invoke(developerToolConfiguration)
       if (developerUiTool != null) {
         developerToolConfiguration.wasConsumedByDeveloperTool = true
-        ApplicationManager.getApplication().invokeAndWait {
+        ApplicationManager.getApplication().invokeAndWait({
           developerUiTool.createComponent()
           developerUiTool.activated()
-        }
-        developerUiTools[developerToolFactoryEp] = developerUiTool
+        }, ModalityState.any())
+        developerUiTools.add(DeveloperUiToolWrapper(
+          developerToolFactoryEp = developerToolFactoryEp,
+          developerUiTool = developerUiTool,
+          developerToolConfiguration = developerToolConfiguration
+        ))
+      }
+      else {
+        fail("No instance of tool was created: ${developerToolFactoryEp.id}")
       }
     }
 
@@ -197,6 +205,13 @@ class DeveloperToolsInstanceSettingsTest {
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
+
+  private data class DeveloperUiToolWrapper<T : DeveloperUiTool>(
+    val developerToolFactoryEp: DeveloperUiToolFactoryEp<out DeveloperUiToolFactory<*>>,
+    val developerUiTool: T,
+    val developerToolConfiguration: DeveloperToolConfiguration
+  )
+
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 
   companion object {

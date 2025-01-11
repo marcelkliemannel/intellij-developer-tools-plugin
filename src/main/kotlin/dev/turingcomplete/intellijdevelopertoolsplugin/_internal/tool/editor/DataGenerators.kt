@@ -3,6 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils
 import com.fasterxml.uuid.Generators
 import com.github.f4b6a3.ulid.UlidCreator
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.HashingUtils
 import org.jetbrains.annotations.Nls
 import java.time.Instant
 import java.time.ZoneId

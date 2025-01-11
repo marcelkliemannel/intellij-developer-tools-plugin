@@ -12,10 +12,6 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ErrorHolder
@@ -23,6 +19,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.Property
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.TextConverter.ActiveInput.SOURCE
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.TextConverter.ActiveInput.TARGET
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
 
 internal abstract class TextConverter(
   protected val textConverterContext: TextConverterContext,
@@ -161,7 +161,7 @@ internal abstract class TextConverter(
     doConversion {
       try {
         toTarget(text)
-      } catch (ignore: Exception) {
+      } catch (_: Exception) {
       }
     }
   }
@@ -170,7 +170,7 @@ internal abstract class TextConverter(
     doConversion {
       try {
         toSource(text)
-      } catch (ignore: Exception) {
+      } catch (_: Exception) {
       }
     }
   }

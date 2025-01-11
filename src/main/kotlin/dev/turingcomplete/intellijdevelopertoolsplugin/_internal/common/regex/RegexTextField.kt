@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.LanguageTextField
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.allowUiDslLabel
 import org.intellij.lang.regexp.RegExpLanguage
 import org.intellij.lang.regexp.intention.CheckRegExpForm
 import java.lang.Boolean.TRUE
@@ -20,6 +19,9 @@ class RegexTextField(
 ) : LanguageTextField(RegExpLanguage.INSTANCE, project, textProperty.get(), true) {
 
   // -- Properties -------------------------------------------------------------------------------------------------- //
+
+  private var onTextChangeFromUi = mutableListOf<((String) -> Unit)>()
+
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
@@ -28,17 +30,22 @@ class RegexTextField(
 
     addDocumentListener(object : DocumentListener {
       override fun documentChanged(event: DocumentEvent) {
-        textProperty.set(event.document.text, TEXT_PROPERTY_CHANGE_ID)
+        val text = event.document.text
+        textProperty.set(text, TEXT_PROPERTY_CHANGE_ID)
+        onTextChangeFromUi.forEach { it(text) }
       }
     })
-
-    allowUiDslLabel(this.component)
 
     textProperty.afterChangeConsumeEvent(parentDisposable) { event ->
       if (event.newValue != event.oldValue && event.id != TEXT_PROPERTY_CHANGE_ID) {
         text = event.newValue
       }
     }
+  }
+
+  fun onTextChangeFromUi(changeListener: ((String) -> Unit)): RegexTextField {
+    onTextChangeFromUi.add(changeListener)
+    return this
   }
 
   override fun onEditorAdded(editor: Editor) {

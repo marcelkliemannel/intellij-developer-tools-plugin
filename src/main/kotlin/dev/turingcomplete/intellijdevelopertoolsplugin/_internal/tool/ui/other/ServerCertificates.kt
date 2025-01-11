@@ -17,8 +17,10 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.ui.HyperlinkAdapter
 import com.intellij.ui.HyperlinkLabel
+import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.BottomGap
@@ -30,21 +32,21 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.text.DateFormatUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.CONFIGURATION
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.AnActionOptionButton
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.DeveloperToolEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.OkHttpClientUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.OkHttpClientUtils.applyIntelliJProxySettings
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.createPopup
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.copyable
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.message.UiToolsBundle
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.safeCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration.PropertyType.CONFIGURATION
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolPresentation
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.awt.datatransfer.StringSelection
@@ -63,7 +65,6 @@ import java.security.cert.X509Certificate
 import java.util.*
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
-import javax.net.ssl.SSLHandshakeException
 import javax.net.ssl.TrustManager
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
@@ -175,7 +176,7 @@ class ServerCertificates(
         buildCertificatesExportUi(httpResponse.certificates)
 
         httpResponse.certificates.forEachIndexed { index, certificate ->
-          group("Server Certificate ${index + 1}", false) {
+          group(UiToolsBundle.message("server-certificates.certificate-title", index + 1), false) {
             if (certificate is X509Certificate) {
               buildCertificatePropertiesUi(certificate)
               buildCertificateValidityUi(certificate)
@@ -495,7 +496,7 @@ class ServerCertificates(
           ).resizableColumn().align(Align.FILL)
         }.resizableRow()
       }
-      createPopup(content).showInCenterOf(parentComponent())
+      createPopup(content).show(RelativePoint.getSouthOf(parentComponent()), Balloon.Position.below)
     }
   }
 
@@ -572,7 +573,7 @@ class ServerCertificates(
             ?: throw IllegalStateException("Default trust manager not available")
           defaultX509TrustManager.checkServerTrusted(chain, authType)
         } catch (e: Exception) {
-          throw SSLHandshakeException("Failed to validate server certificate: ${e.message}", e)
+          throw IllegalStateException("Failed to validate server certificate: ${e.message}", e)
         }
       }
     }

@@ -69,7 +69,7 @@ class ErrorHolder(
    * Creates a [ObservableMutableProperty] that will return an empty string if
    * there is no error.
    *
-   * The `set()` operation is not supported but a [com.intellij.ui.dsl.builder.Row.text]
+   * The `set()` operation is not supported, but a [com.intellij.ui.dsl.builder.Row.text]
    * requires [ObservableMutableProperty] and not only a
    * [com.intellij.openapi.observable.properties.ObservableProperty].
    */

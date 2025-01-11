@@ -19,16 +19,16 @@ import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.util.ui.JBUI
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.NotBlankInputValidator
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toJBColor
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolPresentation
 import java.awt.Color
 import java.util.*
 import javax.swing.border.LineBorder
@@ -159,7 +159,7 @@ class ColorPicker(
     Messages.showErrorDialog(project, e.message, PARSE_CSS_VALUE_DIALOG_TITLE)
     null
   }
-  catch (e: Exception) {
+  catch (_: Exception) {
     Messages.showErrorDialog(project, "Unable to parse input value.", PARSE_CSS_VALUE_DIALOG_TITLE)
     null
   }

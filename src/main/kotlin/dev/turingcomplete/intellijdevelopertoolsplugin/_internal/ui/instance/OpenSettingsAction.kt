@@ -2,6 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance
 
 import com.intellij.CommonBundle
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.ActionUiKind
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
@@ -33,7 +34,8 @@ class OpenSettingsAction : DumbAwareAction(
     fun openSettings(project: Project?) {
       val openSettingsAction = OpenSettingsAction()
       val dataContext = DataContext { if (CommonDataKeys.PROJECT.`is`(it)) project else null }
-      ActionUtil.invokeAction(openSettingsAction, dataContext, OpenSettingsAction::class.java.name, null, null)
+      val event = AnActionEvent.createEvent(openSettingsAction, dataContext, null, OpenSettingsAction::class.java.name, ActionUiKind.NONE, null)
+      ActionUtil.invokeAction(openSettingsAction, event, null)
     }
   }
 }

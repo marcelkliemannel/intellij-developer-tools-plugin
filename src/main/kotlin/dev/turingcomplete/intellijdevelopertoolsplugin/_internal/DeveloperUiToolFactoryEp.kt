@@ -4,7 +4,7 @@ import com.intellij.openapi.extensions.CustomLoadingExtensionPointBean
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.extensions.RequiredElement
 import com.intellij.util.xmlb.annotations.Attribute
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
 
 class DeveloperUiToolFactoryEp<T : DeveloperUiToolFactory<*>> : CustomLoadingExtensionPointBean<T>() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
