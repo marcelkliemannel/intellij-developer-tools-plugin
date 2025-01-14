@@ -5,7 +5,6 @@ import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.COMPATIBILITY_PROBLEMS
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INTERNAL_API_USAGES
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INVALID_PLUGIN
-import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.MISSING_DEPENDENCIES
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.NON_EXTENDABLE_API_USAGES
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.OVERRIDE_ONLY_API_USAGES
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -68,6 +67,7 @@ allprojects {
 
     withType<Test> {
       useJUnitPlatform()
+      systemProperty("java.awt.headless", "false")
     }
   }
 }
@@ -150,7 +150,7 @@ intellijPlatform {
         COMPATIBILITY_PROBLEMS, INTERNAL_API_USAGES, NON_EXTENDABLE_API_USAGES,
         OVERRIDE_ONLY_API_USAGES, INVALID_PLUGIN,
         // Will fail for non-IC IDEs
-        MISSING_DEPENDENCIES
+        //MISSING_DEPENDENCIES
       )
     )
 
@@ -193,6 +193,8 @@ sourceSets {
 
 tasks {
   named("publishPlugin") {
+    dependsOn("check")
+
     doFirst {
       check(platform == "IC") { "Expected platform 'IC', but was: '$platform'" }
     }
@@ -200,10 +202,6 @@ tasks {
 
   named("buildSearchableOptions") {
     enabled = false
-  }
-
-  withType<Test> {
-    systemProperty("java.awt.headless", "false")
   }
 
   named<RunIdeTask>("runIde") {

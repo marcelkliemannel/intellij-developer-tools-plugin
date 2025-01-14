@@ -8,7 +8,7 @@ dependencies {
 
   testImplementation(libs.assertj.core)
   testImplementation(libs.bundles.junit.implementation)
-  testImplementation(libs.bundles.junit.runtime)
+  testRuntimeOnly(libs.bundles.junit.runtime)
 
   testFixturesImplementation(libs.assertj.core)
   testFixturesImplementation(libs.bundles.junit.implementation)
