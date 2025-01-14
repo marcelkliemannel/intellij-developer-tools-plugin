@@ -5,7 +5,6 @@ import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.COMPATIBILITY_PROBLEMS
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INTERNAL_API_USAGES
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INVALID_PLUGIN
-import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.MISSING_DEPENDENCIES
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.NON_EXTENDABLE_API_USAGES
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.OVERRIDE_ONLY_API_USAGES
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -15,84 +14,112 @@ fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
   java
-  // See bundled version: https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-  kotlin("jvm") version "2.0.21"
-  id("org.jetbrains.intellij.platform") version "2.2.1"
-  id("org.jetbrains.changelog") version "2.2.0"
+  alias(libs.plugins.kotlin.jvm)
+  alias(libs.plugins.intellij.platform)
+  alias(libs.plugins.changelog)
 }
 
-group = properties("pluginGroup")
-version = properties("pluginVersion")
+subprojects {
+  apply(plugin = "org.jetbrains.intellij.platform.module")
+}
 
-repositories {
-  mavenLocal()
+val platform = properties("platform")
 
-  mavenCentral()
+allprojects {
+  apply(plugin = "java")
+  apply(plugin = "kotlin")
 
-  intellijPlatform {
-    defaultRepositories()
+  group = properties("pluginGroup")
+  version = properties("pluginVersion")
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+
+    intellijPlatform {
+      defaultRepositories()
+    }
+  }
+
+  dependencies {
+    intellijPlatform {
+      create(platform, properties("platformVersion"), false)
+      bundledPlugins(properties("platformGlobalBundledPlugins").split(','))
+
+      testFramework(TestFrameworkType.Platform)
+      testFramework(TestFrameworkType.JUnit5)
+    }
+  }
+
+  java {
+    toolchain {
+      languageVersion.set(JavaLanguageVersion.of(21))
+    }
+  }
+
+  tasks {
+    withType<KotlinCompile> {
+      compilerOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict")
+        jvmTarget.set(JvmTarget.JVM_21)
+      }
+    }
+
+    withType<Test> {
+      useJUnitPlatform()
+      systemProperty("java.awt.headless", "false")
+    }
   }
 }
 
 dependencies {
   intellijPlatform {
-    create(properties("platform"), properties("platformVersion"), false)
-
-    bundledPlugins(properties("platformBundledPlugins").split(','))
-
     pluginVerifier()
     zipSigner()
 
-    testFramework(TestFrameworkType.Platform)
-    testFramework(TestFrameworkType.JUnit5)
+    pluginModule(project(":common"))
+    if (platform == "IC") {
+      pluginModule(project(":java-dependent"))
+      pluginModule(project(":kotlin-dependent"))
+    }
   }
 
-  implementation("com.fasterxml.uuid:java-uuid-generator:5.0.0") {
+  implementation(libs.bundles.jackson)
+  implementation(libs.uuid.generator) {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
-  implementation("com.jayway.jsonpath:json-path:2.9.0") {
+  implementation(libs.jsonpath) {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
-  val jacksonVersion = "2.17.0"
-  implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
-  implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-properties:$jacksonVersion")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:$jacksonVersion")
-  implementation("com.github.tony19:named-regexp:1.0.0")
-  implementation("org.apache.commons:commons-text:1.10.0")
-  implementation("commons-codec:commons-codec:1.15")
-  val textCaseConverterVersion = "2.0.0"
-  implementation("dev.turingcomplete:text-case-converter:$textCaseConverterVersion")
-  implementation("dev.turingcomplete:text-case-converter-kotlin-extension:$textCaseConverterVersion")
-  implementation("com.github.vertical-blank:sql-formatter:2.0.4")
-  implementation(kotlin("stdlib"))
-  implementation("com.networknt:json-schema-validator:1.4.0") {
+  implementation(libs.json.schema.validator) {
     exclude("org.apache.commons", "commons-lang3")
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
-  implementation("org.apache.commons:commons-compress:1.26.0")
-  val zxing = "3.5.3"
-  implementation("com.google.zxing:core:$zxing")
-  implementation("com.google.zxing:javase:$zxing")
-  implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
-  implementation("com.github.f4b6a3:ulid-creator:5.2.3")
-  implementation("org.silentsoft:csscolor4j:1.0.0")
-  implementation("commons-io:commons-io:2.15.1")
-  implementation("org.bitbucket.b_c:jose4j:0.9.6") {
+  implementation(libs.commons.text)
+  implementation(libs.commons.codec)
+  implementation(libs.commons.io)
+  implementation(libs.commons.compress)
+  implementation(libs.ulid.creator)
+  implementation(libs.csscolor4j)
+  implementation(libs.okhttp)
+  implementation(libs.jfiglet)
+  implementation(libs.jnanoid)
+  implementation(libs.jose4j) {
     exclude(group = "org.slf4j", module = "slf4j-api")
   }
-  implementation("com.squareup.okhttp3:okhttp:4.12.0")
-  implementation("com.github.lalyos:jfiglet:0.0.9")
+  implementation(libs.named.regexp)
+  implementation(libs.sql.formatter)
+  implementation(libs.bundles.zxing)
+  implementation(libs.bundles.text.case.converter)
 
-  testImplementation("org.assertj:assertj-core:3.25.3")
-  val junitVersion = "5.10.2"
-  testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-  testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
-  // This is a workaround, see: https://youtrack.jetbrains.com/issue/IJPL-159134/JUnit5-Test-Framework-refers-to-JUnit4-java.lang.NoClassDefFoundError-junit-framework-TestCase
-  testRuntimeOnly("junit:junit:4.13.2")
+  testImplementation(libs.assertj.core)
+  testImplementation(libs.bundles.junit.implementation)
+  testRuntimeOnly(libs.bundles.junit.runtime)
+  // Required for the PSI Kotlin structure in tests. It needs to be compile-only
+  // as some parts are clashing with the IntelliJ platform dependency and
+  // causing the tests initialisation to fail.
+  testCompileOnly(libs.kotlin.compiler)
+  testImplementation(testFixtures(project(":common")))
 }
 
 intellijPlatform {
@@ -113,7 +140,6 @@ intellijPlatform {
   }
 
   publishing {
-    //        dependsOn("patchChangelog")
     token.set(project.provider { properties("jetbrains.marketplace.token") })
     channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
   }
@@ -122,12 +148,18 @@ intellijPlatform {
     failureLevel.set(
       listOf(
         COMPATIBILITY_PROBLEMS, INTERNAL_API_USAGES, NON_EXTENDABLE_API_USAGES,
-        OVERRIDE_ONLY_API_USAGES, MISSING_DEPENDENCIES, INVALID_PLUGIN
+        OVERRIDE_ONLY_API_USAGES, INVALID_PLUGIN,
+        // Will fail for non-IC IDEs
+        //MISSING_DEPENDENCIES
       )
     )
 
     ides {
       recommended()
+
+      properties("pluginVerificationAdditionalIdes").split(",").forEach { ide ->
+        ide(ide, properties("platformVersion"))
+      }
     }
   }
 }
@@ -140,13 +172,14 @@ changelog {
 }
 
 val writeChangelogToFileTask = tasks.create("writeChangelogToFile") {
-  outputs.dir("${layout.buildDirectory}/generated-resources/changelog")
+  val generatedResourcesDir = layout.buildDirectory.dir("generated-resources/changelog").get()
+  outputs.dir(generatedResourcesDir)
 
   doLast {
     val renderResult = changelog.instance.get().releasedItems.joinToString("\n") { changelog.renderItem(it, Changelog.OutputType.HTML) }
-    val baseDir = "${layout.buildDirectory}/generated-resources/changelog/dev/turingcomplete/intellijdevelopertoolsplugin"
+    val baseDir = generatedResourcesDir.dir("dev/turingcomplete/intellijdevelopertoolsplugin")
     file(baseDir).mkdirs()
-    file("${baseDir}/changelog.html").writeText(renderResult)
+    file(baseDir.file("changelog.html")).writeText(renderResult)
   }
 }
 
@@ -158,26 +191,17 @@ sourceSets {
   }
 }
 
-java {
-  sourceCompatibility = JavaVersion.VERSION_21
-  targetCompatibility = JavaVersion.VERSION_21
-}
-
 tasks {
-  withType<KotlinCompile> {
-    compilerOptions {
-      freeCompilerArgs = listOf("-Xjsr305=strict")
-      jvmTarget.set(JvmTarget.JVM_21)
+  named("publishPlugin") {
+    dependsOn("check")
+
+    doFirst {
+      check(platform == "IC") { "Expected platform 'IC', but was: '$platform'" }
     }
   }
 
   named("buildSearchableOptions") {
     enabled = false
-  }
-
-  withType<Test> {
-    useJUnitPlatform()
-    systemProperty("java.awt.headless", "false")
   }
 
   named<RunIdeTask>("runIde") {

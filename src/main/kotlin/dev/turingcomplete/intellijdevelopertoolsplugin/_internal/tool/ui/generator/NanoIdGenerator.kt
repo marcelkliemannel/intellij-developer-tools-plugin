@@ -3,10 +3,10 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.genera
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolPresentation
 
 internal class NanoIdGenerator(
   project: Project?,

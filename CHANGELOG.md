@@ -10,6 +10,16 @@
 
 ### Fixed
 
+## 6.3.0 - 2025-01-14
+
+### Added
+
+- Tool "Regular Expression" now supports substitution and extraction
+
+### Fixed
+
+- Tool "ASCII Art" was not accessible with non-IntelliJ IDEs
+
 ## 6.2.2 - 2025-01-08
 
 ### Fixed

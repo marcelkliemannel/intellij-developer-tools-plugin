@@ -6,11 +6,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.DumbAwareAction
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.executeWriteCommand
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.DataGenerators.DataGenerator
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.DataGenerators.DataGeneratorBase
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.DataGenerators.DataGeneratorsGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.DataGenerators.dataGenerators
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.executeWriteCommand
 
 internal class DataGeneratorActionGroup : DefaultActionGroup("Insert Generated Data", true) {
   // -- Properties -------------------------------------------------------------------------------------------------- //

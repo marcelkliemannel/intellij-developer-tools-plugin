@@ -2,34 +2,34 @@
   <extensions defaultExtensionNs="com.intellij">
     <intentionAction>
       <language>JAVA</language>
-      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.TextCaseConverterJavaCodeIntentionAction</className>
+      <className>dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.editor.intention.TextCaseConverterJavaCodeIntentionAction</className>
       <bundleName>messages.JavaBundle</bundleName>
       <categoryKey>intention.category.declaration</categoryKey>
     </intentionAction>
     <intentionAction>
       <language>JAVA</language>
-      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.EncodeDecodeJavaCodeIntentionAction</className>
+      <className>dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.editor.intention.EncodeDecodeJavaCodeIntentionAction</className>
       <bundleName>messages.JavaBundle</bundleName>
       <categoryKey>intention.category.declaration</categoryKey>
     </intentionAction>
     <intentionAction>
       <language>JAVA</language>
-      <className>dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.intention.EscapeUnescapeJavaCodeIntentionAction</className>
+      <className>dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.editor.intention.EscapeUnescapeJavaCodeIntentionAction</className>
       <bundleName>messages.JavaBundle</bundleName>
       <categoryKey>intention.category.declaration</categoryKey>
     </intentionAction>
   </extensions>
   <actions>
     <group id="EncoderDecoderJavaLiteralActionGroup"
-           class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncodeDecodeJavaCodeActionGroup">
+           class="dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.editor.action.EncodeDecodeJavaCodeActionGroup">
       <add-to-group group-id="DeveloperToolsGroup"/>
     </group>
     <group id="EscapeUnescapeJavaCodeActionGroup"
-           class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EscapeUnescapeJavaCodeActionGroup">
+           class="dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.editor.action.EscapeUnescapeJavaCodeActionGroup">
       <add-to-group group-id="DeveloperToolsGroup"/>
     </group>
     <group id="TextCaseConverterJavaLiteralActionGroup"
-            class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.TextCaseConverterJavaCodeActionGroup">
+            class="dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.editor.action.TextCaseConverterJavaCodeActionGroup">
       <add-to-group group-id="DeveloperToolsGroup"/>
     </group>
   </actions>

@@ -12,12 +12,12 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer.Companion.ALL_AVAILABLE_LOCALES
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.validateLongValue
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
 import java.math.BigDecimal
 import java.math.MathContext
 import java.text.DecimalFormat

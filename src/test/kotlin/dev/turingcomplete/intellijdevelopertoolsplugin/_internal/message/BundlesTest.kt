@@ -10,7 +10,7 @@ import com.intellij.testFramework.junit5.RunInEdt
 import com.intellij.testFramework.junit5.RunMethodInEdt
 import com.intellij.testFramework.junit5.TestApplication
 import org.assertj.core.api.Assertions.assertThat
-import org.jetbrains.kotlin.idea.codeinsight.utils.callExpression
+import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
@@ -64,7 +64,7 @@ class BundlesTest {
       }
 
       val className = receiver.getReferencedName()
-      val callExpression = ktDotQualifiedExpression.callExpression
+      val callExpression = ktDotQualifiedExpression.selectorExpression as? KtCallExpression
       val methodName = callExpression?.calleeExpression?.text
       if (methodName != "message") {
         return@forEach
@@ -75,7 +75,7 @@ class BundlesTest {
       println("Check message: $messageKey")
       val message = findMessage(className, messageKey)
       assertThat(message).describedAs("Message key: $messageKey").isNotNull
-      assertThat(countUniqueParameters(message!!)).describedAs("Message parameters of key: $messageKey").isEqualTo(parameters.size - 1)
+      assertThat(parameters.size - 1).describedAs("Message parameters of key: $messageKey").isEqualTo(countUniqueParameters(message!!))
     }
   }
 
@@ -111,7 +111,7 @@ class BundlesTest {
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun countUniqueParameters(message: String): Int =
-    Regex("\\{(\\d+)}").findAll(message).map { it.groupValues[1].toInt() }.toSet().size
+    Regex("(?<!\\\$)\\{(\\d+)}").findAll(message).map { it.groupValues[1].toInt() }.toSet().size
 
   private fun KtFile.allKtDotQualifiedExpression(): List<KtDotQualifiedExpression> {
     val methodCalls = mutableListOf<KtDotQualifiedExpression>()

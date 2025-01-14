@@ -95,7 +95,6 @@
   <!-- must be declared in the main `plugin.xml´, see `KotlinK2ModeCompatibilityCheckerKt` -->
   <extensions defaultExtensionNs="org.jetbrains.kotlin">
     <supportsKotlinPluginMode supportsK2="true"/>
-    <supportsKotlinK2Mode/>
   </extensions>
 
   <extensionPoints>
@@ -103,10 +102,10 @@
                     beanClass="dev.turingcomplete.intellijdevelopertoolsplugin._internal.DeveloperUiToolFactoryEp"
                     dynamic="true">
       <with attribute="implementationClass"
-            implements="dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory"/>
+            implements="dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory"/>
     </extensionPoint>
     <extensionPoint name="developerUiToolGroup"
-                    beanClass="dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolGroup"
+                    beanClass="dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolGroup"
                     dynamic="true">
     </extensionPoint>
   </extensionPoints>
@@ -327,13 +326,13 @@
              class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.DataGeneratorActionGroup"/>
 
       <group id="TextCaseConverterActionGroup"
-             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.TextCaseConverterActionGroup"/>
+             class="dev.turingcomplete.intellijdevelopertoolsplugin.common.tool.editor.action.TextCaseConverterActionGroup"/>
 
       <group id="EncodeDecodeActionGroup"
-             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EncodeDecodeActionGroup"/>
+             class="dev.turingcomplete.intellijdevelopertoolsplugin.common.tool.editor.action.EncodeDecodeActionGroup"/>
 
       <group id="EscapeUnescapeActionGroup"
-             class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EscapeUnescapeActionGroup"/>
+             class="dev.turingcomplete.intellijdevelopertoolsplugin.common.tool.editor.action.EscapeUnescapeActionGroup"/>
 
       <action id="EditorTextStatisticAction"
               class="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.editor.action.EditorTextStatisticAction"/>

@@ -31,11 +31,6 @@ import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.ComboBoxPredicate
 import com.intellij.util.Alarm
 import com.intellij.util.text.OrdinalFormat.formatEnglish
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.LocaleContainer.Companion.ALL_AVAILABLE_LOCALES
@@ -54,6 +49,11 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.convert
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.UNIX_TIMESTAMP_MILLIS
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.UNIX_TIMESTAMP_SECONDS
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter.ConversionOrigin.YEAR
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolPresentation
 import java.awt.Font
 import java.time.Duration
 import java.time.Instant
@@ -261,7 +261,7 @@ class DatetimeConverter(
                     DateTimeFormatter.ofPattern(it.text)
                   }
                   return@validationInfo null
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                   return@validationInfo ValidationInfo("Invalid individual format", it)
                 }
               }

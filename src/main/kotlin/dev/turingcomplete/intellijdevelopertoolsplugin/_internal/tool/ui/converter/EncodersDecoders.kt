@@ -2,12 +2,12 @@ package dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.conver
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.decodeFromAscii
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.encodeToAscii
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.decodeFromAscii
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.encodeToAscii
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolPresentation
 import org.apache.commons.codec.binary.Base32
 import java.net.URLDecoder
 import java.net.URLEncoder

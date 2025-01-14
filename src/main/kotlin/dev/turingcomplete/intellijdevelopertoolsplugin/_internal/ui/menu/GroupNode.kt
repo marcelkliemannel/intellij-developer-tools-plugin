@@ -1,6 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.menu
 
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolGroup
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolGroup
 
 internal class GroupNode(val developerUiToolGroup: DeveloperUiToolGroup) :
   ContentNode(

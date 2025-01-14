@@ -9,6 +9,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.PluginDescriptor
@@ -31,10 +32,17 @@ import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.lang.UrlClassLoader
 import com.intellij.util.ui.ColumnInfo
 import com.intellij.util.ui.ListTableModel
-import dev.turingcomplete.intellijdevelopertoolsplugin.*
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.*
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyValuesAction
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.PluginCommonDataKeys
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.simpleColumnInfo
-import org.jetbrains.kotlin.idea.util.application.executeOnPooledThread
+import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.setContextMenu
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.extension
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolPresentation
 import java.awt.Dimension
 import java.net.URLClassLoader
 import java.nio.file.Files
@@ -236,7 +244,7 @@ class IntelliJInternals(
       pluginDescriptors: List<IdeaPluginDescriptor>,
       callback: (List<VirtualFile>) -> Unit
     ) {
-      executeOnPooledThread {
+      ApplicationManager.getApplication().executeOnPooledThread {
         val virtualFileManager = VirtualFileManager.getInstance()
         val pluginDescriptorFiles = pluginDescriptors.flatMap { pluginDescriptor ->
           Files.list(pluginDescriptor.pluginPath.resolve("lib")).use { files ->

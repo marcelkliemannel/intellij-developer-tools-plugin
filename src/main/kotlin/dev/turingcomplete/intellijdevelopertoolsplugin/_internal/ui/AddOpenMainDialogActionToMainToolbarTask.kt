@@ -6,8 +6,8 @@ import com.intellij.openapi.actionSystem.Anchor
 import com.intellij.openapi.actionSystem.Constraints
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.IdeActions
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.dialog.OpenMainDialogAction
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.safeCastTo
 
 class AddOpenMainDialogActionToMainToolbarTask(
   private val openMainDialogAction: AnAction,

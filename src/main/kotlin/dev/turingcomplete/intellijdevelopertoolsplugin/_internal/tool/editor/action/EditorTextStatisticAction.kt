@@ -6,10 +6,10 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAwareAction
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.EditorUtils.getSelectedText
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextStatistic
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.TextStatistic.Companion
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolService
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedText
 
 internal class EditorTextStatisticAction : DumbAwareAction("Show Text Statistic of Document...") {
   // -- Properties -------------------------------------------------------------------------------------------------- //

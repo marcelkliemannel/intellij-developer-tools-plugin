@@ -66,28 +66,27 @@ import com.intellij.util.text.DateFormatUtil
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.ChangeListener
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration.ResetListener
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolFactory
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.NotificationUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.PluginCommonDataKeys.SELECTED_VALUES
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.createContextMenuMouseListener
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.UiUtils.createToggleAction
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.ValueProperty
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.compareTo
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.nameWithoutExtension
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.safeCastTo
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.Unarchiver.OpenUnarchiverContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolService
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.nameWithoutExtension
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.safeCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration.ChangeListener
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration.ResetListener
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperUiToolPresentation
 import io.ktor.util.*
 import org.apache.commons.compress.archivers.ArchiveEntry
 import org.apache.commons.compress.archivers.ArchiveInputStream
@@ -1363,8 +1362,8 @@ internal class Unarchiver(
     val comparator: Comparator<ArchiveNode>
   ) {
 
-    UNCOMPRESSED_SIZE_ASC("Uncompressed size (ascending)", { a, b -> a.totalUncompressedSize().compareTo(b.totalUncompressedSize()) }),
-    UNCOMPRESSED_SIZE_DESC("Uncompressed size (descending)", { a, b -> b.totalUncompressedSize().compareTo(a.totalUncompressedSize()) }),
+    UNCOMPRESSED_SIZE_ASC("Uncompressed size (ascending)", { a, b -> compareValues(a.totalUncompressedSize(), b.totalUncompressedSize()) }),
+    UNCOMPRESSED_SIZE_DESC("Uncompressed size (descending)", { a, b -> compareValues(b.totalUncompressedSize(), a.totalUncompressedSize()) }),
     FILENAME_ASC("Filename (ascending)", { a, b -> a.fileName.compareTo(b.fileName) }),
     FILENAME_DESC("Filename (descending)", { a, b -> b.fileName.compareTo(a.fileName) })
   }

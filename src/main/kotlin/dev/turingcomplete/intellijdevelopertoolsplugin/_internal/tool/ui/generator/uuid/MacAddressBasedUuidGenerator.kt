@@ -11,12 +11,12 @@ import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
-import dev.turingcomplete.intellijdevelopertoolsplugin.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.bind
-import dev.turingcomplete.intellijdevelopertoolsplugin._internal.common.toHexMacAddress
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.LOCAL_INTERFACE
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.RANDOM
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.toHexMacAddress
+import dev.turingcomplete.intellijdevelopertoolsplugin.main.DeveloperToolConfiguration
 import java.net.NetworkInterface
 import java.net.SocketException
 
@@ -45,7 +45,7 @@ abstract class MacAddressBasedUuidGenerator(
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildConfigurationUi(visible: ComponentPredicate) {
-    buttonsGroup("MAC Address:") {
+    buttonsGroup("MAC address:") {
       row {
         radioButton("Generate random multicast MAC address")
           .bind(macAddressGenerationMode, RANDOM)
@@ -105,7 +105,7 @@ abstract class MacAddressBasedUuidGenerator(
         .groupBy { it.hardwareAddress.toHexMacAddress() }
         .map { LocalInterface(it.key, it.value.joinToString("/") { networkInterface -> networkInterface.name }) }
         .toList()
-    } catch (ignore: SocketException) {
+    } catch (_: SocketException) {
       emptyList()
     }
   }
