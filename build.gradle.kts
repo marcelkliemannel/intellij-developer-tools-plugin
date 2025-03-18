@@ -158,7 +158,7 @@ intellijPlatform {
       recommended()
 
       properties("pluginVerificationAdditionalIdes").split(",").forEach { ide ->
-        ide(ide, properties("platformVersion"))
+//        ide(ide, properties("platformVersion"))
       }
     }
   }

@@ -4,6 +4,8 @@
 
 ### Added
 
+- Compatibility with 2025.1 EAP releases
+
 ### Changed
 
 ### Removed

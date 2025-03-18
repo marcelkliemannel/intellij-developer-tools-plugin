@@ -77,6 +77,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.han
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin._internal.ui.instance.handling.OpenDeveloperToolService
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.extension
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.nameWithoutExtension
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
@@ -1163,7 +1164,7 @@ internal class Unarchiver(
     override fun absolutePath(archiveFilePath: Path): Path = archiveFilePath
 
     fun iterateEntries(visitor: (ArchiveEntry, () -> InputStream) -> Boolean) {
-      if (archiveFilePath.fileName.extension == "7z") {
+      if (archiveFilePath.fileName.extension() == "7z") {
         val sevenZFile = SevenZFile.Builder().setFile(archiveFilePath.toFile()).get()
         var archiveEntry = sevenZFile.nextEntry
         while (archiveEntry != null) {
