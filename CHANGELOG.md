@@ -4,13 +4,17 @@
 
 ### Added
 
-- Compatibility with 2025.1 EAP releases
-
 ### Changed
 
 ### Removed
 
 ### Fixed
+
+## 6.4.0 - 2025-03-18
+
+### Added
+
+- Compatibility with 2025.1 EAP releases
 
 ## 6.3.0 - 2025-01-14
 
