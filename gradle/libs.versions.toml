@@ -20,8 +20,8 @@ named-regexp = "1.0.0"
 sql-formatter = "2.0.4"
 assertj = "3.25.3"
 # See bundled version: https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-kotlin = "2.0.21"
-intellij-platform = "2.2.1"
+kotlin = "2.1.10"
+intellij-platform = "2.3.0"
 changelog = "2.2.0"
 
 [libraries]
