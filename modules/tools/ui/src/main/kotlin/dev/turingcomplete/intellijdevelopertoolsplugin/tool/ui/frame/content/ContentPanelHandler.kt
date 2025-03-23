@@ -27,7 +27,7 @@ open class ContentPanelHandler(
   promoteMainDialog: Boolean = false,
   prioritizeVerticalLayout: Boolean = false
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var selectedContentNode = ValueProperty<ContentNode?>(null)
 
@@ -40,7 +40,7 @@ open class ContentPanelHandler(
   private val cachedGroupsPanels = mutableMapOf<String, GroupContentPanel>()
   private val cachedDeveloperToolsPanels = mutableMapOf<DeveloperToolNode, DeveloperToolContentPanel>()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     // The creation of `ToolsMenuTree` will trigger the initial node selection
@@ -60,7 +60,7 @@ open class ContentPanelHandler(
     }
   }
 
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun <T : OpenDeveloperToolContext> openTool(context: T, reference: OpenDeveloperToolReference<out T>) {
     toolsMenuTree.selectDeveloperTool(reference.id) {
@@ -107,7 +107,7 @@ open class ContentPanelHandler(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun initMainDialogPromotionPanel(promoteMainDialog: Boolean) {
     if (!promoteMainDialog) {
@@ -143,7 +143,7 @@ open class ContentPanelHandler(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class PromoteMainDialogNotificationPanel(
     closeNotification: (Boolean) -> Unit
@@ -156,5 +156,5 @@ open class ContentPanelHandler(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

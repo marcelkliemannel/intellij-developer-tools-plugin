@@ -3,22 +3,22 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.settings
 import kotlin.reflect.KClass
 
 interface DeveloperToolConfigurationPropertyType<T: Any> {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   val id: String
   val typeClass: KClass<T>
   val legacyId: String?
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   fun fromPersistent(persistentValue: String): T
 
   fun toPersistent(value: Any): String
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class SimplePropertyType<T: Any>(
     override val id: String,
@@ -34,5 +34,5 @@ interface DeveloperToolConfigurationPropertyType<T: Any> {
     override fun toPersistent(value: Any): String = doToPersistent(value as T)
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

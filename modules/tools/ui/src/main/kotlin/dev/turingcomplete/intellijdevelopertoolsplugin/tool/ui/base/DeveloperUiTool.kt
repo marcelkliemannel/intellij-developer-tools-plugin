@@ -17,7 +17,7 @@ import javax.swing.JComponent
 abstract class DeveloperUiTool(
   protected val parentDisposable: Disposable
 ) : DataProvider, Disposable {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private lateinit var component: DialogPanel
   private val validationListeners = mutableSetOf<(List<ValidationInfo>) -> Unit>()
@@ -26,8 +26,8 @@ abstract class DeveloperUiTool(
 
   protected var wrapComponentInScrollPane = true
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   fun createComponent(): JComponent {
     component = panel {
@@ -108,9 +108,9 @@ abstract class DeveloperUiTool(
     validationListeners.add(listener)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

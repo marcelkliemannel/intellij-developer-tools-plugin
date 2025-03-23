@@ -14,16 +14,16 @@ import javax.swing.JComponent
 
 class AnActionOptionButton(mainAction: AnAction, vararg additionalActions: AnAction)
   : JBOptionButton(null, null) {
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     action = AnActionWrapper(mainAction, this)
     options = additionalActions.map { AnActionWrapper(it, this) }.toTypedArray()
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   private class AnActionWrapper(private val action: AnAction, private val component: JComponent)
     : AbstractAction(action.templatePresentation.text, action.templatePresentation.icon) {
@@ -39,6 +39,6 @@ class AnActionOptionButton(mainAction: AnAction, vararg additionalActions: AnAct
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 }

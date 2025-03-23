@@ -37,19 +37,19 @@ import kotlin.reflect.cast
 open class DeveloperToolContentPanel(
   protected val developerToolNode: DeveloperToolNode
 ) : BorderLayoutPanel() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private lateinit var tabs: JBTabs
   private lateinit var selectedDeveloperToolInstance: ObservableMutableProperty<DeveloperToolContainer>
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     addToTop(createTitleBar())
     addToCenter(createMainContent())
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   fun selected() {
     selectedDeveloperToolInstance.get().instance.activated()
@@ -78,7 +78,7 @@ open class DeveloperToolContentPanel(
     RelativeFont.LARGE.install(this)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createTitleBar(): JComponent = panel {
     row {
@@ -200,7 +200,7 @@ open class DeveloperToolContentPanel(
       override fun getActionUpdateThread() = ActionUpdateThread.BGT
     }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class DestroyWorkbenchAction(
     private val removeTab: () -> Unit,
@@ -222,7 +222,7 @@ open class DeveloperToolContentPanel(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

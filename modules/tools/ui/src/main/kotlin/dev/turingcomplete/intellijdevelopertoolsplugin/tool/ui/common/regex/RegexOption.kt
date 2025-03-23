@@ -3,7 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex
 import java.util.regex.Pattern
 
 enum class RegexOption(val patternFlag: Int, val title: String, val description: String? = null) {
-  // -- Values ------------------------------------------------------------------------------------------------------ //
+  // -- Values -------------------------------------------------------------- //
 
   CASE_INSENSITIVE(
     Pattern.CASE_INSENSITIVE,
@@ -46,13 +46,13 @@ enum class RegexOption(val patternFlag: Int, val title: String, val description:
     "Whitespace will be ignored, and embedded comments starting with <code>#</code> are ignored until the end of a line."
   );
 
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun isSelected(regexOptionFlag: Int) = regexOptionFlag.and(patternFlag) != 0
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

@@ -7,9 +7,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsAp
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.AddOpenMainDialogActionToMainToolbarTask
 
 class DeveloperToolsPluginProjectActivity : ProjectActivity {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override suspend fun execute(project: Project) {
     if (DeveloperToolsApplicationSettings.generalSettings.addOpenMainDialogActionToMainToolbar.get()) {
@@ -20,7 +20,7 @@ class DeveloperToolsPluginProjectActivity : ProjectActivity {
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

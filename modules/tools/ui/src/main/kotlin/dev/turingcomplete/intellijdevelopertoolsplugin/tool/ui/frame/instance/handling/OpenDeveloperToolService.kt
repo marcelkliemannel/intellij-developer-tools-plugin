@@ -11,9 +11,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.to
 
 @Service(Service.Level.PROJECT)
 class OpenDeveloperToolService(val project: Project) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun <T : OpenDeveloperToolContext> openTool(context: T, reference: OpenDeveloperToolReference<T>) {
     if (showToolWindow()) {
@@ -33,7 +33,7 @@ class OpenDeveloperToolService(val project: Project) {
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun showToolWindow(): Boolean =
     if (DeveloperToolsApplicationSettings.generalSettings.autoDetectActionHandlingInstance.get()) {
@@ -43,6 +43,6 @@ class OpenDeveloperToolService(val project: Project) {
       DeveloperToolsApplicationSettings.generalSettings.selectedActionHandlingInstance.get() == TOOL_WINDOW
     }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

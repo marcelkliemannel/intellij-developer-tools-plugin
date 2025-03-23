@@ -14,9 +14,9 @@ class AddOpenMainDialogActionToMainToolbarTask(
   private val mainToolbarRightActionGroup: DefaultActionGroup?,
   private val mainToolbarActionGroup: DefaultActionGroup?
 ) : Runnable {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun run() {
     if (mainToolbarRightActionGroup != null && !mainToolbarRightActionGroup.containsAction(openMainDialogAction)) {
@@ -28,9 +28,9 @@ class AddOpenMainDialogActionToMainToolbarTask(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

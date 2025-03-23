@@ -9,10 +9,10 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.selected
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.bind
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.AUTOMATIC_DETECTION
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.FIXED_TEXT_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.INDIVIDUAL_DELIMITER
@@ -44,15 +44,15 @@ class TextCaseTransformer(
   parentDisposable = parentDisposable,
   project = project
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var originalParsingMode = configuration.register("originalParsingMode", AUTOMATIC_DETECTION)
   private var individualDelimiter = configuration.register("individualDelimiter", " ")
   private var inputTextCase = configuration.register("inputTextCase", STRICT_CAMEL_CASE)
   private var outputTextCase = configuration.register("outputTextCase", COBOL_CASE)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun transform() {
     resultText.set(sourceText.get().toTextCase(outputTextCase.get().textCase, getInputWordsSplitter()))
@@ -106,7 +106,7 @@ class TextCaseTransformer(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun getInputWordsSplitter() =
     when (originalParsingMode.get()) {
@@ -115,7 +115,7 @@ class TextCaseTransformer(
       INDIVIDUAL_DELIMITER -> individualDelimiter.get().toWordsSplitter()
     }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class TextCase(val textCase: StandardTextCase) {
 
@@ -138,7 +138,7 @@ class TextCaseTransformer(
     override fun toString(): String = "${textCase.title()} (${textCase.example()})"
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class OriginalParsingMode {
 
@@ -147,7 +147,7 @@ class TextCaseTransformer(
     INDIVIDUAL_DELIMITER
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<TextCaseTransformer> {
 
@@ -165,7 +165,7 @@ class TextCaseTransformer(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

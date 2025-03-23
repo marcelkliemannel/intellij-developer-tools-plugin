@@ -37,7 +37,7 @@ class PasswordGenerator(
   configuration = configuration,
   parentDisposable = parentDisposable
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var length = configuration.register("length", DEFAULT_LENGTH)
   private var lettersMode = configuration.register("lettersMode", DEFAULT_LETTERS_MODE)
@@ -45,8 +45,8 @@ class PasswordGenerator(
   private var addSymbols = configuration.register("addSymbols", DEFAULT_ADD_SYMBOLS)
   private var symbols = configuration.register("symbols", DEFAULT_SYMBOLS)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildConfigurationUi() {
@@ -124,8 +124,8 @@ class PasswordGenerator(
     return characters.toCharArray()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class LettersMode(val title: String) {
 
@@ -137,7 +137,7 @@ class PasswordGenerator(
     override fun toString(): String = title
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<PasswordGenerator> {
 
@@ -155,7 +155,7 @@ class PasswordGenerator(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

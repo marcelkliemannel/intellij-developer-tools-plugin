@@ -12,8 +12,8 @@ import java.net.URI
 import java.util.*
 
 object OkHttpClientUtils {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun OkHttpClient.Builder.applyIntelliJProxySettings(url: String): OkHttpClient.Builder {
     val proxies = JdkProxyProvider.getInstance().proxySelector.select(VfsUtil.toUri(url))
@@ -98,8 +98,8 @@ object OkHttpClientUtils {
       else -> null
     }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class FallbackProxySelector(private val proxies: List<Proxy>) : ProxySelector() {
     private val failedProxies = Collections.synchronizedSet(mutableSetOf<Proxy>())

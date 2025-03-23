@@ -23,12 +23,12 @@ class SelectRegexOptionsAction(
   private val parentComponent: () -> JComponent,
   private val selectedRegexOptionFlag: ObservableMutableProperty<Int>
 ) : DumbAwareAction("Regular Expression Options", null, AllIcons.General.GearPlain) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var currentDialog: Balloon? = null
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun actionPerformed(e: AnActionEvent) {
     if (currentDialog != null) {
@@ -55,7 +55,7 @@ class SelectRegexOptionsAction(
 
   override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   private fun createRegexOptionPanel() = panel {
@@ -77,8 +77,8 @@ class SelectRegexOptionsAction(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

@@ -9,12 +9,12 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSel
 import org.jetbrains.kotlin.lexer.KtTokens
 
 object PsiKotlinUtils {
-  // -- Variables --------------------------------------------------------------------------------------------------- //
+  // -- Variables ----------------------------------------------------------- //
 
   private val textElementKtTokens = setOf(KtTokens.REGULAR_STRING_PART, KtTokens.IDENTIFIER)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun getTextFromStringValueOrIdentifier(e: AnActionEvent): Pair<String, TextRange>? {
     val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return null
@@ -56,6 +56,6 @@ object PsiKotlinUtils {
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 }

@@ -7,9 +7,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.PsiJavaUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.TextCaseConverterIntentionAction
 
 class TextCaseConverterJavaCodeIntentionAction : TextCaseConverterIntentionAction() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getFamilyName(): String = "Convert text case of Java string or identifier"
 
@@ -20,7 +20,7 @@ class TextCaseConverterJavaCodeIntentionAction : TextCaseConverterIntentionActio
     return PsiJavaUtils.getTextIfStringValueOrIdentifier(psiElement)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

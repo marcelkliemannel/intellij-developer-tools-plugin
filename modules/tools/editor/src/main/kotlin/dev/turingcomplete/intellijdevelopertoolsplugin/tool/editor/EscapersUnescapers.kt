@@ -9,7 +9,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.execut
 import org.apache.commons.text.StringEscapeUtils
 
 object EscapersUnescapers {
-  // -- Variables --------------------------------------------------------------------------------------------------- //
+  // -- Variables ----------------------------------------------------------- //
 
   private val log = logger<EscapersUnescapers>()
 
@@ -29,8 +29,8 @@ object EscapersUnescapers {
     Unescaper("CSV Value", { StringEscapeUtils.unescapeCsv(it) })
   )
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun executeEscapeInEditor(
     text: String,
@@ -72,12 +72,12 @@ object EscapersUnescapers {
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Escaper(val title: String, val escape: (String) -> String, val actionName: String = "Escape $title")
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Unescaper(val title: String, val unescape: (String) -> String, val actionName: String = "Unescape $title")
 }

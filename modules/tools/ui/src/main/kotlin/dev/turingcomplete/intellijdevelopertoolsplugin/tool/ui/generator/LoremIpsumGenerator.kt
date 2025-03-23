@@ -39,7 +39,7 @@ class LoremIpsumGenerator(
     context = context,
     project = project
   ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var textMode = configuration.register("generatedTextKind", PARAGRAPHS)
   private var numberOfValues = configuration.register("numberOfValues", 9)
@@ -49,8 +49,8 @@ class LoremIpsumGenerator(
   private var maxWordsInBullet = configuration.register("maxWordsInBullet", DEFAULT_MAX_BULLET_WORDS)
   private var startWithLoremIpsum = configuration.register("startWithLoremIpsum", true)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun generate(): String = when (textMode.get()) {
     WORDS -> generateWords()
@@ -129,7 +129,7 @@ class LoremIpsumGenerator(
     return words
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun generateParagraphs() = IntRange(0, numberOfValues.get() - 1).joinToString(PARAGRAPH_SEPARATOR) { paragraphIndex ->
 
@@ -226,7 +226,7 @@ class LoremIpsumGenerator(
     return words
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class TextMode(val title: String) {
 
@@ -237,7 +237,7 @@ class LoremIpsumGenerator(
     override fun toString(): String = title
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<LoremIpsumGenerator> {
 
@@ -255,7 +255,7 @@ class LoremIpsumGenerator(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

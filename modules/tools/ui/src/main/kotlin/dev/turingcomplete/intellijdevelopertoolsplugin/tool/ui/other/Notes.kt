@@ -6,11 +6,11 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 
 class Notes(
   private val context: DeveloperUiToolContext,
@@ -18,12 +18,12 @@ class Notes(
   parentDisposable: Disposable,
   private val project: Project?
 ) : DeveloperUiTool(parentDisposable = parentDisposable) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val text = configuration.register("test", "", INPUT)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildUi() {
     row {
@@ -41,8 +41,8 @@ class Notes(
     }.resizableRow()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<Notes> {
 
@@ -58,5 +58,5 @@ class Notes(
     ): ((DeveloperToolConfiguration) -> Notes) = { configuration -> Notes(context, configuration, parentDisposable, project) }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

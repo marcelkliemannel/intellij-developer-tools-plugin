@@ -15,7 +15,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnesc
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnescapers.executeUnescapeInEditor
 
 open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", false) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val escapeActionGroup by lazy {
     createActionGroup(
@@ -40,8 +40,8 @@ open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", fal
     )
   }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   final override fun update(e: AnActionEvent) {
     val editor = e.getData(EDITOR)
@@ -57,7 +57,7 @@ open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", fal
     return editor.getSelectedText()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createActionGroup(title: String, actions: List<AnAction>) = object : DefaultActionGroup(title, true) {
 
@@ -66,7 +66,7 @@ open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", fal
     override fun getChildren(e: AnActionEvent?): Array<AnAction> = decoderActions
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class EscapeAction(
     val escaper: Escaper,
@@ -80,7 +80,7 @@ open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", fal
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class UnescapeAction(
     val unescaper: Unescaper,
@@ -94,5 +94,5 @@ open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", fal
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

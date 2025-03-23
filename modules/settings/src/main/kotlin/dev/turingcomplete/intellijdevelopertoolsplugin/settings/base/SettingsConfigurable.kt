@@ -16,12 +16,12 @@ import javax.swing.JComponent
 abstract class SettingsConfigurable<T: Settings>(
   protected val settings: T,
 ) : Configurable {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val derivatedSettingsContainer = settings.settingsContainer().derivate()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
   
   final override fun createComponent(): JComponent? = panel {
     derivatedSettingsContainer.settingProperties
@@ -83,7 +83,7 @@ abstract class SettingsConfigurable<T: Settings>(
     }.layout(RowLayout.PARENT_GRID)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

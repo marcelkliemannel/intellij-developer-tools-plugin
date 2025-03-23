@@ -8,9 +8,9 @@ import java.io.File
 import java.lang.reflect.Modifier
 
 abstract class IntentionDescriptionTest {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   abstract fun `test intention action description HTML file exists`(): List<DynamicNode>
 
@@ -46,7 +46,7 @@ abstract class IntentionDescriptionTest {
         }
       }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun getDescriptionTemplateRelativePath(
     intentionActionSimpleClassName: String,
@@ -80,6 +80,6 @@ abstract class IntentionDescriptionTest {
     return intentionActions
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

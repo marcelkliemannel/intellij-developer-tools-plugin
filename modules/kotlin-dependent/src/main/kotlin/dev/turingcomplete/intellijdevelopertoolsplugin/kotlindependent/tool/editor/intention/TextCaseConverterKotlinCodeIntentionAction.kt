@@ -7,9 +7,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.kotlindependent.PsiKotlin
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.TextCaseConverterIntentionAction
 
 class TextCaseConverterKotlinCodeIntentionAction : TextCaseConverterIntentionAction() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getFamilyName(): String = "Convert text case of Kotlin string or identifier"
 
@@ -20,7 +20,7 @@ class TextCaseConverterKotlinCodeIntentionAction : TextCaseConverterIntentionAct
     return PsiKotlinUtils.getTextFromStringValueOrIdentifier(psiElement)?.let { it to psiElement.textRange }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

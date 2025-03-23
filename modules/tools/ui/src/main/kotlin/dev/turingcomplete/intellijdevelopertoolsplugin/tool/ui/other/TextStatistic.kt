@@ -34,7 +34,7 @@ class TextStatistic(
   private val project: Project?,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable), OpenDeveloperToolHandler<OpenTextStatisticContext> {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val text = configuration.register("text", "", INPUT, TEXT_EXAMPLE)
 
@@ -62,8 +62,8 @@ class TextStatistic(
 
   private val counterAlarm by lazy { Alarm(parentDisposable) }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildUi() {
     row {
@@ -85,7 +85,7 @@ class TextStatistic(
     updateCounter()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createInputEditorComponent() = AdvancedEditor(
     id = "text",
@@ -210,15 +210,15 @@ class TextStatistic(
     uniqueCharactersTable.reload()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class TextMetric(val title: String, var value: String = "Unknown")
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class OpenTextStatisticContext(val text: String) : OpenDeveloperToolContext
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<TextStatistic> {
 
@@ -243,7 +243,7 @@ class TextStatistic(
       }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

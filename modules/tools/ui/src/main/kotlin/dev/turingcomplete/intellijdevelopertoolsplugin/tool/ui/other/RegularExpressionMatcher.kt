@@ -62,7 +62,7 @@ class RegularExpressionMatcher(
   private val project: Project?,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var selectedRegexOptionFlag = configuration.register("regexOption", 0)
 
@@ -81,8 +81,8 @@ class RegularExpressionMatcher(
 
   private val regexInputErrorHolder = ErrorHolder()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildUi() {
     row {
@@ -103,7 +103,7 @@ class RegularExpressionMatcher(
     sync()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createInputComponent() = panel {
     row {
@@ -331,7 +331,7 @@ class RegularExpressionMatcher(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class MatchResultsTable(
     private val model: MatchResultsTableModel,
@@ -372,7 +372,7 @@ class RegularExpressionMatcher(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private data class Match(
     val groupIndex: Int,
@@ -382,7 +382,7 @@ class RegularExpressionMatcher(
     val matchResultType: MatchResultType
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class MatchResultsTableModel : AbstractTableModel() {
 
@@ -411,7 +411,7 @@ class RegularExpressionMatcher(
     fun getRowMatchResultType(row: Int): MatchResultType = matches[row].matchResultType
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class MatchResultsTableCellRenderer(private val model: MatchResultsTableModel) : ColoredTableCellRenderer() {
 
@@ -448,7 +448,7 @@ class RegularExpressionMatcher(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class MatchResultType {
 
@@ -456,7 +456,7 @@ class RegularExpressionMatcher(
     NAMED_GROUP
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<RegularExpressionMatcher> {
 
@@ -473,7 +473,7 @@ class RegularExpressionMatcher(
       { configuration -> RegularExpressionMatcher(context, configuration, project, parentDisposable) }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

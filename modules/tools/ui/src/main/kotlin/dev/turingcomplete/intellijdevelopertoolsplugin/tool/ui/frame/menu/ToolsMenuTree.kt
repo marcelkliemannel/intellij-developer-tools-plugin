@@ -25,16 +25,16 @@ import com.intellij.util.ui.JBUI.Borders
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactoryEp
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings.Companion.generalSettings
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.ChangelogDialog
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.OpenSettingsAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings.Companion.generalSettings
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactoryEp
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolGroup
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.ChangelogDialog
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.OpenSettingsAction
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTree
@@ -56,11 +56,11 @@ class ToolsMenuTree(
   private val prioritizeVerticalLayout: Boolean = false,
   private val selectContentNode: (ContentNode, Boolean) -> Unit,
 ) : SimpleTree() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var selectionTriggeredBySearch = false
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     val (rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode) = createTreeNodes()
@@ -84,7 +84,7 @@ class ToolsMenuTree(
     selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode)
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   fun recreateTreeNodes() {
     val (newRootNode, defaultGroupNodesToExpand, _) = createTreeNodes()
@@ -153,7 +153,7 @@ class ToolsMenuTree(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun setTreeBorder() {
     border = if (generalSettings.toolsMenuTreeShowGroupNodes.get()) {
@@ -329,7 +329,7 @@ class ToolsMenuTree(
     return Triple(rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class MenuTreeSearch(tree: Tree, private val setSelectionTriggeredBySearch: (Boolean) -> Unit)
     : TreeSpeedSearch(tree, null as Void?) {
@@ -347,7 +347,7 @@ class ToolsMenuTree(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class MenuTreeNodeRenderer(private val toolsMenuTreeShowGroupNodes: Boolean) : NodeRenderer() {
 
@@ -374,5 +374,5 @@ class ToolsMenuTree(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

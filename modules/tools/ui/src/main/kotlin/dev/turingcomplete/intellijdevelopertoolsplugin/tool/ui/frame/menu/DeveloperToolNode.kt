@@ -21,7 +21,7 @@ class DeveloperToolNode(
   title = if (showGrouped) developerUiToolPresentation.groupedMenuTitle else developerUiToolPresentation.menuTitle,
   toolTipText = developerUiToolPresentation.contentTitle
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val _developerTools: MutableList<DeveloperToolContainer> by lazy {
     restoreDeveloperToolInstances().ifEmpty { listOf(doCreateNewDeveloperToolInstance()) }.toMutableList()
@@ -29,8 +29,8 @@ class DeveloperToolNode(
   val developerTools: List<DeveloperToolContainer>
     get() = _developerTools
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   fun createNewDeveloperToolInstance(): DeveloperToolContainer {
     val developerToolContainer = doCreateNewDeveloperToolInstance()
@@ -48,7 +48,7 @@ class DeveloperToolNode(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun restoreDeveloperToolInstances(): List<DeveloperToolContainer> =
     settings.getDeveloperToolConfigurations(developerToolId)
@@ -63,12 +63,12 @@ class DeveloperToolNode(
     return DeveloperToolContainer(developerTool, developerToolConfiguration)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class DeveloperToolContainer(
     val instance: DeveloperUiTool,
     val configuration: DeveloperToolConfiguration
   )
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

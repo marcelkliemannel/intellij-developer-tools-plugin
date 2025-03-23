@@ -17,7 +17,7 @@ class DeveloperToolConfiguration(
   val id: UUID,
   val persistentProperties: Map<String, PersistentProperty>
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   val properties = ConcurrentHashMap<String, PropertyContainer>()
 
@@ -30,8 +30,8 @@ class DeveloperToolConfiguration(
   var isResetting = false
     set
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   fun <T : Any> register(
     key: String,
@@ -85,7 +85,7 @@ class DeveloperToolConfiguration(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun <T : Any> createExampleProvider(example: T?) =
     if (example != null) {
@@ -144,7 +144,7 @@ class DeveloperToolConfiguration(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class PropertyContainer(
     val key: String,
@@ -171,7 +171,7 @@ class DeveloperToolConfiguration(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   enum class PropertyType {
 
@@ -180,7 +180,7 @@ class DeveloperToolConfiguration(
     SENSITIVE
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   @FunctionalInterface
   fun interface ChangeListener {
@@ -188,7 +188,7 @@ class DeveloperToolConfiguration(
     fun configurationChanged(property: ValueProperty<out Any>)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   @FunctionalInterface
   fun interface ResetListener {
@@ -196,9 +196,9 @@ class DeveloperToolConfiguration(
     fun configurationReset()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class PersistentProperty(val key: String, val value: Any, val type: PropertyType)
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

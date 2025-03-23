@@ -6,14 +6,14 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.PsiJavaUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.action.TextCaseConverterActionGroup
 
 class TextCaseConverterJavaCodeActionGroup : TextCaseConverterActionGroup() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? =
     PsiJavaUtils.getPsiElementAtCaret(e)?.let { PsiJavaUtils.getTextIfStringValueOrIdentifier(it) }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

@@ -6,13 +6,13 @@ import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import java.util.concurrent.atomic.AtomicReference
 
 open class ValueProperty<T>(initialValue: T) : ObservableMutableProperty<T> {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val value = AtomicReference(initialValue)
   private val changeDispatcher = SingleEventDispatcher.create<ChangeEvent<T>>()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun afterChange(parentDisposable: Disposable?, listener: (T) -> Unit) =
     changeDispatcher.whenEventHappened(parentDisposable) { listener(it.newValue) }
@@ -40,15 +40,15 @@ open class ValueProperty<T>(initialValue: T) : ObservableMutableProperty<T> {
 
   override fun toString(): String = get().toString()
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class ChangeEvent<T>(val id: String?, val oldValue: T, val newValue: T) {
 
     fun valueChanged() = oldValue != newValue
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

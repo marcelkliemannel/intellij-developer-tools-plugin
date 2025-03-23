@@ -55,12 +55,12 @@ class IntelliJInternals(
   parentDisposable: Disposable,
   private val project: Project?
 ) : DeveloperUiTool(parentDisposable = parentDisposable), DataProvider {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private lateinit var pluginOverviewTable: JBTable
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildUi() {
     group("Plugins") {
@@ -146,7 +146,7 @@ class IntelliJInternals(
     else -> null
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun populatePluginOverviewTableModel() {
     pluginOverviewTable.model.uncheckedCastTo<ListTableModel<IdeaPluginDescriptor>>().items =
@@ -209,7 +209,7 @@ class IntelliJInternals(
     return classLoaderNode
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class OpenPluginDirectory : DumbAwareAction("Open Plugin Directory") {
 
@@ -224,7 +224,7 @@ class IntelliJInternals(
       }
     }
   }
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class OpenPluginDescriptor : DumbAwareAction("Open Plugin Descriptor") {
 
@@ -277,7 +277,7 @@ class IntelliJInternals(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<IntelliJInternals> {
 
@@ -295,7 +295,7 @@ class IntelliJInternals(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

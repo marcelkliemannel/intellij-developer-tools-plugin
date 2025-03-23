@@ -9,10 +9,12 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.not
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.PropertyComponentPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.isWithinLongRange
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.validateBigDecimalValue
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.PropertyComponentPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.CENTURIES
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.DAYS
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.DECADES
@@ -25,8 +27,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitcon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.SECONDS
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.WEEKS
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.YEARS
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import java.math.BigDecimal
 import java.math.BigDecimal.TEN
 import java.math.BigDecimal.ZERO
@@ -38,7 +38,7 @@ class TimeConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : MathContextUnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Time") {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val nanoseconds = configuration.register("${CONFIGURATION_KEY_PREFIX}timeNanoseconds", ZERO, INPUT, NANOSECONDS_EXAMPLE)
 
@@ -58,8 +58,8 @@ class TimeConverter(
   private val hoursDetail = ValueProperty("0")
   private val daysDetail = ValueProperty("0")
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
@@ -109,7 +109,7 @@ class TimeConverter(
     convert(null, null, nanoseconds.get())
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun convert(
     changeOrigin: ChangeOrigin? = null,
@@ -260,7 +260,7 @@ class TimeConverter(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class ChangeOrigin {
 
@@ -278,8 +278,8 @@ class TimeConverter(
     MILLENNIUMS
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

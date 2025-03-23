@@ -12,9 +12,9 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 
 class SettingsBundleMessagesTest : BundleMessagesTest() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   @TestFactory
   override fun `test that all additional languages are containing the same message keys and parameter counts`(): List<DynamicNode> =
@@ -57,8 +57,8 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
     return allMessageBundleUsages
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class SettingsGroupUsageClassVisitor(
     val settingsGroupAnnotationUsages: MutableList<SettingsGroupAnnotationUsage>
@@ -72,7 +72,7 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class SettingsGroupUsageAnnotationVisitor(
     val settingsGroupAnnotationUsages: MutableList<SettingsGroupAnnotationUsage>
@@ -118,7 +118,7 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private data class SettingsGroupAnnotationUsage(
     val id: String,
@@ -126,5 +126,5 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
     val descriptionBundleKey: String?
   )
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

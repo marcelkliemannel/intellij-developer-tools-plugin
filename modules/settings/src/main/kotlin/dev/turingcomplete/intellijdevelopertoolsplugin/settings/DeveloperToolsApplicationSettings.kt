@@ -23,7 +23,7 @@ import java.security.Security
   category = SettingsCategory.TOOLS
 )
 class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   val generalSettings: GeneralSettings by lazy { SettingsHandler.create(GeneralSettings::class) }
   val internalSettings: InternalSettings by lazy { SettingsHandler.create(InternalSettings::class) }
@@ -31,7 +31,7 @@ class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
 
   private val allSettings = listOf<Settings>(generalSettings, internalSettings, jsonHandling)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     try {
@@ -43,7 +43,7 @@ class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
     }
   }
 
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getState(): Element {
     val root = Element("Root")
@@ -86,7 +86,7 @@ class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun applyLegacy(state: Element) {
     if (state.attributes.none { it.name != "name" }) {
@@ -122,8 +122,8 @@ class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
     state.addContent(internalSettingsElement)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

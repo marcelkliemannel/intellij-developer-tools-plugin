@@ -16,9 +16,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils.allT
 import dev.turingcomplete.textcaseconverter.TextCase
 
 abstract class TextCaseConverterIntentionAction : IntentionAction, LowPriorityAction {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   final override fun startInWriteAction() = false
 
@@ -41,8 +41,8 @@ abstract class TextCaseConverterIntentionAction : IntentionAction, LowPriorityAc
 
   abstract fun getSourceText(editor: Editor, file: PsiFile): Pair<String, TextRange>?
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class TextCaseListPopupStep(
     private val editor: Editor,
@@ -63,5 +63,5 @@ abstract class TextCaseConverterIntentionAction : IntentionAction, LowPriorityAc
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

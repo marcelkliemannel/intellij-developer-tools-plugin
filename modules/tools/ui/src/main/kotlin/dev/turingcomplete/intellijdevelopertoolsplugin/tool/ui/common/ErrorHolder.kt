@@ -11,14 +11,14 @@ class ErrorHolder(
   private val addErrorIconToMessage: Boolean = false,
   private val surroundMessageWithHtml: Boolean = true
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val changeListeners = mutableListOf<(List<String>) -> Unit>()
 
   private var errors = mutableListOf<String>()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   fun add(prefix: String, error: Throwable) {
     errors.add("$prefix ${error.message ?: error::class.java.simpleName}")
@@ -86,7 +86,7 @@ class ErrorHolder(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun formatErrors(): String? = errors.let {
     when (it.size) {
@@ -109,6 +109,6 @@ class ErrorHolder(
     changeListeners.forEach { it(errors) }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

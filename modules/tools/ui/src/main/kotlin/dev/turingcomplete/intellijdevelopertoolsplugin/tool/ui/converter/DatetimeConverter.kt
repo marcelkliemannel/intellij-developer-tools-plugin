@@ -70,7 +70,7 @@ class DatetimeConverter(
   parentDisposable: Disposable,
   private val context: DeveloperUiToolContext
 ) : DeveloperUiTool(parentDisposable) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var selectedTimeZoneId = configuration.register("timeZoneId", ZoneId.systemDefault().id)
   private var formattedStandardFormat = configuration.register("formattedStandardFormat", DEFAULT_FORMATTED_STANDARD_FORMAT)
@@ -100,7 +100,7 @@ class DatetimeConverter(
   private val convertMinute = ValueProperty(0)
   private val convertSecond = ValueProperty(0)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     // Validate if selected time zone and formatted local  is still available
@@ -112,7 +112,7 @@ class DatetimeConverter(
     }
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildUi() {
     group("Current Unix Timestamp") {
@@ -310,7 +310,7 @@ class DatetimeConverter(
     currentUnixTimestampUpdateAlarm.cancelAllRequests()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun Row.buildSetToNowButtonUi() {
     button("Set to Now") {
@@ -515,7 +515,7 @@ class DatetimeConverter(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<DatetimeConverter> {
 
@@ -532,7 +532,7 @@ class DatetimeConverter(
       { configuration -> DatetimeConverter(configuration, parentDisposable, context) }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class ConversionOriginKind {
 
@@ -542,7 +542,7 @@ class DatetimeConverter(
     LOCAL_DATE_TIME
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class ConversionOrigin(val kind: ConversionOriginKind) {
 
@@ -557,7 +557,7 @@ class DatetimeConverter(
     SECOND(ConversionOriginKind.LOCAL_DATE_TIME)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class StandardFormat(
     private val title: String,
@@ -595,7 +595,7 @@ class DatetimeConverter(
     override fun toString(): String = title
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

@@ -4,11 +4,11 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 
 abstract class MultiLineTextGenerator(
   private val generatedTextTitle: String,
@@ -17,12 +17,12 @@ abstract class MultiLineTextGenerator(
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val generatedTextEditor: AdvancedEditor by lazy { createGeneratedTextEditor() }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   final override fun Panel.buildUi() {
     buildConfigurationUi()
@@ -64,7 +64,7 @@ abstract class MultiLineTextGenerator(
     configuration.removeChangeListener(this)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun doGenerate() {
     if (validate().isEmpty()) {
@@ -84,6 +84,6 @@ abstract class MultiLineTextGenerator(
     configuration = configuration
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

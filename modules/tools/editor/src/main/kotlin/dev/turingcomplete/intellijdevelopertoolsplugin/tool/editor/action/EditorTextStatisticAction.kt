@@ -11,9 +11,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.ha
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.TextStatistic
 
 class EditorTextStatisticAction : DumbAwareAction("Show Text Statistic of Document...") {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun update(e: AnActionEvent) {
     e.presentation.isEnabledAndVisible = e.getData(CommonDataKeys.PROJECT) != null
@@ -32,7 +32,7 @@ class EditorTextStatisticAction : DumbAwareAction("Show Text Statistic of Docume
 
   override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

@@ -11,15 +11,15 @@ class ValidationResultBorder(
   private val ownerComponent: JComponent,
   private val focusComponent: JComponent = ownerComponent
 ) : LineBorder(defaultBorderColor, 1) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val errorBorder by lazy { JBUI.CurrentTheme.Focus.errorColor(false) }
   private val errorFocusBorder by lazy { JBUI.CurrentTheme.Focus.errorColor(true) }
   private val warningBorder by lazy { JBUI.CurrentTheme.Focus.warningColor(false) }
   private val warningFocusBorder by lazy { JBUI.CurrentTheme.Focus.warningColor(true) }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun paintBorder(c: Component?, g: Graphics?, x: Int, y: Int, width: Int, height: Int) {
     val outline = ObjectUtils.tryCast(ownerComponent.getClientProperty("JComponent.outline"), String::class.java)
@@ -31,9 +31,9 @@ class ValidationResultBorder(
     super.paintBorder(c, g, x, y, width, height)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   private companion object {
 

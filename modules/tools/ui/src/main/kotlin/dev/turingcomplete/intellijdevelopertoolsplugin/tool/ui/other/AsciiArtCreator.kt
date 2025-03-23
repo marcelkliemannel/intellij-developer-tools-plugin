@@ -44,7 +44,7 @@ class AsciiArtCreator(
   parentDisposable: Disposable,
   private val context: DeveloperUiToolContext
 ) : DeveloperUiTool(parentDisposable = parentDisposable), DataProvider {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val log = logger<AsciiArtCreator>()
 
@@ -60,8 +60,8 @@ class AsciiArtCreator(
   private val syncFontsAlarm by lazy { AsyncTaskExecutor.onEdt(parentDisposable) }
   private val createAsciiArtAlarm by lazy { AsyncTaskExecutor.onEdt(parentDisposable) }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
@@ -116,7 +116,7 @@ class AsciiArtCreator(
     syncFonts()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun downloadAdditionalAsciiArtFonts(downloadFontsButton: JButton) {
     ApplicationManager.getApplication().executeOnPooledThread {
@@ -236,7 +236,7 @@ class AsciiArtCreator(
   private fun getBuiltInFontResource(fontFileName: String): InputStream? =
     FigletFont::class.java.getClassLoader().getResourceAsStream(fontFileName)
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class FontFileNamesComboBoxModel() : DefaultComboBoxModel<String>() {
 
@@ -260,7 +260,7 @@ class AsciiArtCreator(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<AsciiArtCreator> {
 
@@ -285,7 +285,7 @@ class AsciiArtCreator(
       }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

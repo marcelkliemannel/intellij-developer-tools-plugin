@@ -11,15 +11,15 @@ import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.selected
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.bind
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.RegexTextField
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.SelectRegexOptionsAction
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.RegexTextField
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.SelectRegexOptionsAction
 
 class TextFilterTransformer(
   context: DeveloperUiToolContext,
@@ -41,7 +41,7 @@ class TextFilterTransformer(
   parentDisposable = parentDisposable,
   project = project
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val tokenMode = configuration.register("tokenSelectionMode", DEFAULT_TOKEN_SELECTION_MODE)
   private val filteringMode = configuration.register("filteringMode", DEFAULT_FILTERING_MODE)
@@ -51,8 +51,8 @@ class TextFilterTransformer(
   private val filteringRegexModeOptions = configuration.register("filteringRegexModeOptions", 0)
   private val filteringRegexModeErrorHolder = ErrorHolder()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildMiddleConfigurationUi() {
     row {
@@ -157,8 +157,8 @@ class TextFilterTransformer(
     resultText.set(result)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class TokenMode(val pluralTitle: String) {
 
@@ -168,7 +168,7 @@ class TextFilterTransformer(
     override fun toString(): String = pluralTitle
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class FilteringMode {
 
@@ -177,7 +177,7 @@ class TextFilterTransformer(
     REGEX
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<TextFilterTransformer> {
 
@@ -195,7 +195,7 @@ class TextFilterTransformer(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

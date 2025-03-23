@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 object DataGenerators {
-  // -- Variables --------------------------------------------------------------------------------------------------- //
+  // -- Variables ----------------------------------------------------------- //
 
   private val uuidV7Generator = UuidV7Generator()
   val dataGenerators: List<DataGeneratorBase> = listOf(
@@ -26,9 +26,9 @@ object DataGenerators {
     DataGeneratorsGroup("Random Hash", createRandomHashGenerators())
   )
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
 
   private fun createRandomHashGenerators(): List<DataGenerator> =
@@ -72,35 +72,35 @@ object DataGenerators {
       }
     }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class UuidV4Generator : DataGenerator("UUIDv4") {
 
     override fun generate(): String = Generators.randomBasedGenerator().generate().toString()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class UuidV7Generator : DataGenerator("UUIDv7") {
 
     override fun generate(): String = Generators.timeBasedEpochGenerator().generate().toString()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class UlidGenerator : DataGenerator("ULID") {
 
     override fun generate(): String = UlidCreator.getUlid().toString()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class NanoIdGenerator : DataGenerator("Nano ID") {
 
     override fun generate(): String = NanoIdUtils.randomNanoId()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   sealed interface DataGeneratorBase {
 
@@ -108,7 +108,7 @@ object DataGenerators {
     val toolText: String?
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   abstract class DataGenerator(
     @Nls(capitalization = Nls.Capitalization.Title) override val title: String,
@@ -119,7 +119,7 @@ object DataGenerators {
     abstract fun generate(): String
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class DataGeneratorsGroup(
     @Nls(capitalization = Nls.Capitalization.Title) override val title: String,

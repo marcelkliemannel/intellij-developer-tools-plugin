@@ -7,9 +7,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.kotlindependent.PsiKotlin
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.EncodeDecodeIntentionAction
 
 class EscapeUnescapeKotlinCodeIntentionAction : EncodeDecodeIntentionAction() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getFamilyName(): String = "Escape or unescape Kotlin string"
 
@@ -20,7 +20,7 @@ class EscapeUnescapeKotlinCodeIntentionAction : EncodeDecodeIntentionAction() {
     return PsiKotlinUtils.getTextFromStringValue(psiElement)?.let { it to psiElement.textRange }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

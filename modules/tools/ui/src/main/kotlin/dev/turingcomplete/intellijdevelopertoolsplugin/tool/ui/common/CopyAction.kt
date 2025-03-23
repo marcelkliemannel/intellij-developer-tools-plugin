@@ -13,18 +13,18 @@ class CopyAction(private val contentDataKey: DataKey<String> = CONTENT_DATA_KEY)
           "Copy the text into the system clipboard",
           AllIcons.Actions.Copy
   ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun actionPerformed(e: AnActionEvent) {
     val content = e.getData(contentDataKey) ?: error("Data missing for: ${contentDataKey.name}")
     CopyPasteManager.getInstance().setContents(StringSelection(content))
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

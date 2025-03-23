@@ -40,7 +40,7 @@ class UlidGenerator(
   parentDisposable = parentDisposable,
   project = project
 ), DataProvider {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val generateMonotonicUlid = configuration.register("generateMonotonicUlid", false)
   private val ulidFormat = configuration.register("ulidFormat", UlidFormat.NONE)
@@ -52,7 +52,7 @@ class UlidGenerator(
   private val parsedUlIdTimestamp = ValueProperty("")
   private val parsedUlIdTransformed = ValueProperty("")
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
   
   init {
     parseUlidInput.afterChange { parseUlid() }
@@ -60,7 +60,7 @@ class UlidGenerator(
     parseUlid()
   }
 
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildConfigurationUi() {
     row {
@@ -148,7 +148,7 @@ class UlidGenerator(
     else -> super.getData(dataId)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun parseUlid() {
     val parseUlidInputValue = parseUlidInput.get()
@@ -161,7 +161,7 @@ class UlidGenerator(
     parsedUlIdTransformed.set("<html><code>${parseUlidTransformFormat.get().format(ulid)}</code></html>")
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class UlidFormat(val title: String, val format: (Ulid) -> String) {
 
@@ -173,7 +173,7 @@ class UlidGenerator(
     override fun toString(): String = title
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<UlidGenerator> {
 
@@ -191,7 +191,7 @@ class UlidGenerator(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

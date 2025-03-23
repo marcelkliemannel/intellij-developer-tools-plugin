@@ -38,7 +38,7 @@ class TextSortingTransformer(
   parentDisposable = parentDisposable,
   project = project
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var unsortedSplitWordsDelimiter = configuration.register("unsortedPredefinedDelimiter", LINE_BREAK)
   private var unsortedIndividualSplitWordsDelimiter = configuration.register("unsortedIndividualSplitWordsDelimiter", " ")
@@ -54,8 +54,8 @@ class TextSortingTransformer(
   private var caseInsensitive = configuration.register("caseInsensitive", false)
   private var reverseOrder = configuration.register("reverseOrder", false)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun transform() {
     val unsortedSplitWordsDelimiterPattern: Regex = unsortedSplitWordsDelimiter.get().splitPattern
@@ -123,7 +123,7 @@ class TextSortingTransformer(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun Row.buildSplitConfigurationUi(
     title: String,
@@ -139,7 +139,7 @@ class TextSortingTransformer(
       .visibleIf(ComboBoxPredicate(splitWordsDelimiterComboBox) { it == INDIVIDUAL })
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class SortingOrder(private val title: String, val comparator: Comparator<String>) {
 
@@ -150,7 +150,7 @@ class TextSortingTransformer(
     override fun toString(): String = title
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class WordsDelimiter(private val title: String, val splitPattern: Regex?, val joinDelimiter: String?) {
 
@@ -165,7 +165,7 @@ class TextSortingTransformer(
     override fun toString(): String = title
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<TextSortingTransformer> {
 
@@ -183,7 +183,7 @@ class TextSortingTransformer(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

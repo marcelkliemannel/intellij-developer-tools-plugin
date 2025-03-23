@@ -36,7 +36,7 @@ class JsonSchemaValidator(
   parentDisposable: Disposable,
   private val project: Project?
 ) : DeveloperUiTool(parentDisposable) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var liveValidation = configuration.register("liveValidation", true)
   private val schemaText = configuration.register("schemaText", "", PropertyType.INPUT, EXAMPLE_SCHEMA)
@@ -50,7 +50,7 @@ class JsonSchemaValidator(
   private val validationState: ObservableMutableProperty<ValidationState> = AtomicProperty(ValidationState.VALIDATED)
   private val validationError: ObservableMutableProperty<String> = AtomicProperty("")
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     liveValidation.afterChange {
@@ -60,7 +60,7 @@ class JsonSchemaValidator(
     }
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildUi() {
     row {
@@ -107,7 +107,7 @@ class JsonSchemaValidator(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun validateSchema() {
     schemaErrorHolder.clear()
@@ -194,7 +194,7 @@ class JsonSchemaValidator(
       }
     }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class ValidationState {
 
@@ -203,7 +203,7 @@ class JsonSchemaValidator(
     INVALID_INPUT
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<JsonSchemaValidator> {
 
@@ -220,7 +220,7 @@ class JsonSchemaValidator(
       { configuration -> JsonSchemaValidator(context, configuration, parentDisposable, project) }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

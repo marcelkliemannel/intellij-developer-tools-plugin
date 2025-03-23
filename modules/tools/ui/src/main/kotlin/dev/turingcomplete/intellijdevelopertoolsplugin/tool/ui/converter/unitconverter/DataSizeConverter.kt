@@ -15,12 +15,12 @@ import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.validateBigDecimalValue
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.DataUnit
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.NumberSystem
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.bitDataUnit
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.dataUnits
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
 
@@ -28,7 +28,7 @@ class DataSizeConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : MathContextUnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Data Size") {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val bitDataSizeValue = configuration.register("${CONFIGURATION_KEY_PREFIX}bitDataSizeValue", ZERO, INPUT, DEFAULT_BIT_DATA_SIZE_VALUE)
   private val showLargeDataUnits = configuration.register("${CONFIGURATION_KEY_PREFIX}showLargeDataUnits", DEFAULT_SHOW_LARGE_DATA_UNITS)
@@ -36,8 +36,8 @@ class DataSizeConverter(
   private val dataSizeProperties: List<DataSizeProperty> = createDataProperties()
   private val bitDataSizeProperty = dataSizeProperties.first { it.dataUnit == bitDataUnit }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
@@ -108,7 +108,7 @@ class DataSizeConverter(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createDataProperties() = dataUnits.map {
     if (it == bitDataUnit) {
@@ -119,7 +119,7 @@ class DataSizeConverter(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class DataSizeProperty(
     val dataUnit: DataUnit,
@@ -141,7 +141,7 @@ class DataSizeConverter(
     override fun toString(): String = dataUnit.name
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

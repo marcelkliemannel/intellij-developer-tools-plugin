@@ -6,19 +6,19 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.DumbAwareAction
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.executeWriteCommand
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.DataGenerators.DataGenerator
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.DataGenerators.DataGeneratorBase
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.DataGenerators.DataGeneratorsGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.DataGenerators.dataGenerators
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.executeWriteCommand
 
 class DataGeneratorActionGroup : DefaultActionGroup("Insert Generated Data", true) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val dataGeneratorActions: Array<AnAction> = dataGenerators.map { createDataGeneratorAction(it) }.toTypedArray()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getChildren(e: AnActionEvent?): Array<AnAction> = dataGeneratorActions
 
@@ -29,7 +29,7 @@ class DataGeneratorActionGroup : DefaultActionGroup("Insert Generated Data", tru
 
   override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createDataGeneratorAction(dataGeneratorBase: DataGeneratorBase): AnAction = when(dataGeneratorBase) {
     is DataGenerator -> DataGeneratorAction(dataGeneratorBase)
@@ -40,7 +40,7 @@ class DataGeneratorActionGroup : DefaultActionGroup("Insert Generated Data", tru
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class DataGeneratorAction(
     private val dataGenerator: DataGenerator
@@ -64,5 +64,5 @@ class DataGeneratorActionGroup : DefaultActionGroup("Insert Generated Data", tru
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

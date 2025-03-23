@@ -27,7 +27,7 @@ abstract class NamespaceAndNameBasedUuidGenerator(
   private val parentDisposable: Disposable,
   supportsBulkGeneration: Boolean
 ) : SpecificUuidGenerator(supportsBulkGeneration) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var namespaceMode = configuration.register(
     "${version}NamespaceMode",
@@ -43,8 +43,8 @@ abstract class NamespaceAndNameBasedUuidGenerator(
   )
   private var name = configuration.register("${version}Name", "")
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildConfigurationUi(visible: ComponentPredicate) {
@@ -97,8 +97,8 @@ abstract class NamespaceAndNameBasedUuidGenerator(
     return Generators.nameBasedGenerator(namespace, algorithm).generate(name.get()).toString()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class NamespaceMode {
 
@@ -106,7 +106,7 @@ abstract class NamespaceAndNameBasedUuidGenerator(
     INDIVIDUAL
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class PredefinedNamespace(private val title: String, val value: UUID) {
 
@@ -118,7 +118,7 @@ abstract class NamespaceAndNameBasedUuidGenerator(
     override fun toString(): String = "$title ($value)"
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

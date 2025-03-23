@@ -23,8 +23,8 @@ class SimpleTable<T>(
   private val toCopyValue: (T) -> String,
   initialSortedColumn: Pair<Int, SortOrder> = Pair(0, SortOrder.ASCENDING)
 ) : JBTable(), DataProvider {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     model = ListTableModel(columns.toTypedArray(), items, initialSortedColumn.first, initialSortedColumn.second)
@@ -43,7 +43,7 @@ class SimpleTable<T>(
     TableSpeedSearch.installOn(this)
   }
 
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun reload() {
     model.uncheckedCastTo<ListTableModel<*>>().apply {
@@ -78,7 +78,7 @@ class SimpleTable<T>(
       setAnimationEnabled(false)
     }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

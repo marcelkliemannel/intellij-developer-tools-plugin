@@ -2,18 +2,18 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.edito
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.util.TextRange
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.action.EscapeUnescapeActionGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.PsiJavaUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.action.EscapeUnescapeActionGroup
 
 class EscapeUnescapeJavaCodeActionGroup : EscapeUnescapeActionGroup() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? =
     PsiJavaUtils.getPsiElementAtCaret(e)?.let { PsiJavaUtils.getTextIfStringValue(it) }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

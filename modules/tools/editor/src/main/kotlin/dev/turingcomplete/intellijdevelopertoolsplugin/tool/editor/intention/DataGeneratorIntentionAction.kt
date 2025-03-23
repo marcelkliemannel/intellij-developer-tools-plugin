@@ -16,9 +16,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.DataGenerator
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.DataGenerators.dataGenerators
 
 class DataGeneratorIntentionAction : IntentionAction, LowPriorityAction {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun startInWriteAction(): Boolean = false
 
@@ -41,8 +41,8 @@ class DataGeneratorIntentionAction : IntentionAction, LowPriorityAction {
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class GenerateTextListPopupStep(
     dataGenerators: List<DataGeneratorBase>,
@@ -75,6 +75,6 @@ class DataGeneratorIntentionAction : IntentionAction, LowPriorityAction {
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

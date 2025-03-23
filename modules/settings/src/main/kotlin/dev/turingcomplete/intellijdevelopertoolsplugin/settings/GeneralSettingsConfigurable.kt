@@ -16,9 +16,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.message.Settings
 class GeneralSettingsConfigurable : SettingsConfigurable<GeneralSettings>(
   settings = generalSettings
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getDisplayName(): @NlsContexts.ConfigurableName String? =
     SettingsBundle.message("general-settings.title")
@@ -47,7 +47,7 @@ class GeneralSettingsConfigurable : SettingsConfigurable<GeneralSettings>(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

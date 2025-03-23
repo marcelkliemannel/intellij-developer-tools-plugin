@@ -14,7 +14,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecod
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecoders.executeEncodingInEditor
 
 open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val encoderActionGroup by lazy {
     createActionGroup(
@@ -39,8 +39,8 @@ open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false
     )
   }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   final override fun update(e: AnActionEvent) {
     val editor = e.getData(EDITOR)
@@ -56,7 +56,7 @@ open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false
     return editor.getSelectedText()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createActionGroup(title: String, actions: List<AnAction>) = object : DefaultActionGroup(title, true) {
 
@@ -65,7 +65,7 @@ open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false
     override fun getChildren(e: AnActionEvent?): Array<AnAction> = decoderActions
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class EncoderAction(
     val encoder: Encoder,
@@ -79,7 +79,7 @@ open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class DecoderAction(
     val decoder: EncodersDecoders.Decoder,
@@ -93,5 +93,5 @@ open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

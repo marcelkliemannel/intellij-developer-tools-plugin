@@ -9,7 +9,7 @@ import java.math.BigDecimal
 import java.math.MathContext
 
 object DataUnits {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val bigDecimalEight = BigDecimal.valueOf(8)
 
@@ -108,9 +108,9 @@ object DataUnits {
     )
   ).flatten()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createDataUnits(
     decimalPrefix: String,
@@ -127,7 +127,7 @@ object DataUnits {
     DataUnit("${binaryPrefix}byte", "${binaryAbbreviationFirstLetter}iB", isLarge, BYTE, BINARY, binaryExponent)
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   enum class NumberSystem(val title: String, val base: BigDecimal) {
 
@@ -136,7 +136,7 @@ object DataUnits {
     DECIMAL("Decimal", BigDecimal.valueOf(10))
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   enum class BaseDataUnit {
 
@@ -144,7 +144,7 @@ object DataUnits {
     BYTE,
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   open class DataUnit(
     val name: String,

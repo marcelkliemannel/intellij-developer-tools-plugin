@@ -41,7 +41,7 @@ abstract class TextTransformer(
   parentDisposable: Disposable,
   protected val project: Project?
 ) : DeveloperUiTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   protected var liveTransformation = configuration.register("liveTransformation", true)
   protected val sourceText = configuration.register("sourceText", "", PropertyType.INPUT, textTransformerContext.initialSourceExampleText)
@@ -50,8 +50,8 @@ abstract class TextTransformer(
   private val sourceEditor by lazy { createSourceInputEditor() }
   private val resultEditor by lazy { createResultOutputEditor(parentDisposable) }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   protected abstract fun transform()
 
@@ -113,7 +113,7 @@ abstract class TextTransformer(
     configuration.removeChangeListener(this)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun Panel.buildActionsUi() {
     row {
@@ -208,7 +208,7 @@ abstract class TextTransformer(
       initialLanguage = textTransformerContext.outputInitialLanguage ?: PlainTextLanguage.INSTANCE
     )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class TextTransformerContext(
     val transformActionTitle: String,
@@ -226,5 +226,5 @@ abstract class TextTransformer(
     val title: String
   )
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

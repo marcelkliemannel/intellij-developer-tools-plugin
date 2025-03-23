@@ -14,13 +14,13 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolService
 
 object ShowDeveloperToolUtils {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   val showDeveloperToolActions: Array<AnAction> by lazy { createShowDeveloperToolsActions() }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createShowDeveloperToolsActions(): Array<AnAction> {
     val showDeveloperToolActions = mutableListOf<AnAction>()
@@ -59,5 +59,5 @@ object ShowDeveloperToolUtils {
       }
     }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 }

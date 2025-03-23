@@ -37,7 +37,7 @@ class SqlFormattingTransformer(
   parentDisposable = parentDisposable,
   project = project
 ), DeveloperToolConfiguration.ChangeListener {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var dialect = configuration.register("dialect", DEFAULT_DIALECT)
   private var indentSpaces = configuration.register("indentSpaces", DEFAULT_INDENT_SPACES)
@@ -47,8 +47,8 @@ class SqlFormattingTransformer(
 
   private lateinit var formatConfig: FormatConfig
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildMiddleConfigurationUi() {
     row {
@@ -98,7 +98,7 @@ class SqlFormattingTransformer(
     super.configurationChanged(property)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun updateFormatConfig() {
     formatConfig = FormatConfig.builder()
@@ -109,7 +109,7 @@ class SqlFormattingTransformer(
       .build()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<SqlFormattingTransformer> {
 
@@ -127,7 +127,7 @@ class SqlFormattingTransformer(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

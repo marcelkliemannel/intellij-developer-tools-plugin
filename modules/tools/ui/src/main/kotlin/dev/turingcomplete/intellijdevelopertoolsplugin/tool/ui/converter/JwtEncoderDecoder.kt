@@ -101,7 +101,7 @@ class JwtEncoderDecoder(
   parentDisposable: Disposable,
   private val project: Project?,
 ) : DeveloperUiTool(parentDisposable) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)
   private var encodedText = configuration.register("encodedText", "", INPUT, EXAMPLE_ENCODED)
@@ -122,7 +122,7 @@ class JwtEncoderDecoder(
 
   private val jwt = Jwt(configuration, encodedText, headerText, payloadText)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     liveConversion.afterChange(parentDisposable) { handleLiveConversionSwitch() }
@@ -134,7 +134,7 @@ class JwtEncoderDecoder(
     }
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildUi() {
     row {
@@ -295,7 +295,7 @@ class JwtEncoderDecoder(
     convert(ENCODED)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun convertFromUi(changeOrigin: ChangeOrigin) {
     if (!liveConversion.get()) {
@@ -481,7 +481,7 @@ class JwtEncoderDecoder(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class StandardClaimGutterIconRenderer(
     private val textRange: TextRange,
@@ -506,7 +506,7 @@ class JwtEncoderDecoder(
     override fun getAlignment(): Alignment = Alignment.RIGHT
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ClaimFeatureUnixTimestampGutterIconRenderer(
     private val textRange: TextRange,
@@ -550,7 +550,7 @@ class JwtEncoderDecoder(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class ChangeOrigin {
 
@@ -559,7 +559,7 @@ class JwtEncoderDecoder(
     SIGNATURE_CONFIGURATION
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class SignatureAlgorithmKind(
     val keyFactory: KeyFactory?
@@ -570,7 +570,7 @@ class JwtEncoderDecoder(
     ECDSA(KeyFactory.getInstance("EC"))
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class SignatureAlgorithm(
     val jwtHeaderValue: String,
@@ -599,7 +599,7 @@ class JwtEncoderDecoder(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class Jwt(
     configuration: DeveloperToolConfiguration,
@@ -739,7 +739,7 @@ class JwtEncoderDecoder(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class Signature(
     configuration: DeveloperToolConfiguration,
@@ -846,7 +846,7 @@ class JwtEncoderDecoder(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class StandardClaim(
     val fieldName: String,
@@ -877,7 +877,7 @@ class JwtEncoderDecoder(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<JwtEncoderDecoder> {
 
@@ -894,10 +894,10 @@ class JwtEncoderDecoder(
       { configuration -> JwtEncoderDecoder(context, configuration, parentDisposable, project) }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ExtendedJsonWebSignature : JsonWebSignature() {
 
@@ -906,7 +906,7 @@ class JwtEncoderDecoder(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   enum class SecretKeyEncodingMode(val title: String) {
 
@@ -915,7 +915,7 @@ class JwtEncoderDecoder(
     BASE64("Base64 Encoded")
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

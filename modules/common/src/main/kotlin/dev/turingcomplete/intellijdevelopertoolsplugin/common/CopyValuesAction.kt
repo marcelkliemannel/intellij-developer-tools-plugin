@@ -15,10 +15,10 @@ class CopyValuesAction(
   private val valueToString: (Any) -> String? = { it.toString() },
   icon: Icon? = PlatformIcons.COPY_ICON
 ) : DumbAwareAction(singleValue, null, icon) {
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun update(e: AnActionEvent) {
     val selectedValues = SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
@@ -40,6 +40,6 @@ class CopyValuesAction(
 
   override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 }

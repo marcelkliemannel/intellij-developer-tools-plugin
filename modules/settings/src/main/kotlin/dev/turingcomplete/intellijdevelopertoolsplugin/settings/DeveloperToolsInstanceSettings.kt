@@ -27,7 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.KClass
 
 abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<InstanceState> {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val developerToolsConfigurations = ConcurrentHashMap<String, CopyOnWriteArrayList<DeveloperToolConfiguration>>()
 
@@ -35,8 +35,8 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
   var expandedGroupNodeIds: MutableSet<String>? = null
     private set
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   fun setExpandedGroupNodeIds(expandedGroupNodeIds: Set<String>) {
     this.expandedGroupNodeIds = expandedGroupNodeIds.toMutableSet()
@@ -101,7 +101,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
       }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun shouldSavePropertyType(propertyType: PropertyType): Boolean =
     when (propertyType) {
@@ -136,7 +136,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
     )
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   open class InstanceState(
     @get:XCollection(style = v2, elementName = "developerToolsConfigurations")
@@ -147,7 +147,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
     var expandedGroupNodeIds: List<String>? = null
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   @Tag(value = "developerToolConfiguration")
   data class DeveloperToolConfigurationState(
@@ -161,7 +161,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
     var properties: List<DeveloperToolConfigurationProperty>? = null,
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   @Tag(value = "property")
   data class DeveloperToolConfigurationProperty(
@@ -173,7 +173,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
     var type: PropertyType? = null
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   /**
    * Using a dedicated converter to handle removed values from the [PropertyType].
@@ -189,7 +189,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class StatePropertyValueConverter : Converter<Any>() {
 
@@ -229,7 +229,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

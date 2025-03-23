@@ -28,7 +28,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.message.Settings
   titleBundleKey = "general-settings.advanced-group.title"
 )
 interface GeneralSettings : Settings {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   @Setting(
     titleBundleKey = "general-settings.add-open-main-dialog-action-to-main-toolbar.title",
@@ -100,10 +100,10 @@ interface GeneralSettings : Settings {
   @BooleanValue(defaultValue = false)
   val dialogIsModal: BooleanSettingProperty
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   enum class ActionHandlingInstance(private val title: String) {
 
@@ -113,7 +113,7 @@ interface GeneralSettings : Settings {
     override fun toString(): String = title
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

@@ -11,9 +11,9 @@ import com.intellij.ui.IconManager
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.ShowDeveloperToolUtils.showDeveloperToolActions
 
 class ShowDeveloperUiToolKeymapExtension : KeymapExtension {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun createGroup(filtered: Condition<in AnAction>?, project: Project?): KeymapGroup? {
     val group = KeymapGroupFactory.getInstance().createGroup("Show Developer Tool", icon)
@@ -25,9 +25,9 @@ class ShowDeveloperUiToolKeymapExtension : KeymapExtension {
     return group
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   private val icon = IconManager.getInstance().getIcon("dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg", ShowDeveloperUiToolKeymapExtension::class.java.classLoader)
 }

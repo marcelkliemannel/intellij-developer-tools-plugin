@@ -18,7 +18,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsAp
 
 @Service(Service.Level.APP)
 class ObjectMapperService {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var jsonMapper: JsonMapper? = null
   private var lastJsonHandlingModificationsCounter: Int = 0
@@ -28,8 +28,8 @@ class ObjectMapperService {
   private val tomlMapper: TomlMapper = TomlMapper()
   private val javaPropsMapper: JavaPropsMapper = JavaPropsMapper()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun jsonMapper(): JsonMapper {
     if (jsonMapper == null || lastJsonHandlingModificationsCounter != DeveloperToolsApplicationSettings.jsonHandling.modificationsCounter) {
@@ -58,7 +58,7 @@ class ObjectMapperService {
       .writeValueAsString(this)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   fun createJsonMapper(): JsonMapper {
     val settings = DeveloperToolsApplicationSettings.jsonHandling
@@ -144,8 +144,8 @@ class ObjectMapperService {
     }.build()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

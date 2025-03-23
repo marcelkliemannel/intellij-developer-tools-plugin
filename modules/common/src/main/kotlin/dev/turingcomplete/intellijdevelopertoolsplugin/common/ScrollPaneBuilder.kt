@@ -8,14 +8,14 @@ import javax.swing.ScrollPaneConstants
 class ScrollPaneBuilder(
   private val component: JComponent
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var withoutBorder: Boolean = true
   private var verticalScrollBarPolicy: Int = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
   private var horizontalScrollBarPolicy: Int = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun withoutBorder(withoutBorder: Boolean): ScrollPaneBuilder {
     this.withoutBorder = withoutBorder
@@ -57,7 +57,7 @@ class ScrollPaneBuilder(
     return scrollPane
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

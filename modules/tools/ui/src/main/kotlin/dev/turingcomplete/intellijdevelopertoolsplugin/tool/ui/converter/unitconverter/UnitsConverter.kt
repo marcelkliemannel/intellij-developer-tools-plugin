@@ -23,7 +23,7 @@ class UnitsConverter(
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable), ResetListener, ChangeListener {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var lastSelectedUnitConverterIndex by configuration.register("lastSelectedUnitConverterIndex", DEFAULT_LAST_SELECTED_UNIT_CONVERTER_INDEX)
 
@@ -37,13 +37,13 @@ class UnitsConverter(
 
   private lateinit var unitConvertersTabbedPanel: TabbedPaneWrapper
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     wrapComponentInScrollPane = false
   }
 
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildUi() {
     unitConvertersTabbedPanel = TabbedPaneWrapper(parentDisposable).apply {
@@ -110,13 +110,13 @@ class UnitsConverter(
     sync()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun sync() {
     unitConverters.forEach { it.sync() }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<UnitsConverter> {
 
@@ -133,7 +133,7 @@ class UnitsConverter(
       { configuration -> UnitsConverter(configuration, parentDisposable) }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

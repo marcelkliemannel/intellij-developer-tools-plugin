@@ -28,11 +28,11 @@ class HashingTransformer(
   parentDisposable = parentDisposable,
   project = project
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var selectedAlgorithm = configuration.register("algorithm", DEFAULT_ALGORITHM)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     check(messageDigestAlgorithms.isNotEmpty())
@@ -43,7 +43,7 @@ class HashingTransformer(
     }
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun transform() {
     val hash = selectedAlgorithm.get().toMessageDigest().digest(sourceText.get().encodeToByteArray())
@@ -58,8 +58,8 @@ class HashingTransformer(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<HashingTransformer> {
 
@@ -81,7 +81,7 @@ class HashingTransformer(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

@@ -15,12 +15,12 @@ import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor.EditorMode.INPUT_OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.PropertyComponentPredicate
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 
 abstract class TextConverter(
   protected val textConverterContext: TextConverterContext,
@@ -29,7 +29,7 @@ abstract class TextConverter(
   protected val project: Project?,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)
   protected var sourceText = configuration.register("sourceText", textConverterContext.defaultSourceText, INPUT)
@@ -43,7 +43,7 @@ abstract class TextConverter(
   private val sourceEditor by lazy { createSourceEditor() }
   private val targetEditor by lazy { createTargetEditor() }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     liveConversion.afterChange(parentDisposable) {
@@ -51,7 +51,7 @@ abstract class TextConverter(
     }
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildUi() {
     buildTopConfigurationUi()
@@ -121,7 +121,7 @@ abstract class TextConverter(
     configuration.removeChangeListener(this)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun Panel.buildActionsUi() {
     buttonsGroup {
@@ -250,7 +250,7 @@ abstract class TextConverter(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   enum class ActiveInput {
 
@@ -258,7 +258,7 @@ abstract class TextConverter(
     TARGET
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class TextConverterContext(
     val convertActionTitle: String,
@@ -276,5 +276,5 @@ abstract class TextConverter(
     val title: String
   )
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

@@ -8,11 +8,11 @@ class PropertyComponentPredicate<T>(
   private val property: ObservableProperty<T>,
   private val expectedValue: T
 ) : ComponentPredicate() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val changeDispatcher = SingleEventDispatcher.create<T>()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     property.afterChange { value ->
@@ -20,7 +20,7 @@ class PropertyComponentPredicate<T>(
     }
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun addListener(listener: (Boolean) -> Unit) {
     changeDispatcher.whenEventHappened { value ->
@@ -30,7 +30,7 @@ class PropertyComponentPredicate<T>(
 
   override fun invoke(): Boolean = property.get()?.equals(expectedValue) ?: false
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

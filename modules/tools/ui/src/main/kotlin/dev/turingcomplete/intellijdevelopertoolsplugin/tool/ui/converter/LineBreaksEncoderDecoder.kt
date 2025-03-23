@@ -6,9 +6,9 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 
 class LineBreaksEncoderDecoder(
   configuration: DeveloperToolConfiguration,
@@ -22,12 +22,12 @@ class LineBreaksEncoderDecoder(
   context = context,
   project = project
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var lineBreakDecoding = configuration.register("lineBreakDecoding", LineBreak.CRLF)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun toTarget(text: String) {
     targetText.set(
@@ -55,8 +55,8 @@ class LineBreaksEncoderDecoder(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class LineBreak(val title: String) {
 
@@ -66,7 +66,7 @@ class LineBreaksEncoderDecoder(
     override fun toString(): String = title
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<LineBreaksEncoderDecoder> {
 
@@ -83,5 +83,5 @@ class LineBreaksEncoderDecoder(
       { configuration -> LineBreaksEncoderDecoder(configuration, parentDisposable, context, project) }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

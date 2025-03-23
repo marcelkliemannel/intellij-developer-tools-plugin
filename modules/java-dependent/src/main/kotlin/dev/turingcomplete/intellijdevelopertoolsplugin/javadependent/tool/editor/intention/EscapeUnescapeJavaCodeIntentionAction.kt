@@ -7,9 +7,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.PsiJavaUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.EscapeUnescapeIntentionAction
 
 class EscapeUnescapeJavaCodeIntentionAction : EscapeUnescapeIntentionAction() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getFamilyName(): String = "Escape or unescape Java string"
 
@@ -20,7 +20,7 @@ class EscapeUnescapeJavaCodeIntentionAction : EscapeUnescapeIntentionAction() {
     return PsiJavaUtils.getTextIfStringValue(psiElement)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

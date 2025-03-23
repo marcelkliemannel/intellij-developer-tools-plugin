@@ -18,9 +18,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecod
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecoders.executeEncodingInEditor
 
 abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   final override fun startInWriteAction(): Boolean = false
 
@@ -45,8 +45,8 @@ abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction 
 
   abstract fun getSourceText(editor: Editor, file: PsiFile): Pair<String, TextRange>?
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class EncodersDecodersModeSelectionListPopupStep(
     text: String,
@@ -66,14 +66,14 @@ abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction 
       baseListPopupStep
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   interface EncoderDecoderListPopupStep<T> : PopupStep<T> {
 
     val actionName: String
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class EncoderListPopupStep(
     private val text: String,
@@ -91,7 +91,7 @@ abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction 
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class DecoderListPopupStep(
     private val text: String,
@@ -109,6 +109,6 @@ abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction 
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

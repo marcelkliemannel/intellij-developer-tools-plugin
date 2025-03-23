@@ -9,9 +9,9 @@ import com.intellij.openapi.project.DumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.safeCastTo
 
 class OpenMainDialogAction : DumbAwareAction() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun actionPerformed(e: AnActionEvent) {
     ApplicationManager.getApplication().service<MainDialogService>().openDialog(e.project)
@@ -19,9 +19,9 @@ class OpenMainDialogAction : DumbAwareAction() {
 
   override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

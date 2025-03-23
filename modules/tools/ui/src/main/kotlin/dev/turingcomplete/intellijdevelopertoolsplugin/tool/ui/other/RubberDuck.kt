@@ -18,9 +18,9 @@ import javax.swing.ImageIcon
 import javax.swing.JLabel
 
 class RubberDuck(parentDisposable: Disposable) : DeveloperUiTool(parentDisposable) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildUi() {
     row {
@@ -53,8 +53,8 @@ class RubberDuck(parentDisposable: Disposable) : DeveloperUiTool(parentDisposabl
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<RubberDuck> {
 
@@ -70,5 +70,5 @@ class RubberDuck(parentDisposable: Disposable) : DeveloperUiTool(parentDisposabl
     ): ((DeveloperToolConfiguration) -> RubberDuck) = { RubberDuck(parentDisposable) }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

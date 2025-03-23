@@ -7,7 +7,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
 import kotlin.reflect.KClass
 
 class DeveloperToolConfigurationEnumPropertyTypeEp<T: Enum<T>>: DeveloperToolConfigurationPropertyType<T> {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   @Attribute("id")
   @RequiredElement
@@ -23,8 +23,8 @@ class DeveloperToolConfigurationEnumPropertyTypeEp<T: Enum<T>>: DeveloperToolCon
   override val typeClass: KClass<T>
     get() = Class.forName(type).kotlin.uncheckedCastTo<KClass<T>>()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun fromPersistent(persistentValue: String): T {
     return java.lang.Enum.valueOf(typeClass.java, persistentValue)
@@ -33,9 +33,9 @@ class DeveloperToolConfigurationEnumPropertyTypeEp<T: Enum<T>>: DeveloperToolCon
   override fun toPersistent(value: Any): String =
     value.uncheckedCastTo<Enum<*>>().name
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

@@ -14,14 +14,14 @@ import kotlin.concurrent.write
 
 @Service(Service.Level.PROJECT)
 class MainToolWindowService(val project: Project) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val toolWindowLock = ReentrantReadWriteLock()
   private var toolWindow: ToolWindow? = null
   private var deferredToolTask: ToolTask? = null // Also only used under `toolWindowLock`
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun setToolWindow(toolWindow: ToolWindow) {
     toolWindowLock.write {
@@ -66,7 +66,7 @@ class MainToolWindowService(val project: Project) {
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun <T : OpenDeveloperToolContext> doOpenTool(
     toolWindow: ToolWindow,
@@ -87,22 +87,22 @@ class MainToolWindowService(val project: Project) {
       ?.showTool(id)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private sealed interface ToolTask
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class OpenToolTask<T : OpenDeveloperToolContext>(
     val context: T,
     val reference: OpenDeveloperToolReference<out T>
   ) : ToolTask
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ShowToolTask(val id: String) : ToolTask
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

@@ -5,9 +5,9 @@ import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 
 interface DeveloperUiToolFactory<T : DeveloperUiTool> {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   fun getDeveloperUiToolPresentation(): DeveloperUiToolPresentation
 
@@ -17,7 +17,7 @@ interface DeveloperUiToolFactory<T : DeveloperUiTool> {
     context: DeveloperUiToolContext
   ): ((DeveloperToolConfiguration) -> T)?
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

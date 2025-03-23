@@ -33,12 +33,12 @@ class CliCommandConverter(
   context = context,
   project = project
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val lineBreakDelimiter = configuration.register("lineBreakDelimiter", defaultLineBreakDelimiter)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildMiddleFirstConfigurationUi() {
     row {
@@ -69,8 +69,8 @@ class CliCommandConverter(
     sourceText.set(result)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<CliCommandConverter> {
 
@@ -88,7 +88,7 @@ class CliCommandConverter(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

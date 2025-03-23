@@ -6,15 +6,15 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.InternalSet
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.Settings
 
 interface InternalSettings : Settings {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   @InternalSetting
   @BooleanValue(defaultValue = true)
   val promoteAddOpenMainDialogActionToMainToolbar: BooleanSettingProperty
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

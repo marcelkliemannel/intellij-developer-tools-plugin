@@ -56,9 +56,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.wrapWithToolBar
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings.Companion.generalSettings
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.actionsPopup
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.dumbAwareAction
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.GeneralBundle
 import java.awt.datatransfer.StringSelection
 import java.nio.file.Files
@@ -84,7 +84,7 @@ class AdvancedEditor(
   private val minimumSizeHeight: Int = DEFAULT_MINIMUM_SIZE_HEIGHT,
   private val fixedEditorSoftWraps: Boolean? = null
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var softWraps = configuration.register("${context.id}-${id}-softWraps", fixedEditorSoftWraps ?: generalSettings.editorSoftWraps.get(), CONFIGURATION)
   private var showSpecialCharacters = configuration.register("${context.id}-${id}-showSpecialCharacters", generalSettings.editorShowSpecialCharacters.get(), CONFIGURATION)
@@ -112,7 +112,7 @@ class AdvancedEditor(
 
   val component: JComponent by lazy { createComponent() }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     textProperty.afterChangeConsumeEvent(parentDisposable) { event ->
@@ -152,7 +152,7 @@ class AdvancedEditor(
     }
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   fun onTextChangeFromUi(changeListener: ((String) -> Unit)): AdvancedEditor {
     onTextChangeFromUi.add(changeListener)
@@ -223,7 +223,7 @@ class AdvancedEditor(
     rangeHighlighters.computeIfAbsent(groupId) { mutableListOf() }.add(rangeHighlighter)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createActions(): ActionGroup = DefaultActionGroup().apply {
     add(CopyContentAction())
@@ -375,7 +375,7 @@ class AdvancedEditor(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private inner class TextChangeListener : DocumentListener {
 
@@ -390,7 +390,7 @@ class AdvancedEditor(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private inner class FocusListener : FocusChangeListener {
 
@@ -407,7 +407,7 @@ class AdvancedEditor(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ClearContentAction
     : DumbAwareAction(GeneralBundle.message("advanced-editor.clear-content-action-title"), null, AllIcons.Actions.GC) {
@@ -424,7 +424,7 @@ class AdvancedEditor(
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class CopyContentAction
     : DumbAwareAction(GeneralBundle.message("advanced-editor.copy-to-clipboard-action-title"), null, AllIcons.Actions.Copy) {
@@ -438,7 +438,7 @@ class AdvancedEditor(
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class SaveContentToFileAction : DumbAwareAction(
     GeneralBundle.message("advanced-editor.save-to-file-action-title"),
@@ -462,7 +462,7 @@ class AdvancedEditor(
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class OpenContentFromFileAction : DumbAwareAction(
     GeneralBundle.message("advanced-editor.open-file-action-title"),
@@ -487,7 +487,7 @@ class AdvancedEditor(
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ExpandEditorAction(private val originalEditor: AdvancedEditor) :
     AnActionButton(GeneralBundle.message("advanced-editor.expand-editor-action-title"), null, AllIcons.Actions.MoveToWindow), DumbAware {
@@ -534,7 +534,7 @@ class AdvancedEditor(
 
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class DiffSupport(
     val title: String,
@@ -542,7 +542,7 @@ class AdvancedEditor(
     val secondText: () -> String
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   enum class EditorMode(val title: String, val editable: Boolean) {
 
@@ -551,7 +551,7 @@ class AdvancedEditor(
     INPUT_OUTPUT(GeneralBundle.message("advanced-editor.mode.input-output"), true),
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

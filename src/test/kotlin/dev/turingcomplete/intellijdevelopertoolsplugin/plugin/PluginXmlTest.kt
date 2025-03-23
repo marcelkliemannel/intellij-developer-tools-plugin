@@ -7,9 +7,9 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 class PluginXmlTest {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   @Test
   fun `test that all referenced class name exist`() {
@@ -48,7 +48,7 @@ class PluginXmlTest {
     assertThat(missingReferencedFiles).describedAs("No missing referenced files").isEmpty()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   fun Element.getAttributeValuesRecursively(vararg attributeNames: String): List<String> {
     val values = mutableListOf<String>()
@@ -78,8 +78,8 @@ class PluginXmlTest {
     return values
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

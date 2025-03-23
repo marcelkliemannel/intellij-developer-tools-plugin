@@ -15,12 +15,12 @@ import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.validateBigDecimalValue
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.DataUnit
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.NumberSystem
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.bitDataUnit
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.dataUnits
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import java.math.BigDecimal
 import java.math.BigDecimal.ONE
 import java.math.BigDecimal.ZERO
@@ -30,7 +30,7 @@ class TransferRateConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
 ) : MathContextUnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Transfer Rate") {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val timeDimension = configuration.register("${CONFIGURATION_KEY_PREFIX}timeDimension", DEFAULT_TIME_DIMENSION)
   private val showLargeDataUnits = configuration.register("${CONFIGURATION_KEY_PREFIX}showLargeDataUnits", DEFAULT_SHOW_LARGE_DATA_UNITS)
@@ -43,8 +43,8 @@ class TransferRateConverter(
 
   private var lastTimeDimension: TransferRateTimeDimension = timeDimension.get()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
@@ -112,7 +112,7 @@ class TransferRateConverter(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun convertByInputFieldChange(
     inputFieldComponent: JBTextField?,
@@ -167,7 +167,7 @@ class TransferRateConverter(
     return "${dataUnit.name}s per ${timeDimension.shortTitle} (${dataUnit.abbreviation}$abbreviationSeparator${timeDimension.abbreviation})"
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   enum class TransferRateTimeDimension(
     val title: String,
@@ -182,7 +182,7 @@ class TransferRateConverter(
     DAYS("Days", "days", "d", TimeUnit.DAYS.toSeconds(1).toBigDecimal())
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class TransferRateProperty(
     val dataUnit: DataUnit,
@@ -221,7 +221,7 @@ class TransferRateConverter(
     override fun toString(): String = dataUnit.name
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

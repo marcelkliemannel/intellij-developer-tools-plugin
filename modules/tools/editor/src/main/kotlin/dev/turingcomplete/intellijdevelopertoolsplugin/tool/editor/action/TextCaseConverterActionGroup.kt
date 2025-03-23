@@ -15,13 +15,13 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils.dete
 import dev.turingcomplete.textcaseconverter.TextCase
 
 open class TextCaseConverterActionGroup : DefaultActionGroup("Convert Text Case To", true) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val textCasesAction: Array<AnAction> =
     allTextCases.map { ConvertTextCaseAction(it) { getSourceText(it) } }.toTypedArray()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   final override fun update(e: AnActionEvent) {
     val editor = e.getData(CommonDataKeys.EDITOR)
@@ -37,8 +37,8 @@ open class TextCaseConverterActionGroup : DefaultActionGroup("Convert Text Case 
     return editor.getSelectedText()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ConvertTextCaseAction(
     val textCase: TextCase,
@@ -65,5 +65,5 @@ open class TextCaseConverterActionGroup : DefaultActionGroup("Convert Text Case 
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

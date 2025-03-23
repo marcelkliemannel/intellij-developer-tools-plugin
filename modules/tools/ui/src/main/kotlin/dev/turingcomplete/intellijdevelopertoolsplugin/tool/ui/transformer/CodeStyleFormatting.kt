@@ -35,11 +35,11 @@ class CodeStyleFormatting(
   parentDisposable = parentDisposable,
   project = project
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var selectedCodeStyleLanguageId = configuration.register("languageId", FAVORITE_DEFAULT_LANGUAGE_ID)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     check(codeStyles.isNotEmpty())
@@ -50,7 +50,7 @@ class CodeStyleFormatting(
     }
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildTopConfigurationUi() {
@@ -82,18 +82,18 @@ class CodeStyleFormatting(
     } ?: error("snh: Can't get PSI file for `LightVirtualFile`")
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun getSelectedCodeStyle() = codeStyles.first { it.language.id == selectedCodeStyleLanguageId.get() }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class CodeStyle(val title: String, val language: Language) {
 
     override fun toString(): String = title
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<CodeStyleFormatting> {
 
@@ -125,7 +125,7 @@ class CodeStyleFormatting(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

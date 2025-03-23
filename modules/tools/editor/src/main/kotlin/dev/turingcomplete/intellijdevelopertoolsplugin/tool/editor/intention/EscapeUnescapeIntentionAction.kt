@@ -18,9 +18,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnesc
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnescapers.executeUnescapeInEditor
 
 abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityAction {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   final override fun startInWriteAction(): Boolean = false
 
@@ -45,8 +45,8 @@ abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityActio
 
   abstract fun getSourceText(editor: Editor, file: PsiFile): Pair<String, TextRange>?
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class EscapersUnescapersModeSelectionListPopupStep(
     text: String,
@@ -66,14 +66,14 @@ abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityActio
       baseListPopupStep
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   interface EscaperUnescaperListPopupStep<T> : PopupStep<T> {
 
     val actionName: String
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class EscaperListPopupStep(
     private val text: String,
@@ -91,7 +91,7 @@ abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityActio
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class UnescaperListPopupStep(
     private val text: String,
@@ -109,6 +109,6 @@ abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityActio
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

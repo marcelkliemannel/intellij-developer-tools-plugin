@@ -7,9 +7,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.PsiJavaUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.EncodeDecodeIntentionAction
 
 class EncodeDecodeJavaCodeIntentionAction : EncodeDecodeIntentionAction() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getFamilyName(): String = "Encode or decode Java string or identifier"
 
@@ -20,7 +20,7 @@ class EncodeDecodeJavaCodeIntentionAction : EncodeDecodeIntentionAction() {
     return PsiJavaUtils.getTextIfStringValueOrIdentifier(psiElement)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

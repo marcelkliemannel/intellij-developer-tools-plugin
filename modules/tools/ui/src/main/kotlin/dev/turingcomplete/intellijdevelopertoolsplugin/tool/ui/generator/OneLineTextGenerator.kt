@@ -36,7 +36,7 @@ abstract class OneLineTextGenerator(
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   protected val supportsBulkGeneration = BooleanComponentPredicate(true)
 
@@ -44,8 +44,8 @@ abstract class OneLineTextGenerator(
   private val invalidConfiguration = AtomicBooleanProperty(false)
   private val generationAlarm by lazy { Alarm(parentDisposable) }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   final override fun Panel.buildUi() {
     buildConfigurationUi()
@@ -92,7 +92,7 @@ abstract class OneLineTextGenerator(
     else -> super.getData(dataId)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun doGenerate() {
     val generate: () -> Unit = {
@@ -155,7 +155,7 @@ abstract class OneLineTextGenerator(
     }.visibleIf(invalidConfiguration)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class RegenerateAction(private val generateContent: () -> Unit) :
     DumbAwareAction("Regenerate", null, AllIcons.Actions.Refresh) {
@@ -167,7 +167,7 @@ abstract class OneLineTextGenerator(
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

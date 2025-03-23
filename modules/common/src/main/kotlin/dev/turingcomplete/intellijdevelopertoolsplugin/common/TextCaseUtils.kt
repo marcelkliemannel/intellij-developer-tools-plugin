@@ -6,7 +6,7 @@ import dev.turingcomplete.textcaseconverter.TextCase
 import dev.turingcomplete.textcaseconverter.WordsSplitter
 
 object TextCaseUtils {
-  // -- Variables --------------------------------------------------------------------------------------------------- //
+  // -- Variables ----------------------------------------------------------- //
 
   private val spacesPattern = Regex("\\s+")
 
@@ -20,8 +20,8 @@ object TextCaseUtils {
   val allTextCases = StandardTextCases.ALL_STANDARD_TEXT_CASES
     .sortedWith(sortTextCases())
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun determineWordsSplitter(text: String, targetTextCase: TextCase): WordsSplitter {
     if (textCasesWithoutSplitWords.contains(targetTextCase)) {
@@ -36,7 +36,7 @@ object TextCaseUtils {
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun sortTextCases() = compareBy<TextCase> {
     val primaryTextCases = listOf(
@@ -55,5 +55,5 @@ object TextCaseUtils {
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 }

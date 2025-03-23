@@ -48,14 +48,14 @@ class HmacTransformer(
   parentDisposable = parentDisposable,
   project = project
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var selectedAlgorithm = configuration.register("algorithm", DEFAULT_ALGORITHM)
 
   private val secretKey = configuration.register("secretKey", SECRET_KEY_DEFAULT, SENSITIVE, EXAMPLE_SECRET)
   private val secretKeyEncodingMode = configuration.register("secretKeyEncodingMode", RAW, CONFIGURATION)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     check(algorithms.isNotEmpty())
@@ -79,7 +79,7 @@ class HmacTransformer(
     }
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun transform() {
     if (validate().isNotEmpty()) {
@@ -145,15 +145,15 @@ class HmacTransformer(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private data class HmacAlgorithm(val title: String, val algorithm: String) {
 
     override fun toString(): String = title
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   enum class SecretKeyEncodingMode(val title: String) {
 
@@ -162,7 +162,7 @@ class HmacTransformer(
     BASE64("Base64 Encoded")
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<HmacTransformer> {
 
@@ -184,7 +184,7 @@ class HmacTransformer(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

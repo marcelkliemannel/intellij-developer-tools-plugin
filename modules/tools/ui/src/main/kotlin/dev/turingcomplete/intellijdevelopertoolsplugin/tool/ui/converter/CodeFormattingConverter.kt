@@ -37,15 +37,15 @@ class CodeFormattingConverter(
   context = context,
   project = project
 ), DeveloperToolConfiguration.ChangeListener {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var firstLanguage = configuration.register("firstLanguage", Language.JSON)
   private var secondLanguage = configuration.register("secondLanguage", Language.YAML)
 
   private val codeStyles by lazy { LanguageCodeStyleSettingsProvider.EP_NAME.extensionList.associate { it.language.id to it.language } }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun configurationChanged(property: ValueProperty<out Any>) {
     setLanguages()
@@ -90,7 +90,7 @@ class CodeFormattingConverter(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun covert(inputErrorHolder: ErrorHolder, doConvert: () -> Unit) {
     // We have to clear both `ErrorHolder`s here. If he user makes an invalid
@@ -115,7 +115,7 @@ class CodeFormattingConverter(
     codeStyles[secondLanguage.get().languageId]?.let { setTargetLanguage(it) }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class Language(
     val title: String,
@@ -138,7 +138,7 @@ class CodeFormattingConverter(
       objectMapper(ObjectMapperService.instance).writeValueAsString(root)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<CodeFormattingConverter> {
 
@@ -156,5 +156,5 @@ class CodeFormattingConverter(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

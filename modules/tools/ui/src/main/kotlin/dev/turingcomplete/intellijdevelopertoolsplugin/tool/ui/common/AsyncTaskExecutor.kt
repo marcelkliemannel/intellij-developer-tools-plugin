@@ -17,20 +17,20 @@ class AsyncTaskExecutor(
   parentDisposable: Disposable,
   private val executionThread: ExecutionThread
 ) : Disposable {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val taskQueue = ConcurrentLinkedQueue<Pair<Runnable, Long>>()
   private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
   var isDisposed: Boolean = false
     private set
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     Disposer.register(parentDisposable, this)
   }
 
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun dispose() {
     isDisposed = true
@@ -59,7 +59,7 @@ class AsyncTaskExecutor(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private suspend fun executeTask(task: Runnable) {
     when (executionThread) {
@@ -74,14 +74,14 @@ class AsyncTaskExecutor(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   enum class ExecutionThread {
     POOLED,
     EDT
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

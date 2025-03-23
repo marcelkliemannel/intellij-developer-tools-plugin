@@ -54,9 +54,9 @@ import kotlin.reflect.KClass
  * Test is in this project and not `settings` due to access to [DeveloperUiToolFactoryEp].
  */
 class DeveloperToolsInstanceSettingsTest : IdeaTest() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   @Test
   fun `Check various configurations persistent states`() {
@@ -244,7 +244,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
       .map(checkLegacyPersistedSettingsImport).toList()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun setConfigurationPropertiesToRandomValues(
     developerUiTools: List<DeveloperUiToolWrapper<*>>,
@@ -350,7 +350,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     return developerUiTools
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private data class ExpectedConfigurationProperty(
     val developerToolId: String,
@@ -360,7 +360,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     val propertyType: String
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private data class DeveloperUiToolWrapper<T : DeveloperUiTool>(
     val developerToolFactoryEp: DeveloperUiToolFactoryEp<out DeveloperUiToolFactory<*>>,
@@ -368,7 +368,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     val developerToolConfiguration: DeveloperToolConfiguration
   )
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

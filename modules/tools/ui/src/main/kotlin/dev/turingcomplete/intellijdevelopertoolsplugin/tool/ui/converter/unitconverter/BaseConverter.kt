@@ -22,15 +22,15 @@ class BaseConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : UnitConverter(parentDisposable, "Base") {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val baseTwoInput = configuration.register("${CONFIGURATION_KEY_PREFIX}baseTwoInput", "0", INPUT, EXAMPLE_BASE_TWO_INPUT)
   private val showOnlyCommonBases = configuration.register("${CONFIGURATION_KEY_PREFIX}showOnlyCommonBases", true, CONFIGURATION)
 
   private lateinit var baseProperties: Map<Int, ValueProperty<String>>
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
@@ -69,7 +69,7 @@ class BaseConverter(
     convertFromCommonBase(2, null)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun convertFromCommonBase(inputBase: Int, textField: JBTextField?) {
     if (textField != null && validate().any { it.component == textField }) {
@@ -115,8 +115,8 @@ class BaseConverter(
     return BigInteger(this, base)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

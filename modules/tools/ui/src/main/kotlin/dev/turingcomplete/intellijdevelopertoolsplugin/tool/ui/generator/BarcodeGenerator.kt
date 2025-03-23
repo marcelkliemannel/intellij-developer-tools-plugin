@@ -47,22 +47,22 @@ import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
 import com.intellij.util.ui.JBUI
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValidateMinIntValueSide
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.toJBColor
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.validateMinMaxValueRelation
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.LEVEL_BITS
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.LEVEL_ENUM_NAME
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.UNSUPPORTED
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.LEVEL_BITS
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.LEVEL_ENUM_NAME
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.UNSUPPORTED
 import java.awt.Container
 import java.awt.Graphics
 import java.lang.Integer.toHexString
@@ -81,7 +81,7 @@ class BarcodeGenerator private constructor(
   private val project: Project?,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var liveGeneration = configuration.register("liveGeneration", true)
   private val format = configuration.register("format", DEFAULT_FORMAT)
@@ -94,8 +94,8 @@ class BarcodeGenerator private constructor(
 
   private val drawPanel by lazy { DrawPanel(configuration) }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
@@ -185,7 +185,7 @@ class BarcodeGenerator private constructor(
     generate(liveGeneration.get())
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun generate(fromConfigChange: Boolean = true) {
     if (configuration.isResetting || (fromConfigChange && !liveGeneration.get())) {
@@ -234,7 +234,7 @@ class BarcodeGenerator private constructor(
       }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class Format(
     val title: String,
@@ -386,7 +386,7 @@ class BarcodeGenerator private constructor(
     override fun toString(): String = title
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   private open class FormatConfiguration(
@@ -476,14 +476,14 @@ class BarcodeGenerator private constructor(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class ErrorCorrectionSupport {
 
     UNSUPPORTED, LEVEL_ENUM_NAME, LEVEL_BITS
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class Pdf417FormatConfiguration(
     configuration: DeveloperToolConfiguration
@@ -586,7 +586,7 @@ class BarcodeGenerator private constructor(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class AztecCodeConfiguration(
     configuration: DeveloperToolConfiguration
@@ -625,7 +625,7 @@ class BarcodeGenerator private constructor(
       super.createHints() + (EncodeHintType.AZTEC_LAYERS to layers.get())
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class QrCodeConfiguration(
     configuration: DeveloperToolConfiguration
@@ -691,7 +691,7 @@ class BarcodeGenerator private constructor(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class DataMatrixConfiguration(
     configuration: DeveloperToolConfiguration
@@ -756,7 +756,7 @@ class BarcodeGenerator private constructor(
               )
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class ErrorCorrection(val level: ErrorCorrectionLevel, val title: String) {
 
@@ -768,7 +768,7 @@ class BarcodeGenerator private constructor(
     override fun toString(): String = title
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class DrawPanel(configuration: DeveloperToolConfiguration) : JPanel() {
 
@@ -817,7 +817,7 @@ class BarcodeGenerator private constructor(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ColorPanel(private val color: ObservableMutableProperty<JBColor>) : JPanel() {
 
@@ -850,7 +850,7 @@ class BarcodeGenerator private constructor(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<BarcodeGenerator> {
 
@@ -871,7 +871,7 @@ class BarcodeGenerator private constructor(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

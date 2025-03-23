@@ -25,7 +25,7 @@ abstract class MacAddressBasedUuidGenerator(
   configuration: DeveloperToolConfiguration,
   supportsBulkGeneration: Boolean
 ) : SpecificUuidGenerator(supportsBulkGeneration) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var macAddressGenerationMode = configuration.register(
     "${version}MacAddressGenerationMode",
@@ -40,8 +40,8 @@ abstract class MacAddressBasedUuidGenerator(
     ""
   )
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildConfigurationUi(visible: ComponentPredicate) {
@@ -85,7 +85,7 @@ abstract class MacAddressBasedUuidGenerator(
     LOCAL_INTERFACE -> EthernetAddress(localInterface)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun validateIndividualMacAddress(): ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
     if (macAddressGenerationMode.get() == INDIVIDUAL && !MAC_ADDRESS_REGEX.matches(individualMacAddress.get())) {
@@ -110,7 +110,7 @@ abstract class MacAddressBasedUuidGenerator(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   enum class MacAddressGenerationMode {
 
@@ -119,7 +119,7 @@ abstract class MacAddressBasedUuidGenerator(
     LOCAL_INTERFACE
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class LocalInterface(val macAddress: String, val title: String) {
 
@@ -141,7 +141,7 @@ abstract class MacAddressBasedUuidGenerator(
     override fun hashCode(): Int = macAddress.hashCode()
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

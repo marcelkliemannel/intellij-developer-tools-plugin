@@ -13,13 +13,13 @@ import kotlin.reflect.KClass
 @RunInEdt(allMethods = false)
 @TestApplication
 abstract class IdeaTest {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   protected lateinit var fixture: IdeaProjectTestFixture
   protected lateinit var disposable: TestDisposable
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   @BeforeEach
   fun beforeEach() {
@@ -36,8 +36,8 @@ abstract class IdeaTest {
     fixture.tearDown()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class TestDisposable(val id: String) : Disposable {
 
@@ -49,5 +49,5 @@ abstract class IdeaTest {
     override fun toString(): String = id
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

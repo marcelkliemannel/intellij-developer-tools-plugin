@@ -141,7 +141,7 @@ class Unarchiver(
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable), DataProvider, ChangeListener, ResetListener, OpenDeveloperToolHandler<OpenUnarchiverContext> {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val archiveTreeSortingMode = configuration.register("archiveTreeSortingMode", DEFAULT_SORTING_MODE)
   private val showArchiveNodeUncompressedSize = configuration.register("showArchiveNodeUncompressedSize", DEFAULT_SHOW_ARCHIVE_NODE_SIZE)
@@ -162,8 +162,8 @@ class Unarchiver(
   private val noArchiveFilePanel by lazy { createNoArchiveFilePanel() }
   private val readingArchiveFilePanel by lazy { createReadingArchiveFilePanel() }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildUi() {
     content.dropTarget = DropTarget(content, FilesDropHandler(project, openArchiveFile()))
@@ -214,7 +214,7 @@ class Unarchiver(
     openArchiveFile().invoke(context.archiveFilePath)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun replaceContent(centerContent: JComponent) {
     content.removeAll()
@@ -472,7 +472,7 @@ class Unarchiver(
     }.resizableRow()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private inner class ArchiveTree(
     private val rootNode: RootNode
@@ -936,7 +936,7 @@ class Unarchiver(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private data class FileTimes(val lastModifiedTime: FileTime?, val lastAccessTime: FileTime?, val creationTime: FileTime?) {
 
@@ -958,7 +958,7 @@ class Unarchiver(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ArchiveNodesAction(
     @NlsActions.ActionText title: String,
@@ -982,7 +982,7 @@ class Unarchiver(
     override fun getActionUpdateThread() = ActionUpdateThread.EDT
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ArchiveNodeAction(
     @NlsActions.ActionText title: String,
@@ -1008,7 +1008,7 @@ class Unarchiver(
     override fun getActionUpdateThread() = ActionUpdateThread.EDT
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private abstract class ArchiveNode(
     val fileName: String,
@@ -1072,7 +1072,7 @@ class Unarchiver(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class FileNode(
     fileName: String,
@@ -1140,7 +1140,7 @@ class Unarchiver(
     )
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private open class DirectoryNode(
     name: String,
@@ -1153,7 +1153,7 @@ class Unarchiver(
     val children: MutableList<ArchiveNode> = mutableListOf()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class RootNode(
     val archiveFilePath: Path
@@ -1208,7 +1208,7 @@ class Unarchiver(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ChooseArchiveFileToOpenAction(
     private val project: Project?,
@@ -1254,7 +1254,7 @@ class Unarchiver(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class OpenArchiveFileInUnarchiverAction : DumbAwareAction(
     "Unarchiver",
@@ -1293,7 +1293,7 @@ class Unarchiver(
               selectedFiles.any { it.extension != null && supportedArchiveExtensions.contains(it.extension) }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class FilesDropHandler(
     private val project: Project?,
@@ -1356,7 +1356,7 @@ class Unarchiver(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class SortingMode(
     val title: String,
@@ -1369,7 +1369,7 @@ class Unarchiver(
     FILENAME_DESC("Filename (descending)", { a, b -> b.fileName.compareTo(a.fileName) })
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ArchiveTreeNodeRenderer(
     val showArchiveNodeUncompressedSize: ValueProperty<Boolean>,
@@ -1406,7 +1406,7 @@ class Unarchiver(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private data class ExtractionContext(
     val rootNode: RootNode,
@@ -1419,7 +1419,7 @@ class Unarchiver(
     val openTargetDirectoryAfterExtraction: Boolean
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private data class ArchiveNodesToExtract(
     val archiveNodes: List<ArchiveNode>,
@@ -1428,7 +1428,7 @@ class Unarchiver(
     val inaccurateTotalUncompressedSize: Boolean
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ExtractTask(
     project: Project?,
@@ -1594,11 +1594,11 @@ class Unarchiver(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class OpenUnarchiverContext(val archiveFilePath: Path) : OpenDeveloperToolContext
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<Unarchiver> {
 
@@ -1617,7 +1617,7 @@ class Unarchiver(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

@@ -20,9 +20,9 @@ import java.nio.file.Paths
 import java.util.*
 
 abstract class BundleMessagesTest : IdeaTest() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   abstract fun `test that all additional languages are containing the same message keys and parameter counts`(): List<DynamicNode>
 
@@ -93,12 +93,12 @@ abstract class BundleMessagesTest : IdeaTest() {
     messagesBundles.firstOrNull { it.bundleName == bundleName }
       ?: error("Bundle `$bundleName` not found")
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun countUniqueParameters(message: String): Int =
     Regex("(?<!\\$)\\{(\\d+)}").findAll(message).map { it.groupValues[1].toInt() }.toSet().size
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class MessagesBundle(
     val bundleName: String,
@@ -109,7 +109,7 @@ abstract class BundleMessagesTest : IdeaTest() {
       ?: error("Bundle `$bundleName` is missing the reference language")
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   data class MessagesBundleUsage(
     val className: String,
@@ -120,7 +120,7 @@ abstract class BundleMessagesTest : IdeaTest() {
     val displayableText: String = messageKey
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class MessageCallsMethodVisitor(
     private val className: String,
@@ -179,7 +179,7 @@ abstract class BundleMessagesTest : IdeaTest() {
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class MessageCallsClassVisitor(
     private val fileName: String,
@@ -197,7 +197,7 @@ abstract class BundleMessagesTest : IdeaTest() {
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

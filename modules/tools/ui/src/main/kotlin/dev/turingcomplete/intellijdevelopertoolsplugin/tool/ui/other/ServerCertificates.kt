@@ -79,7 +79,7 @@ class ServerCertificates(
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable), DataProvider {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val log = logger<ServerCertificates>()
 
@@ -88,8 +88,8 @@ class ServerCertificates(
   private val allowInsecureConnection = configuration.register("allowInsecureConnection", false, CONFIGURATION)
   private val certificatesPanel = BorderLayoutPanel()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildUi() {
     row {
@@ -146,7 +146,7 @@ class ServerCertificates(
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createFetchingUi(): JComponent = panel {
     row {
@@ -334,7 +334,7 @@ class ServerCertificates(
     }.queue()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private abstract class ExportCertificateAction(
     private val formatName: String,
@@ -394,7 +394,7 @@ class ServerCertificates(
       this.replace(Regex("[^a-zA-Z0-9]+"), "_")
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ExportAsPemAction(
     private val certificates: List<Certificate>,
@@ -411,7 +411,7 @@ class ServerCertificates(
       }.joinToString(System.lineSeparator()).toByteArray(StandardCharsets.UTF_8)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ExportAsDerAction(
     private val certificates: List<Certificate>,
@@ -422,7 +422,7 @@ class ServerCertificates(
       certificates.flatMap { it.encoded.asList() }.toByteArray()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ExportAsJksAction(
     private val certificates: List<Certificate>,
@@ -456,7 +456,7 @@ class ServerCertificates(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class CopyAsPemToClipboardAction(
     private val certificates: List<Certificate>
@@ -468,7 +468,7 @@ class ServerCertificates(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ShowAsPemAction(
     private val certificates: List<Certificate>,
@@ -501,7 +501,7 @@ class ServerCertificates(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ShowCertificateDetailsAction(
     private val certificates: List<Certificate>,
@@ -540,7 +540,7 @@ class ServerCertificates(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private data class HttpResponse(
     val certificates: List<Certificate>?,
@@ -551,7 +551,7 @@ class ServerCertificates(
     val body: String?
   )
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class CertificateCapturingTrustManager(
     private val allowInsecureConnection: Boolean
@@ -588,7 +588,7 @@ class ServerCertificates(
       }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<ServerCertificates> {
 
@@ -605,7 +605,7 @@ class ServerCertificates(
       { configuration -> ServerCertificates(project, context, configuration, parentDisposable) }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

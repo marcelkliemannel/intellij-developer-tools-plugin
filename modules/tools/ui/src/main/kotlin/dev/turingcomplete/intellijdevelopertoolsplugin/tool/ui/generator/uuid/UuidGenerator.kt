@@ -7,12 +7,12 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.layout.ComboBoxPredicate
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.OneLineTextGenerator
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.toMessageDigest
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.OneLineTextGenerator
 
 class UuidGenerator(
   project: Project?,
@@ -25,7 +25,7 @@ class UuidGenerator(
   parentDisposable = parentDisposable,
   project = project
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var selectedUuidVersion = configuration.register("version", UuidVersion.V4)
 
@@ -36,13 +36,13 @@ class UuidGenerator(
   private val uuidV6Generator by lazy { UuidV6Generator(configuration) }
   private val uuidV7Generator by lazy { UuidV7Generator() }
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     selectedUuidVersion.afterChange(parentDisposable) { handleVersionSelection() }
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildConfigurationUi() {
     lateinit var selectedVersionComboBox: ComboBox<UuidVersion>
@@ -77,7 +77,7 @@ class UuidGenerator(
 
   override fun generate(): String = getGeneratorForSelectedUuidVersion().generate()
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun handleVersionSelection() {
     val uuidVersion = selectedUuidVersion.get()
@@ -94,7 +94,7 @@ class UuidGenerator(
       UuidVersion.V7 -> uuidV7Generator
     }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class UuidV1Generator(
     configuration: DeveloperToolConfiguration
@@ -103,28 +103,28 @@ class UuidGenerator(
     override fun generate(): String = Generators.timeBasedGenerator(getEthernetAddress()).generate().toString()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class UuidV3Generator(
     configuration: DeveloperToolConfiguration,
     parentDisposable: Disposable
   ) : NamespaceAndNameBasedUuidGenerator(UuidVersion.V3, "MD5".toMessageDigest(), configuration, parentDisposable, false)
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class UuidV4Generator : SpecificUuidGenerator(true) {
 
     override fun generate(): String = Generators.randomBasedGenerator().generate().toString()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class UuidV5Generator(
     configuration: DeveloperToolConfiguration,
     parentDisposable: Disposable
   ) : NamespaceAndNameBasedUuidGenerator(UuidVersion.V5, "SHA-1".toMessageDigest(), configuration, parentDisposable, false)
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class UuidV6Generator(
     configuration: DeveloperToolConfiguration
@@ -133,14 +133,14 @@ class UuidGenerator(
     override fun generate(): String = Generators.timeBasedReorderedGenerator(getEthernetAddress()).generate().toString()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class UuidV7Generator : SpecificUuidGenerator(true) {
 
     override fun generate(): String = Generators.timeBasedEpochGenerator().generate().toString()
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<UuidGenerator> {
 
@@ -158,5 +158,5 @@ class UuidGenerator(
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

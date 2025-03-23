@@ -25,18 +25,18 @@ class TextDiffViewer(
   private val project: Project?,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val firstText = configuration.register("firstText", "", INPUT, FIRST_TEXT_EXAMPLE)
   private val secondText = configuration.register("secondText", "", INPUT, SECOND_TEXT_EXAMPLE)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     wrapComponentInScrollPane = false
   }
 
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildUi() {
     row {
@@ -49,7 +49,7 @@ class TextDiffViewer(
     }.resizableRow()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun createDiffContent(textProperty: ValueProperty<String>) : DiffContent {
     val document = EditorFactory.getInstance().createDocument(textProperty.get()).apply {
@@ -69,7 +69,7 @@ class TextDiffViewer(
     return DiffContentFactory.getInstance().create(project, document)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<TextDiffViewer> {
 
@@ -93,7 +93,7 @@ class TextDiffViewer(
       }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

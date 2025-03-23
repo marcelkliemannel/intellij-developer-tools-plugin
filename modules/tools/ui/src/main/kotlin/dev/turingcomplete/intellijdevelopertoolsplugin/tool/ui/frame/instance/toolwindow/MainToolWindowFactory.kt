@@ -32,9 +32,9 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 
 class MainToolWindowFactory : ToolWindowFactory, DumbAware {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun init(toolWindow: ToolWindow) {
     assert(toolWindow.id == ID)
@@ -70,8 +70,8 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ToolWindowDeveloperToolContentPanel(
     developerToolNode: DeveloperToolNode,
@@ -98,7 +98,7 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ToolWindowContentPanelHandler(
     settings: DeveloperToolsToolWindowSettings,
@@ -157,7 +157,7 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

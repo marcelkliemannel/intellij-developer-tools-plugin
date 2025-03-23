@@ -31,7 +31,7 @@ abstract class MathContextUnitConverter(
   parentDisposable: Disposable,
   title: String
 ): UnitConverter(parentDisposable, title) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private var parsingLocale = configuration.register("${configurationKeyPrefix}parsingLocale", DEFAULT_PARSING_LOCALE)
   private val roundingMode = configuration.register("${configurationKeyPrefix}roundingMode", DEFAULT_ROUNDING_MODE)
@@ -42,8 +42,8 @@ abstract class MathContextUnitConverter(
   var mathContext = createMathContext()
     private set
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   open fun Panel.buildAdditionalSettingsUi() {
     // Override if needed
@@ -92,7 +92,7 @@ abstract class MathContextUnitConverter(
 
   abstract fun doSync()
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun getDecimalSeparator(): String =
     DecimalFormatSymbols.getInstance(parsingLocale.get().locale).decimalSeparator.toString()
@@ -141,7 +141,7 @@ abstract class MathContextUnitConverter(
   private fun createMathContext() =
     MathContext(precision.get(), roundingMode.get().javaMathRoundingMode)
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private enum class RoundingMode(val title: String, val javaMathRoundingMode: java.math.RoundingMode) {
 
@@ -156,7 +156,7 @@ abstract class MathContextUnitConverter(
     override fun toString(): String = title
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

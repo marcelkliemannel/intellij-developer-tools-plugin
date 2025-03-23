@@ -9,9 +9,9 @@ import com.intellij.openapi.editor.SelectionModel
 import com.intellij.openapi.util.TextRange
 
 object EditorUtils {
-  // -- Variables --------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Variables ----------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun Editor.getSelectedText(): Pair<String, TextRange>? {
     val selectionModel = this.selectionModel
@@ -31,7 +31,7 @@ object EditorUtils {
   fun AnActionEvent.getEditor(): Editor =
     this.getData(CommonDataKeys.EDITOR) ?: error("Editor not found")
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun SelectionModel.getTextRangeIfSelection(): TextRange? =
     if (selectionStart < selectionEnd) {
@@ -41,5 +41,5 @@ object EditorUtils {
       null
     }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 }

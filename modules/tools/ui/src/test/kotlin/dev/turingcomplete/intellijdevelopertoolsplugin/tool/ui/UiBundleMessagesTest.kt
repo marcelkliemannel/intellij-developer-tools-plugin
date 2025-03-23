@@ -6,9 +6,9 @@ import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.TestFactory
 
 class UiBundleMessagesTest : BundleMessagesTest() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   @TestFactory
   override fun `test that all additional languages are containing the same message keys and parameter counts`(): List<DynamicNode> =
@@ -24,7 +24,7 @@ class UiBundleMessagesTest : BundleMessagesTest() {
   override fun `test that all keys in the messages bundle are used`(): List<DynamicNode> =
     super.`do test that all keys in the messages bundle are used`()
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

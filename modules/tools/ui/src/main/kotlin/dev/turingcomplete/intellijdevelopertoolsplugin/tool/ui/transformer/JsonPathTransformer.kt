@@ -66,14 +66,14 @@ class JsonPathTransformer(
   parentDisposable = parentDisposable,
   project = project
 ) {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val queryText = configuration.register("contentText", "", INPUT, EXAMPLE_QUERY)
   private val formatResult = configuration.register("formatResult", true, CONFIGURATION)
   private var errorHolder = ErrorHolder()
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildMiddleConfigurationUi() {
     row {
@@ -132,8 +132,8 @@ class JsonPathTransformer(
     validate()
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<JsonPathTransformer> {
 
@@ -157,7 +157,7 @@ class JsonPathTransformer(
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   private class ShowOperatorsHelpPopup(val helpButton: () -> JComponent) :
     DumbAwareAction("Operators Help", null, AllIcons.General.ContextHelp), PopupAction {
@@ -180,7 +180,7 @@ class JsonPathTransformer(
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

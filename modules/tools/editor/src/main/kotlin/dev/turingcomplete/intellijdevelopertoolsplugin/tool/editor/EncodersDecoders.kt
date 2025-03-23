@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 
 object EncodersDecoders {
-  // -- Variables --------------------------------------------------------------------------------------------------- //
+  // -- Variables ----------------------------------------------------------- //
 
   private val log = logger<EncodersDecoders>()
 
@@ -32,7 +32,7 @@ object EncodersDecoders {
     Decoder("ASCII", { it.decodeFromAscii() })
   )
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     val commonEncoders = mutableListOf(
@@ -51,7 +51,7 @@ object EncodersDecoders {
     this.commonEncoders = commonEncoders
   }
 
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun executeEncodingInEditor(
     text: String,
@@ -93,12 +93,12 @@ object EncodersDecoders {
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Encoder(val title: String, val encode: (String) -> String, val actionName: String = "Encode to $title")
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Decoder(val title: String, val decode: (String) -> String, val actionName: String = "Decode from $title")
 }

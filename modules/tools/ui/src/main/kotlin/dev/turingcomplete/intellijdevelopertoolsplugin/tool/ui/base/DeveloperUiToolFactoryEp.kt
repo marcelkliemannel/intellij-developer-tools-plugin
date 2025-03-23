@@ -4,10 +4,9 @@ import com.intellij.openapi.extensions.CustomLoadingExtensionPointBean
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.extensions.RequiredElement
 import com.intellij.util.xmlb.annotations.Attribute
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 
 class DeveloperUiToolFactoryEp<T : DeveloperUiToolFactory<*>> : CustomLoadingExtensionPointBean<T>() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   @Attribute("id")
   @RequiredElement
@@ -26,14 +25,14 @@ class DeveloperUiToolFactoryEp<T : DeveloperUiToolFactory<*>> : CustomLoadingExt
   @Attribute("internalTool")
   var internalTool: Boolean = false
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   override fun getImplementationClassName(): String = implementationClass
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

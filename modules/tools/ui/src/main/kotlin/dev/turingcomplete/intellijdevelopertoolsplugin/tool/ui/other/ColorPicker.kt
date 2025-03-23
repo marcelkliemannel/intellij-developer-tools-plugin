@@ -40,7 +40,7 @@ class ColorPicker(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable
 ) : DeveloperUiTool(parentDisposable), DataProvider {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   private val selectedColor: ValueProperty<JBColor> = configuration.register("selectedColor", JBColor.MAGENTA.toJBColor(), INPUT)
 
@@ -53,7 +53,7 @@ class ColorPicker(
 
   private lateinit var colorPickerModel: ColorPickerModel
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
 
   init {
     setCssValues(selectedColor.get())
@@ -66,7 +66,7 @@ class ColorPicker(
     }
   }
 
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildUi() {
     row {
@@ -174,7 +174,7 @@ class ColorPicker(
     else -> null
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun setCssValues(color: Color) {
     val red = color.red
@@ -240,7 +240,7 @@ class ColorPicker(
     return floatArrayOf(h, s, l)
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<ColorPicker> {
 
@@ -257,7 +257,7 @@ class ColorPicker(
       { configuration -> ColorPicker(project, configuration, parentDisposable) }
   }
 
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

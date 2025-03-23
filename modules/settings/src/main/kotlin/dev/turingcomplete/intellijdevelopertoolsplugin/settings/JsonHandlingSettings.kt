@@ -13,7 +13,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsGro
 @SettingsGroup(id = WRITE_GROUP_ID, titleBundleKey = "json-handling-settings.write-group.title")
 @SettingsGroup(id = READ_CGROUP_ID, titleBundleKey = "json-handling-settings.read-group.title")
 interface JsonHandlingSettings : Settings {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
 
   @Setting(titleBundleKey = "json-handling-settings.write-quote-field-names.title", groupId = WRITE_GROUP_ID)
   @BooleanValue(defaultValue = false)
@@ -91,11 +91,11 @@ interface JsonHandlingSettings : Settings {
   @BooleanValue(defaultValue = false)
   val readAllowTrailingComma: BooleanSettingProperty
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 

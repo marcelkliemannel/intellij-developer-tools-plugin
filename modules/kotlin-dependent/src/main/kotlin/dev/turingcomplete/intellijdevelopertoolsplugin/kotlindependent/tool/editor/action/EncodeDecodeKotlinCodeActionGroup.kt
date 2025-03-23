@@ -6,14 +6,14 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.kotlindependent.PsiKotlin
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.action.EncodeDecodeActionGroup
 
 class EncodeDecodeKotlinCodeActionGroup : EncodeDecodeActionGroup() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? =
     PsiKotlinUtils.getTextFromStringValueOrIdentifier(e)
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

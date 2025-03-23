@@ -13,9 +13,9 @@ import kotlin.reflect.full.findAnnotations
 import kotlin.reflect.full.memberProperties
 
 object SettingsHandler {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exposed Methods ----------------------------------------------------- //
 
   fun <T : Settings> create(clazz: KClass<T>): T {
     @Suppress("UNCHECKED_CAST")
@@ -29,8 +29,8 @@ object SettingsHandler {
   fun <T : Settings> T.settingsContainer(): SettingsContainer<T> =
     Proxy.getInvocationHandler(this).uncheckedCastTo<SettingsContainer<T>>()
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   open class SettingsContainer<T : Settings>(
     val kclass: KClass<T>
@@ -130,7 +130,7 @@ object SettingsHandler {
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 
   class DerivatedSettingsContainer<T : Settings>(
     clazz: KClass<T>,
@@ -150,5 +150,5 @@ object SettingsHandler {
     }
   }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 }
