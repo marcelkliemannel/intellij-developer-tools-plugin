@@ -9,9 +9,9 @@ import java.awt.datatransfer.StringSelection
 
 class CopyAction(private val contentDataKey: DataKey<String> = CONTENT_DATA_KEY) :
   DumbAwareAction(
-          "Copy to Clipboard",
-          "Copy the text into the system clipboard",
-          AllIcons.Actions.Copy
+    "Copy to Clipboard",
+    "Copy the text into the system clipboard",
+    AllIcons.Actions.Copy,
   ) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //

@@ -12,15 +12,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.ToolsM
 import javax.swing.Action
 import javax.swing.JComponent
 
-class ChangelogDialog(
-  project: Project?,
-  parentComponent: JComponent
-) : DialogWrapper(
-  project,
-  parentComponent,
-  true,
-  IdeModalityType.IDE
-) {
+class ChangelogDialog(project: Project?, parentComponent: JComponent) :
+  DialogWrapper(project, parentComponent, true, IdeModalityType.IDE) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
 
@@ -33,26 +26,34 @@ class ChangelogDialog(
 
   // -- Exported Methods ---------------------------------------------------- //
 
-  override fun createCenterPanel(): JComponent = BorderLayoutPanel(0, UIUtil.LARGE_VGAP).apply {
-    addToCenter(panel {
-      row {
-        text(ToolsMenuTree::class.java.getResource(CHANGELOG_HTML_FILE)?.readText() ?: "Couldn't find 'What's New' text")
-          .resizableColumn()
-          .align(Align.FILL)
-      }.resizableRow()
-    }.let { ScrollPaneFactory.createScrollPane(it, true) })
+  override fun createCenterPanel(): JComponent =
+    BorderLayoutPanel(0, UIUtil.LARGE_VGAP).apply {
+      addToCenter(
+        panel {
+            row {
+                text(
+                    ToolsMenuTree::class.java.getResource(CHANGELOG_HTML_FILE)?.readText()
+                      ?: "Couldn't find 'What's New' text"
+                  )
+                  .resizableColumn()
+                  .align(Align.FILL)
+              }
+              .resizableRow()
+          }
+          .let { ScrollPaneFactory.createScrollPane(it, true) }
+      )
 
-    addToBottom(
-      BorderLayoutPanel().apply {
-        addToLeft(
-          UiUtils.createLink(
-            title = "Make a feature request or report an issue",
-            url = "https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues"
+      addToBottom(
+        BorderLayoutPanel().apply {
+          addToLeft(
+            UiUtils.createLink(
+              title = "Make a feature request or report an issue",
+              url = "https://github.com/marcelkliemannel/intellij-developer-tools-plugin/issues",
+            )
           )
-        )
-      }
-    )
-  }
+        }
+      )
+    }
 
   override fun createActions(): Array<Action> = arrayOf(myOKAction)
 
@@ -62,6 +63,7 @@ class ChangelogDialog(
 
   companion object {
 
-    private const val CHANGELOG_HTML_FILE = "/dev/turingcomplete/intellijdevelopertoolsplugin/changelog.html"
+    private const val CHANGELOG_HTML_FILE =
+      "/dev/turingcomplete/intellijdevelopertoolsplugin/changelog.html"
   }
 }

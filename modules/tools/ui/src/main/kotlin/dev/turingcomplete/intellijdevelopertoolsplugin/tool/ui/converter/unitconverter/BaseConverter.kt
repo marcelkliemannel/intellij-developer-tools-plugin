@@ -18,14 +18,19 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import java.math.BigInteger
 
-class BaseConverter(
-  configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
-) : UnitConverter(parentDisposable, "Base") {
+class BaseConverter(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+  UnitConverter(parentDisposable, "Base") {
   // -- Properties ---------------------------------------------------------- //
 
-  private val baseTwoInput = configuration.register("${CONFIGURATION_KEY_PREFIX}baseTwoInput", "0", INPUT, EXAMPLE_BASE_TWO_INPUT)
-  private val showOnlyCommonBases = configuration.register("${CONFIGURATION_KEY_PREFIX}showOnlyCommonBases", true, CONFIGURATION)
+  private val baseTwoInput =
+    configuration.register(
+      key = "${CONFIGURATION_KEY_PREFIX}baseTwoInput",
+      defaultValue = "0",
+      propertyType = INPUT,
+      example = EXAMPLE_BASE_TWO_INPUT,
+    )
+  private val showOnlyCommonBases =
+    configuration.register("${CONFIGURATION_KEY_PREFIX}showOnlyCommonBases", true, CONFIGURATION)
 
   private lateinit var baseProperties: Map<Int, ValueProperty<String>>
 
@@ -34,35 +39,38 @@ class BaseConverter(
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildUi() {
-    baseProperties = bases.map { (base, title) ->
-      val property = if (base == 2) baseTwoInput else ValueProperty("0")
-      row {
-        lateinit var textField: JBTextField
-        val textFieldCell = textField()
-          .validate(base)
-          .label("$title ($base):")
-          .bindText(property)
-          .whenTextChangedFromUi { convertFromCommonBase(base, textField) }
-          .resizableColumn()
-          .align(Align.FILL)
-          .gap(RightGap.SMALL)
-        if (!commonBases.contains(base)) {
-          textFieldCell.visibleIf(showOnlyCommonBases.not())
-        }
-        textField = textFieldCell.component
-      }.layout(RowLayout.PARENT_GRID)
+    baseProperties =
+      bases
+        .map { (base, title) ->
+          val property = if (base == 2) baseTwoInput else ValueProperty("0")
+          row {
+              lateinit var textField: JBTextField
+              val textFieldCell =
+                textField()
+                  .validate(base)
+                  .label("$title ($base):")
+                  .bindText(property)
+                  .whenTextChangedFromUi { convertFromCommonBase(base, textField) }
+                  .resizableColumn()
+                  .align(Align.FILL)
+                  .gap(RightGap.SMALL)
+              if (!commonBases.contains(base)) {
+                textFieldCell.visibleIf(showOnlyCommonBases.not())
+              }
+              textField = textFieldCell.component
+            }
+            .layout(RowLayout.PARENT_GRID)
 
-      base to property
-    }.toMap()
+          base to property
+        }
+        .toMap()
   }
 
   override fun Panel.buildSettingsUi() {
     collapsibleGroup("Settings") {
-      row {
-        checkBox("Show only common bases")
-          .bindSelected(showOnlyCommonBases)
+        row { checkBox("Show only common bases").bindSelected(showOnlyCommonBases) }
       }
-    }.topGap(TopGap.NONE)
+      .topGap(TopGap.NONE)
   }
 
   override fun sync() {
@@ -76,12 +84,13 @@ class BaseConverter(
       return
     }
 
-    val inputProperty = baseProperties[inputBase] ?: throw IllegalArgumentException("Unknown base: $inputBase")
+    val inputProperty =
+      baseProperties[inputBase] ?: throw IllegalArgumentException("Unknown base: $inputBase")
     val input = inputProperty.get().parse(inputBase) ?: return
 
-    baseProperties.filter { it.value != inputProperty }.forEach { (base, property) ->
-      property.set(input.toString(base).uppercase())
-    }
+    baseProperties
+      .filter { it.value != inputProperty }
+      .forEach { (base, property) -> property.set(input.toString(base).uppercase()) }
   }
 
   @Suppress("UnstableApiUsage")
@@ -126,42 +135,43 @@ class BaseConverter(
     private val validChars = ('0'..'9') + ('A'..'Z')
 
     private val commonBases = setOf(2, 8, 10, 16)
-    private val bases = linkedMapOf(
-      2 to "Binary",
-      3 to "Ternary",
-      4 to "Quaternary",
-      5 to "Quinary",
-      6 to "Senary",
-      7 to "Septenary",
-      8 to "Octal",
-      9 to "Nonary",
-      10 to "Decimal",
-      11 to "Undecimal",
-      12 to "Duodecimal",
-      13 to "Tridecimal",
-      14 to "Tetradecimal",
-      15 to "Pentadecimal",
-      16 to "Hexadecimal",
-      17 to "Heptadecimal",
-      18 to "Octodecimal",
-      19 to "Enneadecimal",
-      20 to "Vigesimal",
-      21 to "Unvigesimal",
-      22 to "Duovigesimal",
-      23 to "Trivigesimal",
-      24 to "Tetravigesimal",
-      25 to "Pentavigesimal",
-      26 to "Hexavigesimal",
-      27 to "Septemvigesimal",
-      28 to "Octovigesimal",
-      29 to "Ennevigesimal",
-      30 to "Trigesimal",
-      31 to "Untrigesimal",
-      32 to "Duotrigesimal",
-      33 to "Tretrigesimal",
-      34 to "Tetratrigesimal",
-      35 to "Pentatrigesimal",
-      36 to "Hexatrigesimal"
-    )
+    private val bases =
+      linkedMapOf(
+        2 to "Binary",
+        3 to "Ternary",
+        4 to "Quaternary",
+        5 to "Quinary",
+        6 to "Senary",
+        7 to "Septenary",
+        8 to "Octal",
+        9 to "Nonary",
+        10 to "Decimal",
+        11 to "Undecimal",
+        12 to "Duodecimal",
+        13 to "Tridecimal",
+        14 to "Tetradecimal",
+        15 to "Pentadecimal",
+        16 to "Hexadecimal",
+        17 to "Heptadecimal",
+        18 to "Octodecimal",
+        19 to "Enneadecimal",
+        20 to "Vigesimal",
+        21 to "Unvigesimal",
+        22 to "Duovigesimal",
+        23 to "Trivigesimal",
+        24 to "Tetravigesimal",
+        25 to "Pentavigesimal",
+        26 to "Hexavigesimal",
+        27 to "Septemvigesimal",
+        28 to "Octovigesimal",
+        29 to "Ennevigesimal",
+        30 to "Trigesimal",
+        31 to "Untrigesimal",
+        32 to "Duotrigesimal",
+        33 to "Tretrigesimal",
+        34 to "Tetratrigesimal",
+        35 to "Pentatrigesimal",
+        36 to "Hexatrigesimal",
+      )
   }
 }

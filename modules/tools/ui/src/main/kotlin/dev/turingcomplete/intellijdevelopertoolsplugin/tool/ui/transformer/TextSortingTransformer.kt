@@ -22,29 +22,33 @@ class TextSortingTransformer(
   context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  project: Project?
-) : TextTransformer(
-  textTransformerContext = TextTransformerContext(
-    transformActionTitle = "Sort",
-    sourceTitle = "Unsorted",
-    resultTitle = "Sorted",
-    initialSourceExampleText = EXAMPLE_INPUT,
-    diffSupport = DiffSupport(
-      title = "Text Sorting"
-    )
-  ),
-  context = context,
-  configuration = configuration,
-  parentDisposable = parentDisposable,
-  project = project
-) {
+  project: Project?,
+) :
+  TextTransformer(
+    textTransformerContext =
+      TextTransformerContext(
+        transformActionTitle = "Sort",
+        sourceTitle = "Unsorted",
+        resultTitle = "Sorted",
+        initialSourceExampleText = EXAMPLE_INPUT,
+        diffSupport = DiffSupport(title = "Text Sorting"),
+      ),
+    context = context,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    project = project,
+  ) {
   // -- Properties ---------------------------------------------------------- //
 
-  private var unsortedSplitWordsDelimiter = configuration.register("unsortedPredefinedDelimiter", LINE_BREAK)
-  private var unsortedIndividualSplitWordsDelimiter = configuration.register("unsortedIndividualSplitWordsDelimiter", " ")
+  private var unsortedSplitWordsDelimiter =
+    configuration.register("unsortedPredefinedDelimiter", LINE_BREAK)
+  private var unsortedIndividualSplitWordsDelimiter =
+    configuration.register("unsortedIndividualSplitWordsDelimiter", " ")
 
-  private var sortedJoinWordsDelimiter = configuration.register("sortedJoinWordsDelimiter", LINE_BREAK)
-  private var sortedIndividualJoinWordsDelimiter = configuration.register("sortedIndividualJoinWordsDelimiter", " ")
+  private var sortedJoinWordsDelimiter =
+    configuration.register("sortedJoinWordsDelimiter", LINE_BREAK)
+  private var sortedIndividualJoinWordsDelimiter =
+    configuration.register("sortedIndividualJoinWordsDelimiter", " ")
 
   private var sortingOrder = configuration.register("sortingOrder", SortingOrder.LEXICOGRAPHIC)
 
@@ -58,10 +62,11 @@ class TextSortingTransformer(
   // -- Exposed Methods ----------------------------------------------------- //
 
   override fun transform() {
-    val unsortedSplitWordsDelimiterPattern: Regex = unsortedSplitWordsDelimiter.get().splitPattern
-      ?: Regex("${Regex.escape(unsortedIndividualSplitWordsDelimiter.get())}+")
-    val sortedJoinWordsDelimiter = sortedJoinWordsDelimiter.get().joinDelimiter
-      ?: sortedIndividualJoinWordsDelimiter.get()
+    val unsortedSplitWordsDelimiterPattern: Regex =
+      unsortedSplitWordsDelimiter.get().splitPattern
+        ?: Regex("${Regex.escape(unsortedIndividualSplitWordsDelimiter.get())}+")
+    val sortedJoinWordsDelimiter =
+      sortedJoinWordsDelimiter.get().joinDelimiter ?: sortedIndividualJoinWordsDelimiter.get()
     var unsortedWords = sourceText.get().split(unsortedSplitWordsDelimiterPattern)
 
     if (trimWords.get()) {
@@ -91,7 +96,7 @@ class TextSortingTransformer(
       buildSplitConfigurationUi(
         "Split unsorted words by:",
         unsortedSplitWordsDelimiter,
-        unsortedIndividualSplitWordsDelimiter
+        unsortedIndividualSplitWordsDelimiter,
       )
     }
 
@@ -99,27 +104,20 @@ class TextSortingTransformer(
       buildSplitConfigurationUi(
         "Join sorted words by:",
         sortedJoinWordsDelimiter,
-        sortedIndividualJoinWordsDelimiter
+        sortedIndividualJoinWordsDelimiter,
       )
     }
 
     row {
-      comboBox(SortingOrder.entries)
-        .label("Order:")
-        .bindItem(sortingOrder)
-      checkBox("Reverse")
-        .bindSelected(reverseOrder)
-      checkBox("Case insensitive")
-        .bindSelected(caseInsensitive)
+      comboBox(SortingOrder.entries).label("Order:").bindItem(sortingOrder)
+      checkBox("Reverse").bindSelected(reverseOrder)
+      checkBox("Case insensitive").bindSelected(caseInsensitive)
     }
 
     row {
-      checkBox("Remove duplicates")
-        .bindSelected(removeDuplicates)
-      checkBox("Trim words")
-        .bindSelected(trimWords)
-      checkBox("Remove blank words")
-        .bindSelected(removeBlankWords)
+      checkBox("Remove duplicates").bindSelected(removeDuplicates)
+      checkBox("Trim words").bindSelected(trimWords)
+      checkBox("Remove blank words").bindSelected(removeBlankWords)
     }
   }
 
@@ -128,12 +126,10 @@ class TextSortingTransformer(
   private fun Row.buildSplitConfigurationUi(
     title: String,
     splitWordsDelimiter: ObservableMutableProperty<WordsDelimiter>,
-    individualDelimiter: ObservableMutableProperty<String>
+    individualDelimiter: ObservableMutableProperty<String>,
   ) {
-    val splitWordsDelimiterComboBox = comboBox(WordsDelimiter.entries)
-      .label(title)
-      .bindItem(splitWordsDelimiter)
-      .component
+    val splitWordsDelimiterComboBox =
+      comboBox(WordsDelimiter.entries).label(title).bindItem(splitWordsDelimiter).component
     textField()
       .bindText(individualDelimiter)
       .visibleIf(ComboBoxPredicate(splitWordsDelimiterComboBox) { it == INDIVIDUAL })
@@ -152,7 +148,11 @@ class TextSortingTransformer(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private enum class WordsDelimiter(private val title: String, val splitPattern: Regex?, val joinDelimiter: String?) {
+  private enum class WordsDelimiter(
+    private val title: String,
+    val splitPattern: Regex?,
+    val joinDelimiter: String?,
+  ) {
 
     LINE_BREAK("Line break", Regex("\\R+"), System.lineSeparator()),
     SPACE("Whitespace", Regex("\\s+"), " "),
@@ -169,15 +169,13 @@ class TextSortingTransformer(
 
   class Factory : DeveloperUiToolFactory<TextSortingTransformer> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Text Sorting",
-      contentTitle = "Text Sorting"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "Text Sorting", contentTitle = "Text Sorting")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> TextSortingTransformer) = { configuration ->
       TextSortingTransformer(context, configuration, parentDisposable, project)
     }

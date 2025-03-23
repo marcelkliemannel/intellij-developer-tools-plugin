@@ -7,7 +7,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings.Companion.generalSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings.Companion.assertPersistableType
 import java.math.BigDecimal
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.safeCast
@@ -15,7 +15,7 @@ import kotlin.reflect.safeCast
 class DeveloperToolConfiguration(
   var name: String,
   val id: UUID,
-  val persistentProperties: Map<String, PersistentProperty>
+  val persistentProperties: Map<String, PersistentProperty>,
 ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -37,17 +37,19 @@ class DeveloperToolConfiguration(
     key: String,
     defaultValue: T,
     propertyType: PropertyType = PropertyType.CONFIGURATION,
-    example: T? = null
+    example: T? = null,
   ): ValueProperty<T> =
-    properties[key]?.let { reuseExistingProperty(it) } ?: createNewProperty(defaultValue, propertyType, key, createExampleProvider(example))
+    properties[key]?.let { reuseExistingProperty(it) }
+      ?: createNewProperty(defaultValue, propertyType, key, createExampleProvider(example))
 
   fun <T : Any> registerWithExampleProvider(
     key: String,
     defaultValue: T,
     propertyType: PropertyType = PropertyType.CONFIGURATION,
-    example: (() -> T)? = null
+    example: (() -> T)? = null,
   ): ValueProperty<T> =
-    properties[key]?.let { reuseExistingProperty(it) } ?: createNewProperty(defaultValue, propertyType, key, example)
+    properties[key]?.let { reuseExistingProperty(it) }
+      ?: createNewProperty(defaultValue, propertyType, key, example)
 
   fun addChangeListener(parentDisposable: Disposable, changeListener: ChangeListener) {
     changeListeners.add(changeListener)
@@ -69,18 +71,18 @@ class DeveloperToolConfiguration(
 
   fun reset(
     type: PropertyType? = null,
-    loadExamples: Boolean = generalSettings.loadExamples.get()
+    loadExamples: Boolean = generalSettings.loadExamples.get(),
   ) {
     isResetting = true
     try {
-      properties.filter { type == null || it.value.type == type }
+      properties
+        .filter { type == null || it.value.type == type }
         .forEach { (_, property) ->
           property.reset(loadExamples)
           fireConfigurationChanged(property.reference)
         }
       resetListeners.forEach { it.configurationReset() }
-    }
-    finally {
+    } finally {
       isResetting = false
     }
   }
@@ -90,15 +92,16 @@ class DeveloperToolConfiguration(
   private fun <T : Any> createExampleProvider(example: T?) =
     if (example != null) {
       { example }
-    }
-    else {
+    } else {
       null
     }
 
   private fun <T : Any> reuseExistingProperty(property: PropertyContainer): ValueProperty<T> {
-    if ((property.type == PropertyType.INPUT && !generalSettings.saveInputs.get())
-      || (property.type == PropertyType.CONFIGURATION && !generalSettings.saveConfigurations.get())
-      || (property.type == PropertyType.SENSITIVE && !generalSettings.saveSensitiveInputs.get())
+    if (
+      (property.type == PropertyType.INPUT && !generalSettings.saveInputs.get()) ||
+        (property.type == PropertyType.CONFIGURATION &&
+          !generalSettings.saveConfigurations.get()) ||
+        (property.type == PropertyType.SENSITIVE && !generalSettings.saveSensitiveInputs.get())
     ) {
       property.reset(generalSettings.loadExamples.get())
     }
@@ -111,23 +114,25 @@ class DeveloperToolConfiguration(
     defaultValue: T,
     propertyType: PropertyType,
     key: String,
-    example: (() -> T)?
+    example: (() -> T)?,
   ): ValueProperty<T> {
     val type = assertPersistableType(defaultValue::class)
     val existingPropertyValue = persistentProperties[key]?.value
-    val initialValue: T = type.safeCast(existingPropertyValue) ?: let {
-      if (generalSettings.loadExamples.get() && example != null) example() else defaultValue
-    }
-    val valueProperty = ValueProperty(initialValue).apply {
-      afterChangeConsumeEvent(null, handlePropertyChange(key))
-    }
-    properties[key] = PropertyContainer(
-      key = key,
-      reference = valueProperty,
-      defaultValue = defaultValue,
-      example = example,
-      type = propertyType
-    )
+    val initialValue: T =
+      type.safeCast(existingPropertyValue)
+        ?: let {
+          if (generalSettings.loadExamples.get() && example != null) example() else defaultValue
+        }
+    val valueProperty =
+      ValueProperty(initialValue).apply { afterChangeConsumeEvent(null, handlePropertyChange(key)) }
+    properties[key] =
+      PropertyContainer(
+        key = key,
+        reference = valueProperty,
+        defaultValue = defaultValue,
+        example = example,
+        type = propertyType,
+      )
     return valueProperty
   }
 
@@ -135,14 +140,14 @@ class DeveloperToolConfiguration(
     changeListeners.forEach { it.configurationChanged(property) }
   }
 
-  private fun <T : Any?> handlePropertyChange(key: String): (ValueProperty.ChangeEvent<T>) -> Unit = { event ->
-    val newValue = event.newValue
-    if (event.oldValue != newValue) {
-      properties[key]?.let { property ->
-        fireConfigurationChanged(property.reference)
-      } ?: error("Unknown property: $key")
+  private fun <T : Any?> handlePropertyChange(key: String): (ValueProperty.ChangeEvent<T>) -> Unit =
+    { event ->
+      val newValue = event.newValue
+      if (event.oldValue != newValue) {
+        properties[key]?.let { property -> fireConfigurationChanged(property.reference) }
+          ?: error("Unknown property: $key")
+      }
     }
-  }
 
   // -- Inner Type ---------------------------------------------------------- //
 
@@ -151,7 +156,7 @@ class DeveloperToolConfiguration(
     val reference: ValueProperty<out Any>,
     val defaultValue: Any,
     val example: (() -> Any)?,
-    val type: PropertyType
+    val type: PropertyType,
   ) {
 
     fun reset(loadExamples: Boolean) {
@@ -161,12 +166,14 @@ class DeveloperToolConfiguration(
 
     fun valueWasChanged(): Boolean {
       val value = reference.get()
-      val b = if (defaultValue is BigDecimal) {
-        defaultValue.compareTo(value as BigDecimal) != 0 && example?.invoke()?.uncheckedCastTo<BigDecimal>()?.compareTo(value)?.equals(0)?.not() != false
-      }
-      else {
-        defaultValue != value && example?.invoke()?.equals(value)?.not() != false
-      }
+      val b =
+        if (defaultValue is BigDecimal) {
+          defaultValue.compareTo(value as BigDecimal) != 0 &&
+            example?.invoke()?.uncheckedCastTo<BigDecimal>()?.compareTo(value)?.equals(0)?.not() !=
+              false
+        } else {
+          defaultValue != value && example?.invoke()?.equals(value)?.not() != false
+        }
       return b
     }
   }
@@ -177,7 +184,7 @@ class DeveloperToolConfiguration(
 
     CONFIGURATION,
     INPUT,
-    SENSITIVE
+    SENSITIVE,
   }
 
   // -- Inner Type ---------------------------------------------------------- //

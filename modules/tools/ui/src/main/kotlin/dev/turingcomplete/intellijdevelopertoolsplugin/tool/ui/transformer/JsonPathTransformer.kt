@@ -51,21 +51,23 @@ class JsonPathTransformer(
   context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  project: Project?
-) : TextTransformer(
-  textTransformerContext = TextTransformerContext(
-    transformActionTitle = "Execute Query",
-    sourceTitle = "Original",
-    resultTitle = "Result",
-    initialSourceExampleText = EXAMPLE_SOURCE,
-    inputInitialLanguage = JsonLanguage.INSTANCE,
-    outputInitialLanguage = JsonLanguage.INSTANCE
-  ),
-  context = context,
-  configuration = configuration,
-  parentDisposable = parentDisposable,
-  project = project
-) {
+  project: Project?,
+) :
+  TextTransformer(
+    textTransformerContext =
+      TextTransformerContext(
+        transformActionTitle = "Execute Query",
+        sourceTitle = "Original",
+        resultTitle = "Result",
+        initialSourceExampleText = EXAMPLE_SOURCE,
+        inputInitialLanguage = JsonLanguage.INSTANCE,
+        outputInitialLanguage = JsonLanguage.INSTANCE,
+      ),
+    context = context,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    project = project,
+  ) {
   // -- Properties ---------------------------------------------------------- //
 
   private val queryText = configuration.register("contentText", "", INPUT, EXAMPLE_QUERY)
@@ -92,9 +94,9 @@ class JsonPathTransformer(
   }
 
   override fun Row.buildAdditionalActionsUi() {
-    checkBox("Format result")
-      .bindSelected(formatResult)
-      .whenStateChangedFromUi { configurationChanged(queryText) }
+    checkBox("Format result").bindSelected(formatResult).whenStateChangedFromUi {
+      configurationChanged(queryText)
+    }
   }
 
   override fun transform() {
@@ -106,21 +108,25 @@ class JsonPathTransformer(
     }
 
     try {
-      val resultJsonText = when (val resultJsonNode = JsonPath.parse(sourceText.get(), jsonPathConfiguration).read<Any>(query)) {
-        is ArrayNode -> ObjectMapperService.instance.jsonMapper().writeValueAsString(resultJsonNode)
-        else -> resultJsonNode.toString()
-      }
+      val resultJsonText =
+        when (
+          val resultJsonNode =
+            JsonPath.parse(sourceText.get(), jsonPathConfiguration).read<Any>(query)
+        ) {
+          is ArrayNode ->
+            ObjectMapperService.instance.jsonMapper().writeValueAsString(resultJsonNode)
+          else -> resultJsonNode.toString()
+        }
       if (formatResult.get()) {
-        val workingVirtualFile = LightVirtualFile(this.javaClass.canonicalName, JsonLanguage.INSTANCE, resultJsonText)
+        val workingVirtualFile =
+          LightVirtualFile(this.javaClass.canonicalName, JsonLanguage.INSTANCE, resultJsonText)
         PsiManager.getInstance(project!!).findFile(workingVirtualFile)?.let { workingPsiFile ->
-          val processor = RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))
-          processor.setPostRunnable {
-            resultText.set(workingPsiFile.text)
-          }
+          val processor =
+            RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))
+          processor.setPostRunnable { resultText.set(workingPsiFile.text) }
           processor.run()
         } ?: error("snh: Can't get PSI file for `LightVirtualFile`")
-      }
-      else {
+      } else {
         resultText.set(resultJsonText)
       }
     } catch (e: JsonPathException) {
@@ -137,15 +143,13 @@ class JsonPathTransformer(
 
   class Factory : DeveloperUiToolFactory<JsonPathTransformer> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "JSON Path",
-      contentTitle = "JSON Path Transformer"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "JSON Path", contentTitle = "JSON Path Transformer")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> JsonPathTransformer)? {
       if (project == null) {
         return null
@@ -192,7 +196,8 @@ class JsonPathTransformer(
     }
 
     @Language("JSON")
-    private const val EXAMPLE_SOURCE = """{
+    private const val EXAMPLE_SOURCE =
+      """{
   "starWars": {
     "characters": [
       {
@@ -229,8 +234,9 @@ class JsonPathTransformer(
 
     private const val EXAMPLE_QUERY = "\$.starWars.characters..forename"
 
-    private val operatorsHelpPanel = JBLabel(
-      """
+    private val operatorsHelpPanel =
+      JBLabel(
+          """
           <html>
           <h2>Operators</h2>
           <table>
@@ -246,7 +252,7 @@ class JsonPathTransformer(
               <tr><td><code>[&lt;start&gt;:&lt;end&gt;:&lt;step&gt;]</code></td><td>Selects a range of child elements with the specified step.</td></tr>
               <tr><td><code>[?(&lt;expression&gt;)]</code></td><td>Filter expression. Expression must evaluate to a boolean value.</td></tr>
           </table>
-          
+
           <h2>Examples</h2>
           <table>
               <tr><td><b>Example</b></td><td><b>Description</b></td></tr>
@@ -262,7 +268,9 @@ class JsonPathTransformer(
               <tr><td><code>${'$'}..movie[-1:].director</code></td><td>Selects the director of the last movie in all sub-objects of the root.</td></tr>
           </table>
           </html>
-        """.trimIndent()
-    ).copyable()
+        """
+            .trimIndent()
+        )
+        .copyable()
   }
 }

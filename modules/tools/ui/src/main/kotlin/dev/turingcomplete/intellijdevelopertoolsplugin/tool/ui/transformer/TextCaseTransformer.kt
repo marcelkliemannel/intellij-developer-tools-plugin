@@ -24,29 +24,30 @@ import dev.turingcomplete.textcaseconverter.toWordsSplitter
 import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 
 class TextCaseTransformer(
-  context : DeveloperUiToolContext,
+  context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  project: Project?
-) : TextTransformer(
-  textTransformerContext = TextTransformerContext(
-    transformActionTitle = "Transform",
-    sourceTitle = "Original",
-    resultTitle = "Target",
-    initialSourceExampleText = EXAMPLE_INPUT_TEXT,
-    diffSupport = DiffSupport(
-      title = "Text Case Transformer"
-    ),
-    supportsDebug = true
-  ),
-  context = context,
-  configuration = configuration,
-  parentDisposable = parentDisposable,
-  project = project
-) {
+  project: Project?,
+) :
+  TextTransformer(
+    textTransformerContext =
+      TextTransformerContext(
+        transformActionTitle = "Transform",
+        sourceTitle = "Original",
+        resultTitle = "Target",
+        initialSourceExampleText = EXAMPLE_INPUT_TEXT,
+        diffSupport = DiffSupport(title = "Text Case Transformer"),
+        supportsDebug = true,
+      ),
+    context = context,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    project = project,
+  ) {
   // -- Properties ---------------------------------------------------------- //
 
-  private var originalParsingMode = configuration.register("originalParsingMode", AUTOMATIC_DETECTION)
+  private var originalParsingMode =
+    configuration.register("originalParsingMode", AUTOMATIC_DETECTION)
   private var individualDelimiter = configuration.register("individualDelimiter", " ")
   private var inputTextCase = configuration.register("inputTextCase", STRICT_CAMEL_CASE)
   private var outputTextCase = configuration.register("outputTextCase", COBOL_CASE)
@@ -55,40 +56,39 @@ class TextCaseTransformer(
   // -- Exposed Methods ----------------------------------------------------- //
 
   override fun transform() {
-    resultText.set(sourceText.get().toTextCase(outputTextCase.get().textCase, getInputWordsSplitter()))
+    resultText.set(
+      sourceText.get().toTextCase(outputTextCase.get().textCase, getInputWordsSplitter())
+    )
   }
 
   override fun Panel.buildMiddleConfigurationUi() {
     buttonsGroup("Original:") {
-      row {
-        radioButton("Automatic detection")
-          .bind(originalParsingMode, AUTOMATIC_DETECTION)
-      }
+      row { radioButton("Automatic detection").bind(originalParsingMode, AUTOMATIC_DETECTION) }
 
       row {
-        val fixedTextCaseRadioButton = radioButton("Fixed text case:")
-          .bind(originalParsingMode, FIXED_TEXT_CASE)
-          .gap(RightGap.SMALL)
+        val fixedTextCaseRadioButton =
+          radioButton("Fixed text case:")
+            .bind(originalParsingMode, FIXED_TEXT_CASE)
+            .gap(RightGap.SMALL)
         comboBox(TextCase.entries)
           .bindItem(inputTextCase)
-          .enabledIf(fixedTextCaseRadioButton.selected).component
+          .enabledIf(fixedTextCaseRadioButton.selected)
+          .component
       }
 
       row {
-        val individualDelimiterRadioButton = radioButton("Split words by:")
-          .bind(originalParsingMode, INDIVIDUAL_DELIMITER)
-          .gap(RightGap.SMALL)
+        val individualDelimiterRadioButton =
+          radioButton("Split words by:")
+            .bind(originalParsingMode, INDIVIDUAL_DELIMITER)
+            .gap(RightGap.SMALL)
         textField()
           .bindText(individualDelimiter)
-          .enabledIf(individualDelimiterRadioButton.selected).component
+          .enabledIf(individualDelimiterRadioButton.selected)
+          .component
       }
     }
 
-    row {
-      comboBox(TextCase.entries)
-        .label("Target:")
-        .bindItem(outputTextCase)
-    }
+    row { comboBox(TextCase.entries).label("Target:").bindItem(outputTextCase) }
   }
 
   override fun Panel.buildDebugComponent() {
@@ -97,9 +97,11 @@ class TextCaseTransformer(
         val inputWords = getInputWordsSplitter().split(sourceText.get())
         if (inputWords.isEmpty()) {
           label("<html><i>None</i></html>")
-        }
-        else {
-          val wordsList = inputWords.joinToString(separator = "", prefix = "<ol>", postfix = "</ol>") { "<li>$it</li>" }
+        } else {
+          val wordsList =
+            inputWords.joinToString(separator = "", prefix = "<ol>", postfix = "</ol>") {
+              "<li>$it</li>"
+            }
           label("<html>$wordsList</html>")
         }
       }
@@ -110,7 +112,8 @@ class TextCaseTransformer(
 
   private fun getInputWordsSplitter() =
     when (originalParsingMode.get()) {
-      AUTOMATIC_DETECTION -> TextCaseUtils.determineWordsSplitter(sourceText.get(), inputTextCase.get().textCase)
+      AUTOMATIC_DETECTION ->
+        TextCaseUtils.determineWordsSplitter(sourceText.get(), inputTextCase.get().textCase)
       FIXED_TEXT_CASE -> inputTextCase.get().textCase.wordsSplitter()
       INDIVIDUAL_DELIMITER -> individualDelimiter.get().toWordsSplitter()
     }
@@ -144,22 +147,20 @@ class TextCaseTransformer(
 
     AUTOMATIC_DETECTION,
     FIXED_TEXT_CASE,
-    INDIVIDUAL_DELIMITER
+    INDIVIDUAL_DELIMITER,
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<TextCaseTransformer> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Text Case",
-      contentTitle = "Text Case Transformer"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "Text Case", contentTitle = "Text Case Transformer")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> TextCaseTransformer) = { configuration ->
       TextCaseTransformer(context, configuration, parentDisposable, project)
     }

@@ -26,20 +26,24 @@ object ShowDeveloperToolUtils {
     val showDeveloperToolActions = mutableListOf<AnAction>()
 
     val application = ApplicationManager.getApplication()
-    val showInternalTools = DeveloperToolsApplicationSettings.generalSettings.showInternalTools.get()
+    val showInternalTools =
+      DeveloperToolsApplicationSettings.generalSettings.showInternalTools.get()
     DeveloperUiToolFactoryEp.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
       if (developerToolFactoryEp.internalTool && !showInternalTools) {
         return@forEachExtensionSafe
       }
 
-      val developerUiToolFactory: DeveloperUiToolFactory<*> = developerToolFactoryEp.createInstance(application)
-      val showToolAction = createShowToolAction(
-        id = developerToolFactoryEp.id,
-        presentation = developerUiToolFactory.getDeveloperUiToolPresentation()
-      )
+      val developerUiToolFactory: DeveloperUiToolFactory<*> =
+        developerToolFactoryEp.createInstance(application)
+      val showToolAction =
+        createShowToolAction(
+          id = developerToolFactoryEp.id,
+          presentation = developerUiToolFactory.getDeveloperUiToolPresentation(),
+        )
       showDeveloperToolActions.add(showToolAction)
 
-      ActionManager.getInstance().registerAction("show-developer-tool-${developerToolFactoryEp.id}", showToolAction)
+      ActionManager.getInstance()
+        .registerAction("show-developer-tool-${developerToolFactoryEp.id}", showToolAction)
     }
 
     return showDeveloperToolActions.sortedBy { it.templateText }.toTypedArray()

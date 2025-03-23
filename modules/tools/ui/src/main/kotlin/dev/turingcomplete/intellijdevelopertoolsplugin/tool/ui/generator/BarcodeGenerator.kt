@@ -68,18 +68,19 @@ import java.awt.Graphics
 import java.lang.Integer.toHexString
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Locale
 import javax.imageio.ImageIO
 import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.border.LineBorder
 
-class BarcodeGenerator private constructor(
+class BarcodeGenerator
+private constructor(
   private val formats: Map<Format, FormatConfiguration>,
   private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
   private val project: Project?,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
 ) : DeveloperUiTool(parentDisposable) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -101,25 +102,25 @@ class BarcodeGenerator private constructor(
   override fun Panel.buildUi() {
     lateinit var formatComboBox: ComboBox<Format>
     row {
-      formatComboBox = comboBox(Format.entries)
-        .label("Format:")
-        .bindItem(format)
-        .whenItemSelectedFromUi { generate() }
-        .component
+      formatComboBox =
+        comboBox(Format.entries)
+          .label("Format:")
+          .bindItem(format)
+          .whenItemSelectedFromUi { generate() }
+          .component
     }
 
     row {
-      cell(contentEditor.component)
-        .validationOnApply(contentEditor.bindValidator(contentErrorHolder.asValidation()))
-        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
-        .align(Align.FILL)
-    }.layout(RowLayout.INDEPENDENT)
+        cell(contentEditor.component)
+          .validationOnApply(contentEditor.bindValidator(contentErrorHolder.asValidation()))
+          .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
+          .align(Align.FILL)
+      }
+      .layout(RowLayout.INDEPENDENT)
 
     formats.forEach { (format, configuration) ->
       with(configuration) {
-        buildConfigurationUi(ComboBoxPredicate(formatComboBox) { it == format }) {
-          generate()
-        }
+        buildConfigurationUi(ComboBoxPredicate(formatComboBox) { it == format }) { generate() }
       }
     }
 
@@ -127,54 +128,77 @@ class BarcodeGenerator private constructor(
       label("Background color:").gap(RightGap.SMALL)
       cell(ColorPanel(drawPanel.backgroundColor)).gap(RightGap.SMALL)
       lateinit var backgroundColorButton: JButton
-      backgroundColorButton = button("Change") {
-        ColorChooserService.instance.showDialog(project, backgroundColorButton, "Select Background Color", drawPanel.backgroundColor.get())?.let {
-          drawPanel.backgroundColor.set(it.toJBColor())
-          generate()
-        }
-      }.component
+      backgroundColorButton =
+        button("Change") {
+            ColorChooserService.instance
+              .showDialog(
+                project,
+                backgroundColorButton,
+                "Select Background Color",
+                drawPanel.backgroundColor.get(),
+              )
+              ?.let {
+                drawPanel.backgroundColor.set(it.toJBColor())
+                generate()
+              }
+          }
+          .component
 
       label("Foreground color:").gap(RightGap.SMALL)
       cell(ColorPanel(drawPanel.foregroundColor)).gap(RightGap.SMALL)
       lateinit var foregroundColorButton: JButton
-      foregroundColorButton = button("Change") {
-        ColorChooserService.instance.showDialog(project, foregroundColorButton, "Select Foreground Color", drawPanel.foregroundColor.get())?.let {
-          drawPanel.foregroundColor.set(it.toJBColor())
-          generate()
-        }
-      }.component
-    }
-
-    row {
-      val liveGenerationCheckBox = checkBox("Live generation")
-        .bindSelected(liveGeneration)
-        .whenStateChangedFromUi {
-          if (it) {
-            generate()
+      foregroundColorButton =
+        button("Change") {
+            ColorChooserService.instance
+              .showDialog(
+                project,
+                foregroundColorButton,
+                "Select Foreground Color",
+                drawPanel.foregroundColor.get(),
+              )
+              ?.let {
+                drawPanel.foregroundColor.set(it.toJBColor())
+                generate()
+              }
           }
-        }
-        .gap(RightGap.SMALL)
-
-      button("▼ Generate") { generate(false) }
-        .enabledIf(liveGenerationCheckBox.selected.not())
-
-      val exportToFileActions = ImageIO.getWriterFileSuffixes()
-        .map { fileFormat ->
-          DumbAwareAction.create("Export as $fileFormat") { exportToFile(fileFormat) }
-        }
-        .toTypedArray()
-      actionsButton(
-        actions = exportToFileActions,
-        actionPlace = BarcodeGenerator::class.java.name,
-        icon = AllIcons.Actions.MenuSaveall
-      ).label("Export:").visibleIf(contentErrorHolder.asComponentPredicate().not())
+          .component
     }
 
     row {
-      cell(ScrollPaneFactory.createScrollPane(drawPanel, true))
-        .label("Generated image:", LabelPosition.TOP)
-        .align(AlignY.TOP)
-    }.visibleIf(contentErrorHolder.asComponentPredicate().not()).resizableRow()
+      val liveGenerationCheckBox =
+        checkBox("Live generation")
+          .bindSelected(liveGeneration)
+          .whenStateChangedFromUi {
+            if (it) {
+              generate()
+            }
+          }
+          .gap(RightGap.SMALL)
+
+      button("▼ Generate") { generate(false) }.enabledIf(liveGenerationCheckBox.selected.not())
+
+      val exportToFileActions =
+        ImageIO.getWriterFileSuffixes()
+          .map { fileFormat ->
+            DumbAwareAction.create("Export as $fileFormat") { exportToFile(fileFormat) }
+          }
+          .toTypedArray()
+      actionsButton(
+          actions = exportToFileActions,
+          actionPlace = BarcodeGenerator::class.java.name,
+          icon = AllIcons.Actions.MenuSaveall,
+        )
+        .label("Export:")
+        .visibleIf(contentErrorHolder.asComponentPredicate().not())
+    }
+
+    row {
+        cell(ScrollPaneFactory.createScrollPane(drawPanel, true))
+          .label("Generated image:", LabelPosition.TOP)
+          .align(AlignY.TOP)
+      }
+      .visibleIf(contentErrorHolder.asComponentPredicate().not())
+      .resizableRow()
   }
 
   override fun afterBuildUi() {
@@ -205,10 +229,14 @@ class BarcodeGenerator private constructor(
       val widthValue = formatConfiguration.width()
       val heightValue = formatConfiguration.height()
 
-      val newMatrix = multiFormatWriter.encode(
-        contentEditor.text, formatConfiguration.barcodeFormat, widthValue, heightValue,
-        formatConfiguration.createHints()
-      )
+      val newMatrix =
+        multiFormatWriter.encode(
+          contentEditor.text,
+          formatConfiguration.barcodeFormat,
+          widthValue,
+          heightValue,
+          formatConfiguration.createHints(),
+        )
       drawPanel.matrix.set(newMatrix)
     } catch (_: NumberFormatException) {
       contentErrorHolder.add("Input must be a number")
@@ -220,7 +248,16 @@ class BarcodeGenerator private constructor(
   }
 
   private fun createContentEditor(parentDisposable: Disposable) =
-    AdvancedEditor("content", context, configuration, project, "Content", AdvancedEditor.EditorMode.INPUT, parentDisposable, contentText)
+    AdvancedEditor(
+        "content",
+        context,
+        configuration,
+        project,
+        "Content",
+        AdvancedEditor.EditorMode.INPUT,
+        parentDisposable,
+        contentText,
+      )
       .onTextChangeFromUi { generate() }
 
   private fun exportToFile(fileFormat: String) {
@@ -229,7 +266,10 @@ class BarcodeGenerator private constructor(
     val defaultFilename = "${format.get().name.lowercase()}_$timeStamp.$fileFormat"
     FileChooserFactory.getInstance()
       .createSaveFileDialog(fileSaverDescriptor, project)
-      .save(defaultFilename)?.file?.toPath()?.let { targetPath ->
+      .save(defaultFilename)
+      ?.file
+      ?.toPath()
+      ?.let { targetPath ->
         MatrixToImageWriter.writeToPath(drawPanel.matrix.get(), fileFormat, targetPath)
       }
   }
@@ -238,149 +278,136 @@ class BarcodeGenerator private constructor(
 
   private enum class Format(
     val title: String,
-    val createConfiguration: (DeveloperToolConfiguration) -> FormatConfiguration
+    val createConfiguration: (DeveloperToolConfiguration) -> FormatConfiguration,
   ) {
 
-    AZTEC("Aztec 2D", { configuration ->
-      AztecCodeConfiguration(configuration)
-    }),
-
-    QR_CODE("QR Code 2D", { configuration ->
-      QrCodeConfiguration(configuration)
-    }),
-
-    DATA_MATRIX(
-      "Data Matrix 2D", { configuration ->
-        DataMatrixConfiguration(configuration)
-      }
-    ),
-
-    PDF_417("PDF417", { configuration ->
-      Pdf417FormatConfiguration(configuration)
-    }),
-
+    AZTEC("Aztec 2D", { configuration -> AztecCodeConfiguration(configuration) }),
+    QR_CODE("QR Code 2D", { configuration -> QrCodeConfiguration(configuration) }),
+    DATA_MATRIX("Data Matrix 2D", { configuration -> DataMatrixConfiguration(configuration) }),
+    PDF_417("PDF417", { configuration -> Pdf417FormatConfiguration(configuration) }),
     CODE_39(
-      "Code 39 1D", { configuration ->
+      "Code 39 1D",
+      { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODE_39,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10
+          defaultMargin = 10,
         )
-      }
+      },
     ),
-
     CODE_93(
-      "Code 93 1D", { configuration ->
+      "Code 93 1D",
+      { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODE_93,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10
+          defaultMargin = 10,
         )
-      }
+      },
     ),
-
     CODE_128(
-      "Code 128 1D", { configuration ->
+      "Code 128 1D",
+      { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODE_128,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10
+          defaultMargin = 10,
         )
-      }
+      },
     ),
-
     EAN_8(
-      "EAN-8 1D", { configuration ->
+      "EAN-8 1D",
+      { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.EAN_8,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10
+          defaultMargin = 10,
         )
-      }
+      },
     ),
-
     EAN_13(
-      "EAN-13 1D", { configuration ->
+      "EAN-13 1D",
+      { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.EAN_13,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10
+          defaultMargin = 10,
         )
-      }
+      },
     ),
-
     ITF(
-      "ITF (Interleaved Two of Five) 1D", { configuration ->
+      "ITF (Interleaved Two of Five) 1D",
+      { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.ITF,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10
+          defaultMargin = 10,
         )
-      }
+      },
     ),
-
     CODABAR(
-      "CODABAR 1D", { configuration ->
+      "CODABAR 1D",
+      { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODABAR,
           configuration = configuration,
           supportsHeight = true,
           defaultHeight = 50,
           supportsMargin = true,
-          defaultMargin = 10
+          defaultMargin = 10,
         )
-      }
+      },
     ),
-
     UPC_A(
-      "UPC-A 1D", { configuration ->
+      "UPC-A 1D",
+      { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.UPC_A,
           configuration = configuration,
           supportsHeight = true,
-          defaultHeight = 50
+          defaultHeight = 50,
         )
-      }
+      },
     ),
-
     UPC_E(
-      "UPC-E 1D", { configuration ->
+      "UPC-E 1D",
+      { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.UPC_E,
           configuration = configuration,
           supportsHeight = true,
-          defaultHeight = 50
+          defaultHeight = 50,
         )
-      }
+      },
     ),
-
     UPC_EAN_EXTENSION(
-      "UPC/EAN extension", { configuration ->
+      "UPC/EAN extension",
+      { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.UPC_EAN_EXTENSION,
           configuration = configuration,
           supportsHeight = true,
-          defaultHeight = 50
+          defaultHeight = 50,
         )
-      }
+      },
     );
 
     override fun toString(): String = title
@@ -400,71 +427,75 @@ class BarcodeGenerator private constructor(
     defaultMargin: Int = 1,
     private val supportsErrorCorrection: ErrorCorrectionSupport = UNSUPPORTED,
     defaultErrorCorrection: ErrorCorrection = ErrorCorrection.H,
-    private val comment: String? = null
+    private val comment: String? = null,
   ) {
 
     private val width = configuration.register("${barcodeFormat.name}-width", defaultWidth)
     private val height = configuration.register("${barcodeFormat.name}-height", defaultHeight)
     private val margin = configuration.register("${barcodeFormat.name}-margin", defaultMargin)
-    private val errorCorrection = configuration.register("${barcodeFormat.name}-errorCorrection", defaultErrorCorrection)
+    private val errorCorrection =
+      configuration.register("${barcodeFormat.name}-errorCorrection", defaultErrorCorrection)
 
     fun width() = width.get()
+
     fun height() = height.get()
 
     fun Panel.buildConfigurationUi(visible: ComponentPredicate, onConfigurationChange: () -> Unit) {
       row {
-        if (supportsWidth) {
-          textField()
-            .label("Width:")
-            .bindIntTextImproved(width)
-            .validateLongValue(LongRange(10, 1000))
-            .columns(COLUMNS_TINY)
-            .whenTextChangedFromUi { onConfigurationChange() }
-        }
+          if (supportsWidth) {
+            textField()
+              .label("Width:")
+              .bindIntTextImproved(width)
+              .validateLongValue(LongRange(10, 1000))
+              .columns(COLUMNS_TINY)
+              .whenTextChangedFromUi { onConfigurationChange() }
+          }
 
-        if (supportsHeight) {
-          textField()
-            .label("Height:")
-            .bindIntTextImproved(height)
-            .validateLongValue(LongRange(1, 1000))
-            .columns(COLUMNS_TINY)
-            .whenTextChangedFromUi { onConfigurationChange() }
-        }
+          if (supportsHeight) {
+            textField()
+              .label("Height:")
+              .bindIntTextImproved(height)
+              .validateLongValue(LongRange(1, 1000))
+              .columns(COLUMNS_TINY)
+              .whenTextChangedFromUi { onConfigurationChange() }
+          }
 
-        if (supportsMargin) {
-          textField()
-            .label("Margin:")
-            .bindIntTextImproved(margin)
-            .validateLongValue(LongRange(0, 100))
-            .columns(COLUMNS_TINY)
-            .whenTextChangedFromUi { onConfigurationChange() }
-        }
+          if (supportsMargin) {
+            textField()
+              .label("Margin:")
+              .bindIntTextImproved(margin)
+              .validateLongValue(LongRange(0, 100))
+              .columns(COLUMNS_TINY)
+              .whenTextChangedFromUi { onConfigurationChange() }
+          }
 
-        if (supportsErrorCorrection != UNSUPPORTED) {
-          comboBox(ErrorCorrection.entries)
-            .label("Error correction:")
-            .bindItem(errorCorrection)
-            .onChanged { onConfigurationChange() }
-        }
+          if (supportsErrorCorrection != UNSUPPORTED) {
+            comboBox(ErrorCorrection.entries)
+              .label("Error correction:")
+              .bindItem(errorCorrection)
+              .onChanged { onConfigurationChange() }
+          }
 
-        if (comment != null) {
-          rowComment(comment = comment, maxLineLength = MAX_LINE_LENGTH_WORD_WRAP)
+          if (comment != null) {
+            rowComment(comment = comment, maxLineLength = MAX_LINE_LENGTH_WORD_WRAP)
+          }
         }
-      }.visibleIf(visible)
+        .visibleIf(visible)
 
       buildAdditionalConfigurationUi(visible, onConfigurationChange)
     }
 
-    open fun Panel.buildAdditionalConfigurationUi(visible: ComponentPredicate, onConfigurationChange: () -> Unit) {
-    }
+    open fun Panel.buildAdditionalConfigurationUi(
+      visible: ComponentPredicate,
+      onConfigurationChange: () -> Unit,
+    ) {}
 
     open fun createHints(): Map<EncodeHintType, Any> {
       val hints = mutableMapOf<EncodeHintType, Any>()
       hints[EncodeHintType.CHARACTER_SET] = "utf-8"
       if (supportsErrorCorrection == LEVEL_ENUM_NAME) {
         hints[EncodeHintType.ERROR_CORRECTION] = errorCorrection.get().level.name
-      }
-      else if (supportsErrorCorrection == LEVEL_BITS) {
+      } else if (supportsErrorCorrection == LEVEL_BITS) {
         hints[EncodeHintType.ERROR_CORRECTION] = errorCorrection.get().level.bits
       }
 
@@ -480,95 +511,111 @@ class BarcodeGenerator private constructor(
 
   private enum class ErrorCorrectionSupport {
 
-    UNSUPPORTED, LEVEL_ENUM_NAME, LEVEL_BITS
+    UNSUPPORTED,
+    LEVEL_ENUM_NAME,
+    LEVEL_BITS,
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class Pdf417FormatConfiguration(
-    configuration: DeveloperToolConfiguration
-  ) : FormatConfiguration(
-    barcodeFormat = BarcodeFormat.PDF_417,
-    configuration = configuration,
-    supportsWidth = true,
-    defaultWidth = 250,
-    supportsHeight = true,
-    defaultHeight = 50,
-    supportsMargin = true,
-    defaultMargin = 5,
-    supportsErrorCorrection = LEVEL_BITS,
-    comment = "The actual size will be calculated on a scale factor which is based on the relationship between the width and height value. Use a larger height than width value to rotate the barcode."
-  ) {
+  private class Pdf417FormatConfiguration(configuration: DeveloperToolConfiguration) :
+    FormatConfiguration(
+      barcodeFormat = BarcodeFormat.PDF_417,
+      configuration = configuration,
+      supportsWidth = true,
+      defaultWidth = 250,
+      supportsHeight = true,
+      defaultHeight = 50,
+      supportsMargin = true,
+      defaultMargin = 5,
+      supportsErrorCorrection = LEVEL_BITS,
+      comment =
+        "The actual size will be calculated on a scale factor which is based on the relationship between the width and height value. Use a larger height than width value to rotate the barcode.",
+    ) {
 
-    private val useCompactMode = configuration.register("${BarcodeFormat.PDF_417}-compactMode", false)
-    private val compactModeType = configuration.register("${BarcodeFormat.PDF_417}-compactionModeType", Compaction.AUTO)
+    private val useCompactMode =
+      configuration.register("${BarcodeFormat.PDF_417}-compactMode", false)
+    private val compactModeType =
+      configuration.register("${BarcodeFormat.PDF_417}-compactionModeType", Compaction.AUTO)
     private val insertEcis = configuration.register("${BarcodeFormat.PDF_417}-insertEcis", false)
-    private val setDimensions = configuration.register("${BarcodeFormat.PDF_417}-setDimensions", false)
+    private val setDimensions =
+      configuration.register("${BarcodeFormat.PDF_417}-setDimensions", false)
     private val minColumns = configuration.register("${BarcodeFormat.PDF_417}-minColumns", 1)
     private val maxColumns = configuration.register("${BarcodeFormat.PDF_417}-maxColumns", 50)
     private val minRows = configuration.register("${BarcodeFormat.PDF_417}-minRows", 1)
     private val maxRows = configuration.register("${BarcodeFormat.PDF_417}-minRows", 50)
 
     @Suppress("UnstableApiUsage")
-    override fun Panel.buildAdditionalConfigurationUi(visible: ComponentPredicate, onConfigurationChange: () -> Unit) {
+    override fun Panel.buildAdditionalConfigurationUi(
+      visible: ComponentPredicate,
+      onConfigurationChange: () -> Unit,
+    ) {
       row {
-        val useCompactModeCheckBox = checkBox("PDF417 compact mode:")
-          .bindSelected(useCompactMode)
-          .onChanged { onConfigurationChange() }
-          .gap(RightGap.SMALL)
+          val useCompactModeCheckBox =
+            checkBox("PDF417 compact mode:")
+              .bindSelected(useCompactMode)
+              .onChanged { onConfigurationChange() }
+              .gap(RightGap.SMALL)
 
-        val compactionRenderer = textListCellRenderer<Compaction?> {
-          it?.name?.lowercase()?.replaceFirstChar { char -> char.titlecase(Locale.ROOT) } ?: throw IllegalArgumentException()
+          val compactionRenderer =
+            textListCellRenderer<Compaction?> {
+              it?.name?.lowercase()?.replaceFirstChar { char -> char.titlecase(Locale.ROOT) }
+                ?: throw IllegalArgumentException()
+            }
+          comboBox(Compaction.entries, compactionRenderer)
+            .bindItem(compactModeType)
+            .whenItemSelectedFromUi { onConfigurationChange() }
+            .enabledIf(useCompactModeCheckBox.selected)
+
+          checkBox("Automatically insert ECIs").bindSelected(insertEcis).whenStateChangedFromUi {
+            onConfigurationChange()
+          }
         }
-        comboBox(Compaction.entries, compactionRenderer)
-          .bindItem(compactModeType)
-          .whenItemSelectedFromUi { onConfigurationChange() }
-          .enabledIf(useCompactModeCheckBox.selected)
-
-        checkBox("Automatically insert ECIs")
-          .bindSelected(insertEcis)
-          .whenStateChangedFromUi { onConfigurationChange() }
-      }.visibleIf(visible)
+        .visibleIf(visible)
 
       lateinit var limitDimensionsCheckbox: Cell<JBCheckBox>
       row {
-        limitDimensionsCheckbox = checkBox("Limit dimensions:")
-          .bindSelected(setDimensions)
-          .whenStateChangedFromUi { onConfigurationChange() }
-      }.visibleIf(visible)
+          limitDimensionsCheckbox =
+            checkBox("Limit dimensions:").bindSelected(setDimensions).whenStateChangedFromUi {
+              onConfigurationChange()
+            }
+        }
+        .visibleIf(visible)
       row {
-        textField()
-          .label("Min. col.:")
-          .bindIntTextImproved(minColumns)
-          .validateLongValue(LongRange(1, 1000))
-          .validateMinMaxValueRelation(ValidateMinIntValueSide.MIN) { maxColumns.get() }
-          .columns(COLUMNS_TINY)
-          .gap(RightGap.SMALL)
-          .whenTextChangedFromUi { onConfigurationChange() }
-        textField()
-          .label("Max. col.:")
-          .bindIntTextImproved(maxColumns)
-          .validateLongValue(LongRange(1, 1000))
-          .validateMinMaxValueRelation(ValidateMinIntValueSide.MAX) { minColumns.get() }
-          .columns(COLUMNS_TINY)
-          .whenTextChangedFromUi { onConfigurationChange() }
+          textField()
+            .label("Min. col.:")
+            .bindIntTextImproved(minColumns)
+            .validateLongValue(LongRange(1, 1000))
+            .validateMinMaxValueRelation(ValidateMinIntValueSide.MIN) { maxColumns.get() }
+            .columns(COLUMNS_TINY)
+            .gap(RightGap.SMALL)
+            .whenTextChangedFromUi { onConfigurationChange() }
+          textField()
+            .label("Max. col.:")
+            .bindIntTextImproved(maxColumns)
+            .validateLongValue(LongRange(1, 1000))
+            .validateMinMaxValueRelation(ValidateMinIntValueSide.MAX) { minColumns.get() }
+            .columns(COLUMNS_TINY)
+            .whenTextChangedFromUi { onConfigurationChange() }
 
-        textField()
-          .label("Min. rows:")
-          .bindIntTextImproved(minRows)
-          .validateLongValue(LongRange(1, 1000))
-          .validateMinMaxValueRelation(ValidateMinIntValueSide.MIN) { maxRows.get() }
-          .columns(COLUMNS_TINY)
-          .gap(RightGap.SMALL)
-          .whenTextChangedFromUi { onConfigurationChange() }
-        textField()
-          .label("Max. rows:")
-          .bindIntTextImproved(maxRows)
-          .validateLongValue(LongRange(1, 1000))
-          .validateMinMaxValueRelation(ValidateMinIntValueSide.MAX) { minRows.get() }
-          .columns(COLUMNS_TINY)
-          .whenTextChangedFromUi { onConfigurationChange() }
-      }.visibleIf(visible).enabledIf(limitDimensionsCheckbox.selected)
+          textField()
+            .label("Min. rows:")
+            .bindIntTextImproved(minRows)
+            .validateLongValue(LongRange(1, 1000))
+            .validateMinMaxValueRelation(ValidateMinIntValueSide.MIN) { maxRows.get() }
+            .columns(COLUMNS_TINY)
+            .gap(RightGap.SMALL)
+            .whenTextChangedFromUi { onConfigurationChange() }
+          textField()
+            .label("Max. rows:")
+            .bindIntTextImproved(maxRows)
+            .validateLongValue(LongRange(1, 1000))
+            .validateMinMaxValueRelation(ValidateMinIntValueSide.MAX) { minRows.get() }
+            .columns(COLUMNS_TINY)
+            .whenTextChangedFromUi { onConfigurationChange() }
+        }
+        .visibleIf(visible)
+        .enabledIf(limitDimensionsCheckbox.selected)
     }
 
     override fun createHints(): Map<EncodeHintType, Any> {
@@ -579,7 +626,8 @@ class BarcodeGenerator private constructor(
       hints[EncodeHintType.PDF417_AUTO_ECI] = insertEcis.get()
 
       if (setDimensions.get()) {
-        hints[EncodeHintType.PDF417_DIMENSIONS] = Dimensions(minColumns.get(), maxColumns.get(), minRows.get(), maxRows.get())
+        hints[EncodeHintType.PDF417_DIMENSIONS] =
+          Dimensions(minColumns.get(), maxColumns.get(), minRows.get(), maxRows.get())
       }
 
       return hints
@@ -588,9 +636,7 @@ class BarcodeGenerator private constructor(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class AztecCodeConfiguration(
-    configuration: DeveloperToolConfiguration
-  ) :
+  private class AztecCodeConfiguration(configuration: DeveloperToolConfiguration) :
     FormatConfiguration(
       barcodeFormat = BarcodeFormat.AZTEC,
       configuration = configuration,
@@ -598,27 +644,32 @@ class BarcodeGenerator private constructor(
       defaultWidth = 250,
       supportsHeight = true,
       defaultHeight = 250,
-      supportsErrorCorrection = LEVEL_BITS
+      supportsErrorCorrection = LEVEL_BITS,
     ) {
 
     private val layers = configuration.register("${BarcodeFormat.AZTEC}-layers", 0)
 
     @Suppress("UnstableApiUsage")
-    override fun Panel.buildAdditionalConfigurationUi(visible: ComponentPredicate, onConfigurationChange: () -> Unit) {
+    override fun Panel.buildAdditionalConfigurationUi(
+      visible: ComponentPredicate,
+      onConfigurationChange: () -> Unit,
+    ) {
       row {
-        val renderer = textListCellRenderer<Int?> {
-          when {
-            it == null -> throw IllegalArgumentException()
-            it < 0 -> "$it (compact)"
-            it == 0 -> "Minimum"
-            else -> it.toString()
-          }
+          val renderer =
+            textListCellRenderer<Int?> {
+              when {
+                it == null -> throw IllegalArgumentException()
+                it < 0 -> "$it (compact)"
+                it == 0 -> "Minimum"
+                else -> it.toString()
+              }
+            }
+          comboBox(IntRange(-4, 32).toList(), renderer)
+            .label("Layers:")
+            .bindItem(layers)
+            .whenItemSelectedFromUi { onConfigurationChange() }
         }
-        comboBox(IntRange(-4, 32).toList(), renderer)
-          .label("Layers:")
-          .bindItem(layers)
-          .whenItemSelectedFromUi { onConfigurationChange() }
-      }.visibleIf(visible)
+        .visibleIf(visible)
     }
 
     override fun createHints(): Map<EncodeHintType, Any> =
@@ -627,19 +678,18 @@ class BarcodeGenerator private constructor(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class QrCodeConfiguration(
-    configuration: DeveloperToolConfiguration
-  ) : FormatConfiguration(
-    barcodeFormat = BarcodeFormat.QR_CODE,
-    configuration = configuration,
-    supportsWidth = true,
-    defaultWidth = 200,
-    supportsHeight = true,
-    defaultHeight = 200,
-    supportsMargin = true,
-    defaultMargin = 0,
-    supportsErrorCorrection = LEVEL_ENUM_NAME
-  ) {
+  private class QrCodeConfiguration(configuration: DeveloperToolConfiguration) :
+    FormatConfiguration(
+      barcodeFormat = BarcodeFormat.QR_CODE,
+      configuration = configuration,
+      supportsWidth = true,
+      defaultWidth = 200,
+      supportsHeight = true,
+      defaultHeight = 200,
+      supportsMargin = true,
+      defaultMargin = 0,
+      supportsErrorCorrection = LEVEL_ENUM_NAME,
+    ) {
 
     private val version = configuration.register("${BarcodeFormat.QR_CODE}-version", 0)
     private val compactMode = configuration.register("${BarcodeFormat.QR_CODE}-compactMode", false)
@@ -647,30 +697,41 @@ class BarcodeGenerator private constructor(
     private val maskPattern = configuration.register("${BarcodeFormat.QR_CODE}-maskPattern", -1)
 
     @Suppress("UnstableApiUsage")
-    override fun Panel.buildAdditionalConfigurationUi(visible: ComponentPredicate, onConfigurationChange: () -> Unit) {
+    override fun Panel.buildAdditionalConfigurationUi(
+      visible: ComponentPredicate,
+      onConfigurationChange: () -> Unit,
+    ) {
       row {
-        val compactModeCheckBox = checkBox("Compact mode")
-          .bindSelected(compactMode)
-          .whenStateChangedFromUi { onConfigurationChange() }
-          .gap(RightGap.SMALL)
+          val compactModeCheckBox =
+            checkBox("Compact mode")
+              .bindSelected(compactMode)
+              .whenStateChangedFromUi { onConfigurationChange() }
+              .gap(RightGap.SMALL)
 
-        checkBox("Use GS1")
-          .bindSelected(gs1)
-          .whenStateChangedFromUi { onConfigurationChange() }
-          .enabledIf(compactModeCheckBox.selected)
+          checkBox("Use GS1")
+            .bindSelected(gs1)
+            .whenStateChangedFromUi { onConfigurationChange() }
+            .enabledIf(compactModeCheckBox.selected)
 
-        val versionRenderer = textListCellRenderer<Int?> { if (it == 0) "Minimum" else it?.toString() ?: throw IllegalArgumentException() }
-        comboBox(IntRange(0, 40).toList(), versionRenderer)
-          .label("Version:")
-          .bindItem(version)
-          .whenItemSelectedFromUi { onConfigurationChange() }
+          val versionRenderer =
+            textListCellRenderer<Int?> {
+              if (it == 0) "Minimum" else it?.toString() ?: throw IllegalArgumentException()
+            }
+          comboBox(IntRange(0, 40).toList(), versionRenderer)
+            .label("Version:")
+            .bindItem(version)
+            .whenItemSelectedFromUi { onConfigurationChange() }
 
-        val maskPatternRenderer = textListCellRenderer<Int?> { if (it == -1) "Best" else it?.toString() ?: throw IllegalArgumentException() }
-        comboBox(IntRange(-1, QRCode.NUM_MASK_PATTERNS - 1).toList(), maskPatternRenderer)
-          .label("Mask pattern:")
-          .bindItem(maskPattern)
-          .whenItemSelectedFromUi { onConfigurationChange() }
-      }.visibleIf(visible)
+          val maskPatternRenderer =
+            textListCellRenderer<Int?> {
+              if (it == -1) "Best" else it?.toString() ?: throw IllegalArgumentException()
+            }
+          comboBox(IntRange(-1, QRCode.NUM_MASK_PATTERNS - 1).toList(), maskPatternRenderer)
+            .label("Mask pattern:")
+            .bindItem(maskPattern)
+            .whenItemSelectedFromUi { onConfigurationChange() }
+        }
+        .visibleIf(visible)
     }
 
     override fun createHints(): Map<EncodeHintType, Any> {
@@ -693,67 +754,71 @@ class BarcodeGenerator private constructor(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class DataMatrixConfiguration(
-    configuration: DeveloperToolConfiguration
-  ) : FormatConfiguration(
-    barcodeFormat = BarcodeFormat.DATA_MATRIX,
-    configuration = configuration,
-    supportsWidth = true,
-    defaultWidth = 250,
-    supportsHeight = true,
-    defaultHeight = 250
-  ) {
+  private class DataMatrixConfiguration(configuration: DeveloperToolConfiguration) :
+    FormatConfiguration(
+      barcodeFormat = BarcodeFormat.DATA_MATRIX,
+      configuration = configuration,
+      supportsWidth = true,
+      defaultWidth = 250,
+      supportsHeight = true,
+      defaultHeight = 250,
+    ) {
 
-    private val compactMode = configuration.register("${BarcodeFormat.DATA_MATRIX}-compactMode", false)
+    private val compactMode =
+      configuration.register("${BarcodeFormat.DATA_MATRIX}-compactMode", false)
     private val gs1 = configuration.register("${BarcodeFormat.DATA_MATRIX}-gs1", false)
     private val forceC40 = configuration.register("${BarcodeFormat.DATA_MATRIX}-forceC40", false)
-    private val symbolShape = configuration.register(
-      "${BarcodeFormat.DATA_MATRIX}-symbolShape",
-      SymbolShapeHint.FORCE_NONE
-    )
+    private val symbolShape =
+      configuration.register("${BarcodeFormat.DATA_MATRIX}-symbolShape", SymbolShapeHint.FORCE_NONE)
 
     @Suppress("UnstableApiUsage")
-    override fun Panel.buildAdditionalConfigurationUi(visible: ComponentPredicate, onConfigurationChange: () -> Unit) {
+    override fun Panel.buildAdditionalConfigurationUi(
+      visible: ComponentPredicate,
+      onConfigurationChange: () -> Unit,
+    ) {
       row {
-        val compactModeCheckBox = checkBox("Compact mode")
-          .bindSelected(compactMode)
-          .whenStateChangedFromUi { onConfigurationChange() }
-          .gap(RightGap.SMALL)
+          val compactModeCheckBox =
+            checkBox("Compact mode")
+              .bindSelected(compactMode)
+              .whenStateChangedFromUi { onConfigurationChange() }
+              .gap(RightGap.SMALL)
 
-        checkBox("Use GS1")
-          .bindSelected(gs1)
-          .whenStateChangedFromUi { onConfigurationChange() }
-          .enabledIf(compactModeCheckBox.selected)
-          .gap(RightGap.SMALL)
+          checkBox("Use GS1")
+            .bindSelected(gs1)
+            .whenStateChangedFromUi { onConfigurationChange() }
+            .enabledIf(compactModeCheckBox.selected)
+            .gap(RightGap.SMALL)
 
-        checkBox("Force C40")
-          .bindSelected(forceC40)
-          .whenStateChangedFromUi { onConfigurationChange() }
-          .enabledIf(compactModeCheckBox.selected.not())
+          checkBox("Force C40")
+            .bindSelected(forceC40)
+            .whenStateChangedFromUi { onConfigurationChange() }
+            .enabledIf(compactModeCheckBox.selected.not())
 
-        val symbolShapeRenderer = textListCellRenderer<SymbolShapeHint?> {
-          when (it) {
-            SymbolShapeHint.FORCE_NONE -> "Automatically"
-            SymbolShapeHint.FORCE_SQUARE -> "Square"
-            SymbolShapeHint.FORCE_RECTANGLE -> "Rectangle"
-            else -> throw IllegalArgumentException()
-          }
+          val symbolShapeRenderer =
+            textListCellRenderer<SymbolShapeHint?> {
+              when (it) {
+                SymbolShapeHint.FORCE_NONE -> "Automatically"
+                SymbolShapeHint.FORCE_SQUARE -> "Square"
+                SymbolShapeHint.FORCE_RECTANGLE -> "Rectangle"
+                else -> throw IllegalArgumentException()
+              }
+            }
+          comboBox(SymbolShapeHint.entries, symbolShapeRenderer)
+            .bindItem(symbolShape)
+            .label("Symbol shape:")
+            .whenItemSelectedFromUi { onConfigurationChange() }
         }
-        comboBox(SymbolShapeHint.entries, symbolShapeRenderer)
-          .bindItem(symbolShape)
-          .label("Symbol shape:")
-          .whenItemSelectedFromUi { onConfigurationChange() }
-      }.visibleIf(visible)
+        .visibleIf(visible)
     }
 
     override fun createHints(): Map<EncodeHintType, Any> =
       super.createHints() +
-              mapOf(
-                EncodeHintType.DATA_MATRIX_COMPACT to compactMode,
-                EncodeHintType.DATA_MATRIX_SHAPE to symbolShape.get(),
-                EncodeHintType.GS1_FORMAT to gs1.get(),
-                EncodeHintType.FORCE_C40 to forceC40.get()
-              )
+        mapOf(
+          EncodeHintType.DATA_MATRIX_COMPACT to compactMode,
+          EncodeHintType.DATA_MATRIX_SHAPE to symbolShape.get(),
+          EncodeHintType.GS1_FORMAT to gs1.get(),
+          EncodeHintType.FORCE_C40 to forceC40.get(),
+        )
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -789,8 +854,14 @@ class BarcodeGenerator private constructor(
         repaint()
         parent?.repaint()
       }
-      backgroundColor.afterChange { revalidate(); repaint() }
-      foregroundColor.afterChange { revalidate(); repaint() }
+      backgroundColor.afterChange {
+        revalidate()
+        repaint()
+      }
+      foregroundColor.afterChange {
+        revalidate()
+        repaint()
+      }
     }
 
     fun revalidate2(parent: Container) {
@@ -846,7 +917,8 @@ class BarcodeGenerator private constructor(
 
     private fun updateToolTipText() {
       val colorValue = color.get()
-      toolTipText = "#${toHexString(colorValue.red)}${toHexString(colorValue.green)}${toHexString(colorValue.blue)}"
+      toolTipText =
+        "#${toHexString(colorValue.red)}${toHexString(colorValue.green)}${toHexString(colorValue.blue)}"
     }
   }
 
@@ -854,19 +926,19 @@ class BarcodeGenerator private constructor(
 
   class Factory : DeveloperUiToolFactory<BarcodeGenerator> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "QR Code/Barcode",
-      contentTitle = "QR Code/Barcode Generator"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(
+        menuTitle = "QR Code/Barcode",
+        contentTitle = "QR Code/Barcode Generator",
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> BarcodeGenerator) = { configuration ->
-      val formats: Map<Format, FormatConfiguration> = Format.entries.associateWith {
-        it.createConfiguration(configuration)
-      }
+      val formats: Map<Format, FormatConfiguration> =
+        Format.entries.associateWith { it.createConfiguration(configuration) }
       BarcodeGenerator(formats, context, configuration, project, parentDisposable)
     }
   }

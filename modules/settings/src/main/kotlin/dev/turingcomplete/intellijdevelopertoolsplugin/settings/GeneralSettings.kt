@@ -16,23 +16,21 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.message.Settings
 
 @SettingsGroup(
   id = DEFAULT_EDITOR_SETTINGS_GROUP_ID,
-  titleBundleKey = "general-settings.default-editor-settings-group.title"
+  titleBundleKey = "general-settings.default-editor-settings-group.title",
 )
 @SettingsGroup(
   id = ACTION_HANDLING_GROUP_ID,
   titleBundleKey = "general-settings.action-handling-group.title",
-  descriptionBundleKey = "general-settings.action-handling-group.description"
+  descriptionBundleKey = "general-settings.action-handling-group.description",
 )
-@SettingsGroup(
-  id = ADVANCED_GROUP_ID,
-  titleBundleKey = "general-settings.advanced-group.title"
-)
+@SettingsGroup(id = ADVANCED_GROUP_ID, titleBundleKey = "general-settings.advanced-group.title")
 interface GeneralSettings : Settings {
   // -- Properties ---------------------------------------------------------- //
 
   @Setting(
     titleBundleKey = "general-settings.add-open-main-dialog-action-to-main-toolbar.title",
-    descriptionBundleKey = "general-settings.add-open-main-dialog-action-to-main-toolbar.description"
+    descriptionBundleKey =
+      "general-settings.add-open-main-dialog-action-to-main-toolbar.description",
   )
   @BooleanValue(defaultValue = false)
   val addOpenMainDialogActionToMainToolbar: BooleanSettingProperty
@@ -51,28 +49,43 @@ interface GeneralSettings : Settings {
 
   @Setting(
     titleBundleKey = "general-settings.save-sensitive-inputs.title",
-    descriptionBundleKey = "general-settings.save-sensitive-inputs.description"
+    descriptionBundleKey = "general-settings.save-sensitive-inputs.description",
   )
   @BooleanValue(defaultValue = false)
   val saveSensitiveInputs: BooleanSettingProperty
 
-  @Setting(titleBundleKey = "general-settings.editor-soft-wraps.title", groupId = DEFAULT_EDITOR_SETTINGS_GROUP_ID)
+  @Setting(
+    titleBundleKey = "general-settings.editor-soft-wraps.title",
+    groupId = DEFAULT_EDITOR_SETTINGS_GROUP_ID,
+  )
   @BooleanValue(defaultValue = true)
   val editorSoftWraps: BooleanSettingProperty
 
-  @Setting(titleBundleKey = "general-settings.editor-show-special-characters.title", groupId = DEFAULT_EDITOR_SETTINGS_GROUP_ID)
+  @Setting(
+    titleBundleKey = "general-settings.editor-show-special-characters.title",
+    groupId = DEFAULT_EDITOR_SETTINGS_GROUP_ID,
+  )
   @BooleanValue(defaultValue = false)
   val editorShowSpecialCharacters: BooleanSettingProperty
 
-  @Setting(titleBundleKey = "general-settings.editor-show-whitespaces.title", groupId = DEFAULT_EDITOR_SETTINGS_GROUP_ID)
+  @Setting(
+    titleBundleKey = "general-settings.editor-show-whitespaces.title",
+    groupId = DEFAULT_EDITOR_SETTINGS_GROUP_ID,
+  )
   @BooleanValue(defaultValue = false)
   val editorShowWhitespaces: BooleanSettingProperty
 
-  @Setting(titleBundleKey = "general-settings.tools-menu-tree-show-group-nodes.title", groupId = ADVANCED_GROUP_ID)
+  @Setting(
+    titleBundleKey = "general-settings.tools-menu-tree-show-group-nodes.title",
+    groupId = ADVANCED_GROUP_ID,
+  )
   @BooleanValue(defaultValue = false)
   val toolsMenuTreeShowGroupNodes: BooleanSettingProperty
 
-  @Setting(titleBundleKey = "general-settings.tools-menu-tree-order-alphabetically.title", groupId = ADVANCED_GROUP_ID)
+  @Setting(
+    titleBundleKey = "general-settings.tools-menu-tree-order-alphabetically.title",
+    groupId = ADVANCED_GROUP_ID,
+  )
   @BooleanValue(defaultValue = true)
   val toolsMenuTreeOrderAlphabetically: BooleanSettingProperty
 
@@ -87,12 +100,15 @@ interface GeneralSettings : Settings {
   @Setting(
     titleBundleKey = "general-settings.show-internal-tools.title",
     groupId = ADVANCED_GROUP_ID,
-    descriptionBundleKey = "general-settings.show-internal-tools.description"
+    descriptionBundleKey = "general-settings.show-internal-tools.description",
   )
   @BooleanValue(defaultValue = false)
   val showInternalTools: BooleanSettingProperty
 
-  @Setting(titleBundleKey = "general-settings.hide-workbench-tabs-on-single-tab.title", groupId = ADVANCED_GROUP_ID)
+  @Setting(
+    titleBundleKey = "general-settings.hide-workbench-tabs-on-single-tab.title",
+    groupId = ADVANCED_GROUP_ID,
+  )
   @BooleanValue(defaultValue = true)
   val hideWorkbenchTabsOnSingleTab: BooleanSettingProperty
 
@@ -124,9 +140,8 @@ interface GeneralSettings : Settings {
     fun GeneralSettings.createSensitiveInputsHandlingToolTipText(): String? =
       if (saveInputs.get() && !saveSensitiveInputs.get()) {
         "<html>This sensitive input field will be cleared after the application is closed.<br />" +
-                "You can deactivate this behavior in the ${CommonBundle.settingsTitle().lowercase()}.</html>"
-      }
-      else {
+          "You can deactivate this behavior in the ${CommonBundle.settingsTitle().lowercase()}.</html>"
+      } else {
         null
       }
   }

@@ -1,5 +1,5 @@
 import java.nio.file.Paths
-import java.util.*
+import java.util.Properties
 import kotlin.io.path.inputStream
 
 object PluginUtils {
@@ -8,7 +8,8 @@ object PluginUtils {
   // -- Exported Methods ---------------------------------------------------- //
 
   fun getPluginVersion(): String =
-    Properties().apply { load(Paths.get("gradle.properties").inputStream()) }["pluginVersion"] as String
+    Properties().apply { load(Paths.get("gradle.properties").inputStream()) }["pluginVersion"]
+      as String
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //

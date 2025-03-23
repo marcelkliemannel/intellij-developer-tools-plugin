@@ -2,7 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.settings
 
 import kotlin.reflect.KClass
 
-interface DeveloperToolConfigurationPropertyType<T: Any> {
+interface DeveloperToolConfigurationPropertyType<T : Any> {
   // -- Properties ---------------------------------------------------------- //
 
   val id: String
@@ -20,12 +20,12 @@ interface DeveloperToolConfigurationPropertyType<T: Any> {
   // -- Inner Type ---------------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //
 
-  data class SimplePropertyType<T: Any>(
+  data class SimplePropertyType<T : Any>(
     override val id: String,
     override val typeClass: KClass<T>,
     val doFromPersistent: (String) -> T,
     val doToPersistent: (T) -> String,
-    override val legacyId: String? = null
+    override val legacyId: String? = null,
   ) : DeveloperToolConfigurationPropertyType<T> {
 
     override fun fromPersistent(persistentValue: String): T = doFromPersistent(persistentValue)

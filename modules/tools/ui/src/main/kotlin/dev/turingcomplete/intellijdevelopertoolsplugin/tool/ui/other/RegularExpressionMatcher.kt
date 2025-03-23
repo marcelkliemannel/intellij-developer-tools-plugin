@@ -60,7 +60,7 @@ class RegularExpressionMatcher(
   private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
   private val project: Project?,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
 ) : DeveloperUiTool(parentDisposable) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -68,15 +68,21 @@ class RegularExpressionMatcher(
 
   private val regexPattern = configuration.register("regexText", "", INPUT, EXAMPLE_REGEX)
   private val inputText = configuration.register("inputText", "", INPUT, EXAMPLE_INPUT_TEXT)
-  private val substitutionPattern = configuration.register("substitutionPattern", "", INPUT, EXAMPLE_SUBSTITUTION_PATTERN)
-  private val extractionPattern = configuration.register("extractionPattern", "", INPUT, EXAMPLE_EXTRACTION_PATTERN)
+  private val substitutionPattern =
+    configuration.register("substitutionPattern", "", INPUT, EXAMPLE_SUBSTITUTION_PATTERN)
+  private val extractionPattern =
+    configuration.register("extractionPattern", "", INPUT, EXAMPLE_EXTRACTION_PATTERN)
 
   private val substitutionResult = ValueProperty("")
   private val extractionResult = ValueProperty("")
   private lateinit var inputEditor: AdvancedEditor
 
-  private val regexMatchingAttributes by lazy { EditorColorsManager.getInstance().globalScheme.getAttributes(SEARCH_RESULT_ATTRIBUTES) }
-  private val selectedMatchResultHighlightingAttributes by lazy { EditorColorsManager.getInstance().globalScheme.getAttributes(TEXT_SEARCH_RESULT_ATTRIBUTES) }
+  private val regexMatchingAttributes by lazy {
+    EditorColorsManager.getInstance().globalScheme.getAttributes(SEARCH_RESULT_ATTRIBUTES)
+  }
+  private val selectedMatchResultHighlightingAttributes by lazy {
+    EditorColorsManager.getInstance().globalScheme.getAttributes(TEXT_SEARCH_RESULT_ATTRIBUTES)
+  }
   private lateinit var matchResultsTableModel: MatchResultsTableModel
 
   private val regexInputErrorHolder = ErrorHolder()
@@ -86,13 +92,16 @@ class RegularExpressionMatcher(
 
   override fun Panel.buildUi() {
     row {
-      cell(
-        Splitter(true, 0.7f).apply {
-          firstComponent = createInputComponent()
-          secondComponent = createResultComponent()
-        }
-      ).align(Align.FILL).resizableColumn()
-    }.resizableRow()
+        cell(
+            Splitter(true, 0.7f).apply {
+              firstComponent = createInputComponent()
+              secondComponent = createResultComponent()
+            }
+          )
+          .align(Align.FILL)
+          .resizableColumn()
+      }
+      .resizableRow()
   }
 
   override fun afterBuildUi() {
@@ -107,80 +116,93 @@ class RegularExpressionMatcher(
 
   private fun createInputComponent() = panel {
     row {
-      val regexTextField = RegexTextField(project, parentDisposable, regexPattern)
-        .onTextChangeFromUi { sync() }
-      cell(regexTextField)
-        .label(UiToolsBundle.message("regular-expression-matcher.regex-input"), LabelPosition.TOP)
-        .validationOnApply(regexInputErrorHolder.asValidation())
-        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
-        .align(Align.FILL)
-        .resizableColumn()
-        .gap(RightGap.SMALL)
-      cell(SelectRegexOptionsAction.createActionButton(selectedRegexOptionFlag))
-    }.topGap(TopGap.NONE)
+        val regexTextField =
+          RegexTextField(project, parentDisposable, regexPattern).onTextChangeFromUi { sync() }
+        cell(regexTextField)
+          .label(UiToolsBundle.message("regular-expression-matcher.regex-input"), LabelPosition.TOP)
+          .validationOnApply(regexInputErrorHolder.asValidation())
+          .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
+          .align(Align.FILL)
+          .resizableColumn()
+          .gap(RightGap.SMALL)
+        cell(SelectRegexOptionsAction.createActionButton(selectedRegexOptionFlag))
+      }
+      .topGap(TopGap.NONE)
 
     row {
-      inputEditor = AdvancedEditor(
-        id = "input",
-        context = context,
-        configuration = configuration,
-        project = project,
-        title = UiToolsBundle.message("regular-expression-matcher.text-input-title"),
-        editorMode = AdvancedEditor.EditorMode.INPUT,
-        parentDisposable = parentDisposable,
-        textProperty = inputText
-      ).onTextChangeFromUi { sync() }
-      cell(inputEditor.component).align(Align.FILL)
-    }.resizableRow().topGap(TopGap.SMALL)
+        inputEditor =
+          AdvancedEditor(
+              id = "input",
+              context = context,
+              configuration = configuration,
+              project = project,
+              title = UiToolsBundle.message("regular-expression-matcher.text-input-title"),
+              editorMode = AdvancedEditor.EditorMode.INPUT,
+              parentDisposable = parentDisposable,
+              textProperty = inputText,
+            )
+            .onTextChangeFromUi { sync() }
+        cell(inputEditor.component).align(Align.FILL)
+      }
+      .resizableRow()
+      .topGap(TopGap.SMALL)
   }
 
   private fun createResultComponent() = panel {
     row {
-      cell(JBTabbedPane().apply {
-        addTab(
-          UiToolsBundle.message("regular-expression-matcher.matches-title"),
-          createMatchesTableComponent()
-        )
+        cell(
+            JBTabbedPane().apply {
+              addTab(
+                UiToolsBundle.message("regular-expression-matcher.matches-title"),
+                createMatchesTableComponent(),
+              )
 
-        addTab(
-          UiToolsBundle.message("regular-expression-matcher.substitution-title"),
-          createSubstitutionComponent()
-        )
+              addTab(
+                UiToolsBundle.message("regular-expression-matcher.substitution-title"),
+                createSubstitutionComponent(),
+              )
 
-        addTab(
-          UiToolsBundle.message("regular-expression-matcher.extraction-title"),
-          createExtractionComponent()
-        )
-      }).resizableColumn().align(Align.FILL)
-    }.resizableRow()
+              addTab(
+                UiToolsBundle.message("regular-expression-matcher.extraction-title"),
+                createExtractionComponent(),
+              )
+            }
+          )
+          .resizableColumn()
+          .align(Align.FILL)
+      }
+      .resizableRow()
   }
 
   private fun createMatchesTableComponent() = panel {
     row {
-      val highlightSelectedMatchResults: (List<TextRange>) -> Unit = { textRanges ->
-        inputEditor.removeTextRangeHighlighters(SELECTED_MATCH_RESULT_HIGHLIGHTING_GROUP_ID)
-        textRanges.forEach { textRange ->
-          inputEditor.highlightTextRange(
-            textRange,
-            REGEX_MATCH_SELECTED_HIGHLIGHT_LAYER,
-            selectedMatchResultHighlightingAttributes,
-            SELECTED_MATCH_RESULT_HIGHLIGHTING_GROUP_ID
-          )
-        }
-      }
-      matchResultsTableModel = MatchResultsTableModel()
-      val matchResultsTable = MatchResultsTable(matchResultsTableModel, highlightSelectedMatchResults).apply {
-        whenFocusLost(parentDisposable) {
+        val highlightSelectedMatchResults: (List<TextRange>) -> Unit = { textRanges ->
           inputEditor.removeTextRangeHighlighters(SELECTED_MATCH_RESULT_HIGHLIGHTING_GROUP_ID)
+          textRanges.forEach { textRange ->
+            inputEditor.highlightTextRange(
+              textRange,
+              REGEX_MATCH_SELECTED_HIGHLIGHT_LAYER,
+              selectedMatchResultHighlightingAttributes,
+              SELECTED_MATCH_RESULT_HIGHLIGHTING_GROUP_ID,
+            )
+          }
         }
+        matchResultsTableModel = MatchResultsTableModel()
+        val matchResultsTable =
+          MatchResultsTable(matchResultsTableModel, highlightSelectedMatchResults).apply {
+            whenFocusLost(parentDisposable) {
+              inputEditor.removeTextRangeHighlighters(SELECTED_MATCH_RESULT_HIGHLIGHTING_GROUP_ID)
+            }
+          }
+        cell(
+            ScrollPaneFactory.createScrollPane(matchResultsTable).apply {
+              minimumSize = Dimension(minimumSize.width, 150)
+              preferredSize = Dimension(preferredSize.width, 150)
+            }
+          )
+          .align(Align.FILL)
       }
-      cell(
-        ScrollPaneFactory.createScrollPane(matchResultsTable).apply {
-          minimumSize = Dimension(minimumSize.width, 150)
-          preferredSize = Dimension(preferredSize.width, 150)
-        }
-      ).align(Align.FILL)
-    }.resizableRow()
+      .resizableRow()
   }
 
   @Suppress("UnstableApiUsage")
@@ -196,18 +218,22 @@ class RegularExpressionMatcher(
     }
 
     row {
-      cell(
-        AdvancedEditor(
-          id = "substitution-result",
-          context = context,
-          configuration = configuration,
-          project = project,
-          editorMode = AdvancedEditor.EditorMode.OUTPUT,
-          parentDisposable = parentDisposable,
-          textProperty = substitutionResult
-        ).component
-      ).align(Align.FILL)
-    }.resizableRow().topGap(TopGap.SMALL)
+        cell(
+            AdvancedEditor(
+                id = "substitution-result",
+                context = context,
+                configuration = configuration,
+                project = project,
+                editorMode = AdvancedEditor.EditorMode.OUTPUT,
+                parentDisposable = parentDisposable,
+                textProperty = substitutionResult,
+              )
+              .component
+          )
+          .align(Align.FILL)
+      }
+      .resizableRow()
+      .topGap(TopGap.SMALL)
   }
 
   @Suppress("UnstableApiUsage")
@@ -223,18 +249,22 @@ class RegularExpressionMatcher(
     }
 
     row {
-      cell(
-        AdvancedEditor(
-          id = "extraction-result",
-          context = context,
-          configuration = configuration,
-          project = project,
-          editorMode = AdvancedEditor.EditorMode.OUTPUT,
-          parentDisposable = parentDisposable,
-          textProperty = extractionResult
-        ).component
-      ).align(Align.FILL)
-    }.resizableRow().topGap(TopGap.SMALL)
+        cell(
+            AdvancedEditor(
+                id = "extraction-result",
+                context = context,
+                configuration = configuration,
+                project = project,
+                editorMode = AdvancedEditor.EditorMode.OUTPUT,
+                parentDisposable = parentDisposable,
+                textProperty = extractionResult,
+              )
+              .component
+          )
+          .align(Align.FILL)
+      }
+      .resizableRow()
+      .topGap(TopGap.SMALL)
   }
 
   private fun sync() {
@@ -245,8 +275,8 @@ class RegularExpressionMatcher(
 
   /**
    * Kotlin and Java do not support the retrieval of all named groups yet:
-   * [KT-51671](https://youtrack.jetbrains.com/issue/KT-51671). Therefore, we
-   * are using Google's [com.google.code.regexp.Pattern] for now.
+   * [KT-51671](https://youtrack.jetbrains.com/issue/KT-51671). Therefore, we are using Google's
+   * [com.google.code.regexp.Pattern] for now.
    */
   private fun match() {
     inputEditor.removeAllTextRangeHighlighters()
@@ -267,12 +297,26 @@ class RegularExpressionMatcher(
       var i = 0
       while (matcher.find()) {
         val textRange = TextRange(matcher.start(), matcher.end())
-        inputEditor.highlightTextRange(textRange, REGEX_MATCH_HIGHLIGHT_LAYER, regexMatchingAttributes)
+        inputEditor.highlightTextRange(
+          textRange,
+          REGEX_MATCH_HIGHLIGHT_LAYER,
+          regexMatchingAttributes,
+        )
         results.add(Match(i, "${i + 1}", textRange, matcher.group(), MATCH))
         if (namedGroups.isNotEmpty()) {
-          namedGroups[i].filter { it.value != null }.forEach {
-            results.add(Match(i, it.key, TextRange(matcher.start(it.key), matcher.end(it.key)), it.value, NAMED_GROUP))
-          }
+          namedGroups[i]
+            .filter { it.value != null }
+            .forEach {
+              results.add(
+                Match(
+                  i,
+                  it.key,
+                  TextRange(matcher.start(it.key), matcher.end(it.key)),
+                  it.value,
+                  NAMED_GROUP,
+                )
+              )
+            }
         }
         i++
       }
@@ -294,17 +338,16 @@ class RegularExpressionMatcher(
     }
 
     try {
-      val result = Regex(regex).replace(inputText.get()) { matchResult ->
-        substitutionPattern.get().replace(Regex("""\$(\d+)|\$\{(\d+)}""")) { groupMatch ->
-          val groupIndex = groupMatch.groups[1]?.value?.toInt()
-            ?: groupMatch.groups[2]?.value?.toInt()
-            ?: -1
-          matchResult.groups.getOrNull(groupIndex)?.value ?: "$$groupIndex"
+      val result =
+        Regex(regex).replace(inputText.get()) { matchResult ->
+          substitutionPattern.get().replace(Regex("""\$(\d+)|\$\{(\d+)}""")) { groupMatch ->
+            val groupIndex =
+              groupMatch.groups[1]?.value?.toInt() ?: groupMatch.groups[2]?.value?.toInt() ?: -1
+            matchResult.groups.getOrNull(groupIndex)?.value ?: "$$groupIndex"
+          }
         }
-      }
       substitutionResult.set(result)
-    }
-    catch (_: Exception) {
+    } catch (_: Exception) {
       // An invalid pattern will be handled by `match`.
     }
   }
@@ -316,17 +359,19 @@ class RegularExpressionMatcher(
     }
 
     try {
-      val result = Regex(regex).findAll(inputText.get()).map { matchResult ->
-        extractionPattern.get().replace(Regex("""\$(\d+)|\$\{(\d+)}""")) { groupMatch ->
-          val groupIndex = groupMatch.groups[1]?.value?.toInt()
-            ?: groupMatch.groups[2]?.value?.toInt()
-            ?: -1
-          matchResult.groups.getOrNull(groupIndex)?.value ?: "$$groupIndex"
-        }
-      }.joinToString(separator = "")
+      val result =
+        Regex(regex)
+          .findAll(inputText.get())
+          .map { matchResult ->
+            extractionPattern.get().replace(Regex("""\$(\d+)|\$\{(\d+)}""")) { groupMatch ->
+              val groupIndex =
+                groupMatch.groups[1]?.value?.toInt() ?: groupMatch.groups[2]?.value?.toInt() ?: -1
+              matchResult.groups.getOrNull(groupIndex)?.value ?: "$$groupIndex"
+            }
+          }
+          .joinToString(separator = "")
       extractionResult.set(result)
-    }
-    catch (_: Exception) {
+    } catch (_: Exception) {
       // An invalid pattern will be handled by `match`.
     }
   }
@@ -335,7 +380,7 @@ class RegularExpressionMatcher(
 
   private class MatchResultsTable(
     private val model: MatchResultsTableModel,
-    private val selectedMatchResultHighlight: (List<TextRange>) -> Unit
+    private val selectedMatchResultHighlight: (List<TextRange>) -> Unit,
   ) : JBTable(model), DataProvider {
 
     init {
@@ -358,15 +403,20 @@ class RegularExpressionMatcher(
       }
     }
 
-    override fun getData(dataId: String): Any? = when {
-      PluginCommonDataKeys.SELECTED_VALUES.`is`(dataId) -> selectedRows.map { model.getValueAt(it, 1) as String }.toList()
-      else -> null
-    }
+    override fun getData(dataId: String): Any? =
+      when {
+        PluginCommonDataKeys.SELECTED_VALUES.`is`(dataId) ->
+          selectedRows.map { model.getValueAt(it, 1) as String }.toList()
+        else -> null
+      }
 
     @Suppress("UNCHECKED_CAST")
     private fun createSelectionListener() = ListSelectionListener { e ->
       if (!e.valueIsAdjusting) {
-        val selectedTextRanges = this@MatchResultsTable.selectedRows.map { (model.getValueAt(it, 0) as Pair<String, TextRange>).second }.toList()
+        val selectedTextRanges =
+          this@MatchResultsTable.selectedRows
+            .map { (model.getValueAt(it, 0) as Pair<String, TextRange>).second }
+            .toList()
         selectedMatchResultHighlight(selectedTextRanges)
       }
     }
@@ -379,7 +429,7 @@ class RegularExpressionMatcher(
     val title: String,
     val textRange: TextRange,
     val value: String,
-    val matchResultType: MatchResultType
+    val matchResultType: MatchResultType,
   )
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -397,54 +447,68 @@ class RegularExpressionMatcher(
 
     override fun getColumnCount(): Int = 2
 
-    override fun getColumnName(column: Int): String = when (column) {
-      0 -> UiToolsBundle.message("regular-expression-matcher.matches-group")
-      1 -> UiToolsBundle.message("regular-expression-matcher.matches-value")
-      else -> error("Unknown column: $column")
-    }
+    override fun getColumnName(column: Int): String =
+      when (column) {
+        0 -> UiToolsBundle.message("regular-expression-matcher.matches-group")
+        1 -> UiToolsBundle.message("regular-expression-matcher.matches-value")
+        else -> error("Unknown column: $column")
+      }
 
-    override fun getValueAt(row: Int, column: Int): Any = when(column) {
-      0, 1 -> matches[row]
-      else -> error("Unknown column: $column")
-    }
+    override fun getValueAt(row: Int, column: Int): Any =
+      when (column) {
+        0,
+        1 -> matches[row]
+        else -> error("Unknown column: $column")
+      }
 
     fun getRowMatchResultType(row: Int): MatchResultType = matches[row].matchResultType
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class MatchResultsTableCellRenderer(private val model: MatchResultsTableModel) : ColoredTableCellRenderer() {
+  private class MatchResultsTableCellRenderer(private val model: MatchResultsTableModel) :
+    ColoredTableCellRenderer() {
 
     @Suppress("UNCHECKED_CAST")
-    override fun customizeCellRenderer(table: JTable, match: Any?, selected: Boolean, hasFocus: Boolean, row: Int, column: Int) {
+    override fun customizeCellRenderer(
+      table: JTable,
+      match: Any?,
+      selected: Boolean,
+      hasFocus: Boolean,
+      row: Int,
+      column: Int,
+    ) {
       check(match is Match)
 
       val matchResultType = model.getRowMatchResultType(row)
 
       when (column) {
         0 -> {
-          val prefix = when (matchResultType) {
-            MATCH -> UiToolsBundle.message("regular-expression-matcher.matches-match-prefix")
-            NAMED_GROUP -> UiToolsBundle.message("regular-expression-matcher.matches-group-prefix")
-          }
+          val prefix =
+            when (matchResultType) {
+              MATCH -> UiToolsBundle.message("regular-expression-matcher.matches-match-prefix")
+              NAMED_GROUP ->
+                UiToolsBundle.message("regular-expression-matcher.matches-group-prefix")
+            }
           append("$prefix ", REGULAR_ATTRIBUTES)
           append("${match.title} ", REGULAR_BOLD_ATTRIBUTES)
-          append("(${match.textRange.startOffset} to ${match.textRange.endOffset})", GRAY_SMALL_ATTRIBUTES)
-
+          append(
+            "(${match.textRange.startOffset} to ${match.textRange.endOffset})",
+            GRAY_SMALL_ATTRIBUTES,
+          )
         }
         1 -> append(match.value)
         else -> error("Unknown column: $column")
       }
 
-      border = if (row > 0 && matchResultType == MATCH) {
-        BorderFactory.createCompoundBorder(matchResultAfterFirstMatchBorder, border)
-      }
-      else if (column == 0 && matchResultType == NAMED_GROUP) {
-        BorderFactory.createCompoundBorder(matchResultGroupBorder, border)
-      }
-      else {
-        border
-      }
+      border =
+        if (row > 0 && matchResultType == MATCH) {
+          BorderFactory.createCompoundBorder(matchResultAfterFirstMatchBorder, border)
+        } else if (column == 0 && matchResultType == NAMED_GROUP) {
+          BorderFactory.createCompoundBorder(matchResultGroupBorder, border)
+        } else {
+          border
+        }
     }
   }
 
@@ -453,24 +517,26 @@ class RegularExpressionMatcher(
   private enum class MatchResultType {
 
     MATCH,
-    NAMED_GROUP
+    NAMED_GROUP,
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<RegularExpressionMatcher> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = UiToolsBundle.message("regular-expression-matcher.menu-title"),
-      contentTitle = UiToolsBundle.message("regular-expression-matcher.content-title")
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("regular-expression-matcher.menu-title"),
+        contentTitle = UiToolsBundle.message("regular-expression-matcher.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> RegularExpressionMatcher) =
-      { configuration -> RegularExpressionMatcher(context, configuration, project, parentDisposable) }
+      context: DeveloperUiToolContext,
+    ): ((DeveloperToolConfiguration) -> RegularExpressionMatcher) = { configuration ->
+      RegularExpressionMatcher(context, configuration, project, parentDisposable)
+    }
   }
 
   // -- Companion Object ---------------------------------------------------- //
@@ -487,7 +553,8 @@ class RegularExpressionMatcher(
 
     private const val SELECTED_MATCH_RESULT_HIGHLIGHTING_GROUP_ID = "matchResultHighlighting"
 
-    private val matchResultAfterFirstMatchBorder = JBUI.Borders.customLineTop(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground())
+    private val matchResultAfterFirstMatchBorder =
+      JBUI.Borders.customLineTop(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground())
     private val matchResultGroupBorder = JBUI.Borders.emptyLeft(5)
   }
 }

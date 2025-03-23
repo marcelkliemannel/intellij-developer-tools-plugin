@@ -36,13 +36,15 @@ class MainToolWindowService(val project: Project) {
     }
   }
 
-  fun <T : OpenDeveloperToolContext> openTool(context: T, reference: OpenDeveloperToolReference<T>) {
+  fun <T : OpenDeveloperToolContext> openTool(
+    context: T,
+    reference: OpenDeveloperToolReference<T>,
+  ) {
     toolWindowLock.read {
       if (toolWindow != null) {
         toolWindow!!.show()
         doOpenTool(toolWindow!!, context, reference)
-      }
-      else {
+      } else {
         deferredToolTask = OpenToolTask(context, reference)
         // The content of the tool window will be added asynchronous. So, the
         // return of `show()` (or its callback equivalents) will not indicate
@@ -58,8 +60,7 @@ class MainToolWindowService(val project: Project) {
       if (toolWindow != null) {
         toolWindow!!.show()
         doShowTool(toolWindow!!, id)
-      }
-      else {
+      } else {
         deferredToolTask = ShowToolTask(id)
         ToolWindowManager.getInstance(project).getToolWindow(MainToolWindowFactory.ID)?.show()
       }
@@ -71,18 +72,17 @@ class MainToolWindowService(val project: Project) {
   private fun <T : OpenDeveloperToolContext> doOpenTool(
     toolWindow: ToolWindow,
     context: T,
-    reference: OpenDeveloperToolReference<out T>
+    reference: OpenDeveloperToolReference<out T>,
   ) {
-    toolWindow.contentManager.getContent(0)
+    toolWindow.contentManager
+      .getContent(0)
       ?.getUserData(toolWindowContentPanelHandlerKey)
       ?.openTool(context, reference)
   }
 
-  private fun doShowTool(
-    toolWindow: ToolWindow,
-    id: String
-  ) {
-    toolWindow.contentManager.getContent(0)
+  private fun doShowTool(toolWindow: ToolWindow, id: String) {
+    toolWindow.contentManager
+      .getContent(0)
       ?.getUserData(toolWindowContentPanelHandlerKey)
       ?.showTool(id)
   }
@@ -95,7 +95,7 @@ class MainToolWindowService(val project: Project) {
 
   private class OpenToolTask<T : OpenDeveloperToolContext>(
     val context: T,
-    val reference: OpenDeveloperToolReference<out T>
+    val reference: OpenDeveloperToolReference<out T>,
   ) : ToolTask
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -106,6 +106,7 @@ class MainToolWindowService(val project: Project) {
 
   companion object {
 
-    val toolWindowContentPanelHandlerKey = Key<ContentPanelHandler>(ContentPanelHandler::class.simpleName!!)
+    val toolWindowContentPanelHandlerKey =
+      Key<ContentPanelHandler>(ContentPanelHandler::class.simpleName!!)
   }
 }

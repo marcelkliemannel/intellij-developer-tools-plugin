@@ -16,18 +16,20 @@ class EditorTextStatisticAction : DumbAwareAction("Show Text Statistic of Docume
   // -- Exported Methods ---------------------------------------------------- //
 
   override fun update(e: AnActionEvent) {
-    e.presentation.isEnabledAndVisible = e.getData(CommonDataKeys.PROJECT) != null
-            && e.getData(CommonDataKeys.EDITOR) != null
+    e.presentation.isEnabledAndVisible =
+      e.getData(CommonDataKeys.PROJECT) != null && e.getData(CommonDataKeys.EDITOR) != null
   }
 
   override fun actionPerformed(e: AnActionEvent) {
     val project = e.getData(CommonDataKeys.PROJECT) ?: return
     val editor = e.getData(CommonDataKeys.EDITOR) ?: return
     val text = runReadAction { editor.getSelectedText()?.first ?: editor.document.text }
-    project.service<OpenDeveloperToolService>().openTool(
-      TextStatistic.OpenTextStatisticContext(text),
-      TextStatistic.openTextStatisticReference
-    )
+    project
+      .service<OpenDeveloperToolService>()
+      .openTool(
+        TextStatistic.OpenTextStatisticContext(text),
+        TextStatistic.openTextStatisticReference,
+      )
   }
 
   override fun getActionUpdateThread() = ActionUpdateThread.BGT

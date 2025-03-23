@@ -10,7 +10,7 @@ import com.intellij.openapi.components.Storage
 @State(
   name = "DeveloperToolsDialogSettingsV1",
   storages = [Storage("developer-tools.xml")],
-  category = SettingsCategory.TOOLS
+  category = SettingsCategory.TOOLS,
 )
 class DeveloperToolsDialogSettings : DeveloperToolsInstanceSettings() {
   // -- Properties ---------------------------------------------------------- //
@@ -23,6 +23,7 @@ class DeveloperToolsDialogSettings : DeveloperToolsInstanceSettings() {
   companion object {
 
     val instance: DeveloperToolsDialogSettings
-      get() = ApplicationManager.getApplication().getService(DeveloperToolsDialogSettings::class.java)
+      get() =
+        ApplicationManager.getApplication().getService(DeveloperToolsDialogSettings::class.java)
   }
 }

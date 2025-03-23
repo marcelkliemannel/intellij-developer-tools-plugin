@@ -24,15 +24,14 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.ha
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.TextStatistic.OpenTextStatisticContext
-import org.apache.commons.text.StringEscapeUtils
 import javax.swing.SortOrder
-
+import org.apache.commons.text.StringEscapeUtils
 
 class TextStatistic(
   private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
   private val project: Project?,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
 ) : DeveloperUiTool(parentDisposable), OpenDeveloperToolHandler<OpenTextStatisticContext> {
   // -- Properties ---------------------------------------------------------- //
 
@@ -67,13 +66,16 @@ class TextStatistic(
 
   override fun Panel.buildUi() {
     row {
-      cell(
-        Splitter(true, 0.75f).apply {
-          firstComponent = createInputEditorComponent()
-          secondComponent = createMetricsComponent()
-        }
-      ).align(Align.FILL).resizableColumn()
-    }.resizableRow()
+        cell(
+            Splitter(true, 0.75f).apply {
+              firstComponent = createInputEditorComponent()
+              secondComponent = createMetricsComponent()
+            }
+          )
+          .align(Align.FILL)
+          .resizableColumn()
+      }
+      .resizableRow()
   }
 
   override fun afterBuildUi() {
@@ -87,68 +89,83 @@ class TextStatistic(
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun createInputEditorComponent() = AdvancedEditor(
-    id = "text",
-    context = context,
-    configuration = configuration,
-    project = project,
-    title = "Text",
-    editorMode = EditorMode.INPUT,
-    parentDisposable = parentDisposable,
-    textProperty = text,
-  ).apply {
-    onTextChangeFromUi {
-      counterAlarm.addRequest({ updateCounter() }, 100)
-    }
-  }.component
+  private fun createInputEditorComponent() =
+    AdvancedEditor(
+        id = "text",
+        context = context,
+        configuration = configuration,
+        project = project,
+        title = "Text",
+        editorMode = EditorMode.INPUT,
+        parentDisposable = parentDisposable,
+        textProperty = text,
+      )
+      .apply { onTextChangeFromUi { counterAlarm.addRequest({ updateCounter() }, 100) } }
+      .component
 
   private fun createMetricsComponent() = panel {
     row {
-      cell(JBTabbedPane().apply {
-        metricsTable = createMetricsTable()
-        addTab("Metrics", ScrollPaneFactory.createScrollPane(metricsTable, false))
+        cell(
+            JBTabbedPane().apply {
+              metricsTable = createMetricsTable()
+              addTab("Metrics", ScrollPaneFactory.createScrollPane(metricsTable, false))
 
-        uniqueWordsTable = createUniqueWordsTable()
-        addTab("Unique Words", ScrollPaneFactory.createScrollPane(uniqueWordsTable, false))
+              uniqueWordsTable = createUniqueWordsTable()
+              addTab("Unique Words", ScrollPaneFactory.createScrollPane(uniqueWordsTable, false))
 
-        uniqueCharactersTable = createUniqueCharactersTable()
-        addTab("Unique Characters", ScrollPaneFactory.createScrollPane(uniqueCharactersTable, false))
-      }).resizableColumn().align(Align.FILL)
-    }.resizableRow()
+              uniqueCharactersTable = createUniqueCharactersTable()
+              addTab(
+                "Unique Characters",
+                ScrollPaneFactory.createScrollPane(uniqueCharactersTable, false),
+              )
+            }
+          )
+          .resizableColumn()
+          .align(Align.FILL)
+      }
+      .resizableRow()
   }
 
-  private fun createMetricsTable() = SimpleTable(
-    items = listOf(
-      charactersCounter,
-      wordsCounter,
-      uniqueWordsCounter,
-      averageWordLengthCounter,
-      sentencesCounter,
-      averageWordsPerSentenceCounter,
-      paragraphsCounter,
-      characterCounter,
-      uniqueCharactersCounter,
-      lettersCounter,
-      digitsCounter,
-      nonAsciiCharactersCounter,
-      isoControlCharactersCounter,
-      whitespacesCounter,
-      lineBreaksCounter
-    ),
-    columns = listOf(
-      simpleColumnInfo("Metric", { it.title }) { it.title },
-      simpleColumnInfo("Occurrence", { it.value }) { it.value }
-    ),
-    toCopyValue = { "${it.title}: ${it.value}" },
-    initialSortedColumn = 0 to SortOrder.UNSORTED
-  )
+  private fun createMetricsTable() =
+    SimpleTable(
+      items =
+        listOf(
+          charactersCounter,
+          wordsCounter,
+          uniqueWordsCounter,
+          averageWordLengthCounter,
+          sentencesCounter,
+          averageWordsPerSentenceCounter,
+          paragraphsCounter,
+          characterCounter,
+          uniqueCharactersCounter,
+          lettersCounter,
+          digitsCounter,
+          nonAsciiCharactersCounter,
+          isoControlCharactersCounter,
+          whitespacesCounter,
+          lineBreaksCounter,
+        ),
+      columns =
+        listOf(
+          simpleColumnInfo("Metric", { it.title }) { it.title },
+          simpleColumnInfo("Occurrence", { it.value }) { it.value },
+        ),
+      toCopyValue = { "${it.title}: ${it.value}" },
+      initialSortedColumn = 0 to SortOrder.UNSORTED,
+    )
 
-  private fun createUniqueWordsTable(): SimpleTable<Pair<String, Int>> = SimpleTable(
-    items = uniqueWords,
-    columns = listOf(simpleColumnInfo("Word", { it.first }, { it.first }), simpleColumnInfo("Occurrence", { it.second.toString() }, { it.second })),
-    toCopyValue = { it.first },
-    initialSortedColumn = 1 to SortOrder.DESCENDING
-  )
+  private fun createUniqueWordsTable(): SimpleTable<Pair<String, Int>> =
+    SimpleTable(
+      items = uniqueWords,
+      columns =
+        listOf(
+          simpleColumnInfo("Word", { it.first }, { it.first }),
+          simpleColumnInfo("Occurrence", { it.second.toString() }, { it.second }),
+        ),
+      toCopyValue = { it.first },
+      initialSortedColumn = 1 to SortOrder.DESCENDING,
+    )
 
   private fun createUniqueCharactersTable(): SimpleTable<Pair<Char, Int>> {
     val characterToDisplay: (Pair<Char, Int>) -> String = { (character, _) ->
@@ -161,25 +178,23 @@ class TextStatistic(
           '\r' -> "\\r"
           else -> "\\u" + String.format("%04x", character.code)
         }
-      }
-      else if (character == ' ') {
+      } else if (character == ' ') {
         "Whitespace"
-      }
-      else if (character.code > 127) {
+      } else if (character.code > 127) {
         "$character (${StringEscapeUtils.escapeJava(character.toString())})"
-      }
-      else {
+      } else {
         character.toString()
       }
     }
     return SimpleTable(
       items = uniqueCharacters,
-      columns = listOf(
-        simpleColumnInfo("Character", characterToDisplay, characterToDisplay),
-        simpleColumnInfo("Occurrence", { it.second.toString() }, { it.second })
-      ),
+      columns =
+        listOf(
+          simpleColumnInfo("Character", characterToDisplay, characterToDisplay),
+          simpleColumnInfo("Occurrence", { it.second.toString() }, { it.second }),
+        ),
       toCopyValue = { it.first.toString() },
-      initialSortedColumn = 1 to SortOrder.DESCENDING
+      initialSortedColumn = 1 to SortOrder.DESCENDING,
     )
   }
 
@@ -223,24 +238,20 @@ class TextStatistic(
   class Factory : DeveloperUiToolFactory<TextStatistic> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(
-        menuTitle = "Text Statistic",
-        contentTitle = "Text Statistic"
-      )
+      DeveloperUiToolPresentation(menuTitle = "Text Statistic", contentTitle = "Text Statistic")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> TextStatistic) =
-      { configuration ->
-        TextStatistic(
-          context = context,
-          configuration = configuration,
-          project = project,
-          parentDisposable = parentDisposable
-        )
-      }
+      context: DeveloperUiToolContext,
+    ): ((DeveloperToolConfiguration) -> TextStatistic) = { configuration ->
+      TextStatistic(
+        context = context,
+        configuration = configuration,
+        project = project,
+        parentDisposable = parentDisposable,
+      )
+    }
   }
 
   // -- Companion Object ---------------------------------------------------- //
@@ -249,14 +260,17 @@ class TextStatistic(
 
     private const val ID = "text-statistic"
 
-    private val TEXT_EXAMPLE = """
+    private val TEXT_EXAMPLE =
+      """
 Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
 
 Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.
 
 A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
-    """.trimIndent()
+    """
+        .trimIndent()
 
-    val openTextStatisticReference = OpenDeveloperToolReference.of(ID, OpenTextStatisticContext::class)
+    val openTextStatisticReference =
+      OpenDeveloperToolReference.of(ID, OpenTextStatisticContext::class)
   }
 }

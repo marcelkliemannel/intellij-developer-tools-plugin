@@ -10,15 +10,15 @@ object TextCaseUtils {
 
   private val spacesPattern = Regex("\\s+")
 
-  private val textCasesWithoutSplitWords = setOf(
-    StandardTextCases.LOWER_CASE,
-    StandardTextCases.UPPER_CASE,
-    StandardTextCases.INVERTED_CASE,
-    StandardTextCases.ALTERNATING_CASE
-  )
+  private val textCasesWithoutSplitWords =
+    setOf(
+      StandardTextCases.LOWER_CASE,
+      StandardTextCases.UPPER_CASE,
+      StandardTextCases.INVERTED_CASE,
+      StandardTextCases.ALTERNATING_CASE,
+    )
 
-  val allTextCases = StandardTextCases.ALL_STANDARD_TEXT_CASES
-    .sortedWith(sortTextCases())
+  val allTextCases = StandardTextCases.ALL_STANDARD_TEXT_CASES.sortedWith(sortTextCases())
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
@@ -38,22 +38,23 @@ object TextCaseUtils {
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun sortTextCases() = compareBy<TextCase> {
-    val primaryTextCases = listOf(
-      StandardTextCases.SCREAMING_SNAKE_CASE,
-      StandardTextCases.SOFT_CAMEL_CASE,
-      StandardTextCases.STRICT_CAMEL_CASE,
-      StandardTextCases.PASCAL_CASE,
-      StandardTextCases.SNAKE_CASE,
-      StandardTextCases.KEBAB_CASE
-    )
-    if (it in primaryTextCases) {
-      primaryTextCases.indexOf(it)
+  private fun sortTextCases() =
+    compareBy<TextCase> {
+      val primaryTextCases =
+        listOf(
+          StandardTextCases.SCREAMING_SNAKE_CASE,
+          StandardTextCases.SOFT_CAMEL_CASE,
+          StandardTextCases.STRICT_CAMEL_CASE,
+          StandardTextCases.PASCAL_CASE,
+          StandardTextCases.SNAKE_CASE,
+          StandardTextCases.KEBAB_CASE,
+        )
+      if (it in primaryTextCases) {
+        primaryTextCases.indexOf(it)
+      } else {
+        primaryTextCases.size + StandardTextCases.ALL_STANDARD_TEXT_CASES.indexOf(it)
+      }
     }
-    else {
-      primaryTextCases.size + StandardTextCases.ALL_STANDARD_TEXT_CASES.indexOf(it)
-    }
-  }
 
   // -- Inner Type ---------------------------------------------------------- //
 }

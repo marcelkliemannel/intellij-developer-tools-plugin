@@ -40,131 +40,140 @@ import javax.swing.ToolTipManager
 import javax.swing.border.CompoundBorder
 import kotlin.reflect.KClass
 
-// -- Properties ---------------------------------------------------------------------------------------------------- //
+// -- Properties
+// ---------------------------------------------------------------------------------------------------- //
 
 val longMaxValue = BigDecimal(Long.MAX_VALUE)
 val longMinValue = BigDecimal(Long.MIN_VALUE)
 
-// -- Exposed Methods ----------------------------------------------------------------------------------------------- //
+// -- Exposed Methods
+// -----------------------------------------------------------------------------------------------
+// //
 
-/**
- * The UI DSL only verifies the range of an `intTextField` on a user input.
- */
+/** The UI DSL only verifies the range of an `intTextField` on a user input. */
 @Suppress("UnstableApiUsage")
-fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) = this.apply {
-  validationInfo {
-    if (this@validateLongValue.component.isEnabled) {
-      val value = this@validateLongValue.component.text.toLongOrNull()
-      when {
-        value == null -> error(UIBundle.message("please.enter.a.number"))
-        range != null && value !in range -> error(UIBundle.message("please.enter.a.number.from.0.to.1", range.first, range.last))
-        else -> null
+fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) =
+  this.apply {
+    validationInfo {
+      if (this@validateLongValue.component.isEnabled) {
+        val value = this@validateLongValue.component.text.toLongOrNull()
+        when {
+          value == null -> error(UIBundle.message("please.enter.a.number"))
+          range != null && value !in range ->
+            error(UIBundle.message("please.enter.a.number.from.0.to.1", range.first, range.last))
+          else -> null
+        }
+      } else {
+        null
       }
     }
-    else {
-      null
-    }
   }
-}
 
 @Suppress("UnstableApiUsage")
 fun Cell<JBTextField>.validateBigDecimalValue(
   minInclusive: BigDecimal? = null,
   mathContext: MathContext = MathContext.UNLIMITED,
-  toBigDecimal: (String) -> BigDecimal? = { it.toBigDecimalOrNull(mathContext) }
-) = this.apply {
-  validationInfo {
-    if (!this@validateBigDecimalValue.component.isEnabled) {
-      return@validationInfo null
-    }
-    val value: BigDecimal? = try {
-      toBigDecimal(this@validateBigDecimalValue.component.text)
-    } catch (_: Exception) {
-      return@validationInfo error("Please enter a valid number")
-    }
-    when {
-      value == null -> error("Please enter a number")
-      minInclusive != null && value < minInclusive -> error("Enter a number greater than or equal to 0")
-      else -> null
-    }
-  }
-}
-
-fun <T> Cell<JBRadioButton>.bind(property: ObservableMutableProperty<T>, value: T) = this.apply {
-  this.applyToComponent {
-    isSelected = property.get() == value
-
-    this.addItemListener { event ->
-      if (event.stateChange == ItemEvent.SELECTED) {
-        property.set(value)
+  toBigDecimal: (String) -> BigDecimal? = { it.toBigDecimalOrNull(mathContext) },
+) =
+  this.apply {
+    validationInfo {
+      if (!this@validateBigDecimalValue.component.isEnabled) {
+        return@validationInfo null
+      }
+      val value: BigDecimal? =
+        try {
+          toBigDecimal(this@validateBigDecimalValue.component.text)
+        } catch (_: Exception) {
+          return@validationInfo error("Please enter a valid number")
+        }
+      when {
+        value == null -> error("Please enter a number")
+        minInclusive != null && value < minInclusive ->
+          error("Enter a number greater than or equal to 0")
+        else -> null
       }
     }
   }
-}
 
-/**
- * IntelliJ's `bindIntText` will silently fail if the input is empty and will
- * not execute any other validators.
- */
-@Suppress("UnstableApiUsage")
-fun Cell<JBTextField>.bindIntTextImproved(property: ObservableMutableProperty<Int>) = this.apply {
-  applyToComponent {
-    text = property.get().toString()
-    property.afterChange { text = it.toString() }
-  }
-  this.whenTextChangedFromUi {
-    it.toIntOrNull()?.let { intValue -> property.set(intValue) }
-  }
-}
+fun <T> Cell<JBRadioButton>.bind(property: ObservableMutableProperty<T>, value: T) =
+  this.apply {
+    this.applyToComponent {
+      isSelected = property.get() == value
 
-/**
- * IntelliJ's `bindIntText` will silently fail if the input is empty and will
- * not execute any other validators.
- */
-@Suppress("UnstableApiUsage")
-fun Cell<JBTextField>.bindLongTextImproved(property: ObservableMutableProperty<Long>) = this.apply {
-  applyToComponent {
-    text = property.get().toString()
-    property.afterChange { text = it.toString() }
-  }
-  this.whenTextChangedFromUi {
-    it.toLongOrNull()?.let { longValue -> property.set(longValue) }
-  }
-}
-
-/**
- * IntelliJ's `bindIntText` will silently fail if the input is empty and will
- * not execute any other validators.
- */
-@Suppress("UnstableApiUsage")
-fun Cell<JBTextField>.bindDoubleTextImproved(property: ObservableMutableProperty<Double>) = this.apply {
-  applyToComponent {
-    text = property.get().toString()
-    property.afterChange { text = it.toString() }
-  }
-  this.whenTextChangedFromUi {
-    it.toDoubleOrNull()?.let { doubleValue -> property.set(doubleValue) }
-  }
-}
-
-@Suppress("UnstableApiUsage")
-fun Cell<JBTextField>.validateNonEmpty(errorMessage: String) = this.applyToComponent {
-  validationInfo {
-    if (it.text.isEmpty()) {
-      ValidationInfo(errorMessage)
-    }
-    else {
-      null
+      this.addItemListener { event ->
+        if (event.stateChange == ItemEvent.SELECTED) {
+          property.set(value)
+        }
+      }
     }
   }
-}
 
-fun Cell<JBTextArea>.setValidationResultBorder() = this.applyToComponent {
-  border = CompoundBorder(ValidationResultBorder(this), JBEmptyBorder(3, 5, 3, 5))
-}
+/**
+ * IntelliJ's `bindIntText` will silently fail if the input is empty and will not execute any other
+ * validators.
+ */
+@Suppress("UnstableApiUsage")
+fun Cell<JBTextField>.bindIntTextImproved(property: ObservableMutableProperty<Int>) =
+  this.apply {
+    applyToComponent {
+      text = property.get().toString()
+      property.afterChange { text = it.toString() }
+    }
+    this.whenTextChangedFromUi { it.toIntOrNull()?.let { intValue -> property.set(intValue) } }
+  }
+
+/**
+ * IntelliJ's `bindIntText` will silently fail if the input is empty and will not execute any other
+ * validators.
+ */
+@Suppress("UnstableApiUsage")
+fun Cell<JBTextField>.bindLongTextImproved(property: ObservableMutableProperty<Long>) =
+  this.apply {
+    applyToComponent {
+      text = property.get().toString()
+      property.afterChange { text = it.toString() }
+    }
+    this.whenTextChangedFromUi { it.toLongOrNull()?.let { longValue -> property.set(longValue) } }
+  }
+
+/**
+ * IntelliJ's `bindIntText` will silently fail if the input is empty and will not execute any other
+ * validators.
+ */
+@Suppress("UnstableApiUsage")
+fun Cell<JBTextField>.bindDoubleTextImproved(property: ObservableMutableProperty<Double>) =
+  this.apply {
+    applyToComponent {
+      text = property.get().toString()
+      property.afterChange { text = it.toString() }
+    }
+    this.whenTextChangedFromUi {
+      it.toDoubleOrNull()?.let { doubleValue -> property.set(doubleValue) }
+    }
+  }
 
 @Suppress("UnstableApiUsage")
-fun <T : JTextField> Cell<T>.validateMinMaxValueRelation(side: ValidateMinIntValueSide, getOppositeValue: () -> Int): Cell<T> =
+fun Cell<JBTextField>.validateNonEmpty(errorMessage: String) =
+  this.applyToComponent {
+    validationInfo {
+      if (it.text.isEmpty()) {
+        ValidationInfo(errorMessage)
+      } else {
+        null
+      }
+    }
+  }
+
+fun Cell<JBTextArea>.setValidationResultBorder() =
+  this.applyToComponent {
+    border = CompoundBorder(ValidationResultBorder(this), JBEmptyBorder(3, 5, 3, 5))
+  }
+
+@Suppress("UnstableApiUsage")
+fun <T : JTextField> Cell<T>.validateMinMaxValueRelation(
+  side: ValidateMinIntValueSide,
+  getOppositeValue: () -> Int,
+): Cell<T> =
   this.validationInfo {
     if (this.component.isEnabled) {
       it.text?.toIntOrNull()?.let { thisValue ->
@@ -179,17 +188,22 @@ fun <T : JTextField> Cell<T>.validateMinMaxValueRelation(side: ValidateMinIntVal
           else -> null
         }
       }
-    }
-    else {
+    } else {
       null
     }
   }
 
 fun JBLabel.copyable() = this.apply { setCopyable(true) }
 
-fun JComponent.wrapWithToolBar(actionEventPlace: String, actions: ActionGroup, toolBarPlace: ToolBarPlace): JComponent {
+fun JComponent.wrapWithToolBar(
+  actionEventPlace: String,
+  actions: ActionGroup,
+  toolBarPlace: ToolBarPlace,
+): JComponent {
   return BorderLayoutPanel().apply {
-    val actionToolbar = ActionManager.getInstance().createActionToolbar(actionEventPlace, actions, toolBarPlace.horizontal)
+    val actionToolbar =
+      ActionManager.getInstance()
+        .createActionToolbar(actionEventPlace, actions, toolBarPlace.horizontal)
     actionToolbar.targetComponent = this@wrapWithToolBar
 
     when (toolBarPlace) {
@@ -198,7 +212,8 @@ fun JComponent.wrapWithToolBar(actionEventPlace: String, actions: ActionGroup, t
         addToCenter(this@wrapWithToolBar)
       }
 
-      ToolBarPlace.RIGHT, ToolBarPlace.APPEND -> {
+      ToolBarPlace.RIGHT,
+      ToolBarPlace.APPEND -> {
         addToCenter(this@wrapWithToolBar)
         addToRight(actionToolbar.component)
       }
@@ -207,50 +222,51 @@ fun JComponent.wrapWithToolBar(actionEventPlace: String, actions: ActionGroup, t
 }
 
 fun JTable.setContextMenu(place: String, actionGroup: ActionGroup) {
-  val mouseAdapter = object : MouseAdapter() {
+  val mouseAdapter =
+    object : MouseAdapter() {
 
-    override fun mousePressed(e: MouseEvent) {
-      handleMouseEvent(e)
-    }
+      override fun mousePressed(e: MouseEvent) {
+        handleMouseEvent(e)
+      }
 
-    override fun mouseReleased(e: MouseEvent) {
-      handleMouseEvent(e)
-    }
+      override fun mouseReleased(e: MouseEvent) {
+        handleMouseEvent(e)
+      }
 
-    private fun handleMouseEvent(e: InputEvent) {
-      if (e is MouseEvent && e.isPopupTrigger) {
-        ActionManager.getInstance()
-          .createActionPopupMenu(place, actionGroup).component
-          .show(e.getComponent(), e.x, e.y)
+      private fun handleMouseEvent(e: InputEvent) {
+        if (e is MouseEvent && e.isPopupTrigger) {
+          ActionManager.getInstance()
+            .createActionPopupMenu(place, actionGroup)
+            .component
+            .show(e.getComponent(), e.x, e.y)
+        }
       }
     }
-  }
   addMouseListener(mouseAdapter)
 }
 
-fun Cell<JLabel>.changeFont(scale: Float = 1.0f, style: Int = Font.PLAIN) = this.applyToComponent {
-  font = JBFont.create(this.font.deriveFont(style), false).biggerOn(scale)
-}
+fun Cell<JLabel>.changeFont(scale: Float = 1.0f, style: Int = Font.PLAIN) =
+  this.applyToComponent { font = JBFont.create(this.font.deriveFont(style), false).biggerOn(scale) }
 
-fun Cell<JLabel>.monospaceFont(scale: Float = 1.0f, style: Int = Font.PLAIN) = this.applyToComponent {
-  font = JBFont.create(Font(Font.MONOSPACED, style, this.font.size)).biggerOn(scale)
-}
+fun Cell<JLabel>.monospaceFont(scale: Float = 1.0f, style: Int = Font.PLAIN) =
+  this.applyToComponent {
+    font = JBFont.create(Font(Font.MONOSPACED, style, this.font.size)).biggerOn(scale)
+  }
 
 fun EditorEx.setLanguage(language: Language) {
   val syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(language, project, null)
-  highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(syntaxHighlighter, EditorColorsManager.getInstance().globalScheme)
+  highlighter =
+    EditorHighlighterFactory.getInstance()
+      .createEditorHighlighter(syntaxHighlighter, EditorColorsManager.getInstance().globalScheme)
 }
 
 fun Row.hyperLink(title: String, url: String) {
-  cell(HyperlinkLabel(title).apply {
-    setHyperlinkTarget(url)
-  })
+  cell(HyperlinkLabel(title).apply { setHyperlinkTarget(url) })
 }
 
 fun Color.toJBColor() = this as? JBColor ?: JBColor(this, this)
 
-@Suppress("UNCHECKED_CAST")
-fun <T> TabInfo.castedObject(): T = this.`object` as T
+@Suppress("UNCHECKED_CAST") fun <T> TabInfo.castedObject(): T = this.`object` as T
 
 operator fun ObservableMutableProperty<Boolean>.not(): ObservableMutableProperty<Boolean> =
   transform({ !it }) { !it }
@@ -261,11 +277,13 @@ fun Cell<JComponent>.registerDynamicToolTip(toolTipText: () -> String?) {
   this.component.toolTipText = null
   ToolTipManager.sharedInstance().registerComponent(this.component)
 
-  this.component.addMouseListener(object : MouseAdapter() {
-    override fun mouseEntered(e: MouseEvent?) {
-      this@registerDynamicToolTip.component.toolTipText = toolTipText()
+  this.component.addMouseListener(
+    object : MouseAdapter() {
+      override fun mouseEntered(e: MouseEvent?) {
+        this@registerDynamicToolTip.component.toolTipText = toolTipText()
+      }
     }
-  })
+  )
 }
 
 fun <T : Enum<T>> KClass<T>.valueOf(name: String): T {
@@ -273,16 +291,23 @@ fun <T : Enum<T>> KClass<T>.valueOf(name: String): T {
     ?: error("Enum $this does not have a constant with name: $name")
 }
 
-// -- Private Methods ----------------------------------------------------------------------------------------------- //
-// -- Type ---------------------------------------------------------------------------------------------------------- //
+// -- Private Methods
+// -----------------------------------------------------------------------------------------------
+// //
+// -- Type
+// ---------------------------------------------------------------------------------------------------------- //
 
-enum class ValidateMinIntValueSide { MIN, MAX }
+enum class ValidateMinIntValueSide {
+  MIN,
+  MAX,
+}
 
-// -- Type ---------------------------------------------------------------------------------------------------------- //
+// -- Type
+// ---------------------------------------------------------------------------------------------------------- //
 
 enum class ToolBarPlace(val horizontal: Boolean) {
 
   LEFT(false),
   RIGHT(false),
-  APPEND(true)
+  APPEND(true),
 }

@@ -8,7 +8,7 @@ interface Settings {
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
-  fun <S, T, U: SettingProperty<S, T>> getSetting(settingsName: String): U
+  fun <S, T, U : SettingProperty<S, T>> getSetting(settingsName: String): U
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //

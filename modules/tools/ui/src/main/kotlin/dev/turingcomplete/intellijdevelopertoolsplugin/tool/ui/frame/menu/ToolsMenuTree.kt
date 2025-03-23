@@ -63,7 +63,8 @@ class ToolsMenuTree(
   // -- Initialization ------------------------------------------------------ //
 
   init {
-    val (rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode) = createTreeNodes()
+    val (rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode) =
+      createTreeNodes()
 
     model = DefaultTreeModel(rootNode)
     setCellRenderer(MenuTreeNodeRenderer(generalSettings.toolsMenuTreeShowGroupNodes.get()))
@@ -109,22 +110,33 @@ class ToolsMenuTree(
   }
 
   fun createWrapperComponent(parentComponent: JComponent): JComponent {
-    val wrapper = BorderLayoutPanel().apply {
-      border = Borders.empty()
-      addToCenter(this@ToolsMenuTree)
-      addToBottom(BorderLayoutPanel().apply {
-        border = Borders.empty(UIUtil.PANEL_REGULAR_INSETS)
-        background = UIUtil.SIDE_PANEL_BACKGROUND
-        val linksPanel = JPanel(VerticalLayout(UIUtil.DEFAULT_VGAP * 2)).apply {
-          background = UIUtil.SIDE_PANEL_BACKGROUND
-          add(createSettingsLink())
-          add(createWhatsNewLink(parentComponent))
-        }
-        addToCenter(linksPanel)
-      })
-    }
+    val wrapper =
+      BorderLayoutPanel().apply {
+        border = Borders.empty()
+        addToCenter(this@ToolsMenuTree)
+        addToBottom(
+          BorderLayoutPanel().apply {
+            border = Borders.empty(UIUtil.PANEL_REGULAR_INSETS)
+            background = UIUtil.SIDE_PANEL_BACKGROUND
+            val linksPanel =
+              JPanel(VerticalLayout(UIUtil.DEFAULT_VGAP * 2)).apply {
+                background = UIUtil.SIDE_PANEL_BACKGROUND
+                add(createSettingsLink())
+                add(createWhatsNewLink(parentComponent))
+              }
+            addToCenter(linksPanel)
+          }
+        )
+      }
     return ScrollPaneFactory.createScrollPane(wrapper, true).apply {
-      border = ColoredSideBorder(null, null, null, JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(), 1)
+      border =
+        ColoredSideBorder(
+          null,
+          null,
+          null,
+          JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(),
+          1,
+        )
       background = UIUtil.SIDE_PANEL_BACKGROUND
       viewport.background = UIUtil.SIDE_PANEL_BACKGROUND
       verticalScrollBar.background = UIUtil.SIDE_PANEL_BACKGROUND
@@ -134,68 +146,72 @@ class ToolsMenuTree(
 
   fun selectDeveloperTool(developerToolId: String, onSuccess: () -> Unit) {
     TreeUtil.promiseVisit(this) {
-      val lastPathComponent = it.lastPathComponent
-      if (lastPathComponent is ContentNode && lastPathComponent.id == developerToolId) {
-        INTERRUPT
-      }
-      else {
-        CONTINUE
-      }
-    }.onSuccess {
-      if (it != null) {
-        TreeUtil.selectPath(this, TreeUtil.getPathFromRoot(it.lastPathComponent as ContentNode)).doWhenDone {
-          onSuccess()
+        val lastPathComponent = it.lastPathComponent
+        if (lastPathComponent is ContentNode && lastPathComponent.id == developerToolId) {
+          INTERRUPT
+        } else {
+          CONTINUE
         }
       }
-      else {
-        throw IllegalStateException("Can't find developer tool with ID: $developerToolId")
+      .onSuccess {
+        if (it != null) {
+          TreeUtil.selectPath(this, TreeUtil.getPathFromRoot(it.lastPathComponent as ContentNode))
+            .doWhenDone { onSuccess() }
+        } else {
+          throw IllegalStateException("Can't find developer tool with ID: $developerToolId")
+        }
       }
-    }
   }
 
   // -- Private Methods ----------------------------------------------------- //
 
   private fun setTreeBorder() {
-    border = if (generalSettings.toolsMenuTreeShowGroupNodes.get()) {
-      Borders.emptyLeft(4)
-    }
-    else {
-      Borders.empty()
-    }
+    border =
+      if (generalSettings.toolsMenuTreeShowGroupNodes.get()) {
+        Borders.emptyLeft(4)
+      } else {
+        Borders.empty()
+      }
   }
 
   /**
-   * Directly opening the [com.intellij.openapi.options.ShowSettingsUtil] will
-   * lead to the error `Slow operations are prohibited on EDT` if called in the
-   * dialog.
-   * Using [com.intellij.ui.components.ActionLink] will lead to an error related
-   * to the `project.messageBus`.
+   * Directly opening the [com.intellij.openapi.options.ShowSettingsUtil] will lead to the error
+   * `Slow operations are prohibited on EDT` if called in the dialog. Using
+   * [com.intellij.ui.components.ActionLink] will lead to an error related to the
+   * `project.messageBus`.
    */
   @Suppress("DialogTitleCapitalization")
-  private fun createSettingsLink() = HyperlinkLabel(CommonBundle.settingsTitle()).apply {
-    icon = AllIcons.General.GearPlain
-    addHyperlinkListener(object : HyperlinkAdapter() {
+  private fun createSettingsLink() =
+    HyperlinkLabel(CommonBundle.settingsTitle()).apply {
+      icon = AllIcons.General.GearPlain
+      addHyperlinkListener(
+        object : HyperlinkAdapter() {
 
-      override fun hyperlinkActivated(e: HyperlinkEvent) {
-        OpenSettingsAction.openSettings(project)
-      }
-    })
-  }
-
-  private fun createWhatsNewLink(parentComponent: JComponent) = HyperlinkLabel("What's new").apply {
-    icon = AllIcons.Actions.IntentionBulbGrey
-    addHyperlinkListener(object : HyperlinkAdapter() {
-
-      override fun hyperlinkActivated(e: HyperlinkEvent) {
-        ApplicationManager.getApplication().invokeLater {
-          ChangelogDialog(project, parentComponent).show()
+          override fun hyperlinkActivated(e: HyperlinkEvent) {
+            OpenSettingsAction.openSettings(project)
+          }
         }
-      }
-    })
-  }
+      )
+    }
+
+  private fun createWhatsNewLink(parentComponent: JComponent) =
+    HyperlinkLabel("What's new").apply {
+      icon = AllIcons.Actions.IntentionBulbGrey
+      addHyperlinkListener(
+        object : HyperlinkAdapter() {
+
+          override fun hyperlinkActivated(e: HyperlinkEvent) {
+            ApplicationManager.getApplication().invokeLater {
+              ChangelogDialog(project, parentComponent).show()
+            }
+          }
+        }
+      )
+    }
 
   private fun expandGroupNodes(defaultGroupNodesToExpand: List<GroupNode>) {
-    val expandedGroupNodeIds = settings.expandedGroupNodeIds ?: defaultGroupNodesToExpand.map { it.id }.toSet()
+    val expandedGroupNodeIds =
+      settings.expandedGroupNodeIds ?: defaultGroupNodesToExpand.map { it.id }.toSet()
 
     TreeUtil.promiseVisit(this) {
       val lastPathComponent = it.lastPathComponent
@@ -206,23 +222,27 @@ class ToolsMenuTree(
     }
   }
 
-  private fun selectInitiallySelectedDeveloperToolNode(preferredSelectedDeveloperToolNode: ContentNode?) {
+  private fun selectInitiallySelectedDeveloperToolNode(
+    preferredSelectedDeveloperToolNode: ContentNode?
+  ) {
     var lastSelectedContentNodeSelected = false
     settings.lastSelectedContentNodeId.get()?.let { lastSelectedComponentNodeId ->
       TreeUtil.promiseVisit(this) {
-        val lastPathComponent = it.lastPathComponent
-        if (lastPathComponent is ContentNode && lastPathComponent.id == lastSelectedComponentNodeId) {
-          INTERRUPT
+          val lastPathComponent = it.lastPathComponent
+          if (
+            lastPathComponent is ContentNode && lastPathComponent.id == lastSelectedComponentNodeId
+          ) {
+            INTERRUPT
+          } else {
+            CONTINUE
+          }
         }
-        else {
-          CONTINUE
+        .onSuccess {
+          if (it != null) {
+            TreeUtil.selectNode(this, it.lastPathComponent as ContentNode)
+            lastSelectedContentNodeSelected = true
+          }
         }
-      }.onSuccess {
-        if (it != null) {
-          TreeUtil.selectNode(this, it.lastPathComponent as ContentNode)
-          lastSelectedContentNodeSelected = true
-        }
-      }
     }
     if (lastSelectedContentNodeSelected) {
       return
@@ -230,48 +250,53 @@ class ToolsMenuTree(
 
     if (preferredSelectedDeveloperToolNode != null) {
       TreeUtil.selectNode(this, preferredSelectedDeveloperToolNode)
-    }
-    else {
+    } else {
       // Select first `DeveloperToolNode`
-      TreeUtil.promiseVisit(this) { if (it.lastPathComponent is DeveloperToolNode) INTERRUPT else CONTINUE }
-        .onSuccess { it?.let { TreeUtil.selectNode(this, it.lastPathComponent as DeveloperToolNode) } }
+      TreeUtil.promiseVisit(this) {
+          if (it.lastPathComponent is DeveloperToolNode) INTERRUPT else CONTINUE
+        }
+        .onSuccess {
+          it?.let { TreeUtil.selectNode(this, it.lastPathComponent as DeveloperToolNode) }
+        }
     }
   }
 
   private fun createTreeSelectionListener() = TreeSelectionListener { e ->
-    e.path?.lastPathComponent
+    e.path
+      ?.lastPathComponent
       ?.safeCastTo<ContentNode>()
       ?.takeIf { groupNodeSelectionEnabled || it !is GroupNode }
       ?.let {
         if (it is ExternalNode) {
           it.selected(project)
-        }
-        else {
+        } else {
           selectContentNode(it, selectionTriggeredBySearch)
           settings.lastSelectedContentNodeId.set(it.id)
         }
       }
   }
 
-  private fun createTreeExpansionListener() = object : TreeExpansionListener {
+  private fun createTreeExpansionListener() =
+    object : TreeExpansionListener {
 
-    override fun treeExpanded(event: TreeExpansionEvent?) {
-      saveState(settings)
-    }
+      override fun treeExpanded(event: TreeExpansionEvent?) {
+        saveState(settings)
+      }
 
-    override fun treeCollapsed(event: TreeExpansionEvent?) {
-      saveState(settings)
-    }
+      override fun treeCollapsed(event: TreeExpansionEvent?) {
+        saveState(settings)
+      }
 
-    fun saveState(settings: DeveloperToolsInstanceSettings) {
-      val expandedGroupNodeIds = TreeUtil.collectExpandedPaths(this@ToolsMenuTree)
-        .map { it.lastPathComponent }
-        .filterIsInstance<GroupNode>()
-        .map { it.id }
-        .toSet()
-      settings.setExpandedGroupNodeIds(expandedGroupNodeIds)
+      fun saveState(settings: DeveloperToolsInstanceSettings) {
+        val expandedGroupNodeIds =
+          TreeUtil.collectExpandedPaths(this@ToolsMenuTree)
+            .map { it.lastPathComponent }
+            .filterIsInstance<GroupNode>()
+            .map { it.id }
+            .toSet()
+        settings.setExpandedGroupNodeIds(expandedGroupNodeIds)
+      }
     }
-  }
 
   private fun createTreeNodes(): Triple<RootNode, List<GroupNode>, ContentNode?> {
     val toolsMenuTreeShowGroupNodes = generalSettings.toolsMenuTreeShowGroupNodes.get()
@@ -299,24 +324,32 @@ class ToolsMenuTree(
         return@forEachExtensionSafe
       }
 
-      val developerUiToolFactory: DeveloperUiToolFactory<*> = developerToolFactoryEp.createInstance(application)
+      val developerUiToolFactory: DeveloperUiToolFactory<*> =
+        developerToolFactoryEp.createInstance(application)
       val context = DeveloperUiToolContext(developerToolFactoryEp.id, prioritizeVerticalLayout)
-      developerUiToolFactory.getDeveloperUiToolCreator(project, parentDisposable, context)?.let { developerToolCreator ->
-        val groupId: String? = if (toolsMenuTreeShowGroupNodes) developerToolFactoryEp.groupId else null
-        val parentNode = if (groupId != null) (groupNodes[groupId] ?: error("Unknown group: $groupId")) else rootNode
-        val developerToolNode = DeveloperToolNode(
-          developerToolId = developerToolFactoryEp.id,
-          project = project,
-          settings = settings,
-          parentDisposable = parentDisposable,
-          developerUiToolPresentation = developerUiToolFactory.getDeveloperUiToolPresentation(),
-          showGrouped = toolsMenuTreeShowGroupNodes,
-          developerUiToolCreator = developerToolCreator
-        )
+      developerUiToolFactory.getDeveloperUiToolCreator(project, parentDisposable, context)?.let {
+        developerToolCreator ->
+        val groupId: String? =
+          if (toolsMenuTreeShowGroupNodes) developerToolFactoryEp.groupId else null
+        val parentNode =
+          if (groupId != null) (groupNodes[groupId] ?: error("Unknown group: $groupId"))
+          else rootNode
+        val developerToolNode =
+          DeveloperToolNode(
+            developerToolId = developerToolFactoryEp.id,
+            project = project,
+            settings = settings,
+            parentDisposable = parentDisposable,
+            developerUiToolPresentation = developerUiToolFactory.getDeveloperUiToolPresentation(),
+            showGrouped = toolsMenuTreeShowGroupNodes,
+            developerUiToolCreator = developerToolCreator,
+          )
         parentNode.add(developerToolNode)
 
         if (developerToolFactoryEp.preferredSelected) {
-          check(preferredSelectedDeveloperToolNode == null) { "Multiple initial selected developer tools" }
+          check(preferredSelectedDeveloperToolNode == null) {
+            "Multiple initial selected developer tools"
+          }
           preferredSelectedDeveloperToolNode = developerToolNode
         }
       }
@@ -331,17 +364,19 @@ class ToolsMenuTree(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class MenuTreeSearch(tree: Tree, private val setSelectionTriggeredBySearch: (Boolean) -> Unit)
-    : TreeSpeedSearch(tree, null as Void?) {
+  private class MenuTreeSearch(
+    tree: Tree,
+    private val setSelectionTriggeredBySearch: (Boolean) -> Unit,
+  ) : TreeSpeedSearch(tree, null as Void?) {
 
-    override fun getElementText(element: Any?): String = (element as TreePath).lastPathComponent.toString()
+    override fun getElementText(element: Any?): String =
+      (element as TreePath).lastPathComponent.toString()
 
     override fun selectElement(element: Any?, selectedText: String?) {
       try {
         setSelectionTriggeredBySearch(true)
         super.selectElement(element, selectedText)
-      }
-      finally {
+      } finally {
         setSelectionTriggeredBySearch(false)
       }
     }
@@ -349,24 +384,27 @@ class ToolsMenuTree(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class MenuTreeNodeRenderer(private val toolsMenuTreeShowGroupNodes: Boolean) : NodeRenderer() {
+  private class MenuTreeNodeRenderer(private val toolsMenuTreeShowGroupNodes: Boolean) :
+    NodeRenderer() {
 
-    override fun customizeCellRenderer(tree: JTree,
-                                       value: Any,
-                                       selected: Boolean,
-                                       expanded: Boolean,
-                                       leaf: Boolean,
-                                       row: Int,
-                                       hasFocus: Boolean) {
+    override fun customizeCellRenderer(
+      tree: JTree,
+      value: Any,
+      selected: Boolean,
+      expanded: Boolean,
+      leaf: Boolean,
+      row: Int,
+      hasFocus: Boolean,
+    ) {
       val contentNode = value.uncheckedCastTo(ContentNode::class)
 
       val isTopLevelNode = contentNode.parent is RootNode
-      val textAttributes = if (toolsMenuTreeShowGroupNodes && isTopLevelNode && !contentNode.isSecondaryNode) {
-        REGULAR_BOLD_ATTRIBUTES
-      }
-      else {
-        REGULAR_ATTRIBUTES
-      }
+      val textAttributes =
+        if (toolsMenuTreeShowGroupNodes && isTopLevelNode && !contentNode.isSecondaryNode) {
+          REGULAR_BOLD_ATTRIBUTES
+        } else {
+          REGULAR_ATTRIBUTES
+        }
       append(contentNode.title, textAttributes)
       icon = contentNode.icon
       isIconOnTheRight = false

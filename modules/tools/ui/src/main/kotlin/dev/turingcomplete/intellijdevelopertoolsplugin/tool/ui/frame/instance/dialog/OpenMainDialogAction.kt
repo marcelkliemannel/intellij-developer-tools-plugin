@@ -25,8 +25,10 @@ class OpenMainDialogAction : DumbAwareAction() {
 
   companion object {
 
-    fun getAction(): OpenMainDialogAction? = ActionManager.getInstance().getAction(ID)?.safeCastTo<OpenMainDialogAction>()
+    fun getAction(): OpenMainDialogAction? =
+      ActionManager.getInstance().getAction(ID)?.safeCastTo<OpenMainDialogAction>()
 
-    private const val ID = "dev.turingcomplete.intellijdevelopertoolsplugin.ui.instance.dialog.OpenMainDialogAction"
+    private const val ID =
+      "dev.turingcomplete.intellijdevelopertoolsplugin.ui.instance.dialog.OpenMainDialogAction"
   }
 }

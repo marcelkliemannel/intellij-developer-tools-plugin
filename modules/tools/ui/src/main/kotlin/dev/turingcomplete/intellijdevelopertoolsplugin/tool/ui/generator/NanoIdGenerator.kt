@@ -12,13 +12,14 @@ class NanoIdGenerator(
   project: Project?,
   context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
-) : OneLineTextGenerator(
-  context = context,
-  configuration = configuration,
-  parentDisposable = parentDisposable,
-  project = project
-) {
+  parentDisposable: Disposable,
+) :
+  OneLineTextGenerator(
+    context = context,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    project = project,
+  ) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
@@ -30,20 +31,17 @@ class NanoIdGenerator(
 
   class Factory : DeveloperUiToolFactory<NanoIdGenerator> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Nano ID",
-      contentTitle = "Nano ID Generator"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "Nano ID", contentTitle = "Nano ID Generator")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> NanoIdGenerator) = { configuration ->
       NanoIdGenerator(project, context, configuration, parentDisposable)
     }
   }
-
 
   // -- Companion Object ---------------------------------------------------- //
 }

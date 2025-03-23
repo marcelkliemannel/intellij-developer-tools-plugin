@@ -9,11 +9,12 @@ class BooleanComponentPredicate(initialValue: Boolean) : ComponentPredicate() {
 
   private val changeDispatcher = SingleEventDispatcher.create<Boolean>()
 
-  var value: Boolean by Delegates.observable(initialValue) { _, oldValue, newValue ->
-    if (oldValue != newValue) {
-      changeDispatcher.fireEvent(newValue)
+  var value: Boolean by
+    Delegates.observable(initialValue) { _, oldValue, newValue ->
+      if (oldValue != newValue) {
+        changeDispatcher.fireEvent(newValue)
+      }
     }
-  }
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //

@@ -38,12 +38,13 @@ object UiUtils {
     firstTitle: String,
     secondTitle: String,
     firstText: String,
-    secondText: String
+    secondText: String,
   ) {
     val diffContentFactory = DiffContentFactory.getInstance()
     val firstContent = diffContentFactory.create(firstText)
     val secondContent = diffContentFactory.create(secondText)
-    val request: DiffRequest = SimpleDiffRequest(title, firstContent, secondContent, firstTitle, secondTitle)
+    val request: DiffRequest =
+      SimpleDiffRequest(title, firstContent, secondContent, firstTitle, secondTitle)
     DiffManager.getInstance().showDiff(null, request)
   }
 
@@ -56,84 +57,79 @@ object UiUtils {
     }
 
   @Suppress("UnstableApiUsage")
-  fun actionsPopup(
-    title: String,
-    icon: Icon? = null,
-    actions: List<AnAction>
-  ): ActionGroup = object : ActionGroup(title, null, icon), DumbAware {
+  fun actionsPopup(title: String, icon: Icon? = null, actions: List<AnAction>): ActionGroup =
+    object : ActionGroup(title, null, icon), DumbAware {
 
-    private val popupState = PopupState.forPopup()
+      private val popupState = PopupState.forPopup()
 
-    init {
-      isPopup = true
-      templatePresentation.isPerformGroup = actions.isNotEmpty()
-    }
-
-    override fun getChildren(e: AnActionEvent?): Array<AnAction> = actions.toTypedArray()
-
-    override fun actionPerformed(e: AnActionEvent) {
-      if (popupState.isRecentlyHidden) {
-        return
+      init {
+        isPopup = true
+        templatePresentation.isPerformGroup = actions.isNotEmpty()
       }
 
-      val popup = JBPopupFactory
-        .getInstance()
-        .createActionGroupPopup(
-          null,
-          this,
-          e.dataContext,
-          JBPopupFactory.ActionSelectionAid.MNEMONICS,
-          true
-        )
-      popupState.prepareToShow(popup)
-      PopupUtil.showForActionButtonEvent(popup, e)
+      override fun getChildren(e: AnActionEvent?): Array<AnAction> = actions.toTypedArray()
+
+      override fun actionPerformed(e: AnActionEvent) {
+        if (popupState.isRecentlyHidden) {
+          return
+        }
+
+        val popup =
+          JBPopupFactory.getInstance()
+            .createActionGroupPopup(
+              null,
+              this,
+              e.dataContext,
+              JBPopupFactory.ActionSelectionAid.MNEMONICS,
+              true,
+            )
+        popupState.prepareToShow(popup)
+        PopupUtil.showForActionButtonEvent(popup, e)
+      }
     }
-  }
 
   fun createLink(title: String, url: String): HyperlinkLabel {
-    return HyperlinkLabel(title).apply {
-      setHyperlinkTarget(url)
-    }
+    return HyperlinkLabel(title).apply { setHyperlinkTarget(url) }
   }
 
-  fun createToggleAction(
-    title: String,
-    isSelected: () -> Boolean,
-    setSelected: (Boolean) -> Unit
-  ) = object : ToggleAction(title) {
-    override fun isSelected(e: AnActionEvent): Boolean = isSelected()
+  fun createToggleAction(title: String, isSelected: () -> Boolean, setSelected: (Boolean) -> Unit) =
+    object : ToggleAction(title) {
+      override fun isSelected(e: AnActionEvent): Boolean = isSelected()
 
-    override fun setSelected(e: AnActionEvent, state: Boolean) {
-      setSelected(state)
+      override fun setSelected(e: AnActionEvent, state: Boolean) {
+        setSelected(state)
+      }
+
+      override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
     }
 
-    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
-  }
+  fun createContextMenuMouseListener(place: String, actionGroup: (MouseEvent) -> ActionGroup?) =
+    object : MouseAdapter() {
+      override fun mousePressed(e: MouseEvent) {
+        handleMouseEvent(e)
+      }
 
-  fun createContextMenuMouseListener(
-    place: String,
-    actionGroup: (MouseEvent) -> ActionGroup?
-  ) = object : MouseAdapter() {
-    override fun mousePressed(e: MouseEvent) {
-      handleMouseEvent(e)
-    }
+      override fun mouseReleased(e: MouseEvent) {
+        handleMouseEvent(e)
+      }
 
-    override fun mouseReleased(e: MouseEvent) {
-      handleMouseEvent(e)
-    }
-
-    private fun handleMouseEvent(e: InputEvent) {
-      if (e is MouseEvent && e.isPopupTrigger) {
-        actionGroup(e)?.let {
-          ActionManager.getInstance()
-            .createActionPopupMenu(place, it).component
-            .show(e.component, e.x, e.y)
+      private fun handleMouseEvent(e: InputEvent) {
+        if (e is MouseEvent && e.isPopupTrigger) {
+          actionGroup(e)?.let {
+            ActionManager.getInstance()
+              .createActionPopupMenu(place, it)
+              .component
+              .show(e.component, e.x, e.y)
+          }
         }
       }
     }
-  }
 
-  fun <T> simpleColumnInfo(name: String, displayValue: (T) -> String, sortValue: (T) -> Comparable<*>) =
+  fun <T> simpleColumnInfo(
+    name: String,
+    displayValue: (T) -> String,
+    sortValue: (T) -> Comparable<*>,
+  ) =
     object : ColumnInfo<T, String>(name) {
 
       override fun valueOf(item: T): String = displayValue(item)
@@ -143,18 +139,18 @@ object UiUtils {
 
   fun createPopup(content: JComponent, width: Int = 600, height: Int = 450): Balloon =
     JBPopupFactory.getInstance()
-      .createBalloonBuilder(ScrollPaneFactory.createScrollPane(content, true).apply {
-        preferredSize = Dimension(width, height)
-      })
+      .createBalloonBuilder(
+        ScrollPaneFactory.createScrollPane(content, true).apply {
+          preferredSize = Dimension(width, height)
+        }
+      )
       .setDialogMode(true)
       .setFillColor(UIUtil.getPanelBackground())
       .setBorderColor(JBColor.border())
       .setBlockClicksThroughBalloon(true)
       .setRequestFocus(true)
       .createBalloon()
-      .apply {
-        setAnimationEnabled(false)
-      }
+      .apply { setAnimationEnabled(false) }
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //

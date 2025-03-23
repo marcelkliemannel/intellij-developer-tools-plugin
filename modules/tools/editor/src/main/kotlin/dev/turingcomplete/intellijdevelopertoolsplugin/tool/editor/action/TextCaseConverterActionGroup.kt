@@ -25,7 +25,8 @@ open class TextCaseConverterActionGroup : DefaultActionGroup("Convert Text Case 
 
   final override fun update(e: AnActionEvent) {
     val editor = e.getData(CommonDataKeys.EDITOR)
-    e.presentation.isVisible = editor != null && editor.document.isWritable && getSourceText(e) != null
+    e.presentation.isVisible =
+      editor != null && editor.document.isWritable && getSourceText(e) != null
   }
 
   final override fun getChildren(e: AnActionEvent?): Array<AnAction> = textCasesAction
@@ -42,7 +43,7 @@ open class TextCaseConverterActionGroup : DefaultActionGroup("Convert Text Case 
 
   private class ConvertTextCaseAction(
     val textCase: TextCase,
-    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?
+    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?,
   ) : DumbAwareAction(textCase.example(), null, null) {
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -55,7 +56,7 @@ open class TextCaseConverterActionGroup : DefaultActionGroup("Convert Text Case 
       text: String,
       textRange: TextRange,
       textCase: TextCase,
-      editor: Editor
+      editor: Editor,
     ) {
       val wordsSplitter = determineWordsSplitter(text, textCase)
       val result = textCase.convert(text, wordsSplitter)

@@ -5,14 +5,15 @@ class IntSettingProperty(
   title: String,
   description: String?,
   group: SettingsGroup?,
-  settingValue: IntValue
-) : SettingProperty<Int, IntValue>(
-  title = title,
-  description = description,
-  group = group,
-  settingValue = settingValue,
-  initialValue = settingValue.defaultValue
-) {
+  settingValue: IntValue,
+) :
+  SettingProperty<Int, IntValue>(
+    title = title,
+    description = description,
+    group = group,
+    settingValue = settingValue,
+    initialValue = settingValue.defaultValue,
+  ) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
@@ -21,8 +22,7 @@ class IntSettingProperty(
     val value = get()
     return if (value != settingValue.defaultValue) {
       value.toString()
-    }
-    else {
+    } else {
       null
     }
   }

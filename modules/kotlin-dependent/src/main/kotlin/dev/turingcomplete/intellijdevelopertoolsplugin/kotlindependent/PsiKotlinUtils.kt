@@ -30,8 +30,7 @@ object PsiKotlinUtils {
   fun getTextFromStringValueOrIdentifier(psiElement: PsiElement): String? {
     return if (textElementKtTokens.contains(psiElement.elementType)) {
       psiElement.text
-    }
-    else {
+    } else {
       null
     }
   }
@@ -50,8 +49,7 @@ object PsiKotlinUtils {
   fun getTextFromStringValue(psiElement: PsiElement): String? {
     return if (psiElement.elementType == KtTokens.REGULAR_STRING_PART) {
       psiElement.text
-    }
-    else {
+    } else {
       null
     }
   }

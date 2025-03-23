@@ -15,7 +15,7 @@ abstract class MultiLineTextGenerator(
   private val context: DeveloperUiToolContext,
   private val project: Project?,
   private val configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
 ) : DeveloperUiTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties ---------------------------------------------------------- //
 
@@ -27,13 +27,9 @@ abstract class MultiLineTextGenerator(
   final override fun Panel.buildUi() {
     buildConfigurationUi()
 
-    row {
-      button("Regenerate") { doGenerate() }
-    }
+    row { button("Regenerate") { doGenerate() } }
 
-    row {
-      cell(generatedTextEditor.component).align(Align.FILL)
-    }.resizableRow()
+    row { cell(generatedTextEditor.component).align(Align.FILL) }.resizableRow()
   }
 
   override fun afterBuildUi() {
@@ -68,21 +64,20 @@ abstract class MultiLineTextGenerator(
 
   private fun doGenerate() {
     if (validate().isEmpty()) {
-      generatedTextEditor.apply {
-        text = generate()
-      }
+      generatedTextEditor.apply { text = generate() }
     }
   }
 
-  private fun createGeneratedTextEditor() = AdvancedEditor(
-    id = "generated-text",
-    title = generatedTextTitle,
-    editorMode = AdvancedEditor.EditorMode.OUTPUT,
-    parentDisposable = parentDisposable,
-    project = project,
-    context = context,
-    configuration = configuration
-  )
+  private fun createGeneratedTextEditor() =
+    AdvancedEditor(
+      id = "generated-text",
+      title = generatedTextTitle,
+      editorMode = AdvancedEditor.EditorMode.OUTPUT,
+      parentDisposable = parentDisposable,
+      project = project,
+      context = context,
+      configuration = configuration,
+    )
 
   // -- Inner Type ---------------------------------------------------------- //
   // -- Companion Object ---------------------------------------------------- //

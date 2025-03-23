@@ -13,38 +13,34 @@ object EscapersUnescapers {
 
   private val log = logger<EscapersUnescapers>()
 
-  val commonEscaper = listOf(
-    Escaper("Java String", { StringEscapeUtils.escapeJava(it) }),
-    Escaper("HTML Entities", { StringEscapeUtils.escapeHtml4(it) }),
-    Escaper("JSON Value", { StringEscapeUtils.escapeJson(it) }),
-    Escaper("XML Value", { StringEscapeUtils.escapeXml11(it) }),
-    Escaper("CSV Value", { StringEscapeUtils.escapeCsv(it) })
-  )
+  val commonEscaper =
+    listOf(
+      Escaper("Java String", { StringEscapeUtils.escapeJava(it) }),
+      Escaper("HTML Entities", { StringEscapeUtils.escapeHtml4(it) }),
+      Escaper("JSON Value", { StringEscapeUtils.escapeJson(it) }),
+      Escaper("XML Value", { StringEscapeUtils.escapeXml11(it) }),
+      Escaper("CSV Value", { StringEscapeUtils.escapeCsv(it) }),
+    )
 
-  val commonUnescaper = listOf(
-    Unescaper("Java String", { StringEscapeUtils.unescapeJava(it) }),
-    Unescaper("HTML Entities", { StringEscapeUtils.escapeHtml4(it) }),
-    Unescaper("JSON Value", { StringEscapeUtils.unescapeJson(it) }),
-    Unescaper("XML Value", { StringEscapeUtils.unescapeCsv(it) }),
-    Unescaper("CSV Value", { StringEscapeUtils.unescapeCsv(it) })
-  )
+  val commonUnescaper =
+    listOf(
+      Unescaper("Java String", { StringEscapeUtils.unescapeJava(it) }),
+      Unescaper("HTML Entities", { StringEscapeUtils.escapeHtml4(it) }),
+      Unescaper("JSON Value", { StringEscapeUtils.unescapeJson(it) }),
+      Unescaper("XML Value", { StringEscapeUtils.unescapeCsv(it) }),
+      Unescaper("CSV Value", { StringEscapeUtils.unescapeCsv(it) }),
+    )
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
-  fun executeEscapeInEditor(
-    text: String,
-    textRange: TextRange,
-    escaper: Escaper,
-    editor: Editor
-  ) {
+  fun executeEscapeInEditor(text: String, textRange: TextRange, escaper: Escaper, editor: Editor) {
     try {
       val result = escaper.escape(text)
       editor.executeWriteCommand(escaper.actionName) {
         it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
       }
-    }
-    catch (e: Exception) {
+    } catch (e: Exception) {
       log.warn("Escape failed", e)
       ApplicationManager.getApplication().invokeLater {
         Messages.showErrorDialog(editor.project, "Escape failed: ${e.message}", escaper.actionName)
@@ -56,18 +52,21 @@ object EscapersUnescapers {
     text: String,
     textRange: TextRange,
     unescaper: Unescaper,
-    editor: Editor
+    editor: Editor,
   ) {
     try {
       val result = unescaper.unescape(text)
       editor.executeWriteCommand(unescaper.actionName) {
         it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
       }
-    }
-    catch (e: Exception) {
+    } catch (e: Exception) {
       log.warn("Unescape failed", e)
       ApplicationManager.getApplication().invokeLater {
-        Messages.showErrorDialog(editor.project, "Unescape failed: ${e.message}", unescaper.actionName)
+        Messages.showErrorDialog(
+          editor.project,
+          "Unescape failed: ${e.message}",
+          unescaper.actionName,
+        )
       }
     }
   }
@@ -75,9 +74,17 @@ object EscapersUnescapers {
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //
 
-  class Escaper(val title: String, val escape: (String) -> String, val actionName: String = "Escape $title")
+  class Escaper(
+    val title: String,
+    val escape: (String) -> String,
+    val actionName: String = "Escape $title",
+  )
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  class Unescaper(val title: String, val unescape: (String) -> String, val actionName: String = "Unescape $title")
+  class Unescaper(
+    val title: String,
+    val unescape: (String) -> String,
+    val actionName: String = "Unescape $title",
+  )
 }

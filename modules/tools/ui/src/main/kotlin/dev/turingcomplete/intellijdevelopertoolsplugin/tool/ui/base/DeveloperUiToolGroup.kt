@@ -8,9 +8,7 @@ import org.jetbrains.annotations.Nls
 class DeveloperUiToolGroup {
   // -- Properties ---------------------------------------------------------- //
 
-  @Attribute("id")
-  @RequiredElement
-  lateinit var id: String
+  @Attribute("id") @RequiredElement lateinit var id: String
 
   @Attribute("menuTitle")
   @RequiredElement
@@ -22,11 +20,9 @@ class DeveloperUiToolGroup {
   @Nls(capitalization = Nls.Capitalization.Title)
   lateinit var detailTitle: String
 
-  @Attribute("initiallyExpanded")
-  var initiallyExpanded: Boolean? = false
+  @Attribute("initiallyExpanded") var initiallyExpanded: Boolean? = false
 
-  @Attribute("weight")
-  var weight: Int? = 1
+  @Attribute("weight") var weight: Int? = 1
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
@@ -37,6 +33,8 @@ class DeveloperUiToolGroup {
   companion object {
 
     val EP_NAME: ExtensionPointName<DeveloperUiToolGroup> =
-      ExtensionPointName.create("dev.turingcomplete.intellijdevelopertoolsplugins.developerUiToolGroup")
+      ExtensionPointName.create(
+        "dev.turingcomplete.intellijdevelopertoolsplugins.developerUiToolGroup"
+      )
   }
 }

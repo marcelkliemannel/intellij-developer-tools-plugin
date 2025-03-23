@@ -42,7 +42,7 @@ import java.nio.file.Paths
 import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import java.time.ZoneId
-import java.util.*
+import java.util.Locale
 import kotlin.io.path.bufferedReader
 import kotlin.io.path.createDirectories
 import kotlin.io.path.isDirectory
@@ -50,9 +50,7 @@ import kotlin.io.path.writer
 import kotlin.random.Random
 import kotlin.reflect.KClass
 
-/**
- * Test is in this project and not `settings` due to access to [DeveloperUiToolFactoryEp].
- */
+/** Test is in this project and not `settings` due to access to [DeveloperUiToolFactoryEp]. */
 class DeveloperToolsInstanceSettingsTest : IdeaTest() {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
@@ -64,11 +62,12 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     DeveloperToolsApplicationSettings.generalSettings.saveInputs.set(true)
     DeveloperToolsApplicationSettings.generalSettings.saveSensitiveInputs.set(true)
 
-    val settings = object : DeveloperToolsInstanceSettings() {
-      init {
-        loadState(InstanceState())
+    val settings =
+      object : DeveloperToolsInstanceSettings() {
+        init {
+          loadState(InstanceState())
+        }
       }
-    }
 
     val developerUiTools = instantiateAllDeveloperUiTools(settings)
 
@@ -114,24 +113,33 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
     // Expect: All configurations (with properties) have been persisted
     assertThat(settings.getState().developerToolsConfigurations)
-      .hasSize(developerUiTools.filter {
-        settings.getDeveloperToolConfigurations(it.developerToolFactoryEp.id)[0].properties.isNotEmpty()
-      }.size)
+      .hasSize(
+        developerUiTools
+          .filter {
+            settings
+              .getDeveloperToolConfigurations(it.developerToolFactoryEp.id)[0]
+              .properties
+              .isNotEmpty()
+          }
+          .size
+      )
   }
 
   @TestFactory
   fun `Test fromPersistent and toPersistent of built-in property types`(): List<DynamicNode> {
-    val testVectors: Map<KClass<*>, Pair<Any, String>> = mapOf(
-      Boolean::class to Pair(true, "true"),
-      Int::class to Pair(42, "42"),
-      Long::class to Pair(-84L, "-84"),
-      Double::class to Pair(1234567.0, "1234567.0"),
-      Float::class to Pair(1.2345f, "1.2345"),
-      String::class to Pair("foo", "foo"),
-      JBColor::class to Pair(JBColor.MAGENTA, "-65281"),
-      LocaleContainer::class to Pair(LocaleContainer(Locale.forLanguageTag("de-DE")), "de-DE"),
-      BigDecimal::class to Pair(BigDecimal(1.234), "1.2339999999999999857891452847979962825775146484375")
-    )
+    val testVectors: Map<KClass<*>, Pair<Any, String>> =
+      mapOf(
+        Boolean::class to Pair(true, "true"),
+        Int::class to Pair(42, "42"),
+        Long::class to Pair(-84L, "-84"),
+        Double::class to Pair(1234567.0, "1234567.0"),
+        Float::class to Pair(1.2345f, "1.2345"),
+        String::class to Pair("foo", "foo"),
+        JBColor::class to Pair(JBColor.MAGENTA, "-65281"),
+        LocaleContainer::class to Pair(LocaleContainer(Locale.forLanguageTag("de-DE")), "de-DE"),
+        BigDecimal::class to
+          Pair(BigDecimal(1.234), "1.2339999999999999857891452847979962825775146484375"),
+      )
 
     return builtInConfigurationPropertyTypes.map { (type, propertyType) ->
       dynamicTest(type.qualifiedName!!) {
@@ -161,126 +169,163 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     DeveloperToolsApplicationSettings.generalSettings.saveInputs.set(true)
     DeveloperToolsApplicationSettings.generalSettings.saveSensitiveInputs.set(true)
 
-    val settings = object : DeveloperToolsInstanceSettings() {
-      init {
-        loadState(InstanceState())
+    val settings =
+      object : DeveloperToolsInstanceSettings() {
+        init {
+          loadState(InstanceState())
+        }
       }
-    }
     val developerUiTools = instantiateAllDeveloperUiTools(settings)
     setConfigurationPropertiesToRandomValues(developerUiTools, settings)
 
-    legacyImportDirForPluginVersion.resolve(EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME).writer(options = arrayOf(CREATE, TRUNCATE_EXISTING)).use { writer ->
-      CSVPrinter(writer, expectedConfigurationPropertiesCsvFormat.builder().setSkipHeaderRecord(false).build()).use { printer ->
-        settings.getState().developerToolsConfigurations!!.forEach {
-          it.properties!!.forEach { property ->
-            val persistedValue = StatePropertyValueConverter().toString(property.value!!).split("|", limit = 2)
-            printer.printRecord(it.developerToolId, property.key!!, property.type!!.name, persistedValue[0], persistedValue[1])
+    legacyImportDirForPluginVersion
+      .resolve(EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME)
+      .writer(options = arrayOf(CREATE, TRUNCATE_EXISTING))
+      .use { writer ->
+        CSVPrinter(
+            writer,
+            expectedConfigurationPropertiesCsvFormat.builder().setSkipHeaderRecord(false).build(),
+          )
+          .use { printer ->
+            settings.getState().developerToolsConfigurations!!.forEach {
+              it.properties!!.forEach { property ->
+                val persistedValue =
+                  StatePropertyValueConverter().toString(property.value!!).split("|", limit = 2)
+                printer.printRecord(
+                  it.developerToolId,
+                  property.key!!,
+                  property.type!!.name,
+                  persistedValue[0],
+                  persistedValue[1],
+                )
+              }
+            }
           }
-        }
       }
-    }
 
-    legacyImportDirForPluginVersion.resolve(PERSISTED_STATE_XML_FILENAME).writer(options = arrayOf(CREATE, TRUNCATE_EXISTING)).use { writer ->
-      val element = XmlSerializer.serialize(settings.getState())
-      writer.write(JDOMUtil.write(element))
-    }
+    legacyImportDirForPluginVersion
+      .resolve(PERSISTED_STATE_XML_FILENAME)
+      .writer(options = arrayOf(CREATE, TRUNCATE_EXISTING))
+      .use { writer ->
+        val element = XmlSerializer.serialize(settings.getState())
+        writer.write(JDOMUtil.write(element))
+      }
   }
 
   @TestFactory
   fun `Test legacy settings import`(): List<DynamicNode> {
     val checkLegacyPersistedSettingsImport: (Path) -> DynamicContainer = { legacyImportVersionDir ->
       val persistedStateXmlFile = legacyImportVersionDir.resolve(PERSISTED_STATE_XML_FILENAME)
-      val expectedConfigurationPropertiesCsvFile = legacyImportVersionDir.resolve(EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME)
+      val expectedConfigurationPropertiesCsvFile =
+        legacyImportVersionDir.resolve(EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME)
 
       DeveloperToolsApplicationSettings.generalSettings.saveConfigurations.set(true)
       DeveloperToolsApplicationSettings.generalSettings.saveInputs.set(true)
       DeveloperToolsApplicationSettings.generalSettings.saveSensitiveInputs.set(true)
 
-      val restoredSettings = object : DeveloperToolsInstanceSettings() {
-        init {
-          loadState(XmlSerializer.deserialize(persistedStateXmlFile.toUri().toURL(), InstanceState::class.java))
+      val restoredSettings =
+        object : DeveloperToolsInstanceSettings() {
+          init {
+            loadState(
+              XmlSerializer.deserialize(
+                persistedStateXmlFile.toUri().toURL(),
+                InstanceState::class.java,
+              )
+            )
+          }
         }
-      }
 
-      val expectedConfigurationProperties = expectedConfigurationPropertiesCsvFile.bufferedReader(StandardCharsets.UTF_8).use { reader ->
-        CSVParser(reader, expectedConfigurationPropertiesCsvFormat).records.map { record ->
-          ExpectedConfigurationProperty(
-            developerToolId = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_DEVELOPER_TOOL_ID],
-            propertyId = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_ID],
-            propertyValueType = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE_TYPE_NAME],
-            propertyValue = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE],
-            propertyType = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_TYPE]
-          )
+      val expectedConfigurationProperties =
+        expectedConfigurationPropertiesCsvFile.bufferedReader(StandardCharsets.UTF_8).use { reader
+          ->
+          CSVParser(reader, expectedConfigurationPropertiesCsvFormat).records.map { record ->
+            ExpectedConfigurationProperty(
+              developerToolId = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_DEVELOPER_TOOL_ID],
+              propertyId = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_ID],
+              propertyValueType =
+                record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE_TYPE_NAME],
+              propertyValue = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE],
+              propertyType = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_TYPE],
+            )
+          }
         }
-      }
 
-      val checkProperty: (ExpectedConfigurationProperty) -> DynamicTest = { (developerToolId, propertyId, propertyValueType, propertyValue, propertyType) ->
-        dynamicTest(propertyId) {
-          val developerToolConfiguration = restoredSettings.getDeveloperToolConfigurations(developerToolId)[0]
+      val checkProperty: (ExpectedConfigurationProperty) -> DynamicTest =
+        { (developerToolId, propertyId, propertyValueType, propertyValue, propertyType) ->
+          dynamicTest(propertyId) {
+            val developerToolConfiguration =
+              restoredSettings.getDeveloperToolConfigurations(developerToolId)[0]
 
-          assertThat(developerToolConfiguration.persistentProperties).containsKey(propertyId)
-          val property = developerToolConfiguration.persistentProperties[propertyId]
+            assertThat(developerToolConfiguration.persistentProperties).containsKey(propertyId)
+            val property = developerToolConfiguration.persistentProperties[propertyId]
 
-          assertThat(configurationPropertyTypesByNamesAndLegacyValueTypes).containsKey(propertyValueType)
-          val developerToolConfigurationPropertyType = configurationPropertyTypesByNamesAndLegacyValueTypes[propertyValueType]
+            assertThat(configurationPropertyTypesByNamesAndLegacyValueTypes)
+              .containsKey(propertyValueType)
+            val developerToolConfigurationPropertyType =
+              configurationPropertyTypesByNamesAndLegacyValueTypes[propertyValueType]
 
-          val expectedValue = developerToolConfigurationPropertyType!!.fromPersistent(propertyValue)
-          assertThat(property!!.value).isEqualTo(expectedValue)
+            val expectedValue =
+              developerToolConfigurationPropertyType!!.fromPersistent(propertyValue)
+            assertThat(property!!.value).isEqualTo(expectedValue)
 
-          assertThat(property.type.name).isEqualTo(propertyType)
+            assertThat(property.type.name).isEqualTo(propertyType)
+          }
         }
-      }
 
       dynamicContainer(
         legacyImportVersionDir.fileName.toString(),
-        expectedConfigurationProperties.groupBy { it.developerToolId }.map {
-          dynamicContainer(it.key, it.value.map(checkProperty))
-        })
+        expectedConfigurationProperties
+          .groupBy { it.developerToolId }
+          .map { dynamicContainer(it.key, it.value.map(checkProperty)) },
+      )
     }
 
     return Files.walk(legacyImportDir, 1)
       .filter { it != legacyImportDir }
       .filter { it.isDirectory() }
-      .map(checkLegacyPersistedSettingsImport).toList()
+      .map(checkLegacyPersistedSettingsImport)
+      .toList()
   }
 
   // -- Private Methods ----------------------------------------------------- //
 
   private fun setConfigurationPropertiesToRandomValues(
     developerUiTools: List<DeveloperUiToolWrapper<*>>,
-    settings: DeveloperToolsInstanceSettings
+    settings: DeveloperToolsInstanceSettings,
   ) {
     modifyAllConfigurationProperties(developerUiTools, settings) { property ->
-      val randomValue = if (property.key == "timeZoneId") {
-        val availableZoneIds = ZoneId.getAvailableZoneIds().toList()
-        availableZoneIds[Random.Default.nextInt(0, availableZoneIds.size - 1)]
-      }
-      else {
-        val defaultValue = property.defaultValue
-        when (defaultValue) {
-          is String -> defaultValue + "foo"
-          is Int -> defaultValue + 1
-          is Long -> defaultValue + 1
-          is BigDecimal -> defaultValue.plus(BigDecimal.ONE)
-          is Boolean -> !defaultValue
-          is LocaleContainer -> {
-            val availableLocales = Locale.getAvailableLocales()
-            LocaleContainer(availableLocales[Random.Default.nextInt(0, availableLocales.size - 1)])
+      val randomValue =
+        if (property.key == "timeZoneId") {
+          val availableZoneIds = ZoneId.getAvailableZoneIds().toList()
+          availableZoneIds[Random.Default.nextInt(0, availableZoneIds.size - 1)]
+        } else {
+          val defaultValue = property.defaultValue
+          when (defaultValue) {
+            is String -> defaultValue + "foo"
+            is Int -> defaultValue + 1
+            is Long -> defaultValue + 1
+            is BigDecimal -> defaultValue.plus(BigDecimal.ONE)
+            is Boolean -> !defaultValue
+            is LocaleContainer -> {
+              val availableLocales = Locale.getAvailableLocales()
+              LocaleContainer(
+                availableLocales[Random.Default.nextInt(0, availableLocales.size - 1)]
+              )
+            }
+
+            is Enum<*> -> {
+              val enumConstants = defaultValue::class.java.enumConstants
+              enumConstants[(defaultValue.ordinal + 1) % enumConstants.size]
+            }
+
+            is JBColor -> JBColor(Random.Default.nextInt(0, 255), Random.Default.nextInt(0, 255))
+
+            else ->
+              throw IllegalStateException(
+                "Missing property type mapping for: " + defaultValue::class
+              )
           }
-
-          is Enum<*> -> {
-            val enumConstants = defaultValue::class.java.enumConstants
-            enumConstants[(defaultValue.ordinal + 1) % enumConstants.size]
-          }
-
-          is JBColor -> JBColor(
-            Random.Default.nextInt(0, 255),
-            Random.Default.nextInt(0, 255)
-          )
-
-          else -> throw IllegalStateException("Missing property type mapping for: " + defaultValue::class)
         }
-      }
       property.reference.setWithUncheckedCast(randomValue, null)
     }
   }
@@ -288,13 +333,11 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
   private fun resetAllConfigurations(
     developerUiTools: List<DeveloperUiToolWrapper<*>>,
     settings: DeveloperToolsInstanceSettings,
-    loadExamples: Boolean
+    loadExamples: Boolean,
   ) {
     developerUiTools.forEach { (developerUiToolEp, _, _) ->
       settings.getDeveloperToolConfigurations(developerUiToolEp.id).forEach {
-        val runnable = {
-          it.reset(null, loadExamples)
-        }
+        val runnable = { it.reset(null, loadExamples) }
         ApplicationManager.getApplication().invokeAndWait(runnable, ModalityState.any())
       }
     }
@@ -303,30 +346,31 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
   private fun modifyAllConfigurationProperties(
     developerUiTools: List<DeveloperUiToolWrapper<*>>,
     settings: DeveloperToolsInstanceSettings,
-    modify: (DeveloperToolConfiguration.PropertyContainer) -> Unit
+    modify: (DeveloperToolConfiguration.PropertyContainer) -> Unit,
   ) {
     developerUiTools.forEach { (developerUiToolEp, _) ->
       settings.getDeveloperToolConfigurations(developerUiToolEp.id).forEach {
-        val runnable = {
-          it.properties.values.forEach { property ->
-            modify(property)
-          }
-        }
+        val runnable = { it.properties.values.forEach { property -> modify(property) } }
         ApplicationManager.getApplication().invokeAndWait(runnable, ModalityState.any())
       }
     }
   }
 
-  private fun instantiateAllDeveloperUiTools(settings: DeveloperToolsInstanceSettings): List<DeveloperUiToolWrapper<*>> {
+  private fun instantiateAllDeveloperUiTools(
+    settings: DeveloperToolsInstanceSettings
+  ): List<DeveloperUiToolWrapper<*>> {
     val developerUiTools = mutableListOf<DeveloperUiToolWrapper<*>>()
 
     DeveloperUiToolFactoryEp.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
-      val developerUiToolFactory: DeveloperUiToolFactory<*> = developerToolFactoryEp.createInstance(application)
+      val developerUiToolFactory: DeveloperUiToolFactory<*> =
+        developerToolFactoryEp.createInstance(application)
       val context = DeveloperUiToolContext(developerToolFactoryEp.id, false)
-      val developerToolConfiguration = settings.createDeveloperToolConfiguration(developerToolFactoryEp.id)
-      val developerUiTool = developerUiToolFactory
-        .getDeveloperUiToolCreator(fixture.project, disposable, context)
-        ?.invoke(developerToolConfiguration)
+      val developerToolConfiguration =
+        settings.createDeveloperToolConfiguration(developerToolFactoryEp.id)
+      val developerUiTool =
+        developerUiToolFactory
+          .getDeveloperUiToolCreator(fixture.project, disposable, context)
+          ?.invoke(developerToolConfiguration)
       if (developerUiTool != null) {
         developerToolConfiguration.wasConsumedByDeveloperTool = true
         val runnable = {
@@ -338,11 +382,10 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
           DeveloperUiToolWrapper(
             developerToolFactoryEp = developerToolFactoryEp,
             developerUiTool = developerUiTool,
-            developerToolConfiguration = developerToolConfiguration
+            developerToolConfiguration = developerToolConfiguration,
           )
         )
-      }
-      else {
+      } else {
         Assertions.fail("No instance of tool was created: ${developerToolFactoryEp.id}")
       }
     }
@@ -357,7 +400,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     val propertyId: String,
     val propertyValueType: String,
     val propertyValue: String,
-    val propertyType: String
+    val propertyType: String,
   )
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -365,30 +408,36 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
   private data class DeveloperUiToolWrapper<T : DeveloperUiTool>(
     val developerToolFactoryEp: DeveloperUiToolFactoryEp<out DeveloperUiToolFactory<*>>,
     val developerUiTool: T,
-    val developerToolConfiguration: DeveloperToolConfiguration
+    val developerToolConfiguration: DeveloperToolConfiguration,
   )
 
   // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 
-    private const val EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME = "expected-configuration-properties.csv"
+    private const val EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME =
+      "expected-configuration-properties.csv"
     private const val PERSISTED_STATE_XML_FILENAME = "persisted-state.xml"
     private val legacyImportDir = Paths.get("src/test/resources/legacyImport")
 
     private const val EXPECTED_CONFIGURATION_PROPERTIES_HEADER_DEVELOPER_TOOL_ID = "developerToolId"
     private const val EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_ID = "propertyId"
     private const val EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_TYPE = "propertyType"
-    private const val EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE_TYPE_NAME = "propertyValueTypeName"
+    private const val EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE_TYPE_NAME =
+      "propertyValueTypeName"
     private const val EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE = "propertyValue"
 
-    private val expectedConfigurationPropertiesCsvFormat = CSVFormat.Builder.create().setHeader(
-      EXPECTED_CONFIGURATION_PROPERTIES_HEADER_DEVELOPER_TOOL_ID,
-      EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_ID,
-      EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_TYPE,
-      EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE_TYPE_NAME,
-      EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE
-    ).setSkipHeaderRecord(true).build()
+    private val expectedConfigurationPropertiesCsvFormat =
+      CSVFormat.Builder.create()
+        .setHeader(
+          EXPECTED_CONFIGURATION_PROPERTIES_HEADER_DEVELOPER_TOOL_ID,
+          EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_ID,
+          EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_TYPE,
+          EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE_TYPE_NAME,
+          EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE,
+        )
+        .setSkipHeaderRecord(true)
+        .build()
 
     @BeforeAll
     @JvmStatic

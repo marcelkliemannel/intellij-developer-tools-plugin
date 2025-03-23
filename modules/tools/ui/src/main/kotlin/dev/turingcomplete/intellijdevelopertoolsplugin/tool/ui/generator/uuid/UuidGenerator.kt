@@ -18,13 +18,14 @@ class UuidGenerator(
   project: Project?,
   context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
-) : OneLineTextGenerator(
-  context = context,
-  configuration = configuration,
-  parentDisposable = parentDisposable,
-  project = project
-) {
+  parentDisposable: Disposable,
+) :
+  OneLineTextGenerator(
+    context = context,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    project = project,
+  ) {
   // -- Properties ---------------------------------------------------------- //
 
   private var selectedUuidVersion = configuration.register("version", UuidVersion.V4)
@@ -47,10 +48,8 @@ class UuidGenerator(
   override fun Panel.buildConfigurationUi() {
     lateinit var selectedVersionComboBox: ComboBox<UuidVersion>
     row {
-      selectedVersionComboBox = comboBox(UuidVersion.entries)
-        .label("Version:")
-        .bindItem(selectedUuidVersion)
-        .component
+      selectedVersionComboBox =
+        comboBox(UuidVersion.entries).label("Version:").bindItem(selectedUuidVersion).component
     }
 
     with(uuidV1Generator) {
@@ -81,10 +80,13 @@ class UuidGenerator(
 
   private fun handleVersionSelection() {
     val uuidVersion = selectedUuidVersion.get()
-    supportsBulkGeneration.value = getGeneratorForSelectedUuidVersion(uuidVersion).supportsBulkGeneration
+    supportsBulkGeneration.value =
+      getGeneratorForSelectedUuidVersion(uuidVersion).supportsBulkGeneration
   }
 
-  private fun getGeneratorForSelectedUuidVersion(version: UuidVersion = selectedUuidVersion.get()): SpecificUuidGenerator =
+  private fun getGeneratorForSelectedUuidVersion(
+    version: UuidVersion = selectedUuidVersion.get()
+  ): SpecificUuidGenerator =
     when (version) {
       UuidVersion.V1 -> uuidV1Generator
       UuidVersion.V3 -> uuidV3Generator
@@ -96,19 +98,26 @@ class UuidGenerator(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class UuidV1Generator(
-    configuration: DeveloperToolConfiguration
-  ) : MacAddressBasedUuidGenerator(UuidVersion.V1, configuration, true) {
+  private class UuidV1Generator(configuration: DeveloperToolConfiguration) :
+    MacAddressBasedUuidGenerator(UuidVersion.V1, configuration, true) {
 
-    override fun generate(): String = Generators.timeBasedGenerator(getEthernetAddress()).generate().toString()
+    override fun generate(): String =
+      Generators.timeBasedGenerator(getEthernetAddress()).generate().toString()
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
   private class UuidV3Generator(
     configuration: DeveloperToolConfiguration,
-    parentDisposable: Disposable
-  ) : NamespaceAndNameBasedUuidGenerator(UuidVersion.V3, "MD5".toMessageDigest(), configuration, parentDisposable, false)
+    parentDisposable: Disposable,
+  ) :
+    NamespaceAndNameBasedUuidGenerator(
+      UuidVersion.V3,
+      "MD5".toMessageDigest(),
+      configuration,
+      parentDisposable,
+      false,
+    )
 
   // -- Inner Type ---------------------------------------------------------- //
 
@@ -121,16 +130,23 @@ class UuidGenerator(
 
   private class UuidV5Generator(
     configuration: DeveloperToolConfiguration,
-    parentDisposable: Disposable
-  ) : NamespaceAndNameBasedUuidGenerator(UuidVersion.V5, "SHA-1".toMessageDigest(), configuration, parentDisposable, false)
+    parentDisposable: Disposable,
+  ) :
+    NamespaceAndNameBasedUuidGenerator(
+      UuidVersion.V5,
+      "SHA-1".toMessageDigest(),
+      configuration,
+      parentDisposable,
+      false,
+    )
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class UuidV6Generator(
-    configuration: DeveloperToolConfiguration
-  ) : MacAddressBasedUuidGenerator(UuidVersion.V6, configuration, true) {
+  private class UuidV6Generator(configuration: DeveloperToolConfiguration) :
+    MacAddressBasedUuidGenerator(UuidVersion.V6, configuration, true) {
 
-    override fun generate(): String = Generators.timeBasedReorderedGenerator(getEthernetAddress()).generate().toString()
+    override fun generate(): String =
+      Generators.timeBasedReorderedGenerator(getEthernetAddress()).generate().toString()
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -144,15 +160,13 @@ class UuidGenerator(
 
   class Factory : DeveloperUiToolFactory<UuidGenerator> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "UUID",
-      contentTitle = "UUID Generator"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "UUID", contentTitle = "UUID Generator")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> UuidGenerator) = { configuration ->
       UuidGenerator(project, context, configuration, parentDisposable)
     }

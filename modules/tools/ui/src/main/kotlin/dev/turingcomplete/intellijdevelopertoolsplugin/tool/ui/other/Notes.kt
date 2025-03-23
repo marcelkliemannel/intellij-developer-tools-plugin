@@ -16,7 +16,7 @@ class Notes(
   private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  private val project: Project?
+  private val project: Project?,
 ) : DeveloperUiTool(parentDisposable = parentDisposable) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -27,18 +27,22 @@ class Notes(
 
   override fun Panel.buildUi() {
     row {
-      cell(
-        AdvancedEditor(
-          id = "content",
-          context = context,
-          configuration = configuration,
-          project = project,
-          editorMode = AdvancedEditor.EditorMode.INPUT,
-          parentDisposable = parentDisposable,
-          textProperty = text
-        ).component
-      ).align(Align.FILL).resizableColumn()
-    }.resizableRow()
+        cell(
+            AdvancedEditor(
+                id = "content",
+                context = context,
+                configuration = configuration,
+                project = project,
+                editorMode = AdvancedEditor.EditorMode.INPUT,
+                parentDisposable = parentDisposable,
+                textProperty = text,
+              )
+              .component
+          )
+          .align(Align.FILL)
+          .resizableColumn()
+      }
+      .resizableRow()
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -46,16 +50,16 @@ class Notes(
 
   class Factory : DeveloperUiToolFactory<Notes> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Notes",
-      contentTitle = "Notes"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "Notes", contentTitle = "Notes")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> Notes) = { configuration -> Notes(context, configuration, parentDisposable, project) }
+      context: DeveloperUiToolContext,
+    ): ((DeveloperToolConfiguration) -> Notes) = { configuration ->
+      Notes(context, configuration, parentDisposable, project)
+    }
   }
 
   // -- Companion Object ---------------------------------------------------- //

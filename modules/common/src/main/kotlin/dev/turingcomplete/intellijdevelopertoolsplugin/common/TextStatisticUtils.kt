@@ -47,7 +47,10 @@ object TextStatisticUtils {
         }
         character.isWhitespace() -> {
           whitespaceCount++
-          if (character == '\n' || (character == '\r' && index + 1 < text.length && text[index + 1] == '\n'))
+          if (
+            character == '\n' ||
+              (character == '\r' && index + 1 < text.length && text[index + 1] == '\n')
+          )
             lineBreakCount++
           if (wordBuffer.isNotEmpty()) {
             wordsCount++
@@ -92,7 +95,8 @@ object TextStatisticUtils {
         wordsPerSentenceSum += sentence.split("\\s+".toRegex()).size
       }
     }
-    val averageWordsPerSentence = if (sentencesCount > 0) wordsPerSentenceSum.toDouble() / sentencesCount else 0.0
+    val averageWordsPerSentence =
+      if (sentencesCount > 0) wordsPerSentenceSum.toDouble() / sentencesCount else 0.0
 
     val paragraphsCount = text.split("\\n\\r?\\n".toRegex()).size
 
@@ -110,7 +114,7 @@ object TextStatisticUtils {
       averageWordLength = averageWordLength,
       averageWordsPerSentence = averageWordsPerSentence,
       paragraphsCount = paragraphsCount,
-      isoControlCharactersCount = isoControlCharactersCount
+      isoControlCharactersCount = isoControlCharactersCount,
     )
   }
 
@@ -131,6 +135,6 @@ object TextStatisticUtils {
     val averageWordLength: Double = 0.0,
     val averageWordsPerSentence: Double = 0.0,
     val paragraphsCount: Int = 0,
-    val isoControlCharactersCount: Int = 0
+    val isoControlCharactersCount: Int = 0,
   )
 }

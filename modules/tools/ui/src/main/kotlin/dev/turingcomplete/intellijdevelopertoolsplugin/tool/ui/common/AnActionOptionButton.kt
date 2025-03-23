@@ -12,8 +12,8 @@ import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
 import javax.swing.JComponent
 
-class AnActionOptionButton(mainAction: AnAction, vararg additionalActions: AnAction)
-  : JBOptionButton(null, null) {
+class AnActionOptionButton(mainAction: AnAction, vararg additionalActions: AnAction) :
+  JBOptionButton(null, null) {
   // -- Companion Object ---------------------------------------------------- //
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
@@ -25,8 +25,8 @@ class AnActionOptionButton(mainAction: AnAction, vararg additionalActions: AnAct
 
   // -- Exposed Methods ----------------------------------------------------- //
 
-  private class AnActionWrapper(private val action: AnAction, private val component: JComponent)
-    : AbstractAction(action.templatePresentation.text, action.templatePresentation.icon) {
+  private class AnActionWrapper(private val action: AnAction, private val component: JComponent) :
+    AbstractAction(action.templatePresentation.text, action.templatePresentation.icon) {
 
     init {
       putValue(OptionAction.AN_ACTION, action)
@@ -34,7 +34,8 @@ class AnActionOptionButton(mainAction: AnAction, vararg additionalActions: AnAct
 
     override fun actionPerformed(e: ActionEvent?) {
       val context: DataContext = DataManager.getInstance().getDataContext(component)
-      val event = AnActionEvent.createEvent(action, context, null, "jvmaction", ActionUiKind.NONE, null)
+      val event =
+        AnActionEvent.createEvent(action, context, null, "jvmaction", ActionUiKind.NONE, null)
       ActionUtil.performActionDumbAwareWithCallbacks(action, event)
     }
   }

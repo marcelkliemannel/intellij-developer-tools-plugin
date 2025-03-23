@@ -5,14 +5,15 @@ class BooleanSettingProperty(
   title: String,
   description: String?,
   group: SettingsGroup?,
-  settingValue: BooleanValue
-) : SettingProperty<Boolean, BooleanValue>(
-  title = title,
-  description = description,
-  group = group,
-  settingValue = settingValue,
-  initialValue = settingValue.defaultValue
-) {
+  settingValue: BooleanValue,
+) :
+  SettingProperty<Boolean, BooleanValue>(
+    title = title,
+    description = description,
+    group = group,
+    settingValue = settingValue,
+    initialValue = settingValue.defaultValue,
+  ) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
@@ -21,8 +22,7 @@ class BooleanSettingProperty(
     val value = get()
     return if (value != settingValue.defaultValue) {
       value.toString()
-    }
-    else {
+    } else {
       null
     }
   }

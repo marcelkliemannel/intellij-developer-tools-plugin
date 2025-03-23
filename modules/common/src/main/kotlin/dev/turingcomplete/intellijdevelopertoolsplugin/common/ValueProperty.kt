@@ -25,8 +25,7 @@ open class ValueProperty<T>(initialValue: T) : ObservableMutableProperty<T> {
   }
 
   fun setWithUncheckedCast(value: Any, changeId: String?) {
-    @Suppress("UNCHECKED_CAST")
-    set(value as T, changeId)
+    @Suppress("UNCHECKED_CAST") set(value as T, changeId)
   }
 
   fun set(value: T, changeId: String?, fireEvent: Boolean = true) {

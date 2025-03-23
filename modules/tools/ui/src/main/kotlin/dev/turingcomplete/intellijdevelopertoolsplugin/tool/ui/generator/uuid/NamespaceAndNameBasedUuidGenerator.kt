@@ -18,29 +18,21 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.NamespaceAndNameBasedUuidGenerator.NamespaceMode.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.NamespaceAndNameBasedUuidGenerator.NamespaceMode.PREDEFINED
 import java.security.MessageDigest
-import java.util.*
+import java.util.UUID
 
 abstract class NamespaceAndNameBasedUuidGenerator(
   version: UuidVersion,
   private val algorithm: MessageDigest,
   configuration: DeveloperToolConfiguration,
   private val parentDisposable: Disposable,
-  supportsBulkGeneration: Boolean
+  supportsBulkGeneration: Boolean,
 ) : SpecificUuidGenerator(supportsBulkGeneration) {
   // -- Properties ---------------------------------------------------------- //
 
-  private var namespaceMode = configuration.register(
-    "${version}NamespaceMode",
-    PREDEFINED
-  )
-  private var predefinedNamespace = configuration.register(
-    "${version}PredefinedNamespace",
-    PredefinedNamespace.DNS
-  )
-  private var individualNamespace = configuration.register(
-    "${version}IndividualNamespace",
-    ""
-  )
+  private var namespaceMode = configuration.register("${version}NamespaceMode", PREDEFINED)
+  private var predefinedNamespace =
+    configuration.register("${version}PredefinedNamespace", PredefinedNamespace.DNS)
+  private var individualNamespace = configuration.register("${version}IndividualNamespace", "")
   private var name = configuration.register("${version}Name", "")
 
   // -- Initialization ------------------------------------------------------ //
@@ -49,50 +41,48 @@ abstract class NamespaceAndNameBasedUuidGenerator(
   @Suppress("UnstableApiUsage")
   override fun Panel.buildConfigurationUi(visible: ComponentPredicate) {
     rowsRange {
-      buttonsGroup("Namespace:") {
-        row {
-          val usePredefined = radioButton("Predefined:")
-            .bind(namespaceMode, PREDEFINED)
-            .gap(RightGap.SMALL)
-          comboBox(PredefinedNamespace.entries)
-            .bindItem(predefinedNamespace)
-            .enabledIf(usePredefined.selected).component
+        buttonsGroup("Namespace:") {
+          row {
+            val usePredefined =
+              radioButton("Predefined:").bind(namespaceMode, PREDEFINED).gap(RightGap.SMALL)
+            comboBox(PredefinedNamespace.entries)
+              .bindItem(predefinedNamespace)
+              .enabledIf(usePredefined.selected)
+              .component
+          }
+
+          row {
+            val individualRadioButton =
+              radioButton("Individual:").bind(namespaceMode, INDIVIDUAL).gap(RightGap.SMALL)
+            textField()
+              .text(individualNamespace.get())
+              .validationInfo(validateIndividualNamespace())
+              .whenTextChangedFromUi(parentDisposable) { individualNamespace.set(it) }
+              .enabledIf(individualRadioButton.selected)
+              .component
+          }
         }
 
-        row {
-          val individualRadioButton = radioButton("Individual:")
-            .bind(namespaceMode, INDIVIDUAL)
-            .gap(RightGap.SMALL)
-          textField()
-            .text(individualNamespace.get())
-            .validationInfo(validateIndividualNamespace())
-            .whenTextChangedFromUi(parentDisposable) { individualNamespace.set(it) }
-            .enabledIf(individualRadioButton.selected).component
-        }
+        row { expandableTextField().label("Name:").bindText(name) }
       }
-
-      row {
-        expandableTextField()
-          .label("Name:")
-          .bindText(name)
-      }
-    }.visibleIf(visible)
+      .visibleIf(visible)
   }
 
-  private fun validateIndividualNamespace(): ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
+  private fun validateIndividualNamespace():
+    ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
     if (namespaceMode.get() == INDIVIDUAL && !UUID_REGEX.matches(it.text)) {
       ValidationInfo("Must be a valid UUID")
-    }
-    else {
+    } else {
       null
     }
   }
 
   final override fun generate(): String {
-    val namespace: UUID = when (namespaceMode.get()) {
-      PREDEFINED -> predefinedNamespace.get().value
-      INDIVIDUAL -> UUID.fromString(individualNamespace.get())
-    }
+    val namespace: UUID =
+      when (namespaceMode.get()) {
+        PREDEFINED -> predefinedNamespace.get().value
+        INDIVIDUAL -> UUID.fromString(individualNamespace.get())
+      }
 
     return Generators.nameBasedGenerator(namespace, algorithm).generate(name.get()).toString()
   }
@@ -103,7 +93,7 @@ abstract class NamespaceAndNameBasedUuidGenerator(
   private enum class NamespaceMode {
 
     PREDEFINED,
-    INDIVIDUAL
+    INDIVIDUAL,
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -122,6 +112,9 @@ abstract class NamespaceAndNameBasedUuidGenerator(
 
   companion object {
 
-    private val UUID_REGEX = Regex("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$")
+    private val UUID_REGEX =
+      Regex(
+        "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$"
+      )
   }
 }

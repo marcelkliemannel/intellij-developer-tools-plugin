@@ -23,9 +23,7 @@ class CryptoUtilsTest {
   @ParameterizedTest
   @MethodSource("invalidPrivateKeys")
   fun `parsing of invalid PEM formatted keys`(invalidPemKey: String) {
-    assertThatCode {
-      CryptoUtils.toRkcs8Key(invalidPemKey)
-    }.doesNotThrowAnyException()
+    assertThatCode { CryptoUtils.toRkcs8Key(invalidPemKey) }.doesNotThrowAnyException()
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -37,7 +35,7 @@ class CryptoUtilsTest {
     @JvmStatic
     fun validPrivateKeys(): Collection<Arguments> =
       listOf(
-        """
+          """
             -----BEGIN PRIVATE KEY-----
             MIIBVwIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAzPj2X1dyZzDmqT/W
             ZcdQF9i9vL+UN65wX5i2+Zm3B4TFjQtqYSbdTkCGhPrTfKZ1mH6fHnCqJce5Y4zD
@@ -45,30 +43,35 @@ class CryptoUtilsTest {
             cxMEk5u1bJJNV9IpTey4PPZ0ddOmFGAiAiEA8z3ibztuj9HbW1vJZTZUB3W3uyhH
             6uv3g9jPH0FcV00CIQDNzFqJk2ql+0N+2/tHkD3A0P3AUKPd0QPoRBDeyQ==
             -----END PRIVATE KEY-----
-        """.trimIndent(),
         """
+            .trimIndent(),
+          """
             -----BEGIN PRIVATE KEY-----
             MIIBVwIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAzPj2X1dyZzDmqT/W
-            
+
             ZcdQF9i9vL+UN65wX5i2+Zm3B4TFjQtqYSbdTkCGhPrTfKZ1mH6fHnCqJce5Y4zD
-            
+
             UQIDAQABAkAcQ0hOM2j1dLD+Rl4nQUcxdLKHykHpeNkKccJcMqRm7C9P0hxPjTvV
             -----END PRIVATE KEY-----
-        """.trimIndent(),
-        "MIIBVwIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAzPj2X1dyZzDmqT/W",
-        "MIIBVwIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAzPj2X1dyZzDmqT/WZcdQF9i9vL+UN65wX5i2+Zm3B4TFjQtqYSbdTkCGhPrTfKZ1mH6fHnCqJce5Y4zDUQIDAQABAkAcQ0hOM2j1dLD+Rl4nQUcxdLKHykHpeNkKccJcMqRm7C9P0hxPjTvV"
-      ).map { Arguments.of(it) }
+        """
+            .trimIndent(),
+          "MIIBVwIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAzPj2X1dyZzDmqT/W",
+          "MIIBVwIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAzPj2X1dyZzDmqT/WZcdQF9i9vL+UN65wX5i2+Zm3B4TFjQtqYSbdTkCGhPrTfKZ1mH6fHnCqJce5Y4zDUQIDAQABAkAcQ0hOM2j1dLD+Rl4nQUcxdLKHykHpeNkKccJcMqRm7C9P0hxPjTvV",
+        )
+        .map { Arguments.of(it) }
 
     @JvmStatic
     fun invalidPrivateKeys(): Collection<Arguments> =
       listOf(
-        """
+          """
             -----BEGIN PRIVATE KEY-----
             InvalidBase64Content
             -----END PRIVATE KEY-----
-        """.trimIndent(),
-        "InvalidBase64Content",
-        ""
-      ).map { Arguments.of(it) }
+        """
+            .trimIndent(),
+          "InvalidBase64Content",
+          "",
+        )
+        .map { Arguments.of(it) }
   }
 }

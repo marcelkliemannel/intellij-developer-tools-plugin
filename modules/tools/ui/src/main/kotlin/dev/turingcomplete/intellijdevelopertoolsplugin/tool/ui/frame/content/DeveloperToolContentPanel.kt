@@ -34,13 +34,13 @@ import javax.swing.Icon
 import javax.swing.JComponent
 import kotlin.reflect.cast
 
-open class DeveloperToolContentPanel(
-  protected val developerToolNode: DeveloperToolNode
-) : BorderLayoutPanel() {
+open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperToolNode) :
+  BorderLayoutPanel() {
   // -- Properties ---------------------------------------------------------- //
 
   private lateinit var tabs: JBTabs
-  private lateinit var selectedDeveloperToolInstance: ObservableMutableProperty<DeveloperToolContainer>
+  private lateinit var selectedDeveloperToolInstance:
+    ObservableMutableProperty<DeveloperToolContainer>
 
   // -- Initialization ------------------------------------------------------ //
 
@@ -59,11 +59,16 @@ open class DeveloperToolContentPanel(
     selectedDeveloperToolInstance.get().instance.deactivated()
   }
 
-  fun <T: OpenDeveloperToolContext> openTool(context: T, reference: OpenDeveloperToolReference<out T>) {
+  fun <T : OpenDeveloperToolContext> openTool(
+    context: T,
+    reference: OpenDeveloperToolReference<out T>,
+  ) {
     val developerUiToolInstance = selectedDeveloperToolInstance.get().instance
     assert(developerUiToolInstance is OpenDeveloperToolHandler<*>)
     @Suppress("UNCHECKED_CAST")
-    (developerUiToolInstance as OpenDeveloperToolHandler<T>).applyOpenDeveloperToolContext(reference.contextClass.cast(context))
+    (developerUiToolInstance as OpenDeveloperToolHandler<T>).applyOpenDeveloperToolContext(
+      reference.contextClass.cast(context)
+    )
   }
 
   @Suppress("DialogTitleCapitalization")
@@ -80,32 +85,34 @@ open class DeveloperToolContentPanel(
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun createTitleBar(): JComponent = panel {
-    row {
-      val titleComponent = buildTitle()
+  private fun createTitleBar(): JComponent =
+    panel {
+        row {
+            val titleComponent = buildTitle()
 
-      val actions = mutableListOf(
-        dumbAwareAction("Reset") {
-          selectedDeveloperToolInstance.get().apply {
-            configuration.reset()
-            instance.reset()
+            val actions =
+              mutableListOf(
+                dumbAwareAction("Reset") {
+                  selectedDeveloperToolInstance.get().apply {
+                    configuration.reset()
+                    instance.reset()
+                  }
+                },
+                createNewWorkbenchAction(),
+              )
+            developerToolNode.developerUiToolPresentation.description?.let { description ->
+              actions.add(
+                dumbAwareAction("Show Tool Description") { description.show(titleComponent) }
+              )
+            }
+            actionsButton(actions = actions.toTypedArray(), icon = AllIcons.General.GearPlain)
+              .align(AlignX.RIGHT)
+              .resizableColumn()
+              .gap(RightGap.SMALL)
           }
-        },
-        createNewWorkbenchAction()
-      )
-      developerToolNode.developerUiToolPresentation.description?.let { description ->
-        actions.add(
-          dumbAwareAction("Show Tool Description") {
-            description.show(titleComponent)
-          }
-        )
+          .resizableRow()
       }
-      actionsButton(
-        actions = actions.toTypedArray(),
-        icon = AllIcons.General.GearPlain
-      ).align(AlignX.RIGHT).resizableColumn().gap(RightGap.SMALL)
-    }.resizableRow()
-  }.apply { border = JBEmptyBorder(0, 8, 0, 8) }
+      .apply { border = JBEmptyBorder(0, 8, 0, 8) }
 
   private fun createMainContent(): JComponent {
     tabs = JBTabsFactory.createTabs(developerToolNode.project, developerToolNode.parentDisposable)
@@ -124,34 +131,41 @@ open class DeveloperToolContentPanel(
       generalSettings.hideWorkbenchTabsOnSingleTab.get() && tabs.tabCount == 1
   }
 
-  private fun createTabsChangedListener() = object : TabsListener {
-    override fun selectionChanged(oldSelection: TabInfo?, newSelection: TabInfo?) {
-      oldSelection?.castedObject<DeveloperToolContainer>()?.instance?.deactivated()
+  private fun createTabsChangedListener() =
+    object : TabsListener {
+      override fun selectionChanged(oldSelection: TabInfo?, newSelection: TabInfo?) {
+        oldSelection?.castedObject<DeveloperToolContainer>()?.instance?.deactivated()
 
-      if (newSelection != null) {
-        val newDeveloperToolInstance = newSelection.castedObject<DeveloperToolContainer>()
-        selectedDeveloperToolInstance.set(newDeveloperToolInstance)
-        newDeveloperToolInstance.instance.activated()
+        if (newSelection != null) {
+          val newDeveloperToolInstance = newSelection.castedObject<DeveloperToolContainer>()
+          selectedDeveloperToolInstance.set(newDeveloperToolInstance)
+          newDeveloperToolInstance.instance.activated()
+        }
       }
     }
-  }
 
   private fun addWorkbench(developerToolContainer: DeveloperToolContainer) {
     val developerToolComponent = developerToolContainer.instance.createComponent()
-    val tabInfo = TabInfo(developerToolComponent).apply {
-      setText(developerToolContainer.configuration.name)
-      setObject(developerToolContainer)
+    val tabInfo =
+      TabInfo(developerToolComponent).apply {
+        setText(developerToolContainer.configuration.name)
+        setObject(developerToolContainer)
 
-      val destroyAction = createDestroyWorkbenchAction(developerToolContainer.instance, this)
-      setTabLabelActions(DefaultActionGroup(destroyAction), DeveloperToolContentPanel::class.java.name)
+        val destroyAction = createDestroyWorkbenchAction(developerToolContainer.instance, this)
+        setTabLabelActions(
+          DefaultActionGroup(destroyAction),
+          DeveloperToolContentPanel::class.java.name,
+        )
 
-      val newWorkbenchAction = createNewWorkbenchAction()
-      setTabPaneActions(DefaultActionGroup(newWorkbenchAction))
-    }
+        val newWorkbenchAction = createNewWorkbenchAction()
+        setTabPaneActions(DefaultActionGroup(newWorkbenchAction))
+      }
     tabs.addTab(tabInfo)
     tabs.select(tabInfo, false)
     tabs.setPopupGroup(
-      DefaultActionGroup(createRenameWorkbenchAction()), DeveloperToolContentPanel::class.java.name, true
+      DefaultActionGroup(createRenameWorkbenchAction()),
+      DeveloperToolContentPanel::class.java.name,
+      true,
     )
   }
 
@@ -161,14 +175,15 @@ open class DeveloperToolContentPanel(
       override fun actionPerformed(e: AnActionEvent) {
         val (_, developerToolConfiguration) = selectedDeveloperToolInstance.get()
 
-        val inputDialog = InputDialog(
-          developerToolNode.project,
-          "New name:",
-          "Rename",
-          null,
-          developerToolConfiguration.name,
-          NotBlankInputValidator()
-        )
+        val inputDialog =
+          InputDialog(
+            developerToolNode.project,
+            "New name:",
+            "Rename",
+            null,
+            developerToolConfiguration.name,
+            NotBlankInputValidator(),
+          )
         inputDialog.show()
         inputDialog.inputString?.let { newName ->
           developerToolConfiguration.name = newName
@@ -186,7 +201,7 @@ open class DeveloperToolContentPanel(
         developerToolNode.destroyDeveloperToolInstance(developerUiTool)
         syncTabsSelectionVisibility()
       },
-      { tabs.tabs.size > 1 }
+      { tabs.tabs.size > 1 },
     )
 
   private fun createNewWorkbenchAction() =

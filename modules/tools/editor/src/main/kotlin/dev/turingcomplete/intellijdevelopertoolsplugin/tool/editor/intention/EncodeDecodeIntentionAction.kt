@@ -25,9 +25,10 @@ abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction 
   final override fun startInWriteAction(): Boolean = false
 
   final override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?): Boolean =
-    editor != null && file != null
-            && editor.document.isWritable
-            && getSourceText(editor, file) != null
+    editor != null &&
+      file != null &&
+      editor.document.isWritable &&
+      getSourceText(editor, file) != null
 
   final override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
     if (editor == null || file == null) {
@@ -51,19 +52,23 @@ abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction 
   private class EncodersDecodersModeSelectionListPopupStep(
     text: String,
     textRange: TextRange,
-    editor: Editor
-  ) : BaseListPopupStep<EncoderDecoderListPopupStep<*>>(
-    null,
-    EncoderListPopupStep(text, textRange, editor),
-    DecoderListPopupStep(text, textRange, editor)
-  ) {
+    editor: Editor,
+  ) :
+    BaseListPopupStep<EncoderDecoderListPopupStep<*>>(
+      null,
+      EncoderListPopupStep(text, textRange, editor),
+      DecoderListPopupStep(text, textRange, editor),
+    ) {
 
     override fun hasSubstep(baseListPopupStep: EncoderDecoderListPopupStep<*>): Boolean = true
 
-    override fun getTextFor(baseListPopupStep: EncoderDecoderListPopupStep<*>): String = baseListPopupStep.actionName
+    override fun getTextFor(baseListPopupStep: EncoderDecoderListPopupStep<*>): String =
+      baseListPopupStep.actionName
 
-    override fun onChosen(baseListPopupStep: EncoderDecoderListPopupStep<*>, finalChoice: Boolean): PopupStep<*> =
-      baseListPopupStep
+    override fun onChosen(
+      baseListPopupStep: EncoderDecoderListPopupStep<*>,
+      finalChoice: Boolean,
+    ): PopupStep<*> = baseListPopupStep
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -78,7 +83,7 @@ abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction 
   private class EncoderListPopupStep(
     private val text: String,
     private val textRange: TextRange,
-    private val editor: Editor
+    private val editor: Editor,
   ) : BaseListPopupStep<Encoder>(null, commonEncoders), EncoderDecoderListPopupStep<Encoder> {
 
     override val actionName: String = "Encode To"
@@ -96,7 +101,7 @@ abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction 
   private class DecoderListPopupStep(
     private val text: String,
     private val textRange: TextRange,
-    private val editor: Editor
+    private val editor: Editor,
   ) : BaseListPopupStep<Decoder>(null, commonDecoders), EncoderDecoderListPopupStep<Decoder> {
 
     override val actionName: String = "Decode From"

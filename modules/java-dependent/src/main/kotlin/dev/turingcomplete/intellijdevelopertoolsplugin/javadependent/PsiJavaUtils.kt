@@ -29,8 +29,7 @@ object PsiJavaUtils {
     return getTextIfStringValue(psiElement)
       ?: if (psiElement is PsiIdentifier) {
         psiElement.text to psiElement.textRange
-      }
-      else {
+      } else {
         null
       }
   }
@@ -42,12 +41,10 @@ object PsiJavaUtils {
       val newEnd = psiElement.textRange.endOffset - 1
       if (newStart > newEnd) {
         null
-      }
-      else {
+      } else {
         psiElement.text.substring(1, psiElement.text.length - 1) to TextRange(newStart, newEnd)
       }
-    }
-    else {
+    } else {
       null
     }
 

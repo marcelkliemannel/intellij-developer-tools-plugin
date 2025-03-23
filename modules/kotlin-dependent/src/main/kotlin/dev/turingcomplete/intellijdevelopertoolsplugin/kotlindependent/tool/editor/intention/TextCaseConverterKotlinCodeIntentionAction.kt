@@ -17,7 +17,9 @@ class TextCaseConverterKotlinCodeIntentionAction : TextCaseConverterIntentionAct
 
   override fun getSourceText(editor: Editor, file: PsiFile): Pair<String, TextRange>? {
     val psiElement = file.findElementAt(editor.caretModel.offset) ?: return null
-    return PsiKotlinUtils.getTextFromStringValueOrIdentifier(psiElement)?.let { it to psiElement.textRange }
+    return PsiKotlinUtils.getTextFromStringValueOrIdentifier(psiElement)?.let {
+      it to psiElement.textRange
+    }
   }
 
   // -- Private Methods ----------------------------------------------------- //

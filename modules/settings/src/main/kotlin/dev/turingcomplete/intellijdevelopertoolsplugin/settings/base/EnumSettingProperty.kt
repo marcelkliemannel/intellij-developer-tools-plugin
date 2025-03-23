@@ -7,14 +7,15 @@ class EnumSettingProperty<T : Enum<T>>(
   title: String,
   description: String?,
   group: SettingsGroup?,
-  settingValue: EnumValue<T>
-) : SettingProperty<T, EnumValue<T>>(
-  title = title,
-  description = description,
-  group = group,
-  settingValue = settingValue,
-  initialValue = getDefaultValue(settingValue)
-) {
+  settingValue: EnumValue<T>,
+) :
+  SettingProperty<T, EnumValue<T>>(
+    title = title,
+    description = description,
+    group = group,
+    settingValue = settingValue,
+    initialValue = getDefaultValue(settingValue),
+  ) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
@@ -23,8 +24,7 @@ class EnumSettingProperty<T : Enum<T>>(
     val value = get()
     return if (value != getDefaultValue(settingValue)) {
       value.name
-    }
-    else {
+    } else {
       null
     }
   }
@@ -33,8 +33,7 @@ class EnumSettingProperty<T : Enum<T>>(
     settingValue.enumClass.findEnumValueByName(value)?.let { set(it) }
   }
 
-  fun getAllEnumValues(): List<T> =
-    settingValue.enumClass.java.enumConstants.toList()
+  fun getAllEnumValues(): List<T> = settingValue.enumClass.java.enumConstants.toList()
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //

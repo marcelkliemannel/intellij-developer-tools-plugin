@@ -6,19 +6,15 @@ import com.intellij.util.xmlb.annotations.Attribute
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
 import kotlin.reflect.KClass
 
-class DeveloperToolConfigurationEnumPropertyTypeEp<T: Enum<T>>: DeveloperToolConfigurationPropertyType<T> {
+class DeveloperToolConfigurationEnumPropertyTypeEp<T : Enum<T>> :
+  DeveloperToolConfigurationPropertyType<T> {
   // -- Properties ---------------------------------------------------------- //
 
-  @Attribute("id")
-  @RequiredElement
-  override lateinit var id: String
+  @Attribute("id") @RequiredElement override lateinit var id: String
 
-  @Attribute("type")
-  @RequiredElement
-  lateinit var type: String
+  @Attribute("type") @RequiredElement lateinit var type: String
 
-  @Attribute("legacyId")
-  override var legacyId: String? = null
+  @Attribute("legacyId") override var legacyId: String? = null
 
   override val typeClass: KClass<T>
     get() = Class.forName(type).kotlin.uncheckedCastTo<KClass<T>>()
@@ -30,8 +26,7 @@ class DeveloperToolConfigurationEnumPropertyTypeEp<T: Enum<T>>: DeveloperToolCon
     return java.lang.Enum.valueOf(typeClass.java, persistentValue)
   }
 
-  override fun toPersistent(value: Any): String =
-    value.uncheckedCastTo<Enum<*>>().name
+  override fun toPersistent(value: Any): String = value.uncheckedCastTo<Enum<*>>().name
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //
@@ -40,6 +35,8 @@ class DeveloperToolConfigurationEnumPropertyTypeEp<T: Enum<T>>: DeveloperToolCon
   companion object {
 
     val epName: ExtensionPointName<DeveloperToolConfigurationEnumPropertyTypeEp<*>> =
-      ExtensionPointName.create("dev.turingcomplete.intellijdevelopertoolsplugins.developerToolConfigurationEnumPropertyType")
+      ExtensionPointName.create(
+        "dev.turingcomplete.intellijdevelopertoolsplugins.developerToolConfigurationEnumPropertyType"
+      )
   }
 }

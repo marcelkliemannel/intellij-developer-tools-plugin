@@ -39,12 +39,18 @@ abstract class TextTransformer(
   protected val context: DeveloperUiToolContext,
   protected val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  protected val project: Project?
+  protected val project: Project?,
 ) : DeveloperUiTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties ---------------------------------------------------------- //
 
   protected var liveTransformation = configuration.register("liveTransformation", true)
-  protected val sourceText = configuration.register("sourceText", "", PropertyType.INPUT, textTransformerContext.initialSourceExampleText)
+  protected val sourceText =
+    configuration.register(
+      "sourceText",
+      "",
+      PropertyType.INPUT,
+      textTransformerContext.initialSourceExampleText,
+    )
   protected var resultText = ValueProperty("")
 
   private val sourceEditor by lazy { createSourceInputEditor() }
@@ -58,16 +64,12 @@ abstract class TextTransformer(
   override fun Panel.buildUi() {
     buildTopConfigurationUi()
 
-    row {
-      cell(sourceEditor.component).align(Align.FILL)
-    }.resizableRow()
+    row { cell(sourceEditor.component).align(Align.FILL) }.resizableRow()
 
     buildMiddleConfigurationUi()
     buildActionsUi()
 
-    row {
-      cell(resultEditor.component).align(Align.FILL)
-    }.resizableRow()
+    row { cell(resultEditor.component).align(Align.FILL) }.resizableRow()
   }
 
   override fun afterBuildUi() {
@@ -117,9 +119,8 @@ abstract class TextTransformer(
 
   private fun Panel.buildActionsUi() {
     row {
-      val liveTransformationCheckBox = checkBox("Live transformation")
-        .bindSelected(liveTransformation)
-        .gap(RightGap.SMALL)
+      val liveTransformationCheckBox =
+        checkBox("Live transformation").bindSelected(liveTransformation).gap(RightGap.SMALL)
 
       button("▼ ${textTransformerContext.transformActionTitle}") { transform() }
         .enabledIf(liveTransformationCheckBox.selected.not())
@@ -127,10 +128,9 @@ abstract class TextTransformer(
 
       if (textTransformerContext.supportsDebug) {
         lateinit var debugButton: JComponent
-        debugButton = actionButton(
-          createDebugAction { debugButton },
-          actionPlace = this::class.java.name
-        ).component
+        debugButton =
+          actionButton(createDebugAction { debugButton }, actionPlace = this::class.java.name)
+            .component
       }
 
       buildAdditionalActionsUi()
@@ -141,11 +141,9 @@ abstract class TextTransformer(
     return object : DumbAwareAction("Debug", null, AllIcons.Toolwindows.ToolWindowDebugger) {
 
       override fun actionPerformed(e: AnActionEvent) {
-        val debugComponent = panel {
-          buildDebugComponent()
-        }.apply {
-          preferredSize = Dimension(300, preferredSize.height)
-        }
+        val debugComponent =
+          panel { buildDebugComponent() }
+            .apply { preferredSize = Dimension(300, preferredSize.height) }
         JBPopupFactory.getInstance()
           .createBalloonBuilder(createScrollPane(debugComponent, true))
           .setDialogMode(true)
@@ -164,29 +162,31 @@ abstract class TextTransformer(
 
   private fun createSourceInputEditor(): AdvancedEditor =
     AdvancedEditor(
-      id = "source-input",
-      context = context,
-      configuration = configuration,
-      project = project,
-      title = textTransformerContext.sourceTitle,
-      editorMode = INPUT,
-      parentDisposable = parentDisposable,
-      textProperty = sourceText,
-      diffSupport = textTransformerContext.diffSupport?.let { diffSupport ->
-        AdvancedEditor.DiffSupport(
-          title = diffSupport.title,
-          secondTitle = textTransformerContext.resultTitle,
-          secondText = { resultText.get() },
-        )
-      },
-      initialLanguage = textTransformerContext.inputInitialLanguage ?: PlainTextLanguage.INSTANCE
-    ).apply {
-      onTextChangeFromUi { _ ->
-        if (liveTransformation.get()) {
-          transform()
+        id = "source-input",
+        context = context,
+        configuration = configuration,
+        project = project,
+        title = textTransformerContext.sourceTitle,
+        editorMode = INPUT,
+        parentDisposable = parentDisposable,
+        textProperty = sourceText,
+        diffSupport =
+          textTransformerContext.diffSupport?.let { diffSupport ->
+            AdvancedEditor.DiffSupport(
+              title = diffSupport.title,
+              secondTitle = textTransformerContext.resultTitle,
+              secondText = { resultText.get() },
+            )
+          },
+        initialLanguage = textTransformerContext.inputInitialLanguage ?: PlainTextLanguage.INSTANCE,
+      )
+      .apply {
+        onTextChangeFromUi { _ ->
+          if (liveTransformation.get()) {
+            transform()
+          }
         }
       }
-    }
 
   private fun createResultOutputEditor(parentDisposable: Disposable) =
     AdvancedEditor(
@@ -198,14 +198,15 @@ abstract class TextTransformer(
       editorMode = OUTPUT,
       parentDisposable = parentDisposable,
       textProperty = resultText,
-      diffSupport = textTransformerContext.diffSupport?.let { diffSupport ->
-        AdvancedEditor.DiffSupport(
-          title = diffSupport.title,
-          secondTitle = textTransformerContext.sourceTitle,
-          secondText = { sourceText.get() },
-        )
-      },
-      initialLanguage = textTransformerContext.outputInitialLanguage ?: PlainTextLanguage.INSTANCE
+      diffSupport =
+        textTransformerContext.diffSupport?.let { diffSupport ->
+          AdvancedEditor.DiffSupport(
+            title = diffSupport.title,
+            secondTitle = textTransformerContext.sourceTitle,
+            secondText = { sourceText.get() },
+          )
+        },
+      initialLanguage = textTransformerContext.outputInitialLanguage ?: PlainTextLanguage.INSTANCE,
     )
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -222,9 +223,7 @@ abstract class TextTransformer(
     val supportsDebug: Boolean = false,
   )
 
-  data class DiffSupport(
-    val title: String
-  )
+  data class DiffSupport(val title: String)
 
   // -- Companion Object ---------------------------------------------------- //
 }

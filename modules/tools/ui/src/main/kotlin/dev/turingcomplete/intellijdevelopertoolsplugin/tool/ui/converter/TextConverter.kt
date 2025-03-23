@@ -27,13 +27,15 @@ abstract class TextConverter(
   protected val configuration: DeveloperToolConfiguration,
   protected val context: DeveloperUiToolContext,
   protected val project: Project?,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
 ) : DeveloperUiTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties ---------------------------------------------------------- //
 
   private var liveConversion = configuration.register("liveConversion", true)
-  protected var sourceText = configuration.register("sourceText", textConverterContext.defaultSourceText, INPUT)
-  protected var targetText = configuration.register("targetText", textConverterContext.defaultTargetText, INPUT)
+  protected var sourceText =
+    configuration.register("sourceText", textConverterContext.defaultSourceText, INPUT)
+  protected var targetText =
+    configuration.register("targetText", textConverterContext.defaultTargetText, INPUT)
 
   private val conversionAlarm by lazy { Alarm(parentDisposable) }
 
@@ -46,9 +48,7 @@ abstract class TextConverter(
   // -- Initialization ------------------------------------------------------ //
 
   init {
-    liveConversion.afterChange(parentDisposable) {
-      liveTransformToLastActiveInput()
-    }
+    liveConversion.afterChange(parentDisposable) { liveTransformToLastActiveInput() }
   }
 
   // -- Exposed Methods ----------------------------------------------------- //
@@ -126,9 +126,8 @@ abstract class TextConverter(
   private fun Panel.buildActionsUi() {
     buttonsGroup {
       row {
-        val liveConversionCheckBox = checkBox("Live conversion")
-          .bindSelected(liveConversion)
-          .gap(RightGap.SMALL)
+        val liveConversionCheckBox =
+          checkBox("Live conversion").bindSelected(liveConversion).gap(RightGap.SMALL)
         icon(AllIcons.General.ArrowUp)
           .visibleIf(toSourceActive)
           .enabledIf(liveConversion)
@@ -159,8 +158,7 @@ abstract class TextConverter(
     doConversion {
       try {
         toTarget(text)
-      } catch (_: Exception) {
-      }
+      } catch (_: Exception) {}
     }
   }
 
@@ -168,8 +166,7 @@ abstract class TextConverter(
     doConversion {
       try {
         toSource(text)
-      } catch (_: Exception) {
-      }
+      } catch (_: Exception) {}
     }
   }
 
@@ -182,61 +179,61 @@ abstract class TextConverter(
 
   private fun createSourceEditor() =
     AdvancedEditor(
-      id = "source",
-      title = textConverterContext.sourceTitle,
-      editorMode = INPUT_OUTPUT,
-      parentDisposable = parentDisposable,
-      configuration = configuration,
-      context = context,
-      project = project,
-      textProperty = sourceText,
-      diffSupport = textConverterContext.diffSupport?.let { diffSupport ->
-        AdvancedEditor.DiffSupport(
-          title = diffSupport.title,
-          secondTitle = textConverterContext.targetTitle,
-          secondText = { targetText.get() },
-        )
-      }
-    ).apply {
-      onFocusGained {
-        lastActiveInput.set(ActiveInput.SOURCE)
-      }
-      this.onTextChangeFromUi { text ->
-        if (liveConversion.get()) {
-          lastActiveInput.set(ActiveInput.SOURCE)
-          doToTarget(text)
+        id = "source",
+        title = textConverterContext.sourceTitle,
+        editorMode = INPUT_OUTPUT,
+        parentDisposable = parentDisposable,
+        configuration = configuration,
+        context = context,
+        project = project,
+        textProperty = sourceText,
+        diffSupport =
+          textConverterContext.diffSupport?.let { diffSupport ->
+            AdvancedEditor.DiffSupport(
+              title = diffSupport.title,
+              secondTitle = textConverterContext.targetTitle,
+              secondText = { targetText.get() },
+            )
+          },
+      )
+      .apply {
+        onFocusGained { lastActiveInput.set(ActiveInput.SOURCE) }
+        this.onTextChangeFromUi { text ->
+          if (liveConversion.get()) {
+            lastActiveInput.set(ActiveInput.SOURCE)
+            doToTarget(text)
+          }
         }
       }
-    }
 
   private fun createTargetEditor(): AdvancedEditor {
     return AdvancedEditor(
-      id = "target",
-      title = textConverterContext.targetTitle,
-      editorMode = INPUT_OUTPUT,
-      parentDisposable = parentDisposable,
-      configuration = configuration,
-      context = context,
-      project = project,
-      textProperty = targetText,
-      diffSupport = textConverterContext.diffSupport?.let { diffSupport ->
-        AdvancedEditor.DiffSupport(
-          title = diffSupport.title,
-          secondTitle = textConverterContext.sourceTitle,
-          secondText = { sourceText.get() },
-        )
-      }
-    ).apply {
-      onFocusGained {
-        lastActiveInput.set(ActiveInput.TARGET)
-      }
-      this.onTextChangeFromUi { text ->
-        if (liveConversion.get()) {
-          lastActiveInput.set(ActiveInput.TARGET)
-          doToSource(text)
+        id = "target",
+        title = textConverterContext.targetTitle,
+        editorMode = INPUT_OUTPUT,
+        parentDisposable = parentDisposable,
+        configuration = configuration,
+        context = context,
+        project = project,
+        textProperty = targetText,
+        diffSupport =
+          textConverterContext.diffSupport?.let { diffSupport ->
+            AdvancedEditor.DiffSupport(
+              title = diffSupport.title,
+              secondTitle = textConverterContext.sourceTitle,
+              secondText = { sourceText.get() },
+            )
+          },
+      )
+      .apply {
+        onFocusGained { lastActiveInput.set(ActiveInput.TARGET) }
+        this.onTextChangeFromUi { text ->
+          if (liveConversion.get()) {
+            lastActiveInput.set(ActiveInput.TARGET)
+            doToSource(text)
+          }
         }
       }
-    }
   }
 
   private fun liveTransformToLastActiveInput() {
@@ -255,7 +252,7 @@ abstract class TextConverter(
   enum class ActiveInput {
 
     SOURCE,
-    TARGET
+    TARGET,
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -269,12 +266,10 @@ abstract class TextConverter(
     val targetErrorHolder: ErrorHolder? = null,
     val diffSupport: DiffSupport? = null,
     val defaultSourceText: String = "",
-    val defaultTargetText: String = ""
+    val defaultTargetText: String = "",
   )
 
-  data class DiffSupport(
-    val title: String
-  )
+  data class DiffSupport(val title: String)
 
   // -- Companion Object ---------------------------------------------------- //
 }

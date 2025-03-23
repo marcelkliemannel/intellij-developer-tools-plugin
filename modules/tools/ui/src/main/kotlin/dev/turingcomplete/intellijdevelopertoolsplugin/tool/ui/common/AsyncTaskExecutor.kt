@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 class AsyncTaskExecutor(
   parentDisposable: Disposable,
-  private val executionThread: ExecutionThread
+  private val executionThread: ExecutionThread,
 ) : Disposable {
   // -- Properties ---------------------------------------------------------- //
 
@@ -63,14 +63,9 @@ class AsyncTaskExecutor(
 
   private suspend fun executeTask(task: Runnable) {
     when (executionThread) {
-      ExecutionThread.POOLED -> withContext(Dispatchers.IO) {
-        task.run()
-      }
-      ExecutionThread.EDT -> withContext(Dispatchers.Main) {
-        invokeLater(ModalityState.any()) {
-          task.run()
-        }
-      }
+      ExecutionThread.POOLED -> withContext(Dispatchers.IO) { task.run() }
+      ExecutionThread.EDT ->
+        withContext(Dispatchers.Main) { invokeLater(ModalityState.any()) { task.run() } }
     }
   }
 
@@ -78,15 +73,17 @@ class AsyncTaskExecutor(
 
   enum class ExecutionThread {
     POOLED,
-    EDT
+    EDT,
   }
 
   // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 
-    fun onEdt(parentDisposable: Disposable) = AsyncTaskExecutor(parentDisposable, ExecutionThread.EDT)
+    fun onEdt(parentDisposable: Disposable) =
+      AsyncTaskExecutor(parentDisposable, ExecutionThread.EDT)
 
-    fun onPooled(parentDisposable: Disposable) = AsyncTaskExecutor(parentDisposable, ExecutionThread.POOLED)
+    fun onPooled(parentDisposable: Disposable) =
+      AsyncTaskExecutor(parentDisposable, ExecutionThread.POOLED)
   }
 }

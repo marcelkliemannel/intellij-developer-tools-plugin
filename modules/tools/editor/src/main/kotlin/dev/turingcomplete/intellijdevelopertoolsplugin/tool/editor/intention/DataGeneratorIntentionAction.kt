@@ -46,14 +46,16 @@ class DataGeneratorIntentionAction : IntentionAction, LowPriorityAction {
 
   private class GenerateTextListPopupStep(
     dataGenerators: List<DataGeneratorBase>,
-    private val editor: Editor
+    private val editor: Editor,
   ) : BaseListPopupStep<DataGeneratorBase>(null, dataGenerators) {
 
     override fun getTextFor(dataGenerator: DataGeneratorBase): String = dataGenerator.title
 
-    override fun isFinal(dataGenerator: DataGeneratorBase?): Boolean = dataGenerator is DataGenerator
+    override fun isFinal(dataGenerator: DataGeneratorBase?): Boolean =
+      dataGenerator is DataGenerator
 
-    override fun hasSubstep(dataGenerator: DataGeneratorBase?): Boolean = dataGenerator is DataGeneratorsGroup
+    override fun hasSubstep(dataGenerator: DataGeneratorBase?): Boolean =
+      dataGenerator is DataGeneratorsGroup
 
     override fun onChosen(dataGenerator: DataGeneratorBase, finalChoice: Boolean): PopupStep<*>? {
       when (dataGenerator) {

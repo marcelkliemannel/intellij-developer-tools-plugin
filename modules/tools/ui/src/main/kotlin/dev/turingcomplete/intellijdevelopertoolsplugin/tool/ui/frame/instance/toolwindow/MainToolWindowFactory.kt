@@ -44,10 +44,11 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
   }
 
   override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-    val loaderPanel = BorderLayoutPanel().apply {
-      addToCenter(JLabel(AnimatedIcon.Default.INSTANCE))
-    }
-    toolWindow.contentManager.addContent(ContentFactory.getInstance().createContent(loaderPanel, "", false))
+    val loaderPanel =
+      BorderLayoutPanel().apply { addToCenter(JLabel(AnimatedIcon.Default.INSTANCE)) }
+    toolWindow.contentManager.addContent(
+      ContentFactory.getInstance().createContent(loaderPanel, "", false)
+    )
 
     ApplicationManager.getApplication().executeOnPooledThread {
       // See `DeveloperToolsToolWindowSettings#getInstance` for an explanation
@@ -57,11 +58,15 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
       ApplicationManager.getApplication().invokeLater {
         toolWindow.contentManager.removeAllContents(true)
 
-        val contentPanelHandler = ToolWindowContentPanelHandler(settings, project, toolWindow.disposable)
-        val mainContent = ContentFactory.getInstance().createContent(contentPanelHandler.contentPanel, "", false).apply {
-          preferredFocusableComponent = contentPanelHandler.contentPanel
-          putUserData(toolWindowContentPanelHandlerKey, contentPanelHandler)
-        }
+        val contentPanelHandler =
+          ToolWindowContentPanelHandler(settings, project, toolWindow.disposable)
+        val mainContent =
+          ContentFactory.getInstance()
+            .createContent(contentPanelHandler.contentPanel, "", false)
+            .apply {
+              preferredFocusableComponent = contentPanelHandler.contentPanel
+              putUserData(toolWindowContentPanelHandlerKey, contentPanelHandler)
+            }
         toolWindow.contentManager.addContent(mainContent)
         toolWindow.contentManager.setSelectedContent(mainContent)
 
@@ -75,21 +80,25 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
 
   private class ToolWindowDeveloperToolContentPanel(
     developerToolNode: DeveloperToolNode,
-    private val toggleMenu: (JComponent) -> Unit
+    private val toggleMenu: (JComponent) -> Unit,
   ) : DeveloperToolContentPanel(developerToolNode) {
 
     override fun Row.buildTitle(): JComponent {
-      val menuIcon = IconManager.getInstance().getIcon("dev/turingcomplete/intellijdevelopertoolsplugin/icons/menu.svg", MainToolWindowFactory::class.java.classLoader)
+      val menuIcon =
+        IconManager.getInstance()
+          .getIcon(
+            "dev/turingcomplete/intellijdevelopertoolsplugin/icons/menu.svg",
+            MainToolWindowFactory::class.java.classLoader,
+          )
       lateinit var toggleMenuActionLink: JComponent
-      val toggleMenuAction: DumbAwareAction = object : DumbAwareAction("Show Developer Tool", null, menuIcon) {
+      val toggleMenuAction: DumbAwareAction =
+        object : DumbAwareAction("Show Developer Tool", null, menuIcon) {
 
-        override fun actionPerformed(e: AnActionEvent) {
-          toggleMenu(toggleMenuActionLink)
+          override fun actionPerformed(e: AnActionEvent) {
+            toggleMenu(toggleMenuActionLink)
+          }
         }
-      }
-      toggleMenuActionLink = actionButton(toggleMenuAction)
-        .gap(RightGap.SMALL)
-        .component
+      toggleMenuActionLink = actionButton(toggleMenuAction).gap(RightGap.SMALL).component
 
       @Suppress("DialogTitleCapitalization")
       return label(developerToolNode.developerUiToolPresentation.contentTitle)
@@ -103,15 +112,16 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
   private class ToolWindowContentPanelHandler(
     settings: DeveloperToolsToolWindowSettings,
     project: Project,
-    parentDisposable: Disposable
-  ) : ContentPanelHandler(
-    project = project,
-    parentDisposable = parentDisposable,
-    settings = settings,
-    groupNodeSelectionEnabled = false,
-    promoteMainDialog = true,
-    prioritizeVerticalLayout = true
-  ) {
+    parentDisposable: Disposable,
+  ) :
+    ContentPanelHandler(
+      project = project,
+      parentDisposable = parentDisposable,
+      settings = settings,
+      groupNodeSelectionEnabled = false,
+      promoteMainDialog = true,
+      prioritizeVerticalLayout = true,
+    ) {
 
     private var lastToolsMenuTreePopup: JBPopup? = null
     private var toolsMenuTreeWrapper: JComponent?
@@ -122,10 +132,15 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
       Disposer.register(parentDisposable) { toolsMenuTreeWrapper = null }
     }
 
-    override fun createDeveloperToolContentPanel(developerToolNode: DeveloperToolNode): DeveloperToolContentPanel =
+    override fun createDeveloperToolContentPanel(
+      developerToolNode: DeveloperToolNode
+    ): DeveloperToolContentPanel =
       ToolWindowDeveloperToolContentPanel(developerToolNode, showMenu())
 
-    override fun handleContentNodeSelection(new: ContentNode?, selectionTriggeredBySearch: Boolean) {
+    override fun handleContentNodeSelection(
+      new: ContentNode?,
+      selectionTriggeredBySearch: Boolean,
+    ) {
       super.handleContentNodeSelection(new, selectionTriggeredBySearch)
 
       if (!selectionTriggeredBySearch) {
@@ -139,21 +154,22 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
         lastGeneralSettingsModificationsCounter = generalSettings.modificationsCounter
       }
 
-      lastToolsMenuTreePopup = JBPopupFactory.getInstance()
-        .createComponentPopupBuilder(toolsMenuTreeWrapper!!, toolsMenuTree)
-        .setRequestFocus(true)
-        .setResizable(true)
-        .setMovable(true)
-        .setDimensionServiceKey(project, TOOLS_MENU_TREE_DIMENSION_SERVICE_KEY, false)
-        .setCancelOnOtherWindowOpen(true)
-        .setCancelOnClickOutside(true)
-        .setMinSize(Dimension(220, 200))
-        .createPopup()
-        .apply {
-          size = Dimension(220, 600)
-          Disposer.register(parentDisposable, this)
-          showUnderneathOf(menuOwner)
-        }
+      lastToolsMenuTreePopup =
+        JBPopupFactory.getInstance()
+          .createComponentPopupBuilder(toolsMenuTreeWrapper!!, toolsMenuTree)
+          .setRequestFocus(true)
+          .setResizable(true)
+          .setMovable(true)
+          .setDimensionServiceKey(project, TOOLS_MENU_TREE_DIMENSION_SERVICE_KEY, false)
+          .setCancelOnOtherWindowOpen(true)
+          .setCancelOnClickOutside(true)
+          .setMinSize(Dimension(220, 200))
+          .createPopup()
+          .apply {
+            size = Dimension(220, 600)
+            Disposer.register(parentDisposable, this)
+            showUnderneathOf(menuOwner)
+          }
     }
   }
 

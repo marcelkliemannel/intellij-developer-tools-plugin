@@ -6,11 +6,11 @@ import com.intellij.openapi.project.DumbAwareToggleAction
 import javax.swing.Icon
 
 class SimpleToggleAction(
-        text: String,
-        icon: Icon?,
-        private val isSelected: () -> Boolean,
-        private val setSelected: (Boolean) -> Unit,
-        private val isEnabled: (() -> Boolean)? = null,
+  text: String,
+  icon: Icon?,
+  private val isSelected: () -> Boolean,
+  private val setSelected: (Boolean) -> Unit,
+  private val isEnabled: (() -> Boolean)? = null,
 ) : DumbAwareToggleAction(text, "", icon) {
 
   // -- Properties ---------------------------------------------------------- //

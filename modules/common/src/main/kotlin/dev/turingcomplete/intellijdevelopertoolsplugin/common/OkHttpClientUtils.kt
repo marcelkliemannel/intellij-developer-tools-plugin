@@ -9,7 +9,7 @@ import java.net.Proxy
 import java.net.ProxySelector
 import java.net.SocketAddress
 import java.net.URI
-import java.util.*
+import java.util.Collections
 
 object OkHttpClientUtils {
   // -- Properties ---------------------------------------------------------- //

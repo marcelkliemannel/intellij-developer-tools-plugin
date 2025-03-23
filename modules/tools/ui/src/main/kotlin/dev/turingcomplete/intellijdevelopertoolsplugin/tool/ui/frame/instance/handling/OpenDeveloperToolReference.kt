@@ -20,6 +20,7 @@ interface OpenDeveloperToolReference<T : OpenDeveloperToolContext> {
       object : OpenDeveloperToolReference<T> {
         override val id: String
           get() = id
+
         override val contextClass: KClass<T>
           get() = contextClass
       }

@@ -15,16 +15,21 @@ class DeveloperToolNode(
   val settings: DeveloperToolsInstanceSettings,
   val developerUiToolPresentation: DeveloperUiToolPresentation,
   showGrouped: Boolean,
-  private val developerUiToolCreator: (DeveloperToolConfiguration) -> DeveloperUiTool
-) : ContentNode(
-  id = developerToolId,
-  title = if (showGrouped) developerUiToolPresentation.groupedMenuTitle else developerUiToolPresentation.menuTitle,
-  toolTipText = developerUiToolPresentation.contentTitle
-) {
+  private val developerUiToolCreator: (DeveloperToolConfiguration) -> DeveloperUiTool,
+) :
+  ContentNode(
+    id = developerToolId,
+    title =
+      if (showGrouped) developerUiToolPresentation.groupedMenuTitle
+      else developerUiToolPresentation.menuTitle,
+    toolTipText = developerUiToolPresentation.contentTitle,
+  ) {
   // -- Properties ---------------------------------------------------------- //
 
   private val _developerTools: MutableList<DeveloperToolContainer> by lazy {
-    restoreDeveloperToolInstances().ifEmpty { listOf(doCreateNewDeveloperToolInstance()) }.toMutableList()
+    restoreDeveloperToolInstances()
+      .ifEmpty { listOf(doCreateNewDeveloperToolInstance()) }
+      .toMutableList()
   }
   val developerTools: List<DeveloperToolContainer>
     get() = _developerTools
@@ -39,23 +44,27 @@ class DeveloperToolNode(
   }
 
   fun destroyDeveloperToolInstance(developerUiTool: DeveloperUiTool) {
-    _developerTools.find { it.instance === developerUiTool }?.let {
-      settings.removeDeveloperToolConfiguration(
-        developerToolId = developerToolId,
-        developerToolConfiguration = it.configuration
-      )
-      Disposer.dispose(developerUiTool)
-    }
+    _developerTools
+      .find { it.instance === developerUiTool }
+      ?.let {
+        settings.removeDeveloperToolConfiguration(
+          developerToolId = developerToolId,
+          developerToolConfiguration = it.configuration,
+        )
+        Disposer.dispose(developerUiTool)
+      }
   }
 
   // -- Private Methods ----------------------------------------------------- //
 
   private fun restoreDeveloperToolInstances(): List<DeveloperToolContainer> =
-    settings.getDeveloperToolConfigurations(developerToolId)
-      .map { developerToolConfiguration -> doCreateNewDeveloperToolInstance(developerToolConfiguration) }
+    settings.getDeveloperToolConfigurations(developerToolId).map { developerToolConfiguration ->
+      doCreateNewDeveloperToolInstance(developerToolConfiguration)
+    }
 
   private fun doCreateNewDeveloperToolInstance(
-    developerToolConfiguration: DeveloperToolConfiguration = settings.createDeveloperToolConfiguration(developerToolId)
+    developerToolConfiguration: DeveloperToolConfiguration =
+      settings.createDeveloperToolConfiguration(developerToolId)
   ): DeveloperToolContainer {
     val developerTool = developerUiToolCreator(developerToolConfiguration)
     developerToolConfiguration.wasConsumedByDeveloperTool = true
@@ -67,7 +76,7 @@ class DeveloperToolNode(
 
   data class DeveloperToolContainer(
     val instance: DeveloperUiTool,
-    val configuration: DeveloperToolConfiguration
+    val configuration: DeveloperToolConfiguration,
   )
 
   // -- Companion Object ---------------------------------------------------- //

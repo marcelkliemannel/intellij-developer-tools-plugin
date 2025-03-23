@@ -13,7 +13,7 @@ class CopyValuesAction(
   private val singleValue: String = "Copy Value",
   private val pluralValue: (Int) -> String = { "Copy $it Values" },
   private val valueToString: (Any) -> String? = { it.toString() },
-  icon: Icon? = PlatformIcons.COPY_ICON
+  icon: Icon? = PlatformIcons.COPY_ICON,
 ) : DumbAwareAction(singleValue, null, icon) {
   // -- Companion Object ---------------------------------------------------- //
   // -- Properties ---------------------------------------------------------- //
@@ -21,7 +21,8 @@ class CopyValuesAction(
   // -- Exposed Methods ----------------------------------------------------- //
 
   override fun update(e: AnActionEvent) {
-    val selectedValues = SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
+    val selectedValues =
+      SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
 
     val nonBlankValues = selectedValues.count { valueToString(it)?.isNotBlank() ?: false }
     e.presentation.isVisible = nonBlankValues >= 1
@@ -29,13 +30,18 @@ class CopyValuesAction(
   }
 
   override fun actionPerformed(e: AnActionEvent) {
-    val values: List<Any> = SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
+    val values: List<Any> =
+      SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
     if (values.isEmpty()) {
       return
     }
 
-    CopyPasteManager.getInstance().setContents(StringSelection(values.mapNotNull { valueToString(it) }
-      .joinToString(System.lineSeparator())))
+    CopyPasteManager.getInstance()
+      .setContents(
+        StringSelection(
+          values.mapNotNull { valueToString(it) }.joinToString(System.lineSeparator())
+        )
+      )
   }
 
   override fun getActionUpdateThread() = ActionUpdateThread.EDT

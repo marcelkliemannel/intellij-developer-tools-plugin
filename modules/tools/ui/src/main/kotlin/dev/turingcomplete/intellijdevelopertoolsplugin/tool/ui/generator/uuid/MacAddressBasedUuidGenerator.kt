@@ -23,22 +23,14 @@ import java.net.SocketException
 abstract class MacAddressBasedUuidGenerator(
   version: UuidVersion,
   configuration: DeveloperToolConfiguration,
-  supportsBulkGeneration: Boolean
+  supportsBulkGeneration: Boolean,
 ) : SpecificUuidGenerator(supportsBulkGeneration) {
   // -- Properties ---------------------------------------------------------- //
 
-  private var macAddressGenerationMode = configuration.register(
-    "${version}MacAddressGenerationMode",
-    RANDOM
-  )
-  private var localInterface by configuration.register(
-    "${version}LocalInterface",
-    ""
-  )
-  private var individualMacAddress = configuration.register(
-    "${version}IndividualMacAddress",
-    ""
-  )
+  private var macAddressGenerationMode =
+    configuration.register("${version}MacAddressGenerationMode", RANDOM)
+  private var localInterface by configuration.register("${version}LocalInterface", "")
+  private var individualMacAddress = configuration.register("${version}IndividualMacAddress", "")
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
@@ -46,64 +38,80 @@ abstract class MacAddressBasedUuidGenerator(
   @Suppress("UnstableApiUsage")
   override fun Panel.buildConfigurationUi(visible: ComponentPredicate) {
     buttonsGroup("MAC address:") {
-      row {
-        radioButton("Generate random multicast MAC address")
-          .bind(macAddressGenerationMode, RANDOM)
-      }
+        row {
+          radioButton("Generate random multicast MAC address")
+            .bind(macAddressGenerationMode, RANDOM)
+        }
 
-      row {
-        val individualRadioButton = radioButton("Individual:")
-          .bind(macAddressGenerationMode, INDIVIDUAL)
-          .gap(RightGap.SMALL)
-        expandableTextField()
-          .bindText(individualMacAddress)
-          .validationInfo(validateIndividualMacAddress())
-          .enabledIf(individualRadioButton.selected).component
-      }
+        row {
+          val individualRadioButton =
+            radioButton("Individual:")
+              .bind(macAddressGenerationMode, INDIVIDUAL)
+              .gap(RightGap.SMALL)
+          expandableTextField()
+            .bindText(individualMacAddress)
+            .validationInfo(validateIndividualMacAddress())
+            .enabledIf(individualRadioButton.selected)
+            .component
+        }
 
-      row {
-        val localMacAddresses = collectLocalMacAddresses()
-        visible(localMacAddresses.isNotEmpty())
-        val useLocalInterface = radioButton("Local interface:")
-          .bind(macAddressGenerationMode, LOCAL_INTERFACE)
-          .gap(RightGap.SMALL)
-        comboBox(localMacAddresses)
-          .applyToComponent {
-            model.asSequence().firstOrNull { it.macAddress == localInterface }?.let {
-              selectedItem = it
+        row {
+          val localMacAddresses = collectLocalMacAddresses()
+          visible(localMacAddresses.isNotEmpty())
+          val useLocalInterface =
+            radioButton("Local interface:")
+              .bind(macAddressGenerationMode, LOCAL_INTERFACE)
+              .gap(RightGap.SMALL)
+          comboBox(localMacAddresses)
+            .applyToComponent {
+              model
+                .asSequence()
+                .firstOrNull { it.macAddress == localInterface }
+                ?.let { selectedItem = it }
             }
-          }
-          .whenItemSelectedFromUi { localInterface = it.macAddress }
-          .enabledIf(useLocalInterface.selected).component
+            .whenItemSelectedFromUi { localInterface = it.macAddress }
+            .enabledIf(useLocalInterface.selected)
+            .component
+        }
       }
-    }.visibleIf(visible)
+      .visibleIf(visible)
   }
 
-  fun getEthernetAddress(): EthernetAddress = when (macAddressGenerationMode.get()) {
-    RANDOM -> EthernetAddress.constructMulticastAddress()
-    INDIVIDUAL -> EthernetAddress.valueOf(individualMacAddress.get())
-    LOCAL_INTERFACE -> EthernetAddress(localInterface)
-  }
+  fun getEthernetAddress(): EthernetAddress =
+    when (macAddressGenerationMode.get()) {
+      RANDOM -> EthernetAddress.constructMulticastAddress()
+      INDIVIDUAL -> EthernetAddress.valueOf(individualMacAddress.get())
+      LOCAL_INTERFACE -> EthernetAddress(localInterface)
+    }
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun validateIndividualMacAddress(): ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
-    if (macAddressGenerationMode.get() == INDIVIDUAL && !MAC_ADDRESS_REGEX.matches(individualMacAddress.get())) {
+  private fun validateIndividualMacAddress():
+    ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
+    if (
+      macAddressGenerationMode.get() == INDIVIDUAL &&
+        !MAC_ADDRESS_REGEX.matches(individualMacAddress.get())
+    ) {
       INVALID_MAC_ADDRESS_VALIDATION_INFO
-    }
-    else {
+    } else {
       null
     }
   }
 
   private fun collectLocalMacAddresses(): List<LocalInterface> {
     return try {
-      NetworkInterface.getNetworkInterfaces().asSequence()
+      NetworkInterface.getNetworkInterfaces()
+        .asSequence()
         .filter { !it.isLoopback }
         .filter { it.hardwareAddress != null }
         .filter { it.hardwareAddress.size == 6 }
         .groupBy { it.hardwareAddress.toHexMacAddress() }
-        .map { LocalInterface(it.key, it.value.joinToString("/") { networkInterface -> networkInterface.name }) }
+        .map {
+          LocalInterface(
+            it.key,
+            it.value.joinToString("/") { networkInterface -> networkInterface.name },
+          )
+        }
         .toList()
     } catch (_: SocketException) {
       emptyList()
@@ -116,7 +124,7 @@ abstract class MacAddressBasedUuidGenerator(
 
     RANDOM,
     INDIVIDUAL,
-    LOCAL_INTERFACE
+    LOCAL_INTERFACE,
   }
 
   // -- Inner Type ---------------------------------------------------------- //

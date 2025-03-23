@@ -9,7 +9,7 @@ import javax.swing.border.LineBorder
 
 class ValidationResultBorder(
   private val ownerComponent: JComponent,
-  private val focusComponent: JComponent = ownerComponent
+  private val focusComponent: JComponent = ownerComponent,
 ) : LineBorder(defaultBorderColor, 1) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -22,12 +22,17 @@ class ValidationResultBorder(
   // -- Exposed Methods ----------------------------------------------------- //
 
   override fun paintBorder(c: Component?, g: Graphics?, x: Int, y: Int, width: Int, height: Int) {
-    val outline = ObjectUtils.tryCast(ownerComponent.getClientProperty("JComponent.outline"), String::class.java)
-    this.lineColor = when (outline) {
-      "error" -> if (focusComponent.hasFocus()) errorFocusBorder else errorBorder
-      "warning" -> if (focusComponent.hasFocus()) warningFocusBorder else warningBorder
-      else -> defaultBorderColor
-    }
+    val outline =
+      ObjectUtils.tryCast(
+        ownerComponent.getClientProperty("JComponent.outline"),
+        String::class.java,
+      )
+    this.lineColor =
+      when (outline) {
+        "error" -> if (focusComponent.hasFocus()) errorFocusBorder else errorBorder
+        "warning" -> if (focusComponent.hasFocus()) warningFocusBorder else warningBorder
+        else -> defaultBorderColor
+      }
     super.paintBorder(c, g, x, y, width, height)
   }
 

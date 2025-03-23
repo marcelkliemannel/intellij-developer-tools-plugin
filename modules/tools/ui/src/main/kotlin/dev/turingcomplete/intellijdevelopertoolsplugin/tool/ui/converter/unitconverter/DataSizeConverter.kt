@@ -24,14 +24,22 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitcon
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
 
-class DataSizeConverter(
-  configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
-) : MathContextUnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Data Size") {
+class DataSizeConverter(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+  MathContextUnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Data Size") {
   // -- Properties ---------------------------------------------------------- //
 
-  private val bitDataSizeValue = configuration.register("${CONFIGURATION_KEY_PREFIX}bitDataSizeValue", ZERO, INPUT, DEFAULT_BIT_DATA_SIZE_VALUE)
-  private val showLargeDataUnits = configuration.register("${CONFIGURATION_KEY_PREFIX}showLargeDataUnits", DEFAULT_SHOW_LARGE_DATA_UNITS)
+  private val bitDataSizeValue =
+    configuration.register(
+      "${CONFIGURATION_KEY_PREFIX}bitDataSizeValue",
+      ZERO,
+      INPUT,
+      DEFAULT_BIT_DATA_SIZE_VALUE,
+    )
+  private val showLargeDataUnits =
+    configuration.register(
+      "${CONFIGURATION_KEY_PREFIX}showLargeDataUnits",
+      DEFAULT_SHOW_LARGE_DATA_UNITS,
+    )
 
   private val dataSizeProperties: List<DataSizeProperty> = createDataProperties()
   private val bitDataSizeProperty = dataSizeProperties.first { it.dataUnit == bitDataUnit }
@@ -43,35 +51,42 @@ class DataSizeConverter(
   override fun Panel.buildUi() {
     NumberSystem.entries.forEach { numberSystem ->
       group(numberSystem.title, true) {
-        dataSizeProperties
-          .filter { it.dataUnit.numberSystem == numberSystem }
-          .forEach { transferRateDataUnitProperty ->
-            row {
-              val formattedLabel = label(transferRateDataUnitProperty.inputTitle)
-                .gap(RightGap.SMALL)
-              lateinit var formattedFieldTextField: Cell<JBTextField>
-              formattedFieldTextField = textField()
-                .bindText(transferRateDataUnitProperty.formattedValue)
-                .validateBigDecimalValue(ZERO, mathContext) { it.parseBigDecimal() }
-                .resizableColumn()
-                .align(Align.FILL)
-                .whenTextChangedFromUi {
-                  convertByInputFieldChange(formattedFieldTextField.component, transferRateDataUnitProperty)
-                }
+          dataSizeProperties
+            .filter { it.dataUnit.numberSystem == numberSystem }
+            .forEach { transferRateDataUnitProperty ->
+              row {
+                  val formattedLabel =
+                    label(transferRateDataUnitProperty.inputTitle).gap(RightGap.SMALL)
+                  lateinit var formattedFieldTextField: Cell<JBTextField>
+                  formattedFieldTextField =
+                    textField()
+                      .bindText(transferRateDataUnitProperty.formattedValue)
+                      .validateBigDecimalValue(ZERO, mathContext) { it.parseBigDecimal() }
+                      .resizableColumn()
+                      .align(Align.FILL)
+                      .whenTextChangedFromUi {
+                        convertByInputFieldChange(
+                          formattedFieldTextField.component,
+                          transferRateDataUnitProperty,
+                        )
+                      }
 
-              if (transferRateDataUnitProperty.dataUnit.isLarge) {
-                formattedLabel.visibleIf(showLargeDataUnits)
-                formattedFieldTextField.visibleIf(showLargeDataUnits)
-              }
-            }.layout(RowLayout.PARENT_GRID)
-          }
-      }.bottomGap(BottomGap.NONE).topGap(TopGap.NONE)
+                  if (transferRateDataUnitProperty.dataUnit.isLarge) {
+                    formattedLabel.visibleIf(showLargeDataUnits)
+                    formattedFieldTextField.visibleIf(showLargeDataUnits)
+                  }
+                }
+                .layout(RowLayout.PARENT_GRID)
+            }
+        }
+        .bottomGap(BottomGap.NONE)
+        .topGap(TopGap.NONE)
     }
   }
 
   private fun convertByInputFieldChange(
     inputFieldComponent: JBTextField?,
-    inputDataSizeProperty: DataSizeProperty
+    inputDataSizeProperty: DataSizeProperty,
   ) {
     if (inputFieldComponent != null && validate().any { it.component == inputFieldComponent }) {
       return
@@ -80,8 +95,7 @@ class DataSizeConverter(
     if (inputDataSizeProperty != bitDataSizeProperty) {
       val inputValue = inputDataSizeProperty.formattedValue.get().parseBigDecimal()
       bitDataSizeValue.set(inputDataSizeProperty.dataUnit.toBits(inputValue, mathContext))
-    }
-    else {
+    } else {
       bitDataSizeValue.set(bitDataSizeProperty.formattedValue.get().parseBigDecimal())
     }
 
@@ -102,37 +116,36 @@ class DataSizeConverter(
   @Suppress("UnstableApiUsage")
   override fun Panel.buildAdditionalSettingsUi() {
     row {
-      checkBox("Show large data units")
-        .bindSelected(showLargeDataUnits)
-        .whenStateChangedFromUi { sync() }
+      checkBox("Show large data units").bindSelected(showLargeDataUnits).whenStateChangedFromUi {
+        sync()
+      }
     }
   }
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun createDataProperties() = dataUnits.map {
-    if (it == bitDataUnit) {
-      DataSizeProperty(it, bitDataSizeValue).apply { formattedValue.set(bitDataSizeValue.get().toFormatted()) }
+  private fun createDataProperties() =
+    dataUnits.map {
+      if (it == bitDataUnit) {
+        DataSizeProperty(it, bitDataSizeValue).apply {
+          formattedValue.set(bitDataSizeValue.get().toFormatted())
+        }
+      } else {
+        DataSizeProperty(it, null)
+      }
     }
-    else {
-      DataSizeProperty(it, null)
-    }
-  }
 
   // -- Inner Type ---------------------------------------------------------- //
 
   private class DataSizeProperty(
     val dataUnit: DataUnit,
-    val rawValueReference: ValueProperty<BigDecimal>? = null
+    val rawValueReference: ValueProperty<BigDecimal>? = null,
   ) {
 
     val formattedValue: ValueProperty<String> = ValueProperty("0")
     var inputTitle: String = "${dataUnit.name}:"
 
-    fun setFromBits(
-      bits: BigDecimal,
-      unitConverter: MathContextUnitConverter
-    ) {
+    fun setFromBits(bits: BigDecimal, unitConverter: MathContextUnitConverter) {
       val result = dataUnit.fromBits(bits, unitConverter.mathContext)
       formattedValue.set(with(unitConverter) { result.toFormatted() })
       rawValueReference?.set(result)

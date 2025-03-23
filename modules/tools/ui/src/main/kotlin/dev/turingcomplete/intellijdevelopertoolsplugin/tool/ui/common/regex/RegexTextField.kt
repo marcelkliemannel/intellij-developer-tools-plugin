@@ -28,13 +28,15 @@ class RegexTextField(
   init {
     font = JBFont.create(font, false).biggerOn(1.4f)
 
-    addDocumentListener(object : DocumentListener {
-      override fun documentChanged(event: DocumentEvent) {
-        val text = event.document.text
-        textProperty.set(text, TEXT_PROPERTY_CHANGE_ID)
-        onTextChangeFromUi.forEach { it(text) }
+    addDocumentListener(
+      object : DocumentListener {
+        override fun documentChanged(event: DocumentEvent) {
+          val text = event.document.text
+          textProperty.set(text, TEXT_PROPERTY_CHANGE_ID)
+          onTextChangeFromUi.forEach { it(text) }
+        }
       }
-    })
+    )
 
     textProperty.afterChangeConsumeEvent(parentDisposable) { event ->
       if (event.newValue != event.oldValue && event.id != TEXT_PROPERTY_CHANGE_ID) {

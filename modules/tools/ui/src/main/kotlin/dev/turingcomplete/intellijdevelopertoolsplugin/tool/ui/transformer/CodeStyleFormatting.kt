@@ -20,24 +20,25 @@ class CodeStyleFormatting(
   project: Project,
   context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
-) : TextTransformer(
-  textTransformerContext = TextTransformerContext(
-    transformActionTitle = "Format",
-    sourceTitle = "Original",
-    resultTitle = "Formatted",
-    diffSupport = DiffSupport(
-      title = "Code Style Formatting"
-    )
-  ),
-  context = context,
-  configuration = configuration,
-  parentDisposable = parentDisposable,
-  project = project
-) {
+  parentDisposable: Disposable,
+) :
+  TextTransformer(
+    textTransformerContext =
+      TextTransformerContext(
+        transformActionTitle = "Format",
+        sourceTitle = "Original",
+        resultTitle = "Formatted",
+        diffSupport = DiffSupport(title = "Code Style Formatting"),
+      ),
+    context = context,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    project = project,
+  ) {
   // -- Properties ---------------------------------------------------------- //
 
-  private var selectedCodeStyleLanguageId = configuration.register("languageId", FAVORITE_DEFAULT_LANGUAGE_ID)
+  private var selectedCodeStyleLanguageId =
+    configuration.register("languageId", FAVORITE_DEFAULT_LANGUAGE_ID)
 
   // -- Initialization ------------------------------------------------------ //
 
@@ -46,7 +47,11 @@ class CodeStyleFormatting(
 
     // Validate if selected language is still available
     if (codeStyles.find { it.language.id == selectedCodeStyleLanguageId.get() } == null) {
-      selectedCodeStyleLanguageId.set((codeStyles.find { it.language.id == FAVORITE_DEFAULT_LANGUAGE_ID } ?: codeStyles.first()).language.id)
+      selectedCodeStyleLanguageId.set(
+        (codeStyles.find { it.language.id == FAVORITE_DEFAULT_LANGUAGE_ID } ?: codeStyles.first())
+          .language
+          .id
+      )
     }
   }
 
@@ -59,9 +64,7 @@ class CodeStyleFormatting(
     row {
       comboBox(codeStyles.toList())
         .label("Language:")
-        .applyToComponent {
-          selectedItem = selectedCodeStyle
-        }
+        .applyToComponent { selectedItem = selectedCodeStyle }
         .whenItemSelectedFromUi {
           selectedCodeStyleLanguageId.set(it.language.id)
           setLanguage(it.language)
@@ -72,19 +75,24 @@ class CodeStyleFormatting(
   }
 
   override fun transform() {
-    val workingVirtualFile = LightVirtualFile(this.javaClass.canonicalName, getSelectedCodeStyle().language, sourceText.get())
+    val workingVirtualFile =
+      LightVirtualFile(
+        this.javaClass.canonicalName,
+        getSelectedCodeStyle().language,
+        sourceText.get(),
+      )
     PsiManager.getInstance(project!!).findFile(workingVirtualFile)?.let { workingPsiFile ->
-      val processor = RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))
-      processor.setPostRunnable {
-        resultText.set(workingPsiFile.text)
-      }
+      val processor =
+        RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))
+      processor.setPostRunnable { resultText.set(workingPsiFile.text) }
       processor.run()
     } ?: error("snh: Can't get PSI file for `LightVirtualFile`")
   }
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun getSelectedCodeStyle() = codeStyles.first { it.language.id == selectedCodeStyleLanguageId.get() }
+  private fun getSelectedCodeStyle() =
+    codeStyles.first { it.language.id == selectedCodeStyleLanguageId.get() }
 
   // -- Inner Type ---------------------------------------------------------- //
 
@@ -97,24 +105,25 @@ class CodeStyleFormatting(
 
   class Factory : DeveloperUiToolFactory<CodeStyleFormatting> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Code Style Formatting",
-      contentTitle = "Code Style Formatting"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(
+        menuTitle = "Code Style Formatting",
+        contentTitle = "Code Style Formatting",
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> CodeStyleFormatting)? {
       if (project == null) {
         return null
       }
 
-      val codeStyles: List<CodeStyle> = LanguageCodeStyleSettingsProvider
-        .EP_NAME.extensionList
-        .sortedBy { it.language.displayName }
-        .map { CodeStyle(it.language.displayName, it.language) }
+      val codeStyles: List<CodeStyle> =
+        LanguageCodeStyleSettingsProvider.EP_NAME.extensionList
+          .sortedBy { it.language.displayName }
+          .map { CodeStyle(it.language.displayName, it.language) }
       if (codeStyles.isEmpty()) {
         return null
       }

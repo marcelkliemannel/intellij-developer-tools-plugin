@@ -23,20 +23,24 @@ import java.math.MathContext
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.ParsePosition
-import java.util.*
+import java.util.Locale
 
 abstract class MathContextUnitConverter(
   configurationKeyPrefix: String,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  title: String
-): UnitConverter(parentDisposable, title) {
+  title: String,
+) : UnitConverter(parentDisposable, title) {
   // -- Properties ---------------------------------------------------------- //
 
-  private var parsingLocale = configuration.register("${configurationKeyPrefix}parsingLocale", DEFAULT_PARSING_LOCALE)
-  private val roundingMode = configuration.register("${configurationKeyPrefix}roundingMode", DEFAULT_ROUNDING_MODE)
-  private val decimalPlaces = configuration.register("${configurationKeyPrefix}decimalPlaces", DEFAULT_DECIMAL_PLACES)
-  private val precision = configuration.register("${configurationKeyPrefix}precision", DEFAULT_PRECISION)
+  private var parsingLocale =
+    configuration.register("${configurationKeyPrefix}parsingLocale", DEFAULT_PARSING_LOCALE)
+  private val roundingMode =
+    configuration.register("${configurationKeyPrefix}roundingMode", DEFAULT_ROUNDING_MODE)
+  private val decimalPlaces =
+    configuration.register("${configurationKeyPrefix}decimalPlaces", DEFAULT_DECIMAL_PLACES)
+  private val precision =
+    configuration.register("${configurationKeyPrefix}precision", DEFAULT_PRECISION)
 
   private val parsingDecimalSeparatorInfo = ValueProperty("")
   var mathContext = createMathContext()
@@ -50,9 +54,10 @@ abstract class MathContextUnitConverter(
   }
 
   fun String.parseBigDecimal(): BigDecimal {
-    val decimalFormat = DecimalFormat().apply {
-      decimalFormatSymbols = DecimalFormatSymbols.getInstance(parsingLocale.get().locale)
-    }
+    val decimalFormat =
+      DecimalFormat().apply {
+        decimalFormatSymbols = DecimalFormatSymbols.getInstance(parsingLocale.get().locale)
+      }
     // The `DecimalFormat` is non-strict. So `12foo3` would return `123`.
     val parsePosition = ParsePosition(0)
     val parsedNumber: Number? = decimalFormat.parse(this, parsePosition)
@@ -62,30 +67,34 @@ abstract class MathContextUnitConverter(
     return BigDecimal(parsedNumber.toString(), mathContext)
   }
 
-  fun BigDecimal.toFormatted() = this.stripTrailingZeros()
-    .setScale(decimalPlaces.get(), roundingMode.get().javaMathRoundingMode)
-    .toPlainString()
-    .let {
-      // Remove trailing zeros
-      if (it.contains(".")) {
-        val trimmed = it.trimEnd('0')
-        if (trimmed.endsWith('.')) trimmed.dropLast(1) else trimmed
+  fun BigDecimal.toFormatted() =
+    this.stripTrailingZeros()
+      .setScale(decimalPlaces.get(), roundingMode.get().javaMathRoundingMode)
+      .toPlainString()
+      .let {
+        // Remove trailing zeros
+        if (it.contains(".")) {
+          val trimmed = it.trimEnd('0')
+          if (trimmed.endsWith('.')) trimmed.dropLast(1) else trimmed
+        } else {
+          it
+        }
       }
-      else {
-        it
-      }
-    }.replace(".", getDecimalSeparator())
+      .replace(".", getDecimalSeparator())
 
   override fun sync() {
     mathContext = createMathContext()
 
     val decimalSeparator = getDecimalSeparator()
-    val postfix = when (decimalSeparator) {
-      "." -> " (dot)"
-      "," -> " (comma)"
-      else -> ""
-    }
-    parsingDecimalSeparatorInfo.set("<html>Decimal separator: <b><code>$decimalSeparator</code></b>$postfix</html>")
+    val postfix =
+      when (decimalSeparator) {
+        "." -> " (dot)"
+        "," -> " (comma)"
+        else -> ""
+      }
+    parsingDecimalSeparatorInfo.set(
+      "<html>Decimal separator: <b><code>$decimalSeparator</code></b>$postfix</html>"
+    )
 
     doSync()
   }
@@ -100,42 +109,49 @@ abstract class MathContextUnitConverter(
   @Suppress("UnstableApiUsage")
   override fun Panel.buildSettingsUi() {
     collapsibleGroup("Settings") {
-      buildAdditionalSettingsUi()
-      row {
-        comboBox(ALL_AVAILABLE_LOCALES)
-          .label("Locale for parsing:")
-          .bindItem(parsingLocale)
-          .columns(COLUMNS_MEDIUM)
-          .whenItemSelectedFromUi { sync() }
-      }.layout(RowLayout.PARENT_GRID).bottomGap(BottomGap.NONE)
-      row {
-        cell()
-        label("")
-          .bindText(parsingDecimalSeparatorInfo)
-      }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE)
-      row {
-        textField()
-          .label("Decimal places:")
-          .bindIntTextImproved(decimalPlaces)
-          .validateLongValue(LongRange(1, 50))
-          .columns(COLUMNS_TINY)
-          .whenTextChangedFromUi { sync() }
-      }.layout(RowLayout.PARENT_GRID)
-      row {
-        comboBox(RoundingMode.entries)
-          .label("Rounding mode:")
-          .bindItem(roundingMode)
-          .whenItemSelectedFromUi { sync() }
-      }.layout(RowLayout.PARENT_GRID)
-      row {
-        textField()
-          .label("Precision:")
-          .bindIntTextImproved(precision)
-          .validateLongValue(LongRange(1, 100))
-          .columns(COLUMNS_TINY)
-          .whenTextChangedFromUi { sync() }
-      }.layout(RowLayout.PARENT_GRID)
-    }.topGap(TopGap.NONE)
+        buildAdditionalSettingsUi()
+        row {
+            comboBox(ALL_AVAILABLE_LOCALES)
+              .label("Locale for parsing:")
+              .bindItem(parsingLocale)
+              .columns(COLUMNS_MEDIUM)
+              .whenItemSelectedFromUi { sync() }
+          }
+          .layout(RowLayout.PARENT_GRID)
+          .bottomGap(BottomGap.NONE)
+        row {
+            cell()
+            label("").bindText(parsingDecimalSeparatorInfo)
+          }
+          .layout(RowLayout.PARENT_GRID)
+          .topGap(TopGap.NONE)
+        row {
+            textField()
+              .label("Decimal places:")
+              .bindIntTextImproved(decimalPlaces)
+              .validateLongValue(LongRange(1, 50))
+              .columns(COLUMNS_TINY)
+              .whenTextChangedFromUi { sync() }
+          }
+          .layout(RowLayout.PARENT_GRID)
+        row {
+            comboBox(RoundingMode.entries)
+              .label("Rounding mode:")
+              .bindItem(roundingMode)
+              .whenItemSelectedFromUi { sync() }
+          }
+          .layout(RowLayout.PARENT_GRID)
+        row {
+            textField()
+              .label("Precision:")
+              .bindIntTextImproved(precision)
+              .validateLongValue(LongRange(1, 100))
+              .columns(COLUMNS_TINY)
+              .whenTextChangedFromUi { sync() }
+          }
+          .layout(RowLayout.PARENT_GRID)
+      }
+      .topGap(TopGap.NONE)
   }
 
   private fun createMathContext() =
@@ -143,7 +159,10 @@ abstract class MathContextUnitConverter(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private enum class RoundingMode(val title: String, val javaMathRoundingMode: java.math.RoundingMode) {
+  private enum class RoundingMode(
+    val title: String,
+    val javaMathRoundingMode: java.math.RoundingMode,
+  ) {
 
     DOWN("Down", java.math.RoundingMode.DOWN),
     UP("Up", java.math.RoundingMode.UP),

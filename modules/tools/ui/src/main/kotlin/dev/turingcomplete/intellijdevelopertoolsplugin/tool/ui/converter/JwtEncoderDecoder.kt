@@ -43,9 +43,9 @@ import com.intellij.util.Alarm
 import com.intellij.util.ExceptionUtil
 import com.intellij.util.text.DateFormatUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.decodeBase64String
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.registerDynamicToolTip
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.setValidationResultBorder
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.toPrettyStringWithDefaultObjectMapper
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
@@ -72,7 +72,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEnco
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.ECDSA
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.HMAC
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.RSA
-import io.ktor.util.*
 import org.apache.commons.codec.binary.Base32
 import org.jose4j.jws.AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256
 import org.jose4j.jws.AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384
@@ -91,7 +90,9 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Base64
+import java.util.Objects
+import java.util.StringJoiner
 import javax.swing.Icon
 import javax.swing.JComponent
 
@@ -118,7 +119,11 @@ class JwtEncoderDecoder(
   private val headerEditor by lazy { createHeaderEditor() }
   private val payloadEditor by lazy { createPayloadEditor() }
 
-  private val highlightingAttributes by lazy { EditorColorsManager.getInstance().globalScheme.getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES) }
+  private val highlightingAttributes by lazy {
+    EditorColorsManager.getInstance()
+      .globalScheme
+      .getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES)
+  }
 
   private val jwt = Jwt(configuration, encodedText, headerText, payloadText)
 
@@ -138,153 +143,185 @@ class JwtEncoderDecoder(
 
   override fun Panel.buildUi() {
     row {
-      cell(
-        Splitter(true, 0.2f).apply {
-          firstComponent = createEncodedComponent()
-          secondComponent = createEncodingDecodingComponent()
-        }
-      ).align(Align.FILL).resizableColumn()
-    }.resizableRow()
+        cell(
+            Splitter(true, 0.2f).apply {
+              firstComponent = createEncodedComponent()
+              secondComponent = createEncodingDecodingComponent()
+            }
+          )
+          .align(Align.FILL)
+          .resizableColumn()
+      }
+      .resizableRow()
   }
 
   private fun createEncodedComponent(): JComponent = panel {
     row {
-      cell(encodedEditor.component)
-        .validationOnApply(encodedEditor.bindValidator(jwt.encodedErrorHolder.asValidation()))
-        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
-        .align(Align.FILL)
-        .resizableColumn()
-    }.resizableRow().bottomGap(BottomGap.NONE)
+        cell(encodedEditor.component)
+          .validationOnApply(encodedEditor.bindValidator(jwt.encodedErrorHolder.asValidation()))
+          .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
+          .align(Align.FILL)
+          .resizableColumn()
+      }
+      .resizableRow()
+      .bottomGap(BottomGap.NONE)
     val signatureErrors = jwt.signatureErrorHolder.asComponentPredicate()
     row {
-      text("<icon src='AllIcons.General.InspectionsOK'>&nbsp;Valid signature")
-        .visibleIf(signatureErrors.not())
-        .resizableColumn()
-      text("")
-        .bindText(jwt.signatureErrorHolder.asPropertyForTextCell())
-        .visibleIf(signatureErrors)
-        .resizableColumn()
-    }.topGap(TopGap.NONE)
+        text("<icon src='AllIcons.General.InspectionsOK'>&nbsp;Valid signature")
+          .visibleIf(signatureErrors.not())
+          .resizableColumn()
+        text("")
+          .bindText(jwt.signatureErrorHolder.asPropertyForTextCell())
+          .visibleIf(signatureErrors)
+          .resizableColumn()
+      }
+      .topGap(TopGap.NONE)
   }
 
   @Suppress("UnstableApiUsage")
   private fun createEncodingDecodingComponent(): JComponent = panel {
     row {
-      val liveConversionCheckBox = checkBox("Live conversion")
-        .bindSelected(liveConversion)
-        .gap(RightGap.SMALL)
+      val liveConversionCheckBox =
+        checkBox("Live conversion").bindSelected(liveConversion).gap(RightGap.SMALL)
 
       button("▼ Decode") { convert(ENCODED) }
         .enabledIf(liveConversionCheckBox.selected.not())
         .gap(RightGap.SMALL)
       button("▲ Encode") {
-        // This will set the signature algorithm in the header and will run the encoding.
-        convert(SIGNATURE_CONFIGURATION)
-      }.enabledIf(liveConversionCheckBox.selected.not())
+          // This will set the signature algorithm in the header and will run the encoding.
+          convert(SIGNATURE_CONFIGURATION)
+        }
+        .enabledIf(liveConversionCheckBox.selected.not())
     }
 
     if (context.prioritizeVerticalLayout) {
       row {
-        cell(
-          Splitter(true, 0.5f).apply {
-            firstComponent = createHeaderEditorComponent()
-            secondComponent = createPayloadEditorComponent()
-          }
-        ).align(Align.FILL).resizableColumn()
-      }.resizableRow().bottomGap(BottomGap.NONE)
-    }
-    else {
+          cell(
+              Splitter(true, 0.5f).apply {
+                firstComponent = createHeaderEditorComponent()
+                secondComponent = createPayloadEditorComponent()
+              }
+            )
+            .align(Align.FILL)
+            .resizableColumn()
+        }
+        .resizableRow()
+        .bottomGap(BottomGap.NONE)
+    } else {
       row {
-        cell(
-          Splitter(false, 0.5f).apply {
-            firstComponent = createHeaderEditorComponent()
-            secondComponent = createPayloadEditorComponent()
-          }
-        ).align(Align.FILL).resizableColumn()
-      }.resizableRow().bottomGap(BottomGap.NONE)
+          cell(
+              Splitter(false, 0.5f).apply {
+                firstComponent = createHeaderEditorComponent()
+                secondComponent = createPayloadEditorComponent()
+              }
+            )
+            .align(Align.FILL)
+            .resizableColumn()
+        }
+        .resizableRow()
+        .bottomGap(BottomGap.NONE)
     }
 
     collapsibleGroup("Signature Algorithm Configuration") {
-      lateinit var signatureAlgorithmComboBox: ComboBox<SignatureAlgorithm>
-      row {
-        signatureAlgorithmComboBox = comboBox(SignatureAlgorithm.entries)
-          .label("Algorithm:")
-          .bindItem(jwt.signature.algorithm)
-          .whenItemSelectedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
-          .component
-      }.layout(RowLayout.PARENT_GRID).topGap(TopGap.NONE)
-
-      row {
-        // Bug: The label from `expandableTextField().label(...)` disappears
-        // if the encoding selection gets changed
-        label("Secret key:")
-        expandableTextField()
-          .align(AlignX.FILL)
-          .bindText(jwt.signature.secret)
-          .whenTextChangedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
-          .gap(RightGap.SMALL)
-          .resizableColumn()
-          .registerDynamicToolTip { generalSettings.createSensitiveInputsHandlingToolTipText() }
-
-        val encodingActions = mutableListOf<AnAction>().apply {
-          SecretKeyEncodingMode.entries.forEach { secretKeyEncodingModeValue ->
-            add(SimpleToggleAction(
-              text = secretKeyEncodingModeValue.title,
-              icon = AllIcons.Actions.ToggleSoftWrap,
-              isSelected = { jwt.signature.secretEncodingMode.get() == secretKeyEncodingModeValue },
-              setSelected = { jwt.signature.secretEncodingMode.set(secretKeyEncodingModeValue) }
-            ))
+        lateinit var signatureAlgorithmComboBox: ComboBox<SignatureAlgorithm>
+        row {
+            signatureAlgorithmComboBox =
+              comboBox(SignatureAlgorithm.entries)
+                .label("Algorithm:")
+                .bindItem(jwt.signature.algorithm)
+                .whenItemSelectedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
+                .component
           }
-        }
-        actionButton(
-          UiUtils.actionsPopup(
-            title = "Encoding",
-            icon = AllIcons.General.Settings,
-            actions = encodingActions
+          .layout(RowLayout.PARENT_GRID)
+          .topGap(TopGap.NONE)
+
+        row {
+            // Bug: The label from `expandableTextField().label(...)` disappears
+            // if the encoding selection gets changed
+            label("Secret key:")
+            expandableTextField()
+              .align(AlignX.FILL)
+              .bindText(jwt.signature.secret)
+              .whenTextChangedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
+              .gap(RightGap.SMALL)
+              .resizableColumn()
+              .registerDynamicToolTip { generalSettings.createSensitiveInputsHandlingToolTipText() }
+
+            val encodingActions =
+              mutableListOf<AnAction>().apply {
+                SecretKeyEncodingMode.entries.forEach { secretKeyEncodingModeValue ->
+                  add(
+                    SimpleToggleAction(
+                      text = secretKeyEncodingModeValue.title,
+                      icon = AllIcons.Actions.ToggleSoftWrap,
+                      isSelected = {
+                        jwt.signature.secretEncodingMode.get() == secretKeyEncodingModeValue
+                      },
+                      setSelected = {
+                        jwt.signature.secretEncodingMode.set(secretKeyEncodingModeValue)
+                      },
+                    )
+                  )
+                }
+              }
+            actionButton(
+              UiUtils.actionsPopup(
+                title = "Encoding",
+                icon = AllIcons.General.Settings,
+                actions = encodingActions,
+              )
+            )
+          }
+          .visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.keyFactory == null })
+          .layout(RowLayout.PARENT_GRID)
+
+        row {
+            textArea()
+              .rows(5)
+              .align(Align.FILL)
+              .label(label = "Private key:", position = LabelPosition.TOP)
+              .bindText(jwt.signature.privateKey)
+              .setValidationResultBorder()
+              .whenTextChangedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
+              .validationInfo(jwt.signature.privateKeyErrorHolder.asValidation())
+              .registerDynamicToolTip { generalSettings.createSensitiveInputsHandlingToolTipText() }
+          }
+          .visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.keyFactory != null })
+
+        row {
+          checkBox("Strict key requirements validation")
+            .bindSelected(jwt.signature.strictSigningKeyValidation)
+            .whenStateChangedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
+            .gap(RightGap.SMALL)
+          contextHelp(
+            "The RFC 7518 for the JSON Web Algorithms (JWA) specifies some restrictions that a key or secret should fulfill for the computation of a signature (e.g., a minimum length). This option can be used to enforce these restrictions."
           )
-        )
-      }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.keyFactory == null }).layout(RowLayout.PARENT_GRID)
-
-      row {
-        textArea()
-          .rows(5)
-          .align(Align.FILL)
-          .label(label = "Private key:", position = LabelPosition.TOP)
-          .bindText(jwt.signature.privateKey)
-          .setValidationResultBorder()
-          .whenTextChangedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
-          .validationInfo(jwt.signature.privateKeyErrorHolder.asValidation())
-          .registerDynamicToolTip { generalSettings.createSensitiveInputsHandlingToolTipText() }
-      }.visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.keyFactory != null })
-
-      row {
-        checkBox("Strict key requirements validation")
-          .bindSelected(jwt.signature.strictSigningKeyValidation)
-          .whenStateChangedFromUi { convertFromUi(SIGNATURE_CONFIGURATION) }
-          .gap(RightGap.SMALL)
-        contextHelp("The RFC 7518 for the JSON Web Algorithms (JWA) specifies some restrictions that a key or secret should fulfill for the computation of a signature (e.g., a minimum length). This option can be used to enforce these restrictions.")
+        }
       }
-    }.apply { expanded = false }.topGap(TopGap.NONE)
+      .apply { expanded = false }
+      .topGap(TopGap.NONE)
   }
 
   private fun createPayloadEditorComponent(): JComponent = panel {
     row {
-      cell(payloadEditor.component)
-        .validationOnApply(payloadEditor.bindValidator(jwt.payloadErrorHolder.asValidation()))
-        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
-        .align(Align.FILL)
-        .resizableColumn()
-    }.resizableRow()
+        cell(payloadEditor.component)
+          .validationOnApply(payloadEditor.bindValidator(jwt.payloadErrorHolder.asValidation()))
+          .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
+          .align(Align.FILL)
+          .resizableColumn()
+      }
+      .resizableRow()
   }
 
   private fun createHeaderEditorComponent(): JComponent = panel {
     row {
-      cell(headerEditor.component)
-        .validationOnApply(headerEditor.bindValidator(jwt.headerErrorHolder.asValidation()))
-        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
-        .align(Align.FILL)
-        .resizableColumn()
-    }.resizableRow()
+        cell(headerEditor.component)
+          .validationOnApply(headerEditor.bindValidator(jwt.headerErrorHolder.asValidation()))
+          .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
+          .align(Align.FILL)
+          .resizableColumn()
+      }
+      .resizableRow()
   }
 
   override fun afterBuildUi() {
@@ -346,7 +383,7 @@ class JwtEncoderDecoder(
           TextRange(dotIndex, dotIndex + 1),
           ENCODED_DOT_SEPARATOR_HIGHLIGHTER_LAYER,
           highlightingAttributes,
-          ENCODED_DOT_SEPARATOR_GROUP_ID
+          ENCODED_DOT_SEPARATOR_GROUP_ID,
         )
         dotIndex = encoded.indexOf('.', dotIndex + 1)
         i++
@@ -378,36 +415,42 @@ class JwtEncoderDecoder(
     UNIX_TIMESTAMP_SECONDS_JSON_VALUE_REGEX.findAll(editor.text).forEach {
       val unixTimestampSecondsMatch = it.groups[1]
       if (unixTimestampSecondsMatch != null) {
-        val textRange = TextRange(unixTimestampSecondsMatch.range.first, unixTimestampSecondsMatch.range.last + 1)
+        val textRange =
+          TextRange(unixTimestampSecondsMatch.range.first, unixTimestampSecondsMatch.range.last + 1)
         editor.highlightTextRange(
           textRange,
           UNIX_TIMESTAMP_HIGHLIGHT_LAYER,
           null,
           HEADER_PAYLOAD_HIGHLIGHT_GROUP_ID,
-          ClaimFeatureUnixTimestampGutterIconRenderer(textRange, unixTimestampSecondsMatch.value.toLong())
+          ClaimFeatureUnixTimestampGutterIconRenderer(
+            textRange,
+            unixTimestampSecondsMatch.value.toLong(),
+          ),
         )
       }
     }
 
-    CLAIM_REGEX.findAll(editor.text).mapNotNull {
-      val claimMatch = it.groups[1]
-      if (claimMatch != null) {
-        val standardClaim = StandardClaim.findByFieldName(claimMatch.value)
-        if (standardClaim != null) {
-          return@mapNotNull claimMatch.range to standardClaim
+    CLAIM_REGEX.findAll(editor.text)
+      .mapNotNull {
+        val claimMatch = it.groups[1]
+        if (claimMatch != null) {
+          val standardClaim = StandardClaim.findByFieldName(claimMatch.value)
+          if (standardClaim != null) {
+            return@mapNotNull claimMatch.range to standardClaim
+          }
         }
+        null
       }
-      null
-    }.forEach { (claimRange, standardClaim) ->
-      val textRange = TextRange(claimRange.first, claimRange.last + 1)
-      editor.highlightTextRange(
-        textRange,
-        CLAIM_REGEX_MATCH_HIGHLIGHT_LAYER,
-        null,
-        HEADER_PAYLOAD_HIGHLIGHT_GROUP_ID,
-        StandardClaimGutterIconRenderer(textRange, standardClaim)
-      )
-    }
+      .forEach { (claimRange, standardClaim) ->
+        val textRange = TextRange(claimRange.first, claimRange.last + 1)
+        editor.highlightTextRange(
+          textRange,
+          CLAIM_REGEX_MATCH_HIGHLIGHT_LAYER,
+          null,
+          HEADER_PAYLOAD_HIGHLIGHT_GROUP_ID,
+          StandardClaimGutterIconRenderer(textRange, standardClaim),
+        )
+      }
   }
 
   private fun createEncodedEditor(): AdvancedEditor =
@@ -416,8 +459,10 @@ class JwtEncoderDecoder(
       changeOrigin = ENCODED,
       title = "Encoded",
       language = PlainTextLanguage.INSTANCE,
-      textProperty = encodedText
-    ) { highlightDotSeparator() }
+      textProperty = encodedText,
+    ) {
+      highlightDotSeparator()
+    }
 
   private fun createHeaderEditor(): AdvancedEditor =
     createEditor(
@@ -425,8 +470,10 @@ class JwtEncoderDecoder(
       changeOrigin = HEADER_OR_PAYLOAD,
       title = "Header",
       language = JsonLanguage.INSTANCE,
-      textProperty = headerText
-    ) { highlightHeaderClaims() }
+      textProperty = headerText,
+    ) {
+      highlightHeaderClaims()
+    }
 
   private fun createPayloadEditor(): AdvancedEditor =
     createEditor(
@@ -434,8 +481,10 @@ class JwtEncoderDecoder(
       changeOrigin = HEADER_OR_PAYLOAD,
       title = "Payload",
       language = JsonLanguage.INSTANCE,
-      textProperty = payloadText
-    ) { highlightPayloadClaims() }
+      textProperty = payloadText,
+    ) {
+      highlightPayloadClaims()
+    }
 
   private fun createEditor(
     id: String,
@@ -443,27 +492,27 @@ class JwtEncoderDecoder(
     title: String,
     language: Language,
     textProperty: ValueProperty<String>,
-    onTextChangeFromUi: (() -> Unit)? = null
-  ) = AdvancedEditor(
-    id = id,
-    context = context,
-    configuration = configuration,
-    project = project,
-    title = title,
-    editorMode = EditorMode.INPUT_OUTPUT,
-    parentDisposable = parentDisposable,
-    textProperty = textProperty,
-    initialLanguage = language
-  ).apply {
-    onFocusGained {
-      lastActiveInput = this
-    }
-    this.onTextChangeFromUi { _ ->
-      lastActiveInput = this
-      convertFromUi(changeOrigin)
-      onTextChangeFromUi?.invoke()
-    }
-  }
+    onTextChangeFromUi: (() -> Unit)? = null,
+  ) =
+    AdvancedEditor(
+        id = id,
+        context = context,
+        configuration = configuration,
+        project = project,
+        title = title,
+        editorMode = EditorMode.INPUT_OUTPUT,
+        parentDisposable = parentDisposable,
+        textProperty = textProperty,
+        initialLanguage = language,
+      )
+      .apply {
+        onFocusGained { lastActiveInput = this }
+        this.onTextChangeFromUi { _ ->
+          lastActiveInput = this
+          convertFromUi(changeOrigin)
+          onTextChangeFromUi?.invoke()
+        }
+      }
 
   private fun handleLiveConversionSwitch() {
     if (liveConversion.get()) {
@@ -471,7 +520,8 @@ class JwtEncoderDecoder(
       // will now be encoded/decoded once during the switch to live mode.
       when (lastActiveInput) {
         encodedEditor -> convert(ENCODED)
-        headerEditor, payloadEditor -> {
+        headerEditor,
+        payloadEditor -> {
           // This will set the signature algorithm in the header and will run the encoding.
           convert(SIGNATURE_CONFIGURATION)
         }
@@ -485,7 +535,7 @@ class JwtEncoderDecoder(
 
   private class StandardClaimGutterIconRenderer(
     private val textRange: TextRange,
-    private val standardClaim: StandardClaim
+    private val standardClaim: StandardClaim,
   ) : GutterIconRenderer(), DumbAware {
 
     override fun getTooltipText(): String = standardClaim.toString()
@@ -495,8 +545,7 @@ class JwtEncoderDecoder(
     override fun equals(other: Any?): Boolean {
       return if (other != null && other is StandardClaimGutterIconRenderer) {
         other.textRange == textRange && other.standardClaim == standardClaim
-      }
-      else {
+      } else {
         false
       }
     }
@@ -510,7 +559,7 @@ class JwtEncoderDecoder(
 
   private class ClaimFeatureUnixTimestampGutterIconRenderer(
     private val textRange: TextRange,
-    private val unixTimestampSeconds: Long
+    private val unixTimestampSeconds: Long,
   ) : GutterIconRenderer(), DumbAware {
 
     override fun getTooltipText(): String {
@@ -522,7 +571,11 @@ class JwtEncoderDecoder(
           .format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
       )
 
-      val diff = DateFormatUtil.formatBetweenDates(unixTimestampSeconds.times(1000), System.currentTimeMillis())
+      val diff =
+        DateFormatUtil.formatBetweenDates(
+          unixTimestampSeconds.times(1000),
+          System.currentTimeMillis(),
+        )
       tooltipText.add("${diff.capitalize()}.")
 
       return tooltipText.toString()
@@ -533,8 +586,7 @@ class JwtEncoderDecoder(
     override fun equals(other: Any?): Boolean {
       return if (other != null && other is ClaimFeatureUnixTimestampGutterIconRenderer) {
         other.textRange == textRange && other.unixTimestampSeconds == unixTimestampSeconds
-      }
-      else {
+      } else {
         false
       }
     }
@@ -546,7 +598,11 @@ class JwtEncoderDecoder(
     companion object {
 
       private val clockGutterIcon =
-        IconManager.getInstance().getIcon("dev/turingcomplete/intellijdevelopertoolsplugin/icons/clock_gutter.svg", JwtEncoderDecoder::class.java.classLoader)
+        IconManager.getInstance()
+          .getIcon(
+            "dev/turingcomplete/intellijdevelopertoolsplugin/icons/clock_gutter.svg",
+            JwtEncoderDecoder::class.java.classLoader,
+          )
     }
   }
 
@@ -556,18 +612,16 @@ class JwtEncoderDecoder(
 
     ENCODED,
     HEADER_OR_PAYLOAD,
-    SIGNATURE_CONFIGURATION
+    SIGNATURE_CONFIGURATION,
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private enum class SignatureAlgorithmKind(
-    val keyFactory: KeyFactory?
-  ) {
+  private enum class SignatureAlgorithmKind(val keyFactory: KeyFactory?) {
 
     HMAC(null),
     RSA(KeyFactory.getInstance("RSA")),
-    ECDSA(KeyFactory.getInstance("EC"))
+    ECDSA(KeyFactory.getInstance("EC")),
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -576,7 +630,7 @@ class JwtEncoderDecoder(
     val jwtHeaderValue: String,
     val kind: SignatureAlgorithmKind,
     @Suppress("unused") // May be used for JWK validation
-    val algorithmIdentifiers: String
+    val algorithmIdentifiers: String,
   ) {
 
     HMAC256("HS256", HMAC, HMAC_SHA256),
@@ -588,7 +642,6 @@ class JwtEncoderDecoder(
     ECDSA256("ES256", ECDSA, ECDSA_USING_P256_CURVE_AND_SHA256),
     ECDSA384("ES384", ECDSA, ECDSA_USING_P384_CURVE_AND_SHA384),
     ECDSA512("ES512", ECDSA, ECDSA_USING_P521_CURVE_AND_SHA512);
-
 
     override fun toString(): String = "$name ($jwtHeaderValue)"
 
@@ -605,13 +658,14 @@ class JwtEncoderDecoder(
     configuration: DeveloperToolConfiguration,
     val encoded: ValueProperty<String>,
     val header: ValueProperty<String>,
-    val payload: ValueProperty<String>
+    val payload: ValueProperty<String>,
   ) {
 
     val encodedErrorHolder = ErrorHolder()
     val headerErrorHolder = ErrorHolder()
     val payloadErrorHolder = ErrorHolder()
-    val signatureErrorHolder = ErrorHolder(addErrorIconToMessage = true, surroundMessageWithHtml = false)
+    val signatureErrorHolder =
+      ErrorHolder(addErrorIconToMessage = true, surroundMessageWithHtml = false)
 
     val signature = Signature(configuration, signatureErrorHolder)
 
@@ -623,24 +677,28 @@ class JwtEncoderDecoder(
 
       // Header
       if (numOfJwtParts >= 1) {
-        val handleError: (Exception) -> Unit = { error -> header.set(jwtParts[0]); headerErrorHolder.add(error) }
+        val handleError: (Exception) -> Unit = { error ->
+          header.set(jwtParts[0])
+          headerErrorHolder.add(error)
+        }
         parseAsJson(jwtParts[0].decodeBase64String(), handleError) {
           parseHeader(it)
           header.set(ObjectMapperService.instance.prettyPrintJson(it))
         }
-      }
-      else {
+      } else {
         header.set("")
       }
 
       // Payload
       if (numOfJwtParts >= 2) {
-        val handleError: (Exception) -> Unit = { error -> payload.set(jwtParts[1]); payloadErrorHolder.add(error) }
+        val handleError: (Exception) -> Unit = { error ->
+          payload.set(jwtParts[1])
+          payloadErrorHolder.add(error)
+        }
         parseAsJson(jwtParts[1].decodeBase64String(), handleError) {
           payload.set(ObjectMapperService.instance.prettyPrintJson(it))
         }
-      }
-      else {
+      } else {
         payload.set("")
       }
 
@@ -649,11 +707,12 @@ class JwtEncoderDecoder(
         signature.compute(jwtParts[0], jwtParts[1])?.let { expectedSignature ->
           val actualSignature = jwtParts[2]
           if (expectedSignature != actualSignature) {
-            signatureErrorHolder.add("Invalid signature. Check the configuration in the 'Signature Algorithm Configuration' section.")
+            signatureErrorHolder.add(
+              "Invalid signature. Check the configuration in the 'Signature Algorithm Configuration' section."
+            )
           }
         }
-      }
-      else {
+      } else {
         signatureErrorHolder.add("Encoded JWT does not have a signature part")
       }
     }
@@ -663,35 +722,43 @@ class JwtEncoderDecoder(
 
       val jsonMapper = ObjectMapperService.instance.jsonMapper()
 
-      val headerJson = try {
-        val headerJson = jsonMapper.readTree(header.get())
-        parseHeader(headerJson)
-        headerJson
-      } catch (e: Exception) {
-        headerErrorHolder.add(e)
-        null
-      }
+      val headerJson =
+        try {
+          val headerJson = jsonMapper.readTree(header.get())
+          parseHeader(headerJson)
+          headerJson
+        } catch (e: Exception) {
+          headerErrorHolder.add(e)
+          null
+        }
 
-      val payloadJson = try {
-        jsonMapper.readTree(payload.get())
-      } catch (e: Exception) {
-        payloadErrorHolder.add(e)
-        null
-      }
+      val payloadJson =
+        try {
+          jsonMapper.readTree(payload.get())
+        } catch (e: Exception) {
+          payloadErrorHolder.add(e)
+          null
+        }
 
       if (headerErrorHolder.isSet() || payloadErrorHolder.isSet()) {
         encoded.set("")
         signatureErrorHolder.add("Unable to compute signature due to header or payload errors")
-      }
-      else {
-        val encodedHeader = urlEncoder.encode(jsonMapper.writeValueAsString(headerJson!!).encodeToByteArray()).decodeToString()
-        val encodedPayload = urlEncoder.encode(jsonMapper.writeValueAsString(payloadJson!!).encodeToByteArray()).decodeToString()
+      } else {
+        val encodedHeader =
+          urlEncoder
+            .encode(jsonMapper.writeValueAsString(headerJson!!).encodeToByteArray())
+            .decodeToString()
+        val encodedPayload =
+          urlEncoder
+            .encode(jsonMapper.writeValueAsString(payloadJson!!).encodeToByteArray())
+            .decodeToString()
         val encodedSignature = signature.compute(encodedHeader, encodedPayload)
         if (encodedSignature == null) {
           encoded.set("")
-          signatureErrorHolder.addIfEmpty("Unable to compute signature due signature configuration errors")
-        }
-        else {
+          signatureErrorHolder.addIfEmpty(
+            "Unable to compute signature due signature configuration errors"
+          )
+        } else {
           encoded.set("${encodedHeader}.${encodedPayload}.$encodedSignature")
         }
       }
@@ -701,7 +768,7 @@ class JwtEncoderDecoder(
       parseAsJson(header.get(), { headerErrorHolder.add(it) }) { headerNode ->
         if (headerNode is ObjectNode) {
           headerNode.put("alg", signature.algorithm.get().jwtHeaderValue)
-          header.set(headerNode.toPrettyStringWithDefaultObjectMapper())
+          header.set(ObjectMapperService.instance.prettyPrintJson(headerNode))
         }
       }
     }
@@ -719,17 +786,19 @@ class JwtEncoderDecoder(
         val algorithm = SignatureAlgorithm.findByJwtHeaderValue(algFieldValue)
         if (algorithm != null) {
           signature.algorithm.set(algorithm)
-        }
-        else {
+        } else {
           headerErrorHolder.add("Unsupported algorithm: '$algFieldValue'")
         }
-      }
-      else {
+      } else {
         headerErrorHolder.add("Missing algorithm header field: 'alg'")
       }
     }
 
-    private fun parseAsJson(text: String, handleError: (Exception) -> Unit, handleResult: (JsonNode) -> Unit) {
+    private fun parseAsJson(
+      text: String,
+      handleError: (Exception) -> Unit,
+      handleResult: (JsonNode) -> Unit,
+    ) {
       try {
         val jsonNode = ObjectMapperService.instance.jsonMapper().readTree(text)
         handleResult(jsonNode)
@@ -743,15 +812,17 @@ class JwtEncoderDecoder(
 
   private class Signature(
     configuration: DeveloperToolConfiguration,
-    private val signatureErrorHolder: ErrorHolder
+    private val signatureErrorHolder: ErrorHolder,
   ) {
 
     val algorithm = configuration.register("algorithm", DEFAULT_SIGNATURE_ALGORITHM)
-    val strictSigningKeyValidation = configuration.register("signingKeyValidation", SIGNING_KEY_VALIDATION_DEFAULT, CONFIGURATION)
+    val strictSigningKeyValidation =
+      configuration.register("signingKeyValidation", SIGNING_KEY_VALIDATION_DEFAULT, CONFIGURATION)
     val secret = configuration.register("secret", "", SENSITIVE, EXAMPLE_SECRET)
-    val privateKey = configuration.registerWithExampleProvider("privateKey", "", SENSITIVE) {
-      if (algorithm.get().kind == RSA) EXAMPLE_RSA_PRIVATE_KEY else EXAMPLE_EC_PRIVATE_KEY
-    }
+    val privateKey =
+      configuration.registerWithExampleProvider("privateKey", "", SENSITIVE) {
+        if (algorithm.get().kind == RSA) EXAMPLE_RSA_PRIVATE_KEY else EXAMPLE_EC_PRIVATE_KEY
+      }
     val secretEncodingMode = configuration.register("secretKeyEncodingMode", RAW, CONFIGURATION)
 
     val privateKeyErrorHolder = ErrorHolder()
@@ -770,14 +841,16 @@ class JwtEncoderDecoder(
 
       return try {
         val signingKey = createSigningKey() ?: return null
-        ExtendedJsonWebSignature().apply {
-          // The algorithm gets derivative from the header property `alg`
-          setEncodedHeader(encodedHeader)
-          setEncodedPayload(encodedPayload)
-          setKey(signingKey)
-          isDoKeyValidation = strictSigningKeyValidation.get()
-          sign()
-        }.encodedSignature
+        ExtendedJsonWebSignature()
+          .apply {
+            // The algorithm gets derivative from the header property `alg`
+            setEncodedHeader(encodedHeader)
+            setEncodedPayload(encodedPayload)
+            setKey(signingKey)
+            isDoKeyValidation = strictSigningKeyValidation.get()
+            sign()
+          }
+          .encodedSignature
       } catch (e: Exception) {
         signatureErrorHolder.add("Failed to compute signature:", ExceptionUtil.getRootCause(e))
         null
@@ -787,31 +860,33 @@ class JwtEncoderDecoder(
     private fun createSigningKey(): Key? {
       val signatureAlgorithm = algorithm.get()
       return when (signatureAlgorithm.kind) {
-        HMAC -> HmacKey(
-          when (secretEncodingMode.get()) {
-            RAW -> secret.get().encodeToByteArray()
-            BASE32 -> Base32().decode(secret.get())
-            BASE64 -> Base64.getDecoder().decode(secret.get())
-          }
-        )
+        HMAC ->
+          HmacKey(
+            when (secretEncodingMode.get()) {
+              RAW -> secret.get().encodeToByteArray()
+              BASE32 -> Base32().decode(secret.get())
+              BASE64 -> Base64.getDecoder().decode(secret.get())
+            }
+          )
 
-        RSA, ECDSA -> readPrivateKey(signatureAlgorithm.kind.keyFactory!!) ?: return null
+        RSA,
+        ECDSA -> readPrivateKey(signatureAlgorithm.kind.keyFactory!!) ?: return null
       }
     }
 
-    private fun readPrivateKey(keyFactory: KeyFactory) = try {
-      val privateKeyValue = privateKey.get()
-      if (privateKeyValue.isBlank()) {
-        privateKeyErrorHolder.add("A private key must be provided")
+    private fun readPrivateKey(keyFactory: KeyFactory) =
+      try {
+        val privateKeyValue = privateKey.get()
+        if (privateKeyValue.isBlank()) {
+          privateKeyErrorHolder.add("A private key must be provided")
+          null
+        } else {
+          keyFactory.generatePrivate(PKCS8EncodedKeySpec(toRawKey(privateKey.get())))
+        }
+      } catch (e: Exception) {
+        privateKeyErrorHolder.add(e)
         null
       }
-      else {
-        keyFactory.generatePrivate(PKCS8EncodedKeySpec(toRawKey(privateKey.get())))
-      }
-    } catch (e: Exception) {
-      privateKeyErrorHolder.add(e)
-      null
-    }
 
     private fun toRawKey(keyInput: String): ByteArray =
       Base64.getDecoder().decode(keyInput.replace(RAW_KEY_REGEX, ""))
@@ -851,14 +926,18 @@ class JwtEncoderDecoder(
   private enum class StandardClaim(
     val fieldName: String,
     val title: String,
-    val description: String
+    val description: String,
   ) {
 
     ISSUER("iss", "Issuer", "The issuer of the JWT."),
     SUBJECT("sub", "Subject", "The subject of the JWT (e.g., the user)."),
     AUDIENCE("aud", "Audience", "The recipient for which the JWT is intended."),
     EXPIRATION_TIME("exp", "Expiration Time", "The time after which the JWT expires."),
-    NOT_BEFORE_TIME("nbf", "Not Before Time", "The time before which the JWT must not be accepted for processing."),
+    NOT_BEFORE_TIME(
+      "nbf",
+      "Not Before Time",
+      "The time before which the JWT must not be accepted for processing.",
+    ),
     ISSUED_AT_TIME("iat", "Issued at Time", "The time at which the JWT was issued."),
     JWT_ID("jti", "JWT ID", "An Unique identifier of this JWT."),
     ALG("alg", "Algorithm", "The algorithm to calculate the signature of this JWT."),
@@ -873,7 +952,8 @@ class JwtEncoderDecoder(
 
     companion object {
 
-      fun findByFieldName(fieldName: String): StandardClaim? = entries.firstOrNull { it.fieldName == fieldName }
+      fun findByFieldName(fieldName: String): StandardClaim? =
+        entries.firstOrNull { it.fieldName == fieldName }
     }
   }
 
@@ -881,21 +961,22 @@ class JwtEncoderDecoder(
 
   class Factory : DeveloperUiToolFactory<JwtEncoderDecoder> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "JSON Web Token (JWT)",
-      contentTitle = "JSON Web Token (JWT) Decoder/Encoder"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(
+        menuTitle = "JSON Web Token (JWT)",
+        contentTitle = "JSON Web Token (JWT) Decoder/Encoder",
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> JwtEncoderDecoder) =
-      { configuration -> JwtEncoderDecoder(context, configuration, parentDisposable, project) }
+      context: DeveloperUiToolContext,
+    ): ((DeveloperToolConfiguration) -> JwtEncoderDecoder) = { configuration ->
+      JwtEncoderDecoder(context, configuration, parentDisposable, project)
+    }
   }
 
   // -- Inner Type ---------------------------------------------------------- //
-
 
   // -- Inner Type ---------------------------------------------------------- //
 
@@ -912,7 +993,7 @@ class JwtEncoderDecoder(
 
     RAW("Raw"),
     BASE32("Base32 Encoded"),
-    BASE64("Base64 Encoded")
+    BASE64("Base64 Encoded"),
   }
 
   // -- Companion Object ---------------------------------------------------- //
@@ -921,7 +1002,8 @@ class JwtEncoderDecoder(
 
     private val urlEncoder = Base64.getUrlEncoder().withoutPadding()
 
-    private val UNIX_TIMESTAMP_SECONDS_JSON_VALUE_REGEX = Regex(":\\s*(?<unixTimestampSeconds>\\b\\d{1,10}\\b)")
+    private val UNIX_TIMESTAMP_SECONDS_JSON_VALUE_REGEX =
+      Regex(":\\s*(?<unixTimestampSeconds>\\b\\d{1,10}\\b)")
     private val CLAIM_REGEX = Regex("\\s?\"(?<name>[a-zA-Z]+)\":")
     private const val UNIX_TIMESTAMP_HIGHLIGHT_LAYER = HighlighterLayer.SELECTION - 1
     private const val CLAIM_REGEX_MATCH_HIGHLIGHT_LAYER = UNIX_TIMESTAMP_HIGHLIGHT_LAYER - 1
@@ -936,24 +1018,29 @@ class JwtEncoderDecoder(
     private const val EXAMPLE_ENCODED =
       "ewogICJ0eXAiOiJKV1QiLAogICJhbGciOiJIUzI1NiIKfQ.ewogICJqdGkiOiI5NjQ5MmQ1OS0wYWQ1LTRjMDAtODkyZC01OTBhZDVhYzAwZjMiLAogICJzdWIiOiIwMTIzNDU2Nzg5IiwKICAibmFtZSI6IkpvaG4gRG9lIiwKICAiaWF0IjoxNjgxMDQwNTE1Cn0.IqeNl3lHSUfPfEYmttvlQp1sH9LpAoPJlUiSv4XPDSE"
     private const val EXAMPLE_SECRET = "s3cre!"
-    private val EXAMPLE_HEADER = """
+    private val EXAMPLE_HEADER =
+      """
           {
             "typ":"JWT",
             "alg":"HS256"
           }
-          """.trimIndent()
-    private val EXAMPLE_PAYLOAD = """
+          """
+        .trimIndent()
+    private val EXAMPLE_PAYLOAD =
+      """
           {
             "jti":"96492d59-0ad5-4c00-892d-590ad5ac00f3",
             "sub":"0123456789",
             "name":"John Doe",
             "iat":1681040515
           }
-          """.trimIndent()
+          """
+        .trimIndent()
 
     private const val SIGNING_KEY_VALIDATION_DEFAULT = false
 
-    private val EXAMPLE_RSA_PRIVATE_KEY = """
+    private val EXAMPLE_RSA_PRIVATE_KEY =
+      """
 -----BEGIN RSA PRIVATE KEY-----
 MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDdadLFj3DqaYtpZ1ik6ejpIIAU
 2KhFqygTvR6SSS9RmcFQu/vojHWzQUhm8aqrGYVkDXCHvEcyBPcZUlWBczcDwQ5YF8VktRpMxfAI
@@ -978,12 +1065,15 @@ pBOjAoGAcw2M22BK3NWOHhJ8EC4p6aUIR96lNcCWE/ij+MWCcRdotLDSDuT1q13C+UTxDZ5PsmDs
 N/bhCDRZYZoLYo0/h6v4zKBDaX05nVUTCYux0Fo2HGrj5S0bjmgyRcr8+enA3CTzCHZPWZ7ZeADb
 0Mbtt/Q4JyOCgwORgXJVQBHxxIQ=
 -----END RSA PRIVATE KEY-----
-    """.trimIndent()
-    private val EXAMPLE_EC_PRIVATE_KEY = """
+    """
+        .trimIndent()
+    private val EXAMPLE_EC_PRIVATE_KEY =
+      """
 -----BEGIN EC PRIVATE KEY-----
 MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCDQ+B6qEzr/M2sql4X+09X9YlYt8BKA
 HX8Q7/6s4KC3qQ==
 -----END RSA PRIVATE KEY-----
-    """.trimIndent()
+    """
+        .trimIndent()
   }
 }

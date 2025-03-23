@@ -15,20 +15,23 @@ class OpenDeveloperToolService(val project: Project) {
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
-  fun <T : OpenDeveloperToolContext> openTool(context: T, reference: OpenDeveloperToolReference<T>) {
+  fun <T : OpenDeveloperToolContext> openTool(
+    context: T,
+    reference: OpenDeveloperToolReference<T>,
+  ) {
     if (showToolWindow()) {
       project.service<MainToolWindowService>().openTool(context, reference)
-    }
-    else {
-      ApplicationManager.getApplication().service<MainDialogService>().openTool(project, context, reference)
+    } else {
+      ApplicationManager.getApplication()
+        .service<MainDialogService>()
+        .openTool(project, context, reference)
     }
   }
 
   fun showTool(id: String) {
     if (showToolWindow()) {
       project.service<MainToolWindowService>().showTool(id)
-    }
-    else {
+    } else {
       ApplicationManager.getApplication().service<MainDialogService>().showTool(project, id)
     }
   }
@@ -38,9 +41,9 @@ class OpenDeveloperToolService(val project: Project) {
   private fun showToolWindow(): Boolean =
     if (DeveloperToolsApplicationSettings.generalSettings.autoDetectActionHandlingInstance.get()) {
       !DeveloperToolsApplicationSettings.generalSettings.addOpenMainDialogActionToMainToolbar.get()
-    }
-    else {
-      DeveloperToolsApplicationSettings.generalSettings.selectedActionHandlingInstance.get() == TOOL_WINDOW
+    } else {
+      DeveloperToolsApplicationSettings.generalSettings.selectedActionHandlingInstance.get() ==
+        TOOL_WINDOW
     }
 
   // -- Inner Type ---------------------------------------------------------- //

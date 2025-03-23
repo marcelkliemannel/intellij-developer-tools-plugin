@@ -19,24 +19,23 @@ open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false
   private val encoderActionGroup by lazy {
     createActionGroup(
       title = "Encode To",
-      actions = EncodersDecoders.commonEncoders.map { encoder ->
-        EncoderAction(encoder) { getSourceText(it) }
-      }
+      actions =
+        EncodersDecoders.commonEncoders.map { encoder ->
+          EncoderAction(encoder) { getSourceText(it) }
+        },
     )
   }
   private val decoderActionGroup by lazy {
     createActionGroup(
       title = "Decode From",
-      actions = EncodersDecoders.commonDecoders.map { decoder ->
-        DecoderAction(decoder) { getSourceText(it) }
-      }
+      actions =
+        EncodersDecoders.commonDecoders.map { decoder ->
+          DecoderAction(decoder) { getSourceText(it) }
+        },
     )
   }
   private val encoderDecoderActions: Array<AnAction> by lazy {
-    arrayOf(
-      encoderActionGroup,
-      decoderActionGroup
-    )
+    arrayOf(encoderActionGroup, decoderActionGroup)
   }
 
   // -- Initialization ------------------------------------------------------ //
@@ -44,7 +43,8 @@ open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false
 
   final override fun update(e: AnActionEvent) {
     val editor = e.getData(EDITOR)
-    e.presentation.isVisible = editor != null && editor.document.isWritable && getSourceText(e) != null
+    e.presentation.isVisible =
+      editor != null && editor.document.isWritable && getSourceText(e) != null
   }
 
   final override fun getChildren(e: AnActionEvent?): Array<AnAction> = encoderDecoderActions
@@ -58,18 +58,19 @@ open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun createActionGroup(title: String, actions: List<AnAction>) = object : DefaultActionGroup(title, true) {
+  private fun createActionGroup(title: String, actions: List<AnAction>) =
+    object : DefaultActionGroup(title, true) {
 
-    private val decoderActions: Array<AnAction> = actions.toTypedArray()
+      private val decoderActions: Array<AnAction> = actions.toTypedArray()
 
-    override fun getChildren(e: AnActionEvent?): Array<AnAction> = decoderActions
-  }
+      override fun getChildren(e: AnActionEvent?): Array<AnAction> = decoderActions
+    }
 
   // -- Inner Type ---------------------------------------------------------- //
 
   private class EncoderAction(
     val encoder: Encoder,
-    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?
+    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?,
   ) : DumbAwareAction(encoder.title, encoder.actionName, null) {
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -83,7 +84,7 @@ open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false
 
   private class DecoderAction(
     val decoder: EncodersDecoders.Decoder,
-    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?
+    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?,
   ) : DumbAwareAction(decoder.title, decoder.actionName, null) {
 
     override fun actionPerformed(e: AnActionEvent) {

@@ -26,31 +26,28 @@ class MainDialogService {
         val mainDialog = MainDialog(project)
         this.dialog.set(mainDialog)
         mainDialog.show()
-      }
-      else {
+      } else {
         currentDialog.toFront()
       }
     }
   }
 
   fun closeDialog() {
-    dialogLock.write {
-      dialog.set(null)
-    }
+    dialogLock.write { dialog.set(null) }
   }
 
-  fun <T : OpenDeveloperToolContext> openTool(project: Project?, context: T, reference: OpenDeveloperToolReference<T>) {
+  fun <T : OpenDeveloperToolContext> openTool(
+    project: Project?,
+    context: T,
+    reference: OpenDeveloperToolReference<T>,
+  ) {
     openDialog(project)
-    dialogLock.read {
-      dialog.get()?.contentPanelHandler?.openTool(context, reference)
-    }
+    dialogLock.read { dialog.get()?.contentPanelHandler?.openTool(context, reference) }
   }
 
   fun showTool(project: Project?, id: String) {
     openDialog(project)
-    dialogLock.read {
-      dialog.get()?.contentPanelHandler?.showTool(id)
-    }
+    dialogLock.read { dialog.get()?.contentPanelHandler?.showTool(id) }
   }
 
   // -- Private Methods ----------------------------------------------------- //

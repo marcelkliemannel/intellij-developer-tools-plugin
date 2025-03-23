@@ -42,14 +42,15 @@ class AsciiArtCreator(
   private val configuration: DeveloperToolConfiguration,
   private val project: Project?,
   parentDisposable: Disposable,
-  private val context: DeveloperUiToolContext
+  private val context: DeveloperUiToolContext,
 ) : DeveloperUiTool(parentDisposable = parentDisposable), DataProvider {
   // -- Properties ---------------------------------------------------------- //
 
   private val log = logger<AsciiArtCreator>()
 
   private val textInput = configuration.register("textInput", "", INPUT, "Awesome")
-  private val selectedFontFileName = configuration.register("selectedFontFileName", DEFAULT_BUILT_IN_FILE_NAME, CONFIGURATION)
+  private val selectedFontFileName =
+    configuration.register("selectedFontFileName", DEFAULT_BUILT_IN_FILE_NAME, CONFIGURATION)
 
   private val asciiArtOutputErrorHolder = ErrorHolder()
   private val asciiArtOutput = ValueProperty("")
@@ -82,32 +83,44 @@ class AsciiArtCreator(
         .whenItemSelectedFromUi { createAsciiArt() }
         .gap(RightGap.SMALL)
         .applyToComponent { prototypeDisplayValue = "x".repeat(30) }
-      hyperLink(UiToolsBundle.message("ascii-art.examples"), "https://github.com/xero/figlet-fonts/blob/master/Examples.md")
+      hyperLink(
+        UiToolsBundle.message("ascii-art.examples"),
+        "https://github.com/xero/figlet-fonts/blob/master/Examples.md",
+      )
     }
 
     row {
-      val editor = AdvancedEditor(
-        id = "asciiArtOutput",
-        context = context,
-        configuration = configuration,
-        project = project,
-        title = UiToolsBundle.message("ascii-art.output-title"),
-        editorMode = AdvancedEditor.EditorMode.OUTPUT,
-        parentDisposable = parentDisposable,
-        textProperty = asciiArtOutput,
-        fixedEditorSoftWraps = false
-      ).onTextChangeFromUi { createAsciiArt() }
-      cell(editor.component)
-        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
-        .validationOnApply(editor.bindValidator(asciiArtOutputErrorHolder.asValidation()))
-        .resizableColumn().align(Align.FILL)
-    }.resizableRow().topGap(TopGap.MEDIUM).bottomGap(BottomGap.MEDIUM)
+        val editor =
+          AdvancedEditor(
+              id = "asciiArtOutput",
+              context = context,
+              configuration = configuration,
+              project = project,
+              title = UiToolsBundle.message("ascii-art.output-title"),
+              editorMode = AdvancedEditor.EditorMode.OUTPUT,
+              parentDisposable = parentDisposable,
+              textProperty = asciiArtOutput,
+              fixedEditorSoftWraps = false,
+            )
+            .onTextChangeFromUi { createAsciiArt() }
+        cell(editor.component)
+          .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
+          .validationOnApply(editor.bindValidator(asciiArtOutputErrorHolder.asValidation()))
+          .resizableColumn()
+          .align(Align.FILL)
+      }
+      .resizableRow()
+      .topGap(TopGap.MEDIUM)
+      .bottomGap(BottomGap.MEDIUM)
 
     row {
       lateinit var downloadFontsButton: JButton
-      downloadFontsButton = button(UiToolsBundle.message("ascii-art.download-additional-ascii-art-fonts")) {
-        downloadAdditionalAsciiArtFonts(downloadFontsButton)
-      }.gap(RightGap.SMALL).component
+      downloadFontsButton =
+        button(UiToolsBundle.message("ascii-art.download-additional-ascii-art-fonts")) {
+            downloadAdditionalAsciiArtFonts(downloadFontsButton)
+          }
+          .gap(RightGap.SMALL)
+          .component
       contextHelp(UiToolsBundle.message("ascii-art.download-additional-ascii-art-fonts-help"))
     }
   }
@@ -125,40 +138,44 @@ class AsciiArtCreator(
       } catch (e: Exception) {
         log.warn("Failed to clear ASCII art fonts download directory: $downloadedFontsPath", e)
       }
-      ApplicationManager.getApplication().invokeLater {
-        syncFonts()
-      }
+      ApplicationManager.getApplication().invokeLater { syncFonts() }
 
       GitHubUtils.downloadFiles(
-        project = project!!,
-        repositoryUrl = "https://github.com/xero/figlet-fonts",
-        destinationPath = downloadedFontsPath,
-        preDownloadFilter = { fileName -> fileName.endsWith(".flf") },
-        afterDownloadFilter = { file ->
-          try {
-            createAsciiArt(Files.newInputStream(file), UiToolsBundle.message("ascii-art.example"))
-            true
-          } catch (e: Exception) {
-            log.warn("Failed to render example ASCII art using font file: $file. Font file will be ignored.", e)
-            false
-          }
-        },
-        onStart = { downloadFontsButton.isEnabled = false },
-        onSuccess = { },
-        onThrowable = {
-          ApplicationManager.getApplication().invokeLater {
-            Messages.showErrorDialog(
-              project,
-              UiToolsBundle.message("ascii-art.download-additional-ascii-art-fonts-failed-details"),
-              UiToolsBundle.message("ascii-art.download-additional-ascii-art-fonts-failed-title"),
-            )
-          }
-        },
-        onFinished = {
-          syncFonts()
-          downloadFontsButton.isEnabled = true
-        }
-      ).queue()
+          project = project!!,
+          repositoryUrl = "https://github.com/xero/figlet-fonts",
+          destinationPath = downloadedFontsPath,
+          preDownloadFilter = { fileName -> fileName.endsWith(".flf") },
+          afterDownloadFilter = { file ->
+            try {
+              createAsciiArt(Files.newInputStream(file), UiToolsBundle.message("ascii-art.example"))
+              true
+            } catch (e: Exception) {
+              log.warn(
+                "Failed to render example ASCII art using font file: $file. Font file will be ignored.",
+                e,
+              )
+              false
+            }
+          },
+          onStart = { downloadFontsButton.isEnabled = false },
+          onSuccess = {},
+          onThrowable = {
+            ApplicationManager.getApplication().invokeLater {
+              Messages.showErrorDialog(
+                project,
+                UiToolsBundle.message(
+                  "ascii-art.download-additional-ascii-art-fonts-failed-details"
+                ),
+                UiToolsBundle.message("ascii-art.download-additional-ascii-art-fonts-failed-title"),
+              )
+            }
+          },
+          onFinished = {
+            syncFonts()
+            downloadFontsButton.isEnabled = true
+          },
+        )
+        .queue()
     }
   }
 
@@ -208,8 +225,7 @@ class AsciiArtCreator(
         val fontResource = getBuiltInFontResource(it)
         if (fontResource != null) {
           fontResources.put(it) { getBuiltInFontResource(it)!! }
-        }
-        else {
+        } else {
           log.warn("Built-in font $it not found")
         }
       }
@@ -253,8 +269,7 @@ class AsciiArtCreator(
       if (fileNames.isNotEmpty()) {
         // This will also call `fireContentsChanged`
         selectedItem = fileNames.first()
-      }
-      else {
+      } else {
         fireContentsChanged(this, -1, -1)
       }
     }
@@ -267,22 +282,21 @@ class AsciiArtCreator(
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
         menuTitle = UiToolsBundle.message("ascii-art.menu-title"),
-        contentTitle = UiToolsBundle.message("ascii-art.content-title")
+        contentTitle = UiToolsBundle.message("ascii-art.content-title"),
       )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> AsciiArtCreator) =
-      { configuration ->
-        AsciiArtCreator(
-          configuration = configuration,
-          project = project,
-          parentDisposable = parentDisposable,
-          context = context
-        )
-      }
+      context: DeveloperUiToolContext,
+    ): ((DeveloperToolConfiguration) -> AsciiArtCreator) = { configuration ->
+      AsciiArtCreator(
+        configuration = configuration,
+        project = project,
+        parentDisposable = parentDisposable,
+        context = context,
+      )
+    }
   }
 
   // -- Companion Object ---------------------------------------------------- //
@@ -291,6 +305,7 @@ class AsciiArtCreator(
 
     const val DEFAULT_BUILT_IN_FILE_NAME = "standard.flf"
     private val builtInFonts = listOf<String>(DEFAULT_BUILT_IN_FILE_NAME, "slant.flf")
-    private val downloadedFontsPath = PathManager.getSystemDir().resolve(Paths.get("plugins", "developer-tools", "ascii-fonts"))
+    private val downloadedFontsPath =
+      PathManager.getSystemDir().resolve(Paths.get("plugins", "developer-tools", "ascii-fonts"))
   }
 }

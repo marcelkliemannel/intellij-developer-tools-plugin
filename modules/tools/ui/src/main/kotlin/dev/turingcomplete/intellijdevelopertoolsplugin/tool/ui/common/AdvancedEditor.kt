@@ -82,13 +82,28 @@ class AdvancedEditor(
   private val diffSupport: DiffSupport? = null,
   private val supportsExpand: Boolean = true,
   private val minimumSizeHeight: Int = DEFAULT_MINIMUM_SIZE_HEIGHT,
-  private val fixedEditorSoftWraps: Boolean? = null
+  private val fixedEditorSoftWraps: Boolean? = null,
 ) {
   // -- Properties ---------------------------------------------------------- //
 
-  private var softWraps = configuration.register("${context.id}-${id}-softWraps", fixedEditorSoftWraps ?: generalSettings.editorSoftWraps.get(), CONFIGURATION)
-  private var showSpecialCharacters = configuration.register("${context.id}-${id}-showSpecialCharacters", generalSettings.editorShowSpecialCharacters.get(), CONFIGURATION)
-  private var showWhitespaces = configuration.register("${context.id}-${id}-showWhitespaces", generalSettings.editorShowWhitespaces.get(), CONFIGURATION)
+  private var softWraps =
+    configuration.register(
+      "${context.id}-${id}-softWraps",
+      fixedEditorSoftWraps ?: generalSettings.editorSoftWraps.get(),
+      CONFIGURATION,
+    )
+  private var showSpecialCharacters =
+    configuration.register(
+      "${context.id}-${id}-showSpecialCharacters",
+      generalSettings.editorShowSpecialCharacters.get(),
+      CONFIGURATION,
+    )
+  private var showWhitespaces =
+    configuration.register(
+      "${context.id}-${id}-showWhitespaces",
+      generalSettings.editorShowWhitespaces.get(),
+      CONFIGURATION,
+    )
 
   private var onTextChangeFromUi = mutableListOf<((String) -> Unit)>()
   private var onFocusGained: (() -> Unit)? = null
@@ -176,7 +191,12 @@ class AdvancedEditor(
         title?.let { addToTop(JBLabel("$it ${editorMode.title}:")) }
 
         editor.component.border = ValidationResultBorder(editor.component, editor.contentComponent)
-        val editorComponent = editor.component.wrapWithToolBar(AdvancedEditor::class.java.simpleName, createActions(), ToolBarPlace.RIGHT)
+        val editorComponent =
+          editor.component.wrapWithToolBar(
+            AdvancedEditor::class.java.simpleName,
+            createActions(),
+            ToolBarPlace.RIGHT,
+          )
         addToCenter(editorComponent)
         // This prevents the `Editor` from increasing the size of the dialog if
         // the text in the editor is larger than the preferred height on the
@@ -185,13 +205,16 @@ class AdvancedEditor(
         minimumSize = JBUI.size(0, minimumSizeHeight)
       }
 
-      override fun getData(dataId: String): Any? = when {
-        CommonDataKeys.EDITOR.`is`(dataId) -> editor
-        else -> null
-      }
+      override fun getData(dataId: String): Any? =
+        when {
+          CommonDataKeys.EDITOR.`is`(dataId) -> editor
+          else -> null
+        }
     }
 
-  fun <T> bindValidator(validation: ValidationInfoBuilder.(T) -> ValidationInfo?): ValidationInfoBuilder.(T) -> ValidationInfo? = {
+  fun <T> bindValidator(
+    validation: ValidationInfoBuilder.(T) -> ValidationInfo?
+  ): ValidationInfoBuilder.(T) -> ValidationInfo? = {
     validation(it)?.forComponent(editor.component)
   }
 
@@ -212,108 +235,128 @@ class AdvancedEditor(
     groupId: String = "other",
     gutterIconRenderer: GutterIconRenderer? = null,
   ) {
-    val rangeHighlighter = editor.markupModel.addRangeHighlighter(
-      textRange.startOffset,
-      textRange.endOffset,
-      layer,
-      textAttributes,
-      HighlighterTargetArea.EXACT_RANGE
-    )
+    val rangeHighlighter =
+      editor.markupModel.addRangeHighlighter(
+        textRange.startOffset,
+        textRange.endOffset,
+        layer,
+        textAttributes,
+        HighlighterTargetArea.EXACT_RANGE,
+      )
     rangeHighlighter.gutterIconRenderer = gutterIconRenderer
     rangeHighlighters.computeIfAbsent(groupId) { mutableListOf() }.add(rangeHighlighter)
   }
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun createActions(): ActionGroup = DefaultActionGroup().apply {
-    add(CopyContentAction())
-    if (editorMode.editable) {
-      add(ClearContentAction())
-    }
-
-    addSeparator()
-
-    val settingsActions = mutableListOf<AnAction>().apply {
-      add(SimpleToggleAction(
-        text = GeneralBundle.message("advanced-editor.soft-wrap"),
-        icon = AllIcons.Actions.ToggleSoftWrap,
-        isSelected = { softWraps.get() },
-        setSelected = { softWraps.set(it) },
-        isEnabled = fixedEditorSoftWraps?.let { { fixedEditorSoftWraps } }
-      ))
-      add(SimpleToggleAction(
-        text = GeneralBundle.message("advanced-editor.show-special-characters"),
-        icon = null,
-        isSelected = { showSpecialCharacters.get() },
-        setSelected = { showSpecialCharacters.set(it) }
-      ))
-      add(SimpleToggleAction(
-        text = GeneralBundle.message("advanced-editor.show-whitespaces"),
-        icon = null,
-        isSelected = { showWhitespaces.get() },
-        setSelected = { showWhitespaces.set(it) }
-      ))
-    }
-    add(
-      actionsPopup(
-        title = GeneralBundle.message("advanced-editor.settings"),
-        icon = AllIcons.General.Settings,
-        actions = settingsActions
-      )
-    )
-
-    addSeparator()
-
-    val additionalActions = mutableListOf<AnAction>().apply {
-      addAll(createDiffAction())
-      add(Separator.getInstance())
-      add(SaveContentToFileAction())
+  private fun createActions(): ActionGroup =
+    DefaultActionGroup().apply {
+      add(CopyContentAction())
       if (editorMode.editable) {
-        add(OpenContentFromFileAction())
+        add(ClearContentAction())
       }
-      if (supportsExpand) {
-        add(Separator.getInstance())
-        add(ExpandEditorAction(this@AdvancedEditor))
-      }
-    }
-    add(
-      actionsPopup(
-        title = GeneralBundle.message("advanced-editor.additional-actions"),
-        icon = AllIcons.Actions.MoreHorizontal,
-        actions = additionalActions
+
+      addSeparator()
+
+      val settingsActions =
+        mutableListOf<AnAction>().apply {
+          add(
+            SimpleToggleAction(
+              text = GeneralBundle.message("advanced-editor.soft-wrap"),
+              icon = AllIcons.Actions.ToggleSoftWrap,
+              isSelected = { softWraps.get() },
+              setSelected = { softWraps.set(it) },
+              isEnabled = fixedEditorSoftWraps?.let { { fixedEditorSoftWraps } },
+            )
+          )
+          add(
+            SimpleToggleAction(
+              text = GeneralBundle.message("advanced-editor.show-special-characters"),
+              icon = null,
+              isSelected = { showSpecialCharacters.get() },
+              setSelected = { showSpecialCharacters.set(it) },
+            )
+          )
+          add(
+            SimpleToggleAction(
+              text = GeneralBundle.message("advanced-editor.show-whitespaces"),
+              icon = null,
+              isSelected = { showWhitespaces.get() },
+              setSelected = { showWhitespaces.set(it) },
+            )
+          )
+        }
+      add(
+        actionsPopup(
+          title = GeneralBundle.message("advanced-editor.settings"),
+          icon = AllIcons.General.Settings,
+          actions = settingsActions,
+        )
       )
-    )
-  }
+
+      addSeparator()
+
+      val additionalActions =
+        mutableListOf<AnAction>().apply {
+          addAll(createDiffAction())
+          add(Separator.getInstance())
+          add(SaveContentToFileAction())
+          if (editorMode.editable) {
+            add(OpenContentFromFileAction())
+          }
+          if (supportsExpand) {
+            add(Separator.getInstance())
+            add(ExpandEditorAction(this@AdvancedEditor))
+          }
+        }
+      add(
+        actionsPopup(
+          title = GeneralBundle.message("advanced-editor.additional-actions"),
+          icon = AllIcons.Actions.MoreHorizontal,
+          actions = additionalActions,
+        )
+      )
+    }
 
   private fun createDiffAction(): List<AnAction> {
     val actions = mutableListOf<AnAction>()
 
     val firstTitle = title ?: GeneralBundle.message("advanced-editor.diff-no-title-fallback")
 
-    actions.add(dumbAwareAction(GeneralBundle.message("advanced-editor.show-diff-with-clipboard"), AllIcons.Actions.DiffWithClipboard) { e ->
-      val editor = e.getEditor()
-      val firstText = runReadAction { editor.document.text }
-      UiUtils.showDiffDialog(
-        title = GeneralBundle.message("advanced-editor.show-diff-with-clipboard"),
-        firstTitle = firstTitle,
-        secondTitle = GeneralBundle.message("advanced-editor.clipboard"),
-        firstText = firstText,
-        secondText = ClipboardUtil.getTextInClipboard() ?: ""
-      )
-    })
-
-    diffSupport?.let {
-      actions.add(dumbAwareAction(GeneralBundle.message("advanced-editor.show-diff-with-title", it.secondTitle), AllIcons.Actions.Diff) { e ->
+    actions.add(
+      dumbAwareAction(
+        GeneralBundle.message("advanced-editor.show-diff-with-clipboard"),
+        AllIcons.Actions.DiffWithClipboard,
+      ) { e ->
         val editor = e.getEditor()
         val firstText = runReadAction { editor.document.text }
         UiUtils.showDiffDialog(
-          title = GeneralBundle.message("advanced-editor.show-diff-with-title", it.secondTitle),
+          title = GeneralBundle.message("advanced-editor.show-diff-with-clipboard"),
           firstTitle = firstTitle,
-          secondTitle = it.secondTitle,
+          secondTitle = GeneralBundle.message("advanced-editor.clipboard"),
           firstText = firstText,
-          secondText = it.secondText()
+          secondText = ClipboardUtil.getTextInClipboard() ?: "",
         )
-      })
+      }
+    )
+
+    diffSupport?.let {
+      actions.add(
+        dumbAwareAction(
+          GeneralBundle.message("advanced-editor.show-diff-with-title", it.secondTitle),
+          AllIcons.Actions.Diff,
+        ) { e ->
+          val editor = e.getEditor()
+          val firstText = runReadAction { editor.document.text }
+          UiUtils.showDiffDialog(
+            title = GeneralBundle.message("advanced-editor.show-diff-with-title", it.secondTitle),
+            firstTitle = firstTitle,
+            secondTitle = it.secondTitle,
+            firstText = firstText,
+            secondText = it.secondText(),
+          )
+        }
+      )
     }
 
     return actions
@@ -321,13 +364,14 @@ class AdvancedEditor(
 
   private fun createEditor(): EditorEx {
     val editorFactory = EditorFactory.getInstance()
-    val document = (editorFactory as EditorFactoryImpl).createDocument(textProperty.get(), true, false)
-    val editor = if (editorMode.editable) {
-      editorFactory.createEditor(document, project) as EditorEx
-    }
-    else {
-      editorFactory.createViewer(document, project) as EditorEx
-    }
+    val document =
+      (editorFactory as EditorFactoryImpl).createDocument(textProperty.get(), true, false)
+    val editor =
+      if (editorMode.editable) {
+        editorFactory.createEditor(document, project) as EditorEx
+      } else {
+        editorFactory.createViewer(document, project) as EditorEx
+      }
     editor.putUserData(editorActiveKey, UIUtil.hasFocus(editor.contentComponent))
     Disposer.register(parentDisposable) { EditorFactory.getInstance().releaseEditor(editor) }
 
@@ -355,9 +399,7 @@ class AdvancedEditor(
         isWhitespacesShown = showWhitespaces.get()
         isBlinkCaret = editorMode.editable
         additionalLinesCount = 0
-        project?.let {
-          setTabSize(CodeStyle.getIndentOptions(it, document).TAB_SIZE)
-        }
+        project?.let { setTabSize(CodeStyle.getIndentOptions(it, document).TAB_SIZE) }
       }
     }
   }
@@ -367,12 +409,12 @@ class AdvancedEditor(
 
     val isLaFDark = ColorUtil.isDark(UIUtil.getPanelBackground())
     val isEditorDark = EditorColorsManager.getInstance().isDarkEditor
-    colorsScheme = if (isLaFDark == isEditorDark) {
-      EditorColorsManager.getInstance().globalScheme
-    }
-    else {
-      EditorColorsManager.getInstance().schemeForCurrentUITheme
-    }
+    colorsScheme =
+      if (isLaFDark == isEditorDark) {
+        EditorColorsManager.getInstance().globalScheme
+      } else {
+        EditorColorsManager.getInstance().schemeForCurrentUITheme
+      }
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -409,8 +451,12 @@ class AdvancedEditor(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class ClearContentAction
-    : DumbAwareAction(GeneralBundle.message("advanced-editor.clear-content-action-title"), null, AllIcons.Actions.GC) {
+  private class ClearContentAction :
+    DumbAwareAction(
+      GeneralBundle.message("advanced-editor.clear-content-action-title"),
+      null,
+      AllIcons.Actions.GC,
+    ) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getEditor()
@@ -426,8 +472,12 @@ class AdvancedEditor(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class CopyContentAction
-    : DumbAwareAction(GeneralBundle.message("advanced-editor.copy-to-clipboard-action-title"), null, AllIcons.Actions.Copy) {
+  private class CopyContentAction :
+    DumbAwareAction(
+      GeneralBundle.message("advanced-editor.copy-to-clipboard-action-title"),
+      null,
+      AllIcons.Actions.Copy,
+    ) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getEditor()
@@ -440,22 +490,32 @@ class AdvancedEditor(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class SaveContentToFileAction : DumbAwareAction(
-    GeneralBundle.message("advanced-editor.save-to-file-action-title"),
-    null,
-    AllIcons.Actions.MenuSaveall
-  ) {
+  private class SaveContentToFileAction :
+    DumbAwareAction(
+      GeneralBundle.message("advanced-editor.save-to-file-action-title"),
+      null,
+      AllIcons.Actions.MenuSaveall,
+    ) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getEditor()
-      val fileSaverDescriptor = FileSaverDescriptor(GeneralBundle.message("advanced-editor.file-saver-description"), "")
+      val fileSaverDescriptor =
+        FileSaverDescriptor(GeneralBundle.message("advanced-editor.file-saver-description"), "")
       val timeStamp = LocalDateTime.now().format(timestampFormat)
       val defaultFilename = "$timeStamp.txt"
       FileChooserFactory.getInstance()
         .createSaveFileDialog(fileSaverDescriptor, e.project)
-        .save(defaultFilename)?.file?.toPath()?.let {
+        .save(defaultFilename)
+        ?.file
+        ?.toPath()
+        ?.let {
           val content = runReadAction { editor.document.text }
-          Files.writeString(it, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+          Files.writeString(
+            it,
+            content,
+            StandardOpenOption.CREATE,
+            StandardOpenOption.TRUNCATE_EXISTING,
+          )
         }
     }
 
@@ -464,18 +524,21 @@ class AdvancedEditor(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class OpenContentFromFileAction : DumbAwareAction(
-    GeneralBundle.message("advanced-editor.open-file-action-title"),
-    null,
-    AllIcons.Actions.MenuOpen
-  ) {
+  private class OpenContentFromFileAction :
+    DumbAwareAction(
+      GeneralBundle.message("advanced-editor.open-file-action-title"),
+      null,
+      AllIcons.Actions.MenuOpen,
+    ) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getEditor()
       val fileChooserDescriptor = FileChooserDescriptor(true, true, false, false, false, false)
       FileChooserFactory.getInstance()
         .createFileChooser(fileChooserDescriptor, e.project, editor.component)
-        .choose(e.project).firstOrNull()?.let {
+        .choose(e.project)
+        .firstOrNull()
+        ?.let {
           runWriteAction {
             editor.putUserData(editorActiveKey, true)
             editor.document.setText(Files.readString(it.toNioPath()))
@@ -490,24 +553,31 @@ class AdvancedEditor(
   // -- Inner Type ---------------------------------------------------------- //
 
   private class ExpandEditorAction(private val originalEditor: AdvancedEditor) :
-    AnActionButton(GeneralBundle.message("advanced-editor.expand-editor-action-title"), null, AllIcons.Actions.MoveToWindow), DumbAware {
+    AnActionButton(
+      GeneralBundle.message("advanced-editor.expand-editor-action-title"),
+      null,
+      AllIcons.Actions.MoveToWindow,
+    ),
+    DumbAware {
 
     override fun actionPerformed(e: AnActionEvent) {
       val expandedText = ValueProperty(originalEditor.text)
       val expandedEditor = createExpandedEditor(originalEditor, expandedText)
-      val apply = object: DialogWrapper(originalEditor.component, true) {
+      val apply =
+        object : DialogWrapper(originalEditor.component, true) {
 
-        init {
-          setSize(700, 550)
-          init()
+            init {
+              setSize(700, 550)
+              init()
 
-          setOKButtonText(GeneralBundle.message("advanced-editor.apply"))
-        }
+              setOKButtonText(GeneralBundle.message("advanced-editor.apply"))
+            }
 
-        override fun createCenterPanel(): JComponent = expandedEditor.component
+            override fun createCenterPanel(): JComponent = expandedEditor.component
 
-        override fun getDimensionServiceKey(): String? = ExpandEditorAction::class.java.name
-      }.showAndGet()
+            override fun getDimensionServiceKey(): String? = ExpandEditorAction::class.java.name
+          }
+          .showAndGet()
 
       if (apply) {
         runWriteAction {
@@ -517,7 +587,10 @@ class AdvancedEditor(
       }
     }
 
-    private fun createExpandedEditor(originalEditor: AdvancedEditor, textProperty: ValueProperty<String>) =
+    private fun createExpandedEditor(
+      originalEditor: AdvancedEditor,
+      textProperty: ValueProperty<String>,
+    ) =
       AdvancedEditor(
         id = "${originalEditor.id}-expanded",
         context = originalEditor.context,
@@ -529,18 +602,15 @@ class AdvancedEditor(
         textProperty = textProperty,
         initialLanguage = originalEditor.initialLanguage,
         diffSupport = originalEditor.diffSupport,
-        supportsExpand = false
+        supportsExpand = false,
       )
 
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
   }
+
   // -- Inner Type ---------------------------------------------------------- //
 
-  data class DiffSupport(
-    val title: String,
-    val secondTitle: String,
-    val secondText: () -> String
-  )
+  data class DiffSupport(val title: String, val secondTitle: String, val secondText: () -> String)
 
   // -- Inner Type ---------------------------------------------------------- //
 

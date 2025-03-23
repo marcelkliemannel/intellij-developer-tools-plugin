@@ -5,9 +5,7 @@ import com.intellij.util.ui.JBUI
 import javax.swing.JComponent
 import javax.swing.ScrollPaneConstants
 
-class ScrollPaneBuilder(
-  private val component: JComponent
-) {
+class ScrollPaneBuilder(private val component: JComponent) {
   // -- Properties ---------------------------------------------------------- //
 
   private var withoutBorder: Boolean = true

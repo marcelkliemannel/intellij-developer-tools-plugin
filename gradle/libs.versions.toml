@@ -78,4 +78,4 @@ text-case-converter = ["text-case-converter", "text-case-converter-kotlin-extens
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
-spotless = { id = "spotless-plugin-gradle", version.ref = "spotless" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

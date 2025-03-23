@@ -23,7 +23,10 @@ abstract class TextCaseConverterIntentionAction : IntentionAction, LowPriorityAc
   final override fun startInWriteAction() = false
 
   final override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?) =
-    editor != null && file != null && editor.document.isWritable && getSourceText(editor, file) != null
+    editor != null &&
+      file != null &&
+      editor.document.isWritable &&
+      getSourceText(editor, file) != null
 
   final override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
     if (editor == null || file == null) {
@@ -47,7 +50,7 @@ abstract class TextCaseConverterIntentionAction : IntentionAction, LowPriorityAc
   private class TextCaseListPopupStep(
     private val editor: Editor,
     private val text: String,
-    private val textRange: TextRange
+    private val textRange: TextRange,
   ) : BaseListPopupStep<TextCase>("Select Target Text Case", allTextCases) {
 
     override fun getTextFor(textCase: TextCase): String = textCase.example()

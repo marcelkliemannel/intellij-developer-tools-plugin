@@ -12,10 +12,15 @@ class DeveloperToolsPluginProjectActivity : ProjectActivity {
   // -- Exported Methods ---------------------------------------------------- //
 
   override suspend fun execute(project: Project) {
-    if (DeveloperToolsApplicationSettings.generalSettings.addOpenMainDialogActionToMainToolbar.get()) {
-      val addOpenMainDialogActionToMainToolbarTask = AddOpenMainDialogActionToMainToolbarTask.createIfAvailable()
+    if (
+      DeveloperToolsApplicationSettings.generalSettings.addOpenMainDialogActionToMainToolbar.get()
+    ) {
+      val addOpenMainDialogActionToMainToolbarTask =
+        AddOpenMainDialogActionToMainToolbarTask.createIfAvailable()
       if (addOpenMainDialogActionToMainToolbarTask != null) {
-        ApplicationManager.getApplication().invokeLater { addOpenMainDialogActionToMainToolbarTask.run() }
+        ApplicationManager.getApplication().invokeLater {
+          addOpenMainDialogActionToMainToolbarTask.run()
+        }
       }
     }
   }

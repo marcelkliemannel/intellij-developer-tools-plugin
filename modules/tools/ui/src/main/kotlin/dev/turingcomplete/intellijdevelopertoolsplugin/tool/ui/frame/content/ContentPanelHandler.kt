@@ -25,7 +25,7 @@ open class ContentPanelHandler(
   settings: DeveloperToolsInstanceSettings,
   groupNodeSelectionEnabled: Boolean = true,
   promoteMainDialog: Boolean = false,
-  prioritizeVerticalLayout: Boolean = false
+  prioritizeVerticalLayout: Boolean = false,
 ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -38,19 +38,23 @@ open class ContentPanelHandler(
   private val mainDialogPromotionPanel = BorderLayoutPanel()
 
   private val cachedGroupsPanels = mutableMapOf<String, GroupContentPanel>()
-  private val cachedDeveloperToolsPanels = mutableMapOf<DeveloperToolNode, DeveloperToolContentPanel>()
+  private val cachedDeveloperToolsPanels =
+    mutableMapOf<DeveloperToolNode, DeveloperToolContentPanel>()
 
   // -- Initialization ------------------------------------------------------ //
 
   init {
     // The creation of `ToolsMenuTree` will trigger the initial node selection
-    toolsMenuTree = ToolsMenuTree(
-      project,
-      parentDisposable,
-      settings,
-      groupNodeSelectionEnabled,
-      prioritizeVerticalLayout
-    ) { node, selectionTriggeredBySearch -> handleContentNodeSelection(node, selectionTriggeredBySearch) }
+    toolsMenuTree =
+      ToolsMenuTree(
+        project,
+        parentDisposable,
+        settings,
+        groupNodeSelectionEnabled,
+        prioritizeVerticalLayout,
+      ) { node, selectionTriggeredBySearch ->
+        handleContentNodeSelection(node, selectionTriggeredBySearch)
+      }
 
     initMainDialogPromotionPanel(promoteMainDialog)
 
@@ -62,7 +66,10 @@ open class ContentPanelHandler(
 
   // -- Exported Methods ---------------------------------------------------- //
 
-  fun <T : OpenDeveloperToolContext> openTool(context: T, reference: OpenDeveloperToolReference<out T>) {
+  fun <T : OpenDeveloperToolContext> openTool(
+    context: T,
+    reference: OpenDeveloperToolReference<out T>,
+  ) {
     toolsMenuTree.selectDeveloperTool(reference.id) {
       cachedDeveloperToolsPanels[selectedContentNode.get()]?.openTool(context, reference)
     }
@@ -72,10 +79,14 @@ open class ContentPanelHandler(
     toolsMenuTree.selectDeveloperTool(id) {}
   }
 
-  protected open fun createDeveloperToolContentPanel(developerToolNode: DeveloperToolNode): DeveloperToolContentPanel =
-    DeveloperToolContentPanel(developerToolNode)
+  protected open fun createDeveloperToolContentPanel(
+    developerToolNode: DeveloperToolNode
+  ): DeveloperToolContentPanel = DeveloperToolContentPanel(developerToolNode)
 
-  protected open fun handleContentNodeSelection(new: ContentNode?, selectionTriggeredBySearch: Boolean) {
+  protected open fun handleContentNodeSelection(
+    new: ContentNode?,
+    selectionTriggeredBySearch: Boolean,
+  ) {
     val old = selectedContentNode.get()
     if (old != new) {
       if (old is DeveloperToolNode) {
@@ -88,17 +99,25 @@ open class ContentPanelHandler(
 
       when (new) {
         is GroupNode -> {
-          setContentPanel(cachedGroupsPanels.getOrPut(new.developerUiToolGroup.id) {
-            GroupContentPanel(new) {
-              selectedContentNode.set(it)
-              TreeUtil.selectNode(toolsMenuTree, it)
-            }
-          }.panel)
+          setContentPanel(
+            cachedGroupsPanels
+              .getOrPut(new.developerUiToolGroup.id) {
+                GroupContentPanel(new) {
+                  selectedContentNode.set(it)
+                  TreeUtil.selectNode(toolsMenuTree, it)
+                }
+              }
+              .panel
+          )
           selectedContentNode.set(new)
         }
 
         is DeveloperToolNode -> {
-          setContentPanel(cachedDeveloperToolsPanels.getOrPut(new) { createDeveloperToolContentPanel(new) }.also { it.selected() })
+          setContentPanel(
+            cachedDeveloperToolsPanels
+              .getOrPut(new) { createDeveloperToolContentPanel(new) }
+              .also { it.selected() }
+          )
           selectedContentNode.set(new)
         }
 
@@ -118,19 +137,22 @@ open class ContentPanelHandler(
       return
     }
 
-    val addOpenMainDialogActionToMainToolbarTask = AddOpenMainDialogActionToMainToolbarTask.createIfAvailable()
-      ?: return
+    val addOpenMainDialogActionToMainToolbarTask =
+      AddOpenMainDialogActionToMainToolbarTask.createIfAvailable() ?: return
 
-    val promoteMainDialogNotificationPanel = PromoteMainDialogNotificationPanel { addOpenMainDialogActionToMainToolbar ->
-      generalSettings.addOpenMainDialogActionToMainToolbar.set(addOpenMainDialogActionToMainToolbar)
-      internalSettings.promoteAddOpenMainDialogActionToMainToolbar.set(false)
+    val promoteMainDialogNotificationPanel =
+      PromoteMainDialogNotificationPanel { addOpenMainDialogActionToMainToolbar ->
+        generalSettings.addOpenMainDialogActionToMainToolbar.set(
+          addOpenMainDialogActionToMainToolbar
+        )
+        internalSettings.promoteAddOpenMainDialogActionToMainToolbar.set(false)
 
-      if (addOpenMainDialogActionToMainToolbar) {
-        addOpenMainDialogActionToMainToolbarTask.run()
+        if (addOpenMainDialogActionToMainToolbar) {
+          addOpenMainDialogActionToMainToolbarTask.run()
+        }
+
+        mainDialogPromotionPanel.isVisible = false
       }
-
-      mainDialogPromotionPanel.isVisible = false
-    }
     mainDialogPromotionPanel.addToCenter(promoteMainDialogNotificationPanel)
   }
 
@@ -145,9 +167,8 @@ open class ContentPanelHandler(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class PromoteMainDialogNotificationPanel(
-    closeNotification: (Boolean) -> Unit
-  ) : EditorNotificationPanel(Status.Promo) {
+  private class PromoteMainDialogNotificationPanel(closeNotification: (Boolean) -> Unit) :
+    EditorNotificationPanel(Status.Promo) {
 
     init {
       text = "<html>The tools are also available as a standalone window.</html>"

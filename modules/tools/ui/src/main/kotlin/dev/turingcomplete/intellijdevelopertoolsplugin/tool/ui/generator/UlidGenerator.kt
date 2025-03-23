@@ -33,13 +33,15 @@ class UlidGenerator(
   project: Project?,
   context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
-) : OneLineTextGenerator(
-  context = context,
-  configuration = configuration,
-  parentDisposable = parentDisposable,
-  project = project
-), DataProvider {
+  parentDisposable: Disposable,
+) :
+  OneLineTextGenerator(
+    context = context,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    project = project,
+  ),
+  DataProvider {
   // -- Properties ---------------------------------------------------------- //
 
   private val generateMonotonicUlid = configuration.register("generateMonotonicUlid", false)
@@ -53,7 +55,7 @@ class UlidGenerator(
   private val parsedUlIdTransformed = ValueProperty("")
 
   // -- Initialization ------------------------------------------------------ //
-  
+
   init {
     parseUlidInput.afterChange { parseUlid() }
     parseUlidTransformFormat.afterChange { parseUlid() }
@@ -63,28 +65,20 @@ class UlidGenerator(
   // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildConfigurationUi() {
+    row { comboBox(UlidFormat.entries).label("Format:").bindItem(ulidFormat) }
     row {
-      comboBox(UlidFormat.entries)
-        .label("Format:")
-        .bindItem(ulidFormat)
-    }
-    row {
-      checkBox("Monotonic")
-        .bindSelected(generateMonotonicUlid)
-        .gap(RightGap.SMALL)
-      contextHelp("If selected, the random component is incremented for each new ULID generated in the same millisecond. Otherwise, the random component is reset for each new ULID generated.")
+      checkBox("Monotonic").bindSelected(generateMonotonicUlid).gap(RightGap.SMALL)
+      contextHelp(
+        "If selected, the random component is incremented for each new ULID generated in the same millisecond. Otherwise, the random component is reset for each new ULID generated."
+      )
     }
 
     buttonsGroup {
+      row { radioButton("Use current Unix timestamp").bindSelected(useIndividualTime.not()) }
       row {
-        radioButton("Use current Unix timestamp")
-          .bindSelected(useIndividualTime.not())
-      }
-      row {
-        radioButton("Use individual timestamp:")
-          .bindSelected(useIndividualTime)
-          .gap(RightGap.SMALL)
-        textField().validateLongValue(LongRange(0, Long.MAX_VALUE))
+        radioButton("Use individual timestamp:").bindSelected(useIndividualTime).gap(RightGap.SMALL)
+        textField()
+          .validateLongValue(LongRange(0, Long.MAX_VALUE))
           .gap(RightGap.SMALL)
           .enabledIf(useIndividualTime)
           .bindLongTextImproved(individualTime)
@@ -98,55 +92,55 @@ class UlidGenerator(
       row {
         expandableTextField()
           .bindText(parseUlidInput)
-          .validationOnInput { if (!Ulid.isValid(it.text)) ValidationInfo("Invalid ULID") else null }
+          .validationOnInput {
+            if (!Ulid.isValid(it.text)) ValidationInfo("Invalid ULID") else null
+          }
           .align(Align.FILL)
       }
       row {
-        label("")
-          .label("Timestamp:")
-          .bindText(parsedUlIdTimestamp)
-          .gap(RightGap.SMALL)
+        label("").label("Timestamp:").bindText(parsedUlIdTimestamp).gap(RightGap.SMALL)
         actionButton(CopyAction(parsedUlIdTimestampDataKey), UlidGenerator::class.java.name)
       }
       row {
-        comboBox(UlidFormat.entries.filter { it != UlidFormat.NONE })
-          .label("Transform to:")
-          .bindItem(parseUlidTransformFormat)
-      }.bottomGap(BottomGap.NONE)
+          comboBox(UlidFormat.entries.filter { it != UlidFormat.NONE })
+            .label("Transform to:")
+            .bindItem(parseUlidTransformFormat)
+        }
+        .bottomGap(BottomGap.NONE)
       row {
-        label("")
-          .bindText(parsedUlIdTransformed)
-          .gap(RightGap.SMALL)
-        actionButton(CopyAction(parsedUlIdTransformedDataKey), UlidGenerator::class.java.name)
-      }.topGap(TopGap.NONE)
+          label("").bindText(parsedUlIdTransformed).gap(RightGap.SMALL)
+          actionButton(CopyAction(parsedUlIdTransformedDataKey), UlidGenerator::class.java.name)
+        }
+        .topGap(TopGap.NONE)
     }
   }
 
   override fun generate(): String {
-    val ulid: Ulid = if (generateMonotonicUlid.get()) {
-      if (useIndividualTime.get()) {
-        UlidCreator.getMonotonicUlid(individualTime.get())
+    val ulid: Ulid =
+      if (generateMonotonicUlid.get()) {
+        if (useIndividualTime.get()) {
+          UlidCreator.getMonotonicUlid(individualTime.get())
+        } else {
+          UlidCreator.getMonotonicUlid()
+        }
+      } else {
+        if (useIndividualTime.get()) {
+          UlidCreator.getUlid(individualTime.get())
+        } else {
+          UlidCreator.getUlid()
+        }
       }
-      else {
-        UlidCreator.getMonotonicUlid()
-      }
-    }
-    else {
-      if (useIndividualTime.get()) {
-        UlidCreator.getUlid(individualTime.get())
-      }
-      else {
-        UlidCreator.getUlid()
-      }
-    }
     return ulidFormat.get().format(ulid)
   }
 
-  override fun getData(dataId: String): Any? = when {
-    parsedUlIdTimestampDataKey.`is`(dataId) -> StringUtil.stripHtml(parsedUlIdTimestamp.get(), false)
-    parsedUlIdTransformedDataKey.`is`(dataId) -> StringUtil.stripHtml(parsedUlIdTransformed.get(), false)
-    else -> super.getData(dataId)
-  }
+  override fun getData(dataId: String): Any? =
+    when {
+      parsedUlIdTimestampDataKey.`is`(dataId) ->
+        StringUtil.stripHtml(parsedUlIdTimestamp.get(), false)
+      parsedUlIdTransformedDataKey.`is`(dataId) ->
+        StringUtil.stripHtml(parsedUlIdTransformed.get(), false)
+      else -> super.getData(dataId)
+    }
 
   // -- Private Methods ----------------------------------------------------- //
 
@@ -157,8 +151,12 @@ class UlidGenerator(
     }
 
     val ulid = Ulid.from(parseUlidInputValue)
-    parsedUlIdTimestamp.set("<html><code>${ulid.time}</code> (${DateTimeFormatter.ISO_INSTANT.format(ulid.instant)})")
-    parsedUlIdTransformed.set("<html><code>${parseUlidTransformFormat.get().format(ulid)}</code></html>")
+    parsedUlIdTimestamp.set(
+      "<html><code>${ulid.time}</code> (${DateTimeFormatter.ISO_INSTANT.format(ulid.instant)})"
+    )
+    parsedUlIdTransformed.set(
+      "<html><code>${parseUlidTransformFormat.get().format(ulid)}</code></html>"
+    )
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -177,15 +175,13 @@ class UlidGenerator(
 
   class Factory : DeveloperUiToolFactory<UlidGenerator> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "ULID",
-      contentTitle = "ULID Generator"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "ULID", contentTitle = "ULID Generator")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> UlidGenerator) = { configuration ->
       UlidGenerator(project, context, configuration, parentDisposable)
     }

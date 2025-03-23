@@ -19,6 +19,11 @@ class DeveloperToolsActionGroup : DefaultActionGroup("Developer Tools", true) {
 
   companion object {
 
-    private val icon = IconManager.getInstance().getIcon("dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg", DeveloperToolsActionGroup::class.java.classLoader)
+    private val icon =
+      IconManager.getInstance()
+        .getIcon(
+          "dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg",
+          DeveloperToolsActionGroup::class.java.classLoader,
+        )
   }
 }

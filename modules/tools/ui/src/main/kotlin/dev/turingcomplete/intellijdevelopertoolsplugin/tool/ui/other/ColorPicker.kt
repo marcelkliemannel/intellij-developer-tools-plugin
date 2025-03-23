@@ -30,7 +30,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.NotBlankInputValidator
 import java.awt.Color
-import java.util.*
+import java.util.Locale
 import javax.swing.border.LineBorder
 import kotlin.math.max
 import kotlin.math.min
@@ -38,11 +38,12 @@ import kotlin.math.min
 class ColorPicker(
   private val project: Project?,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
 ) : DeveloperUiTool(parentDisposable), DataProvider {
   // -- Properties ---------------------------------------------------------- //
 
-  private val selectedColor: ValueProperty<JBColor> = configuration.register("selectedColor", JBColor.MAGENTA.toJBColor(), INPUT)
+  private val selectedColor: ValueProperty<JBColor> =
+    configuration.register("selectedColor", JBColor.MAGENTA.toJBColor(), INPUT)
 
   private val cssRgb = AtomicProperty("")
   private val cssRgbWithAlpha = AtomicProperty("")
@@ -70,109 +71,120 @@ class ColorPicker(
 
   override fun Panel.buildUi() {
     row {
-      val colorPicker = ColorPickerBuilder(showAlpha = true, showAlphaAsPercent = true)
-        .setOriginalColor(selectedColor.get())
-        .withFocus()
-        .addSaturationBrightnessComponent()
-        .addColorAdjustPanel(MaterialGraphicalColorPipetteProvider())
-        .addColorValuePanel()
-        .addColorListener({ color, _ -> selectedColor.set(color.toJBColor(), COLOR_SELECTION_CHANGE_ID) }, true)
-        .apply { colorPickerModel = this.model }
-        .build()
-        .apply {
-          content.apply {
-            border = LineBorder(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground())
-          }
-        }
-      cell(colorPicker.content).align(Align.FILL)
-    }.bottomGap(BottomGap.MEDIUM)
+        val colorPicker =
+          ColorPickerBuilder(showAlpha = true, showAlphaAsPercent = true)
+            .setOriginalColor(selectedColor.get())
+            .withFocus()
+            .addSaturationBrightnessComponent()
+            .addColorAdjustPanel(MaterialGraphicalColorPipetteProvider())
+            .addColorValuePanel()
+            .addColorListener(
+              { color, _ -> selectedColor.set(color.toJBColor(), COLOR_SELECTION_CHANGE_ID) },
+              true,
+            )
+            .apply { colorPickerModel = this.model }
+            .build()
+            .apply {
+              content.apply {
+                border = LineBorder(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground())
+              }
+            }
+        cell(colorPicker.content).align(Align.FILL)
+      }
+      .bottomGap(BottomGap.MEDIUM)
 
     group("CSS Colors") {
       row {
-        label("")
-          .bindText(cssRgb)
-          .gap(RightGap.SMALL)
+          label("").bindText(cssRgb).gap(RightGap.SMALL)
 
-        actionButton(CopyAction(cssRgbDataKey), ColorPicker::class.java.name)
-      }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
-
-      row {
-        label("")
-          .bindText(cssRgbWithAlpha)
-          .gap(RightGap.SMALL)
-        actionButton(CopyAction(cssRgbWithAlphaDataKey), ColorPicker::class.java.name)
-      }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
-
-      row {
-        label("")
-          .bindText(cssHex)
-          .gap(RightGap.SMALL)
-        actionButton(CopyAction(cssHexDataKey), ColorPicker::class.java.name)
-      }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
-
-      row {
-        label("")
-          .bindText(cssHexWithAlpha)
-          .gap(RightGap.SMALL)
-        actionButton(CopyAction(cssHexWithAlphaDataKey), ColorPicker::class.java.name)
-      }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
-
-      row {
-        label("")
-          .bindText(cssHls)
-          .gap(RightGap.SMALL)
-        actionButton(CopyAction(cssHslDataKey), ColorPicker::class.java.name)
-      }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
-
-      row {
-        label("")
-          .bindText(cssHlsWithAlpha)
-          .gap(RightGap.SMALL)
-        actionButton(CopyAction(cssHslWithAlphaDataKey), ColorPicker::class.java.name)
-      }.topGap(TopGap.NONE).bottomGap(BottomGap.NONE)
-
-      row {
-        button("Parse CSS Color Value") {
-          val inputDialog = Messages.InputDialog(
-            project,
-            "CSS color value:",
-            PARSE_CSS_VALUE_DIALOG_TITLE,
-            null,
-            "",
-            NotBlankInputValidator()
-          )
-          inputDialog.show()
-          inputDialog.inputString?.let { parseCssColorValue(it) }?.let { selectedColor.set(it) }
+          actionButton(CopyAction(cssRgbDataKey), ColorPicker::class.java.name)
         }
-      }.topGap(TopGap.NONE)
+        .topGap(TopGap.NONE)
+        .bottomGap(BottomGap.NONE)
+
+      row {
+          label("").bindText(cssRgbWithAlpha).gap(RightGap.SMALL)
+          actionButton(CopyAction(cssRgbWithAlphaDataKey), ColorPicker::class.java.name)
+        }
+        .topGap(TopGap.NONE)
+        .bottomGap(BottomGap.NONE)
+
+      row {
+          label("").bindText(cssHex).gap(RightGap.SMALL)
+          actionButton(CopyAction(cssHexDataKey), ColorPicker::class.java.name)
+        }
+        .topGap(TopGap.NONE)
+        .bottomGap(BottomGap.NONE)
+
+      row {
+          label("").bindText(cssHexWithAlpha).gap(RightGap.SMALL)
+          actionButton(CopyAction(cssHexWithAlphaDataKey), ColorPicker::class.java.name)
+        }
+        .topGap(TopGap.NONE)
+        .bottomGap(BottomGap.NONE)
+
+      row {
+          label("").bindText(cssHls).gap(RightGap.SMALL)
+          actionButton(CopyAction(cssHslDataKey), ColorPicker::class.java.name)
+        }
+        .topGap(TopGap.NONE)
+        .bottomGap(BottomGap.NONE)
+
+      row {
+          label("").bindText(cssHlsWithAlpha).gap(RightGap.SMALL)
+          actionButton(CopyAction(cssHslWithAlphaDataKey), ColorPicker::class.java.name)
+        }
+        .topGap(TopGap.NONE)
+        .bottomGap(BottomGap.NONE)
+
+      row {
+          button("Parse CSS Color Value") {
+            val inputDialog =
+              Messages.InputDialog(
+                project,
+                "CSS color value:",
+                PARSE_CSS_VALUE_DIALOG_TITLE,
+                null,
+                "",
+                NotBlankInputValidator(),
+              )
+            inputDialog.show()
+            inputDialog.inputString?.let { parseCssColorValue(it) }?.let { selectedColor.set(it) }
+          }
+        }
+        .topGap(TopGap.NONE)
     }
   }
 
-  private fun parseCssColorValue(inputString: String): JBColor? = try {
-    val color = org.silentsoft.csscolor4j.Color.valueOf(inputString)
-    JBColor(
-      Color(color.red, color.green, color.blue, (color.opacity * 255.0).toInt()),
-      Color(color.red, color.green, color.blue, (color.opacity * 255.0).toInt())
-    )
-  }
-  catch (e: IllegalArgumentException) {
-    Messages.showErrorDialog(project, e.message, PARSE_CSS_VALUE_DIALOG_TITLE)
-    null
-  }
-  catch (_: Exception) {
-    Messages.showErrorDialog(project, "Unable to parse input value.", PARSE_CSS_VALUE_DIALOG_TITLE)
-    null
-  }
+  private fun parseCssColorValue(inputString: String): JBColor? =
+    try {
+      val color = org.silentsoft.csscolor4j.Color.valueOf(inputString)
+      JBColor(
+        Color(color.red, color.green, color.blue, (color.opacity * 255.0).toInt()),
+        Color(color.red, color.green, color.blue, (color.opacity * 255.0).toInt()),
+      )
+    } catch (e: IllegalArgumentException) {
+      Messages.showErrorDialog(project, e.message, PARSE_CSS_VALUE_DIALOG_TITLE)
+      null
+    } catch (_: Exception) {
+      Messages.showErrorDialog(
+        project,
+        "Unable to parse input value.",
+        PARSE_CSS_VALUE_DIALOG_TITLE,
+      )
+      null
+    }
 
-  override fun getData(dataId: String): Any? = when {
-    cssRgbDataKey.`is`(dataId) -> StringUtil.stripHtml(cssRgb.get(), false)
-    cssRgbWithAlphaDataKey.`is`(dataId) -> StringUtil.stripHtml(cssRgbWithAlpha.get(), false)
-    cssHexDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHex.get(), false)
-    cssHexWithAlphaDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHexWithAlpha.get(), false)
-    cssHslDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHls.get(), false)
-    cssHslWithAlphaDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHlsWithAlpha.get(), false)
-    else -> null
-  }
+  override fun getData(dataId: String): Any? =
+    when {
+      cssRgbDataKey.`is`(dataId) -> StringUtil.stripHtml(cssRgb.get(), false)
+      cssRgbWithAlphaDataKey.`is`(dataId) -> StringUtil.stripHtml(cssRgbWithAlpha.get(), false)
+      cssHexDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHex.get(), false)
+      cssHexWithAlphaDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHexWithAlpha.get(), false)
+      cssHslDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHls.get(), false)
+      cssHslWithAlphaDataKey.`is`(dataId) -> StringUtil.stripHtml(cssHlsWithAlpha.get(), false)
+      else -> null
+    }
 
   // -- Private Methods ----------------------------------------------------- //
 
@@ -182,11 +194,19 @@ class ColorPicker(
     val blue = color.blue
     val alpha = color.alpha
     cssRgb.set("<html><code><b>rgb($red, $green, $blue)</b></code></html>")
-    cssRgbWithAlpha.set("<html><code><b>rgba($red, $green, $blue, ${"%.2f".format(Locale.US, alpha / 255.0)})</b></code></html>")
-    cssHex.set("<html><code><b>${"#%02X%02X%02X".format(Locale.US, red, green, blue)}</b></code></html>")
-    cssHexWithAlpha.set("<html><code><b>${"#%02X%02X%02X%02X".format(Locale.US, red, green, blue, alpha)}</b></code></html>")
+    cssRgbWithAlpha.set(
+      "<html><code><b>rgba($red, $green, $blue, ${"%.2f".format(Locale.US, alpha / 255.0)})</b></code></html>"
+    )
+    cssHex.set(
+      "<html><code><b>${"#%02X%02X%02X".format(Locale.US, red, green, blue)}</b></code></html>"
+    )
+    cssHexWithAlpha.set(
+      "<html><code><b>${"#%02X%02X%02X%02X".format(Locale.US, red, green, blue, alpha)}</b></code></html>"
+    )
     val hsl = rgbToHsl(red, green, blue)
-    cssHls.set("<html><code><b>${"hsl(%.2f, %.2f%%, %.2f%%)".format(Locale.US, hsl[0], hsl[1] * 100, hsl[2] * 100)}</b></code></html>")
+    cssHls.set(
+      "<html><code><b>${"hsl(%.2f, %.2f%%, %.2f%%)".format(Locale.US, hsl[0], hsl[1] * 100, hsl[2] * 100)}</b></code></html>"
+    )
     cssHlsWithAlpha.set(
       "<html><code><b>${
         "hsla(%.2f, %.2f%%, %.2f%%, %.2f)".format(
@@ -194,7 +214,7 @@ class ColorPicker(
           hsl[0],
           hsl[1] * 100,
           hsl[2] * 100,
-          alpha / 255.0
+          alpha / 255.0,
         )
       }</b></code></html>"
     )
@@ -215,24 +235,24 @@ class ColorPicker(
     if (max == min) {
       s = 0f
       h = s
-    }
-    else {
+    } else {
       val d = max - min
       s = if (l > 0.5) d / (2 - max - min) else d / (max + min)
 
-      h = when (max) {
-        r -> {
-          (g - b) / d + (if (g < b) 6 else 0)
-        }
+      h =
+        when (max) {
+          r -> {
+            (g - b) / d + (if (g < b) 6 else 0)
+          }
 
-        g -> {
-          (b - r) / d + 2
-        }
+          g -> {
+            (b - r) / d + 2
+          }
 
-        else -> {
-          (r - g) / d + 4
+          else -> {
+            (r - g) / d + 4
+          }
         }
-      }
 
       h /= 6f
     }
@@ -244,17 +264,16 @@ class ColorPicker(
 
   class Factory : DeveloperUiToolFactory<ColorPicker> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Color Picker",
-      contentTitle = "Color Picker"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "Color Picker", contentTitle = "Color Picker")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> ColorPicker) =
-      { configuration -> ColorPicker(project, configuration, parentDisposable) }
+      context: DeveloperUiToolContext,
+    ): ((DeveloperToolConfiguration) -> ColorPicker) = { configuration ->
+      ColorPicker(project, configuration, parentDisposable)
+    }
   }
 
   // -- Companion Object ---------------------------------------------------- //

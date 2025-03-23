@@ -14,14 +14,15 @@ class LineBreaksEncoderDecoder(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   context: DeveloperUiToolContext,
-  project: Project?
-) : TextConverter(
-  textConverterContext = encoderDecoderTextConverterContext,
-  configuration = configuration,
-  parentDisposable = parentDisposable,
-  context = context,
-  project = project
-) {
+  project: Project?,
+) :
+  TextConverter(
+    textConverterContext = encoderDecoderTextConverterContext,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    context = context,
+    project = project,
+  ) {
   // -- Properties ---------------------------------------------------------- //
 
   private var lineBreakDecoding = configuration.register("lineBreakDecoding", LineBreak.CRLF)
@@ -48,11 +49,7 @@ class LineBreaksEncoderDecoder(
   }
 
   override fun Panel.buildMiddleFirstConfigurationUi() {
-    row {
-      comboBox(LineBreak.entries)
-        .label("Decode line break to:")
-        .bindItem(lineBreakDecoding)
-    }
+    row { comboBox(LineBreak.entries).label("Decode line break to:").bindItem(lineBreakDecoding) }
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -70,17 +67,19 @@ class LineBreaksEncoderDecoder(
 
   class Factory : DeveloperUiToolFactory<LineBreaksEncoderDecoder> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Line Breaks",
-      contentTitle = "Line Breaks Encoder/Decoder"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(
+        menuTitle = "Line Breaks",
+        contentTitle = "Line Breaks Encoder/Decoder",
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> LineBreaksEncoderDecoder) =
-      { configuration -> LineBreaksEncoderDecoder(configuration, parentDisposable, context, project) }
+      context: DeveloperUiToolContext,
+    ): ((DeveloperToolConfiguration) -> LineBreaksEncoderDecoder) = { configuration ->
+      LineBreaksEncoderDecoder(configuration, parentDisposable, context, project)
+    }
   }
 
   // -- Companion Object ---------------------------------------------------- //

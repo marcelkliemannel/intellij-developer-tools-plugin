@@ -17,8 +17,7 @@ object IoUtils {
     this.listFiles()?.forEach { file ->
       if (file.isDirectory) {
         files.addAll(file.collectAllFiles())
-      }
-      else {
+      } else {
         files.add(file)
       }
     }
@@ -29,9 +28,7 @@ object IoUtils {
   fun Path.collectAllFiles(): List<Path> {
     check(this.isDirectory())
 
-    return Files.walk(this)
-      .filter { it.isRegularFile() }
-      .toList()
+    return Files.walk(this).filter { it.isRegularFile() }.toList()
   }
 
   // -- Private Methods ----------------------------------------------------- //

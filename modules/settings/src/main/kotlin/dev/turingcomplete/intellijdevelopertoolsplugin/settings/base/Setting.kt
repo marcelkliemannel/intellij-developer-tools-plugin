@@ -8,5 +8,5 @@ import org.jetbrains.annotations.PropertyKey
 annotation class Setting(
   @PropertyKey(resourceBundle = SETTINGS_BUNDLE_ID) val titleBundleKey: String,
   @PropertyKey(resourceBundle = SETTINGS_BUNDLE_ID) val descriptionBundleKey: String = "",
-  val groupId: String = ""
+  val groupId: String = "",
 )

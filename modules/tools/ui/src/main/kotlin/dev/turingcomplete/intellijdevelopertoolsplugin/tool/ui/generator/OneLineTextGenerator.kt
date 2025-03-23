@@ -34,7 +34,7 @@ abstract class OneLineTextGenerator(
   private val project: Project?,
   private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
 ) : DeveloperUiTool(parentDisposable), DeveloperToolConfiguration.ChangeListener {
   // -- Properties ---------------------------------------------------------- //
 
@@ -87,10 +87,11 @@ abstract class OneLineTextGenerator(
     configuration.removeChangeListener(this)
   }
 
-  override fun getData(dataId: String): Any? = when {
-    CONTENT_DATA_KEY.`is`(dataId) -> generatedText.get()
-    else -> super.getData(dataId)
-  }
+  override fun getData(dataId: String): Any? =
+    when {
+      CONTENT_DATA_KEY.`is`(dataId) -> generatedText.get()
+      else -> super.getData(dataId)
+    }
 
   // -- Private Methods ----------------------------------------------------- //
 
@@ -99,8 +100,7 @@ abstract class OneLineTextGenerator(
       if (validate().isEmpty()) {
         generatedText.set(generate())
         invalidConfiguration.set(false)
-      }
-      else {
+      } else {
         invalidConfiguration.set(true)
       }
     }
@@ -112,47 +112,61 @@ abstract class OneLineTextGenerator(
 
   private fun Panel.buildBulkGenerationUi() {
     collapsibleGroup("Bulk Generation", false) {
-      val resultEditor = AdvancedEditor(
-        id = "bulk-generation", title = null, editorMode = OUTPUT,
-        configuration = configuration, project = project, context = context,
-        parentDisposable = parentDisposable
-      )
+        val resultEditor =
+          AdvancedEditor(
+            id = "bulk-generation",
+            title = null,
+            editorMode = OUTPUT,
+            configuration = configuration,
+            project = project,
+            context = context,
+            parentDisposable = parentDisposable,
+          )
 
-      row {
-        label("Number of values:").gap(RightGap.SMALL)
+        row {
+          label("Number of values:").gap(RightGap.SMALL)
 
-        val numberOfValuesTextField = intTextField(IntRange(1, 99999)).columns(COLUMNS_TINY).applyToComponent {
-          text = DEFAULT_NUMBER_OF_VALUES
-        }.gap(RightGap.SMALL)
+          val numberOfValuesTextField =
+            intTextField(IntRange(1, 99999))
+              .columns(COLUMNS_TINY)
+              .applyToComponent { text = DEFAULT_NUMBER_OF_VALUES }
+              .gap(RightGap.SMALL)
 
-        button("Generate") {
-          configuration
-          if (validate().isEmpty()) {
-            resultEditor.text = IntRange(1, numberOfValuesTextField.component.text.toInt())
-              .joinToString(System.lineSeparator()) { generate() }
+          button("Generate") {
+            configuration
+            if (validate().isEmpty()) {
+              resultEditor.text =
+                IntRange(1, numberOfValuesTextField.component.text.toInt()).joinToString(
+                  System.lineSeparator()
+                ) {
+                  generate()
+                }
+            }
           }
         }
-      }
 
-      row {
-        cell(resultEditor.component).align(Align.FILL)
-      }.resizableRow()
-    }.resizableRow().bottomGap(BottomGap.MEDIUM).visibleIf(supportsBulkGeneration)
+        row { cell(resultEditor.component).align(Align.FILL) }.resizableRow()
+      }
+      .resizableRow()
+      .bottomGap(BottomGap.MEDIUM)
+      .visibleIf(supportsBulkGeneration)
   }
 
   private fun Panel.buildGeneratedValueUi() {
     row {
-      label("")
-        .bindText(generatedText)
-        .monospaceFont(scale = 1.7f, style = Font.BOLD)
-        .gap(RightGap.SMALL)
-      actionButton(CopyAction()).gap(RightGap.SMALL)
-      actionButton(RegenerateAction { doGenerate() })
-    }.visibleIf(invalidConfiguration.not())
+        label("")
+          .bindText(generatedText)
+          .monospaceFont(scale = 1.7f, style = Font.BOLD)
+          .gap(RightGap.SMALL)
+        actionButton(CopyAction()).gap(RightGap.SMALL)
+        actionButton(RegenerateAction { doGenerate() })
+      }
+      .visibleIf(invalidConfiguration.not())
     row {
-      icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
-      label("Invalid configuration").bold()
-    }.visibleIf(invalidConfiguration)
+        icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
+        label("Invalid configuration").bold()
+      }
+      .visibleIf(invalidConfiguration)
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -173,6 +187,7 @@ abstract class OneLineTextGenerator(
 
     private const val DEFAULT_NUMBER_OF_VALUES = "10"
 
-    //val codeFont: Font = JBFont.MONOSPACED EditorColorsManager.getInstance().globalScheme.editorFontName
+    // val codeFont: Font = JBFont.MONOSPACED
+    // EditorColorsManager.getInstance().globalScheme.editorFontName
   }
 }

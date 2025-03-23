@@ -14,9 +14,8 @@ import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Dimension
 import javax.swing.JComponent
 
-abstract class DeveloperUiTool(
-  protected val parentDisposable: Disposable
-) : DataProvider, Disposable {
+abstract class DeveloperUiTool(protected val parentDisposable: Disposable) :
+  DataProvider, Disposable {
   // -- Properties ---------------------------------------------------------- //
 
   private lateinit var component: DialogPanel
@@ -30,9 +29,7 @@ abstract class DeveloperUiTool(
   // -- Exposed Methods ----------------------------------------------------- //
 
   fun createComponent(): JComponent {
-    component = panel {
-      buildUi()
-    }
+    component = panel { buildUi() }
     // This prevents the `Editor` from increasing the size of the dialog if the
     // to display all the text on the screen instead of using scrollbars. The
     // reason for this behavior is that the UI DSL always sets the minimum size
@@ -45,15 +42,16 @@ abstract class DeveloperUiTool(
       it.registerValidators(parentDisposable)
     }
 
-    var wrapper: JComponent = object : BorderLayoutPanel(), DataProvider {
+    var wrapper: JComponent =
+      object : BorderLayoutPanel(), DataProvider {
 
-      init {
-        border = JBEmptyBorder(12, 16, 16, 16)
-        addToCenter(component)
+        init {
+          border = JBEmptyBorder(12, 16, 16, 16)
+          addToCenter(component)
+        }
+
+        override fun getData(dataId: String): Any? = this@DeveloperUiTool.getData(dataId)
       }
-
-      override fun getData(dataId: String): Any? = this@DeveloperUiTool.getData(dataId)
-    }
 
     if (wrapComponentInScrollPane) {
       wrapper = createScrollPane(wrapper, true)
@@ -97,9 +95,8 @@ abstract class DeveloperUiTool(
   }
 
   fun validate(): List<ValidationInfo> {
-    val result = findComponentsOfType(component, DialogPanel::class.java).flatMap {
-      it.validateAll()
-    }.toList()
+    val result =
+      findComponentsOfType(component, DialogPanel::class.java).flatMap { it.validateAll() }.toList()
     validationListeners.forEach { it(result) }
     return result
   }
@@ -115,16 +112,14 @@ abstract class DeveloperUiTool(
   companion object {
 
     /**
-     * If [com.intellij.ui.dsl.builder.Cell.validationOnApply] gets called and
-     * there is no [com.intellij.ui.dsl.builder.Cell.validationRequestor]
-     * registered, IntelliJ will log the warning `Please, install
-     * Cell.validationRequestor`. To circumvent this, we set a dummy requestor
-     * without any functionally.
+     * If [com.intellij.ui.dsl.builder.Cell.validationOnApply] gets called and there is no
+     * [com.intellij.ui.dsl.builder.Cell.validationRequestor] registered, IntelliJ will log the
+     * warning `Please, install Cell.validationRequestor`. To circumvent this, we set a dummy
+     * requestor without any functionally.
      *
-     * Future todos: The validation mechanism of the new UI has been further
-     * developed since the initial creation of the plugin. The current mechanism
-     * in [DeveloperUiTool.validate], may no longer be necessary and may be better
-     * solved with on-board resources.
+     * Future todos: The validation mechanism of the new UI has been further developed since the
+     * initial creation of the plugin. The current mechanism in [DeveloperUiTool.validate], may no
+     * longer be necessary and may be better solved with on-board resources.
      */
     val DUMMY_DIALOG_VALIDATION_REQUESTOR = DialogValidationRequestor { _, _ -> }
   }

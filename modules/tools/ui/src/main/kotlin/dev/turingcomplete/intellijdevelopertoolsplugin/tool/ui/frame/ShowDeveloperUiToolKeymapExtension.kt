@@ -29,5 +29,10 @@ class ShowDeveloperUiToolKeymapExtension : KeymapExtension {
   // -- Inner Type ---------------------------------------------------------- //
   // -- Companion Object ---------------------------------------------------- //
 
-  private val icon = IconManager.getInstance().getIcon("dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg", ShowDeveloperUiToolKeymapExtension::class.java.classLoader)
+  private val icon =
+    IconManager.getInstance()
+      .getIcon(
+        "dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg",
+        ShowDeveloperUiToolKeymapExtension::class.java.classLoader,
+      )
 }

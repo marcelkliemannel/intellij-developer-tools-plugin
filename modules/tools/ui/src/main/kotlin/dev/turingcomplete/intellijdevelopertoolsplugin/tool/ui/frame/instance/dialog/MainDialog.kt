@@ -14,23 +14,16 @@ import javax.swing.Action
 import javax.swing.JComponent
 
 /**
- * Note regarding modality:
- * It seems that, as of IntelliJ 2023.1 and at least on macOS, a non-modal
- * dialog is always shown in front of the IDE window. This can also be seen
- * in IntelliJ's "UI DSL Showcase" dialog.
+ * Note regarding modality: It seems that, as of IntelliJ 2023.1 and at least on macOS, a non-modal
+ * dialog is always shown in front of the IDE window. This can also be seen in IntelliJ's "UI DSL
+ * Showcase" dialog.
  */
-class MainDialog(
-  project: Project?
-) : DialogWrapper(
-  project,
-  null,
-  true,
-  IdeModalityType.MODELESS,
-  false
-), Place.Navigator {
+class MainDialog(project: Project?) :
+  DialogWrapper(project, null, true, IdeModalityType.MODELESS, false), Place.Navigator {
   // -- Properties ---------------------------------------------------------- //
 
-  val contentPanelHandler = ContentPanelHandler(project, disposable, DeveloperToolsDialogSettings.instance)
+  val contentPanelHandler =
+    ContentPanelHandler(project, disposable, DeveloperToolsDialogSettings.instance)
 
   // -- Initialization ------------------------------------------------------ //
 
@@ -49,9 +42,8 @@ class MainDialog(
 
       firstComponent = contentPanelHandler.toolsMenuTree.createWrapperComponent(this@apply)
 
-      secondComponent = contentPanelHandler.contentPanel.apply {
-        border = JBEmptyBorder(0, 0, 0, DIVIDER_WIDTH)
-      }
+      secondComponent =
+        contentPanelHandler.contentPanel.apply { border = JBEmptyBorder(0, 0, 0, DIVIDER_WIDTH) }
     }
   }
 

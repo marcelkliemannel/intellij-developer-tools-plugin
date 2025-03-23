@@ -21,11 +21,14 @@ object EditorUtils {
   }
 
   fun Editor.executeWriteCommand(actionName: String, action: (Editor) -> Unit) {
-    CommandProcessor.getInstance().executeCommand(this.project, {
-      runWriteAction {
-        action(this)
-      }
-    }, actionName, null, this.document)
+    CommandProcessor.getInstance()
+      .executeCommand(
+        this.project,
+        { runWriteAction { action(this) } },
+        actionName,
+        null,
+        this.document,
+      )
   }
 
   fun AnActionEvent.getEditor(): Editor =
@@ -36,8 +39,7 @@ object EditorUtils {
   private fun SelectionModel.getTextRangeIfSelection(): TextRange? =
     if (selectionStart < selectionEnd) {
       TextRange(selectionStart, selectionEnd)
-    }
-    else {
+    } else {
       null
     }
 

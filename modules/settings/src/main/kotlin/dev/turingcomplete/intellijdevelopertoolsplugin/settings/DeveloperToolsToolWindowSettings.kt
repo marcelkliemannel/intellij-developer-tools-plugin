@@ -10,7 +10,7 @@ import com.intellij.openapi.project.Project
 @State(
   name = "DeveloperToolsToolWindowSettingsV1",
   storages = [Storage("developer-tools.xml")],
-  category = SettingsCategory.TOOLS
+  category = SettingsCategory.TOOLS,
 )
 @Service(PROJECT)
 class DeveloperToolsToolWindowSettings : DeveloperToolsInstanceSettings() {
@@ -23,9 +23,7 @@ class DeveloperToolsToolWindowSettings : DeveloperToolsInstanceSettings() {
 
   companion object {
 
-    /**
-     * Warning: The first access to this service will trigger the `loadState()`.
-     */
+    /** Warning: The first access to this service will trigger the `loadState()`. */
     fun getInstance(project: Project): DeveloperToolsToolWindowSettings =
       project.getService(DeveloperToolsToolWindowSettings::class.java)
   }

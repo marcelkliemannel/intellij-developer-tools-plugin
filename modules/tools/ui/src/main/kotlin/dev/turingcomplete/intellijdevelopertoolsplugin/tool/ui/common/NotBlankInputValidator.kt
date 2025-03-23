@@ -7,11 +7,9 @@ class NotBlankInputValidator : InputValidator {
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
-  override fun checkInput(inputString: String?): Boolean =
-    inputString?.isNotBlank() ?: false
+  override fun checkInput(inputString: String?): Boolean = inputString?.isNotBlank() ?: false
 
-  override fun canClose(inputString: String?): Boolean =
-    inputString?.isNotBlank() ?: false
+  override fun canClose(inputString: String?): Boolean = inputString?.isNotBlank() ?: false
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //

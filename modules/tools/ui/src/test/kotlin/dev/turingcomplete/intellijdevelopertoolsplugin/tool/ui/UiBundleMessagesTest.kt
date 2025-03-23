@@ -11,13 +11,17 @@ class UiBundleMessagesTest : BundleMessagesTest() {
   // -- Exported Methods ---------------------------------------------------- //
 
   @TestFactory
-  override fun `test that all additional languages are containing the same message keys and parameter counts`(): List<DynamicNode> =
-    super.`do test that all additional languages are containing the same message keys and parameter counts`()
+  override fun `test that all additional languages are containing the same message keys and parameter counts`():
+    List<DynamicNode> =
+    super
+      .`do test that all additional languages are containing the same message keys and parameter counts`()
 
   @TestFactory
   @RunMethodInEdt(writeIntent = RunMethodInEdt.WriteIntentMode.True)
-  override fun `test that all message(messageKey, params) calls are referencing to an existing message key and are using the correct parameters count`(): List<DynamicNode> =
-    super.`do test that all message(messageKey, params) calls are referencing to an existing message key and are using the correct parameters count`()
+  override fun `test that all message(messageKey, params) calls are referencing to an existing message key and are using the correct parameters count`():
+    List<DynamicNode> =
+    super
+      .`do test that all message(messageKey, params) calls are referencing to an existing message key and are using the correct parameters count`()
 
   @TestFactory
   @RunMethodInEdt(writeIntent = RunMethodInEdt.WriteIntentMode.True)

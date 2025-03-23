@@ -31,32 +31,38 @@ class LoremIpsumGenerator(
   project: Project?,
   context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
-) : MultiLineTextGenerator(
+  parentDisposable: Disposable,
+) :
+  MultiLineTextGenerator(
     generatedTextTitle = "Generated lorem ipsum",
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
-    project = project
+    project = project,
   ) {
   // -- Properties ---------------------------------------------------------- //
 
   private var textMode = configuration.register("generatedTextKind", PARAGRAPHS)
   private var numberOfValues = configuration.register("numberOfValues", 9)
-  private var minWordsInParagraph = configuration.register("minWordsInParagraph", DEFAULT_MIN_PARAGRAPH_WORDS)
-  private var maxWordsInParagraph = configuration.register("maxWordsInParagraph", DEFAULT_MAX_PARAGRAPH_WORDS)
-  private var minWordsInBullet = configuration.register("minWordsInBullet", DEFAULT_MIN_BULLET_WORDS)
-  private var maxWordsInBullet = configuration.register("maxWordsInBullet", DEFAULT_MAX_BULLET_WORDS)
+  private var minWordsInParagraph =
+    configuration.register("minWordsInParagraph", DEFAULT_MIN_PARAGRAPH_WORDS)
+  private var maxWordsInParagraph =
+    configuration.register("maxWordsInParagraph", DEFAULT_MAX_PARAGRAPH_WORDS)
+  private var minWordsInBullet =
+    configuration.register("minWordsInBullet", DEFAULT_MIN_BULLET_WORDS)
+  private var maxWordsInBullet =
+    configuration.register("maxWordsInBullet", DEFAULT_MAX_BULLET_WORDS)
   private var startWithLoremIpsum = configuration.register("startWithLoremIpsum", true)
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
-  override fun generate(): String = when (textMode.get()) {
-    WORDS -> generateWords()
-    PARAGRAPHS -> generateParagraphs()
-    BULLETS -> generateBullets()
-  }
+  override fun generate(): String =
+    when (textMode.get()) {
+      WORDS -> generateWords()
+      PARAGRAPHS -> generateParagraphs()
+      BULLETS -> generateBullets()
+    }
 
   override fun Panel.buildConfigurationUi() {
     lateinit var textModeComboBox: ComboBox<TextMode>
@@ -66,42 +72,42 @@ class LoremIpsumGenerator(
         .validateLongValue(LongRange(1, 999))
         .columns(COLUMNS_TINY)
         .gap(RightGap.SMALL)
-      textModeComboBox = comboBox(TextMode.entries)
-        .bindItem(textMode)
-        .component
+      textModeComboBox = comboBox(TextMode.entries).bindItem(textMode).component
     }
 
     row {
-      textField()
-        .label("Minimum words in paragraph:")
-        .bindIntTextImproved(minWordsInParagraph)
-        .validateLongValue(LongRange(1, 999))
-        .columns(COLUMNS_TINY)
-        .validateMinMaxValueRelation(MIN) { maxWordsInParagraph.get() }
-        .gap(RightGap.SMALL)
-      textField()
-        .label("Maximum:")
-        .bindIntTextImproved(maxWordsInParagraph)
-        .validateLongValue(LongRange(1, 999))
-        .columns(COLUMNS_TINY)
-        .validateMinMaxValueRelation(MAX) { minWordsInParagraph.get() }
-    }.visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == PARAGRAPHS })
+        textField()
+          .label("Minimum words in paragraph:")
+          .bindIntTextImproved(minWordsInParagraph)
+          .validateLongValue(LongRange(1, 999))
+          .columns(COLUMNS_TINY)
+          .validateMinMaxValueRelation(MIN) { maxWordsInParagraph.get() }
+          .gap(RightGap.SMALL)
+        textField()
+          .label("Maximum:")
+          .bindIntTextImproved(maxWordsInParagraph)
+          .validateLongValue(LongRange(1, 999))
+          .columns(COLUMNS_TINY)
+          .validateMinMaxValueRelation(MAX) { minWordsInParagraph.get() }
+      }
+      .visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == PARAGRAPHS })
 
     row {
-      textField()
-        .label("Minimum words in bullet:")
-        .bindIntTextImproved(minWordsInBullet)
-        .validateLongValue(LongRange(1, 999))
-        .columns(COLUMNS_TINY)
-        .validateMinMaxValueRelation(MIN) { maxWordsInBullet.get() }
-        .gap(RightGap.SMALL)
-      textField()
-        .label("Maximum:")
-        .bindIntTextImproved(maxWordsInBullet)
-        .validateLongValue(LongRange(1, 999))
-        .columns(COLUMNS_TINY)
-        .validateMinMaxValueRelation(MAX) { minWordsInBullet.get() }
-    }.visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == BULLETS })
+        textField()
+          .label("Minimum words in bullet:")
+          .bindIntTextImproved(minWordsInBullet)
+          .validateLongValue(LongRange(1, 999))
+          .columns(COLUMNS_TINY)
+          .validateMinMaxValueRelation(MIN) { maxWordsInBullet.get() }
+          .gap(RightGap.SMALL)
+        textField()
+          .label("Maximum:")
+          .bindIntTextImproved(maxWordsInBullet)
+          .validateLongValue(LongRange(1, 999))
+          .columns(COLUMNS_TINY)
+          .validateMinMaxValueRelation(MAX) { minWordsInBullet.get() }
+      }
+      .visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == BULLETS })
 
     row {
       checkBox("<html>Start with iconic <i>Lorem ipsum dolor sit amet…</i></html>")
@@ -110,13 +116,16 @@ class LoremIpsumGenerator(
   }
 
   fun generateIconicText(atMostWords: Int, isSentence: Boolean): List<String> {
-    val words = ICONIC_LOREM_IPSUM_SENTENCE.subList(0, min(ICONIC_LOREM_IPSUM_SENTENCE.size, atMostWords)).toMutableList()
+    val words =
+      ICONIC_LOREM_IPSUM_SENTENCE.subList(0, min(ICONIC_LOREM_IPSUM_SENTENCE.size, atMostWords))
+        .toMutableList()
 
     if (isSentence) {
       val wordsSize = words.size
       // Comma
       if (wordsSize > ICONIC_LOREM_IPSUM_SENTENCE_COMMA_INDEX + 1) {
-        words[ICONIC_LOREM_IPSUM_SENTENCE_COMMA_INDEX] = "${words[ICONIC_LOREM_IPSUM_SENTENCE_COMMA_INDEX]},"
+        words[ICONIC_LOREM_IPSUM_SENTENCE_COMMA_INDEX] =
+          "${words[ICONIC_LOREM_IPSUM_SENTENCE_COMMA_INDEX]},"
       }
       if (wordsSize >= 1) {
         // Capitalize first character
@@ -131,19 +140,20 @@ class LoremIpsumGenerator(
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun generateParagraphs() = IntRange(0, numberOfValues.get() - 1).joinToString(PARAGRAPH_SEPARATOR) { paragraphIndex ->
+  private fun generateParagraphs() =
+    IntRange(0, numberOfValues.get() - 1).joinToString(PARAGRAPH_SEPARATOR) { paragraphIndex ->
+      val totalWordsInParagraph =
+        SECURE_RANDOM.nextInt(minWordsInParagraph.get(), maxWordsInParagraph.get() + 1)
 
-    val totalWordsInParagraph = SECURE_RANDOM.nextInt(minWordsInParagraph.get(), maxWordsInParagraph.get() + 1)
+      val initialWords =
+        if (paragraphIndex == 0 && startWithLoremIpsum.get()) {
+          generateIconicText(totalWordsInParagraph, true)
+        } else {
+          emptyList()
+        }
 
-    val initialWords = if (paragraphIndex == 0 && startWithLoremIpsum.get()) {
-      generateIconicText(totalWordsInParagraph, true)
+      createSentences(initialWords, totalWordsInParagraph).joinToString(WORDS_SEPARATOR)
     }
-    else {
-      emptyList()
-    }
-
-    createSentences(initialWords, totalWordsInParagraph).joinToString(WORDS_SEPARATOR)
-  }
 
   private fun generateWords(): String {
     val words = mutableListOf<String>()
@@ -159,41 +169,42 @@ class LoremIpsumGenerator(
     return words.joinToString(WORDS_SEPARATOR)
   }
 
-  private fun generateBullets() = IntRange(0, numberOfValues.get() - 1).joinToString(BULLET_SEPARATOR) { bulletIndex ->
-    val words = mutableListOf<String>()
+  private fun generateBullets() =
+    IntRange(0, numberOfValues.get() - 1).joinToString(BULLET_SEPARATOR) { bulletIndex ->
+      val words = mutableListOf<String>()
 
-    val totalWordsInBullet = SECURE_RANDOM.nextInt(minWordsInBullet.get(), maxWordsInBullet.get())
+      val totalWordsInBullet = SECURE_RANDOM.nextInt(minWordsInBullet.get(), maxWordsInBullet.get())
 
-    if (bulletIndex == 0 && startWithLoremIpsum.get()) {
-      words.addAll(generateIconicText(totalWordsInBullet, true))
+      if (bulletIndex == 0 && startWithLoremIpsum.get()) {
+        words.addAll(generateIconicText(totalWordsInBullet, true))
+      }
+
+      // Avoid a single word sentence.
+      words.addAll(createSentences(words, totalWordsInBullet))
+
+      words[0] = "$BULLET_SYMBOL ${words[0]}"
+
+      words.joinToString(WORDS_SEPARATOR)
     }
 
-    // Avoid a single word sentence.
-    words.addAll(createSentences(words, totalWordsInBullet))
-
-    words[0] = "$BULLET_SYMBOL ${words[0]}"
-
-    words.joinToString(WORDS_SEPARATOR)
-  }
-
-  private fun getRandomWords(words: Int): List<String> = IntRange(0, words - 1).asSequence()
-    .map { getRandomWord() }
-    .toList()
+  private fun getRandomWords(words: Int): List<String> =
+    IntRange(0, words - 1).asSequence().map { getRandomWord() }.toList()
 
   private fun getRandomWord() = LOREM_IPSUM_WORDS[SECURE_RANDOM.nextInt(LOREM_IPSUM_WORDS.size)]
 
   private fun createSentence(words: List<String>): List<String> {
     // Divide sentence in n-1 fragments (the last fragment does not get a comma).
     val fragments = Math.floorDiv(words.size, TEXT_FRAGMENT_LENGTH) - 1
-    val indiciesOfWordsWithCommas = IntRange(0, fragments - 1)
-      // Randomly decide with a 2/3 change to put comma in fragment
-      .filter { SECURE_RANDOM.nextInt(1, 4) != 3 }
-      // Randomly decide index after the first word
-      .map { fragmentIndex ->
-        val commaIndexInFragment = SECURE_RANDOM.nextInt(1, TEXT_FRAGMENT_LENGTH)
-        (TEXT_FRAGMENT_LENGTH * fragmentIndex) + commaIndexInFragment
-      }
-      .toSet()
+    val indiciesOfWordsWithCommas =
+      IntRange(0, fragments - 1)
+        // Randomly decide with a 2/3 change to put comma in fragment
+        .filter { SECURE_RANDOM.nextInt(1, 4) != 3 }
+        // Randomly decide index after the first word
+        .map { fragmentIndex ->
+          val commaIndexInFragment = SECURE_RANDOM.nextInt(1, TEXT_FRAGMENT_LENGTH)
+          (TEXT_FRAGMENT_LENGTH * fragmentIndex) + commaIndexInFragment
+        }
+        .toSet()
 
     return words.mapIndexed { i: Int, rawWord: String ->
       var word = rawWord
@@ -218,7 +229,9 @@ class LoremIpsumGenerator(
       // With the max we ensue that there are at least `MIN_SENTENCE_WORDS` words.
       val minSentenceWords = max(min(MIN_SENTENCE_WORDS, remainingWords), MIN_SENTENCE_WORDS)
       val maxSentenceWords = max(min(MAX_SENTENCE_WORDS, remainingWords), MIN_SENTENCE_WORDS)
-      val sentenceWords = if (minSentenceWords == maxSentenceWords) minSentenceWords else SECURE_RANDOM.nextInt(minSentenceWords, maxSentenceWords)
+      val sentenceWords =
+        if (minSentenceWords == maxSentenceWords) minSentenceWords
+        else SECURE_RANDOM.nextInt(minSentenceWords, maxSentenceWords)
       val elements = createSentence(getRandomWords(sentenceWords))
       words.addAll(elements)
     }
@@ -241,15 +254,13 @@ class LoremIpsumGenerator(
 
   class Factory : DeveloperUiToolFactory<LoremIpsumGenerator> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Lorem Ipsum",
-      contentTitle = "Lorem Ipsum Generator"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "Lorem Ipsum", contentTitle = "Lorem Ipsum Generator")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> LoremIpsumGenerator) = { configuration ->
       LoremIpsumGenerator(project, context, configuration, parentDisposable)
     }
@@ -260,10 +271,15 @@ class LoremIpsumGenerator(
   companion object {
 
     private val SECURE_RANDOM = SecureRandom()
-    private val ICONIC_LOREM_IPSUM_SENTENCE = listOf("lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit")
+    private val ICONIC_LOREM_IPSUM_SENTENCE =
+      listOf("lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit")
     private const val ICONIC_LOREM_IPSUM_SENTENCE_COMMA_INDEX = 4
     private val LOREM_IPSUM_WORDS: List<String> by lazy {
-      LoremIpsumGenerator::class.java.getResource("/dev/turingcomplete/intellijdevelopertoolsplugin/lorem-ipsum.txt")!!.readText().lines()
+      LoremIpsumGenerator::class
+        .java
+        .getResource("/dev/turingcomplete/intellijdevelopertoolsplugin/lorem-ipsum.txt")!!
+        .readText()
+        .lines()
     }
     private const val DEFAULT_MIN_PARAGRAPH_WORDS = 20
     private const val DEFAULT_MAX_PARAGRAPH_WORDS = 100

@@ -11,17 +11,10 @@ import org.jetbrains.annotations.Nls
 import javax.swing.JComponent
 
 data class DeveloperUiToolPresentation(
-  @Nls(capitalization = Nls.Capitalization.Title)
-  val menuTitle: String,
-
-  @Nls(capitalization = Nls.Capitalization.Title)
-  val groupedMenuTitle: String = menuTitle,
-
-  @Nls(capitalization = Nls.Capitalization.Title)
-  val contentTitle: String,
-
-  @Nls(capitalization = Nls.Capitalization.Sentence)
-  val description: Description? = null
+  @Nls(capitalization = Nls.Capitalization.Title) val menuTitle: String,
+  @Nls(capitalization = Nls.Capitalization.Title) val groupedMenuTitle: String = menuTitle,
+  @Nls(capitalization = Nls.Capitalization.Title) val contentTitle: String,
+  @Nls(capitalization = Nls.Capitalization.Sentence) val description: Description? = null,
 ) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
@@ -39,12 +32,9 @@ data class DeveloperUiToolPresentation(
   private class ContextHelpDescription(private val description: String) : Description {
 
     override fun show(parentComponent: JComponent) {
-      val panel = panel {
-        row {
-          label("<html>$description</html>")
-        }
-      }
-      JBPopupFactory.getInstance().createBalloonBuilder(panel)
+      val panel = panel { row { label("<html>$description</html>") } }
+      JBPopupFactory.getInstance()
+        .createBalloonBuilder(panel)
         .setDialogMode(true)
         .setFillColor(UIUtil.getPanelBackground())
         .setBorderColor(JBColor.border())

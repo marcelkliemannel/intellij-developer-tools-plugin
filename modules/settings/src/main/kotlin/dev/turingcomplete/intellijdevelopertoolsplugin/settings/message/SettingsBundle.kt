@@ -8,13 +8,16 @@ object SettingsBundle {
 
   const val SETTINGS_BUNDLE_ID = "message.SettingsBundle"
 
-  private val instance: DynamicBundle = DynamicBundle(SettingsBundle::class.java, SETTINGS_BUNDLE_ID)
+  private val instance: DynamicBundle =
+    DynamicBundle(SettingsBundle::class.java, SETTINGS_BUNDLE_ID)
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
-  fun message(@PropertyKey(resourceBundle = SETTINGS_BUNDLE_ID) key: String, vararg params: Any): String =
-    instance.getMessage(key, *params)
+  fun message(
+    @PropertyKey(resourceBundle = SETTINGS_BUNDLE_ID) key: String,
+    vararg params: Any,
+  ): String = instance.getMessage(key, *params)
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //

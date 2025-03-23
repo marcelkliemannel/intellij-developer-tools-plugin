@@ -6,7 +6,7 @@ import com.intellij.ui.layout.ComponentPredicate
 
 class PropertyComponentPredicate<T>(
   private val property: ObservableProperty<T>,
-  private val expectedValue: T
+  private val expectedValue: T,
 ) : ComponentPredicate() {
   // -- Properties ---------------------------------------------------------- //
 
@@ -15,17 +15,13 @@ class PropertyComponentPredicate<T>(
   // -- Initialization ------------------------------------------------------ //
 
   init {
-    property.afterChange { value ->
-      changeDispatcher.fireEvent(value)
-    }
+    property.afterChange { value -> changeDispatcher.fireEvent(value) }
   }
 
   // -- Exposed Methods ----------------------------------------------------- //
 
   override fun addListener(listener: (Boolean) -> Unit) {
-    changeDispatcher.whenEventHappened { value ->
-      listener(value?.equals(expectedValue) ?: false)
-    }
+    changeDispatcher.whenEventHappened { value -> listener(value?.equals(expectedValue) ?: false) }
   }
 
   override fun invoke(): Boolean = property.get()?.equals(expectedValue) ?: false

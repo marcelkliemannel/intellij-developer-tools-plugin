@@ -25,9 +25,10 @@ abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityActio
   final override fun startInWriteAction(): Boolean = false
 
   final override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?): Boolean =
-    editor != null && file != null
-            && editor.document.isWritable
-            && getSourceText(editor, file) != null
+    editor != null &&
+      file != null &&
+      editor.document.isWritable &&
+      getSourceText(editor, file) != null
 
   final override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
     if (editor == null || file == null) {
@@ -51,19 +52,23 @@ abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityActio
   private class EscapersUnescapersModeSelectionListPopupStep(
     text: String,
     textRange: TextRange,
-    editor: Editor
-  ) : BaseListPopupStep<EscaperUnescaperListPopupStep<*>>(
-    null,
-    EscaperListPopupStep(text, textRange, editor),
-    UnescaperListPopupStep(text, textRange, editor)
-  ) {
+    editor: Editor,
+  ) :
+    BaseListPopupStep<EscaperUnescaperListPopupStep<*>>(
+      null,
+      EscaperListPopupStep(text, textRange, editor),
+      UnescaperListPopupStep(text, textRange, editor),
+    ) {
 
     override fun hasSubstep(baseListPopupStep: EscaperUnescaperListPopupStep<*>): Boolean = true
 
-    override fun getTextFor(baseListPopupStep: EscaperUnescaperListPopupStep<*>): String = baseListPopupStep.actionName
+    override fun getTextFor(baseListPopupStep: EscaperUnescaperListPopupStep<*>): String =
+      baseListPopupStep.actionName
 
-    override fun onChosen(baseListPopupStep: EscaperUnescaperListPopupStep<*>, finalChoice: Boolean): PopupStep<*> =
-      baseListPopupStep
+    override fun onChosen(
+      baseListPopupStep: EscaperUnescaperListPopupStep<*>,
+      finalChoice: Boolean,
+    ): PopupStep<*> = baseListPopupStep
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -78,7 +83,7 @@ abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityActio
   private class EscaperListPopupStep(
     private val text: String,
     private val textRange: TextRange,
-    private val editor: Editor
+    private val editor: Editor,
   ) : BaseListPopupStep<Escaper>(null, commonEscaper), EscaperUnescaperListPopupStep<Escaper> {
 
     override val actionName: String = "Escape"
@@ -96,8 +101,9 @@ abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityActio
   private class UnescaperListPopupStep(
     private val text: String,
     private val textRange: TextRange,
-    private val editor: Editor
-  ) : BaseListPopupStep<Unescaper>(null, commonUnescaper), EscaperUnescaperListPopupStep<Unescaper> {
+    private val editor: Editor,
+  ) :
+    BaseListPopupStep<Unescaper>(null, commonUnescaper), EscaperUnescaperListPopupStep<Unescaper> {
 
     override val actionName: String = "Unescape"
 

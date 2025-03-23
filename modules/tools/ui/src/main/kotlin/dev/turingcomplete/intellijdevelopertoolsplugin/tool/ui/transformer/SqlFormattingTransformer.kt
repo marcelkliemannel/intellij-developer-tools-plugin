@@ -21,28 +21,30 @@ class SqlFormattingTransformer(
   context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  project: Project?
-) : TextTransformer(
-  textTransformerContext = TextTransformerContext(
-    transformActionTitle = "Format",
-    sourceTitle = "Plain SQL",
-    resultTitle = "Formatted SQL",
-    initialSourceExampleText = EXAMPLE_SQL,
-    diffSupport = DiffSupport(
-      title = "SQL Formatting"
-    )
+  project: Project?,
+) :
+  TextTransformer(
+    textTransformerContext =
+      TextTransformerContext(
+        transformActionTitle = "Format",
+        sourceTitle = "Plain SQL",
+        resultTitle = "Formatted SQL",
+        initialSourceExampleText = EXAMPLE_SQL,
+        diffSupport = DiffSupport(title = "SQL Formatting"),
+      ),
+    context = context,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    project = project,
   ),
-  context = context,
-  configuration = configuration,
-  parentDisposable = parentDisposable,
-  project = project
-), DeveloperToolConfiguration.ChangeListener {
+  DeveloperToolConfiguration.ChangeListener {
   // -- Properties ---------------------------------------------------------- //
 
   private var dialect = configuration.register("dialect", DEFAULT_DIALECT)
   private var indentSpaces = configuration.register("indentSpaces", DEFAULT_INDENT_SPACES)
   private var uppercase = configuration.register("uppercase", DEFAULT_UPPERCASE)
-  private var linesBetweenQueries = configuration.register("linesBetweenQueries", DEFAULT_LINES_BETWEEN_QUERIES)
+  private var linesBetweenQueries =
+    configuration.register("linesBetweenQueries", DEFAULT_LINES_BETWEEN_QUERIES)
   private var maxColumnLength = configuration.register("maxColumnLength", DEFAULT_MAX_COLUMN_LENGTH)
 
   private lateinit var formatConfig: FormatConfig
@@ -51,37 +53,35 @@ class SqlFormattingTransformer(
   // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildMiddleConfigurationUi() {
-    row {
-      comboBox(Dialect.entries)
-        .label("Dialect:")
-        .bindItem(dialect)
-    }.layout(RowLayout.PARENT_GRID)
+    row { comboBox(Dialect.entries).label("Dialect:").bindItem(dialect) }
+      .layout(RowLayout.PARENT_GRID)
 
     row {
-      textField()
-        .label("Indent spaces:")
-        .bindIntTextImproved(indentSpaces)
-        .validateLongValue(LongRange(0, 99))
-    }.layout(RowLayout.PARENT_GRID)
+        textField()
+          .label("Indent spaces:")
+          .bindIntTextImproved(indentSpaces)
+          .validateLongValue(LongRange(0, 99))
+      }
+      .layout(RowLayout.PARENT_GRID)
 
     row {
-      textField()
-        .label("Lines between queries:")
-        .bindIntTextImproved(linesBetweenQueries)
-        .validateLongValue(LongRange(0, 99))
-    }.layout(RowLayout.PARENT_GRID)
+        textField()
+          .label("Lines between queries:")
+          .bindIntTextImproved(linesBetweenQueries)
+          .validateLongValue(LongRange(0, 99))
+      }
+      .layout(RowLayout.PARENT_GRID)
 
     row {
-      textField()
-        .label("Maximum column length:")
-        .bindIntTextImproved(maxColumnLength)
-        .validateLongValue(LongRange(0, 99))
-    }.layout(RowLayout.PARENT_GRID)
+        textField()
+          .label("Maximum column length:")
+          .bindIntTextImproved(maxColumnLength)
+          .validateLongValue(LongRange(0, 99))
+      }
+      .layout(RowLayout.PARENT_GRID)
 
-    row {
-      checkBox("Convert keywords to uppercase")
-        .bindSelected(uppercase)
-    }.layout(RowLayout.PARENT_GRID)
+    row { checkBox("Convert keywords to uppercase").bindSelected(uppercase) }
+      .layout(RowLayout.PARENT_GRID)
   }
 
   override fun afterBuildUi() {
@@ -101,27 +101,26 @@ class SqlFormattingTransformer(
   // -- Private Methods ----------------------------------------------------- //
 
   private fun updateFormatConfig() {
-    formatConfig = FormatConfig.builder()
-      .indent(" ".repeat(indentSpaces.get()))
-      .uppercase(uppercase.get())
-      .linesBetweenQueries(linesBetweenQueries.get())
-      .maxColumnLength(maxColumnLength.get())
-      .build()
+    formatConfig =
+      FormatConfig.builder()
+        .indent(" ".repeat(indentSpaces.get()))
+        .uppercase(uppercase.get())
+        .linesBetweenQueries(linesBetweenQueries.get())
+        .maxColumnLength(maxColumnLength.get())
+        .build()
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<SqlFormattingTransformer> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "SQL Formatting",
-      contentTitle = "SQL Formatting"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "SQL Formatting", contentTitle = "SQL Formatting")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> SqlFormattingTransformer) = { configuration ->
       SqlFormattingTransformer(context, configuration, parentDisposable, project)
     }
@@ -131,7 +130,8 @@ class SqlFormattingTransformer(
 
   companion object {
 
-    private const val EXAMPLE_SQL = "select c.id, c.name, o.address, o.orderedAt from customers c left join orders o ON (o.customerId = c.id) order by o.orderedAt"
+    private const val EXAMPLE_SQL =
+      "select c.id, c.name, o.address, o.orderedAt from customers c left join orders o ON (o.customerId = c.id) order by o.orderedAt"
 
     private val DEFAULT_DIALECT = Dialect.N1ql
     private const val DEFAULT_INDENT_SPACES = 2

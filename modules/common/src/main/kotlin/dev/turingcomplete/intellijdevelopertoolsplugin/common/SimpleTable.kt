@@ -21,23 +21,27 @@ class SimpleTable<T>(
   items: List<T>,
   columns: List<ColumnInfo<T, String>>,
   private val toCopyValue: (T) -> String,
-  initialSortedColumn: Pair<Int, SortOrder> = Pair(0, SortOrder.ASCENDING)
+  initialSortedColumn: Pair<Int, SortOrder> = Pair(0, SortOrder.ASCENDING),
 ) : JBTable(), DataProvider {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
 
   init {
-    model = ListTableModel(columns.toTypedArray(), items, initialSortedColumn.first, initialSortedColumn.second)
+    model =
+      ListTableModel(
+        columns.toTypedArray(),
+        items,
+        initialSortedColumn.first,
+        initialSortedColumn.second,
+      )
     setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
     rowSelectionAllowed = true
     columnSelectionAllowed = false
     setContextMenu(
-      this::class.java.name, DefaultActionGroup(
-        CopyValuesAction(valueToString = {
-          @Suppress("UNCHECKED_CAST")
-          toCopyValue(it as T)
-        })
-      )
+      this::class.java.name,
+      DefaultActionGroup(
+        CopyValuesAction(valueToString = { @Suppress("UNCHECKED_CAST") toCopyValue(it as T) })
+      ),
     )
     setEmptyState("No values")
     TableSpeedSearch.installOn(this)
@@ -52,31 +56,31 @@ class SimpleTable<T>(
     }
   }
 
-  override fun getData(dataId: String): Any? = when {
-    PluginCommonDataKeys.SELECTED_VALUES.`is`(dataId) -> {
-      val tableModel = model.uncheckedCastTo<ListTableModel<T>>()
-      selectedRows
-        .map { tableModel.getRowValue(rowSorter.convertRowIndexToModel(it)) }
-        .toList()
+  override fun getData(dataId: String): Any? =
+    when {
+      PluginCommonDataKeys.SELECTED_VALUES.`is`(dataId) -> {
+        val tableModel = model.uncheckedCastTo<ListTableModel<T>>()
+        selectedRows.map { tableModel.getRowValue(rowSorter.convertRowIndexToModel(it)) }.toList()
+      }
+
+      else -> null
     }
 
-    else -> null
-  }
-
-  fun asBalloon(parentDisposable: Disposable) = JBPopupFactory.getInstance()
-    .createBalloonBuilder(ScrollPaneFactory.createScrollPane(this, false).apply {
-      preferredSize = Dimension(400, 300)
-    })
-    .setDialogMode(true)
-    .setFillColor(UIUtil.getPanelBackground())
-    .setBorderColor(JBColor.border())
-    .setBlockClicksThroughBalloon(true)
-    .setRequestFocus(true)
-    .setDisposable(parentDisposable)
-    .createBalloon()
-    .apply {
-      setAnimationEnabled(false)
-    }
+  fun asBalloon(parentDisposable: Disposable) =
+    JBPopupFactory.getInstance()
+      .createBalloonBuilder(
+        ScrollPaneFactory.createScrollPane(this, false).apply {
+          preferredSize = Dimension(400, 300)
+        }
+      )
+      .setDialogMode(true)
+      .setFillColor(UIUtil.getPanelBackground())
+      .setBorderColor(JBColor.border())
+      .setBlockClicksThroughBalloon(true)
+      .setRequestFocus(true)
+      .setDisposable(parentDisposable)
+      .createBalloon()
+      .apply { setAnimationEnabled(false) }
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //

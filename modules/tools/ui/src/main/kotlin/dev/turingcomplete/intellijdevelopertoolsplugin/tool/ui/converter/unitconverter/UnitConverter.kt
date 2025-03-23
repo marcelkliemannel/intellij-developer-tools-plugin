@@ -8,10 +8,7 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.JComponent
 
-abstract class UnitConverter(
-  private val parentDisposable: Disposable,
-  val title: String
-) {
+abstract class UnitConverter(private val parentDisposable: Disposable, val title: String) {
   // -- Properties ---------------------------------------------------------- //
 
   private lateinit var component: DialogPanel

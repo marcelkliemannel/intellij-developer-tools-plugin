@@ -16,18 +16,20 @@ class HashingTransformer(
   context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  project: Project?
-) : TextTransformer(
-  textTransformerContext = TextTransformerContext(
-    transformActionTitle = "Hash",
-    sourceTitle = "Plain",
-    resultTitle = "Hashed"
-  ),
-  context = context,
-  configuration = configuration,
-  parentDisposable = parentDisposable,
-  project = project
-) {
+  project: Project?,
+) :
+  TextTransformer(
+    textTransformerContext =
+      TextTransformerContext(
+        transformActionTitle = "Hash",
+        sourceTitle = "Plain",
+        resultTitle = "Hashed",
+      ),
+    context = context,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    project = project,
+  ) {
   // -- Properties ---------------------------------------------------------- //
 
   private var selectedAlgorithm = configuration.register("algorithm", DEFAULT_ALGORITHM)
@@ -39,23 +41,22 @@ class HashingTransformer(
 
     // Validate if selected algorithm is still available
     if (messageDigestAlgorithms.find { it == selectedAlgorithm.get() } == null) {
-      selectedAlgorithm.set(messageDigestAlgorithms.find { it == DEFAULT_ALGORITHM } ?: messageDigestAlgorithms.first())
+      selectedAlgorithm.set(
+        messageDigestAlgorithms.find { it == DEFAULT_ALGORITHM } ?: messageDigestAlgorithms.first()
+      )
     }
   }
 
   // -- Exposed Methods ----------------------------------------------------- //
 
   override fun transform() {
-    val hash = selectedAlgorithm.get().toMessageDigest().digest(sourceText.get().encodeToByteArray())
+    val hash =
+      selectedAlgorithm.get().toMessageDigest().digest(sourceText.get().encodeToByteArray())
     resultText.set(hash.toHexString())
   }
 
   override fun Panel.buildTopConfigurationUi() {
-    row {
-      comboBox(messageDigestAlgorithms)
-        .label("Algorithm:")
-        .bindItem(selectedAlgorithm)
-    }
+    row { comboBox(messageDigestAlgorithms).label("Algorithm:").bindItem(selectedAlgorithm) }
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -63,21 +64,21 @@ class HashingTransformer(
 
   class Factory : DeveloperUiToolFactory<HashingTransformer> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Hashing",
-      contentTitle = "Hashing Transformer"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "Hashing", contentTitle = "Hashing Transformer")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> HashingTransformer)? {
       if (messageDigestAlgorithms.isEmpty()) {
         return null
       }
 
-      return { configuration -> HashingTransformer(context, configuration, parentDisposable, project) }
+      return { configuration ->
+        HashingTransformer(context, configuration, parentDisposable, project)
+      }
     }
   }
 
@@ -86,6 +87,8 @@ class HashingTransformer(
   companion object {
 
     private const val DEFAULT_ALGORITHM = "SHA-256"
-    private val messageDigestAlgorithms: List<String> by lazy { Security.getAlgorithms("MessageDigest").sorted() }
+    private val messageDigestAlgorithms: List<String> by lazy {
+      Security.getAlgorithms("MessageDigest").sorted()
+    }
   }
 }

@@ -72,6 +72,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.extension
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.nameWithoutExtension
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.safeCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.toLowerCasePreservingASCIIRules
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.ChangeListener
@@ -88,18 +89,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.ha
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolService
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.Unarchiver.OpenUnarchiverContext
-import io.ktor.util.*
-import org.apache.commons.compress.archivers.ArchiveEntry
-import org.apache.commons.compress.archivers.ArchiveInputStream
-import org.apache.commons.compress.archivers.ArchiveStreamFactory
-import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry
-import org.apache.commons.compress.archivers.sevenz.SevenZFile
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
-import org.apache.commons.compress.archivers.zip.ZipMethod
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
-import org.apache.commons.compress.compressors.gzip.GzipUtils
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.IOUtils
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
@@ -134,28 +123,66 @@ import javax.swing.table.DefaultTableModel
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreePath
-
+import org.apache.commons.compress.archivers.ArchiveEntry
+import org.apache.commons.compress.archivers.ArchiveInputStream
+import org.apache.commons.compress.archivers.ArchiveStreamFactory
+import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry
+import org.apache.commons.compress.archivers.sevenz.SevenZFile
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
+import org.apache.commons.compress.archivers.zip.ZipMethod
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.compress.compressors.gzip.GzipUtils
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
 
 class Unarchiver(
   private val project: Project?,
   private val configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
-) : DeveloperUiTool(parentDisposable), DataProvider, ChangeListener, ResetListener, OpenDeveloperToolHandler<OpenUnarchiverContext> {
+  parentDisposable: Disposable,
+) :
+  DeveloperUiTool(parentDisposable),
+  DataProvider,
+  ChangeListener,
+  ResetListener,
+  OpenDeveloperToolHandler<OpenUnarchiverContext> {
   // -- Properties ---------------------------------------------------------- //
 
-  private val archiveTreeSortingMode = configuration.register("archiveTreeSortingMode", DEFAULT_SORTING_MODE)
-  private val showArchiveNodeUncompressedSize = configuration.register("showArchiveNodeUncompressedSize", DEFAULT_SHOW_ARCHIVE_NODE_SIZE)
+  private val archiveTreeSortingMode =
+    configuration.register("archiveTreeSortingMode", DEFAULT_SORTING_MODE)
+  private val showArchiveNodeUncompressedSize =
+    configuration.register("showArchiveNodeUncompressedSize", DEFAULT_SHOW_ARCHIVE_NODE_SIZE)
   private val showArchiveNodeTotalNumberOfChildren =
-    configuration.register("showArchiveNodeTotalNumberOfChildren", DEFAULT_SHOW_ARCHIVE_NODE_TOTAL_NUMBER_OF_CHILDREN)
-  private val openFileInEditorOnDoubleClick = configuration.register("openFileInEditorOnDoubleClick", DEFAULT_OPEN_IN_EDITOR_ON_DOUBLE_CLICK)
-  private val lastSelectedOpenedDirectoryPath = configuration.register("lastSelectedOpenedDirectoryPath", DEFAULT_LAST_OPENED_DIRECTORY_PATH)
-  private val lastSelectedTargetDirectoryPath = configuration.register("lastSelectedTargetDirectoryPath", DEFAULT_LAST_SELECTED_TARGET_DIRECTORY_PATH)
-  private val createArchiveFilenameSubDirectory = configuration.register("createArchiveFilenameSubDirectory", DEFAULT_CREATE_ARCHIVE_FILENAME_SUB_DIRECTORY)
-  private val clearTargetDirectory = configuration.register("clearTargetDirectory", DEFAULT_CLEAR_TARGET_DIRECTORY)
-  private val createParentDirectories = configuration.register("createParentDirectories", DEFAULT_CREATE_PARENT_DIRECTORIES)
-  private val preserveDirectoryStructure = configuration.register("preserveDirectoryStructure", DEFAULT_PRESERVE_DIRECTORY_STRUCTURE)
-  private val preserveFileAttributes = configuration.register("preserveFileAttributes", DEFAULT_PRESERVE_FILE_ATTRIBUTES)
-  private val openTargetDirectoryAfterExtraction = configuration.register("openTargetDirectoryAfterExtraction", DEFAULT_OPEN_TARGET_DIRECTORY_AFTER_EXTRACTION)
+    configuration.register(
+      "showArchiveNodeTotalNumberOfChildren",
+      DEFAULT_SHOW_ARCHIVE_NODE_TOTAL_NUMBER_OF_CHILDREN,
+    )
+  private val openFileInEditorOnDoubleClick =
+    configuration.register("openFileInEditorOnDoubleClick", DEFAULT_OPEN_IN_EDITOR_ON_DOUBLE_CLICK)
+  private val lastSelectedOpenedDirectoryPath =
+    configuration.register("lastSelectedOpenedDirectoryPath", DEFAULT_LAST_OPENED_DIRECTORY_PATH)
+  private val lastSelectedTargetDirectoryPath =
+    configuration.register(
+      "lastSelectedTargetDirectoryPath",
+      DEFAULT_LAST_SELECTED_TARGET_DIRECTORY_PATH,
+    )
+  private val createArchiveFilenameSubDirectory =
+    configuration.register(
+      "createArchiveFilenameSubDirectory",
+      DEFAULT_CREATE_ARCHIVE_FILENAME_SUB_DIRECTORY,
+    )
+  private val clearTargetDirectory =
+    configuration.register("clearTargetDirectory", DEFAULT_CLEAR_TARGET_DIRECTORY)
+  private val createParentDirectories =
+    configuration.register("createParentDirectories", DEFAULT_CREATE_PARENT_DIRECTORIES)
+  private val preserveDirectoryStructure =
+    configuration.register("preserveDirectoryStructure", DEFAULT_PRESERVE_DIRECTORY_STRUCTURE)
+  private val preserveFileAttributes =
+    configuration.register("preserveFileAttributes", DEFAULT_PRESERVE_FILE_ATTRIBUTES)
+  private val openTargetDirectoryAfterExtraction =
+    configuration.register(
+      "openTargetDirectoryAfterExtraction",
+      DEFAULT_OPEN_TARGET_DIRECTORY_AFTER_EXTRACTION,
+    )
 
   private var tree: ArchiveTree? = null
   private val content = BorderLayoutPanel()
@@ -169,11 +196,7 @@ class Unarchiver(
     content.dropTarget = DropTarget(content, FilesDropHandler(project, openArchiveFile()))
     content.addToCenter(noArchiveFilePanel)
 
-    row {
-      cell(content)
-        .resizableColumn()
-        .align(Align.FILL)
-    }.resizableRow()
+    row { cell(content).resizableColumn().align(Align.FILL) }.resizableRow()
   }
 
   override fun afterBuildUi() {
@@ -201,8 +224,8 @@ class Unarchiver(
   }
 
   /**
-   * This method may get called before the [tree] was initialized, for example,
-   * during a drop of a file.
+   * This method may get called before the [tree] was initialized, for example, during a drop of a
+   * file.
    */
   override fun getData(dataId: String): Any? =
     when {
@@ -248,10 +271,12 @@ class Unarchiver(
           if (previousExpandedRelativePaths.isNotEmpty()) {
             TreeUtil.promiseExpand(tree!!.tree) { treePath ->
               val archiveNode = ArchiveNode.findInLastPathComponent(treePath)
-              if (archiveNode != null && previousExpandedRelativePaths.contains(archiveNode.relativePath)) {
+              if (
+                archiveNode != null &&
+                  previousExpandedRelativePaths.contains(archiveNode.relativePath)
+              ) {
                 TreeVisitor.Action.CONTINUE
-              }
-              else {
+              } else {
                 TreeVisitor.Action.SKIP_CHILDREN
               }
             }
@@ -261,58 +286,68 @@ class Unarchiver(
         log.warn("Reading archive file failed", e)
         ApplicationManager.getApplication().invokeLater {
           replaceContent(noArchiveFilePanel)
-          Messages.showErrorDialog(project, "Reading archive failed: ${e.message}", "Reading Archive Failed")
+          Messages.showErrorDialog(
+            project,
+            "Reading archive failed: ${e.message}",
+            "Reading Archive Failed",
+          )
         }
       }
     }
   }
 
-  private fun buildArchiveTree(archiveFilePath: Path) = RootNode(archiveFilePath).apply {
-    val normalizedPathToDirectoryNode = mutableMapOf<String, DirectoryNode>()
-    normalizedPathToDirectoryNode[""] = this
-    iterateEntries { archiveEntry, _ ->
-      val path = archiveEntry.name
-      val normalizedPath = path.trimEnd('/')
-      val parentNode: DirectoryNode = buildParentDirectoryTreeStructure(this, normalizedPath, normalizedPathToDirectoryNode) {
-        it.totalChildren += 1
-        it.addUncompressedSize(archiveEntry.size)
-      }
-      val name = normalizedPath.substringAfterLast("/", normalizedPath)
-      val isDirectory = path.endsWith("/")
-      if (!isDirectory) {
-        val fileNode = FileNode(name, archiveEntry)
-        parentNode.children.add(fileNode)
-      }
-      else {
-        if (!normalizedPathToDirectoryNode.containsKey(normalizedPath)) {
-          val directoryNode = DirectoryNode(name, path, archiveEntry)
-          normalizedPathToDirectoryNode[normalizedPath] = directoryNode
-          parentNode.children.add(directoryNode)
+  private fun buildArchiveTree(archiveFilePath: Path) =
+    RootNode(archiveFilePath).apply {
+      val normalizedPathToDirectoryNode = mutableMapOf<String, DirectoryNode>()
+      normalizedPathToDirectoryNode[""] = this
+      iterateEntries { archiveEntry, _ ->
+        val path = archiveEntry.name
+        val normalizedPath = path.trimEnd('/')
+        val parentNode: DirectoryNode =
+          buildParentDirectoryTreeStructure(this, normalizedPath, normalizedPathToDirectoryNode) {
+            it.totalChildren += 1
+            it.addUncompressedSize(archiveEntry.size)
+          }
+        val name = normalizedPath.substringAfterLast("/", normalizedPath)
+        val isDirectory = path.endsWith("/")
+        if (!isDirectory) {
+          val fileNode = FileNode(name, archiveEntry)
+          parentNode.children.add(fileNode)
+        } else {
+          if (!normalizedPathToDirectoryNode.containsKey(normalizedPath)) {
+            val directoryNode = DirectoryNode(name, path, archiveEntry)
+            normalizedPathToDirectoryNode[normalizedPath] = directoryNode
+            parentNode.children.add(directoryNode)
+          } else {
+            normalizedPathToDirectoryNode[normalizedPath]!!.archiveEntry = archiveEntry
+          }
         }
-        else {
-          normalizedPathToDirectoryNode[normalizedPath]!!.archiveEntry = archiveEntry
-        }
+        true
       }
-      true
     }
-  }
 
   private fun buildParentDirectoryTreeStructure(
     rootNode: DirectoryNode,
     normalizedPath: String,
     normalizedPathToDirectoryNode: MutableMap<String, DirectoryNode>,
-    modifyParentNode: (DirectoryNode) -> Unit
+    modifyParentNode: (DirectoryNode) -> Unit,
   ): DirectoryNode {
     val parentPathParts = normalizedPath.split("/")
     var currentPath = ""
     var parentNode: DirectoryNode = rootNode
     for (i in parentPathParts.indices) {
       val currentNormalizedPath = currentPath.trimEnd('/')
-      parentNode = normalizedPathToDirectoryNode.computeIfAbsent(currentNormalizedPath) {
-        val directoryNode = DirectoryNode(currentNormalizedPath.substringAfterLast("/", currentNormalizedPath), currentPath, null)
-        parentNode.children.add(directoryNode)
-        directoryNode
-      }
+      parentNode =
+        normalizedPathToDirectoryNode.computeIfAbsent(currentNormalizedPath) {
+          val directoryNode =
+            DirectoryNode(
+              currentNormalizedPath.substringAfterLast("/", currentNormalizedPath),
+              currentPath,
+              null,
+            )
+          parentNode.children.add(directoryNode)
+          directoryNode
+        }
       modifyParentNode(parentNode)
       currentPath += parentPathParts[i] + "/"
     }
@@ -320,9 +355,7 @@ class Unarchiver(
   }
 
   private fun doSortArchiveTree(node: DirectoryNode) {
-    node.children.filterIsInstance<DirectoryNode>().forEach {
-      doSortArchiveTree(it)
-    }
+    node.children.filterIsInstance<DirectoryNode>().forEach { doSortArchiveTree(it) }
     node.children.sortWith(archiveTreeSortingMode.get().comparator)
   }
 
@@ -331,62 +364,103 @@ class Unarchiver(
     tree = archiveTree
 
     row {
-      cell(archiveTree.installSearchField())
-        .gap(RightGap.SMALL)
+        cell(archiveTree.installSearchField()).gap(RightGap.SMALL)
 
-      val actionGroup = DefaultActionGroup().apply {
-        val commonActionsManager = CommonActionsManager.getInstance()
-        add(commonActionsManager.createExpandAllHeaderAction(archiveTree.tree))
-        add(commonActionsManager.createCollapseAllHeaderAction(archiveTree.tree))
-        addSeparator()
-        add(createSettingsActionGroup())
-        add(createReloadAction(archiveFilePath))
-        addSeparator()
-        add(ChooseArchiveFileToOpenAction(project, archiveTree.tree, lastSelectedOpenedDirectoryPath, openArchiveFile()))
+        val actionGroup =
+          DefaultActionGroup().apply {
+            val commonActionsManager = CommonActionsManager.getInstance()
+            add(commonActionsManager.createExpandAllHeaderAction(archiveTree.tree))
+            add(commonActionsManager.createCollapseAllHeaderAction(archiveTree.tree))
+            addSeparator()
+            add(createSettingsActionGroup())
+            add(createReloadAction(archiveFilePath))
+            addSeparator()
+            add(
+              ChooseArchiveFileToOpenAction(
+                project,
+                archiveTree.tree,
+                lastSelectedOpenedDirectoryPath,
+                openArchiveFile(),
+              )
+            )
+          }
+        cell(
+          ActionManager.getInstance()
+            .createActionToolbar(Unarchiver::class.qualifiedName!!, actionGroup, true)
+            .run {
+              targetComponent = component
+              component
+            }
+        )
       }
-      cell(ActionManager.getInstance().createActionToolbar(Unarchiver::class.qualifiedName!!, actionGroup, true).run {
-        targetComponent = component
-        component
-      })
-    }.bottomGap(BottomGap.NONE)
+      .bottomGap(BottomGap.NONE)
 
     row {
-      cell(ScrollPaneFactory.createScrollPane(archiveTree.component, false))
-        .align(Align.FILL)
-        .resizableColumn()
-    }.resizableRow().topGap(TopGap.NONE)
+        cell(ScrollPaneFactory.createScrollPane(archiveTree.component, false))
+          .align(Align.FILL)
+          .resizableColumn()
+      }
+      .resizableRow()
+      .topGap(TopGap.NONE)
   }
 
-  private fun createSettingsActionGroup() = object : DefaultActionGroup("Settings", true) {
+  private fun createSettingsActionGroup() =
+    object : DefaultActionGroup("Settings", true) {
 
-    init {
-      templatePresentation.icon = AllIcons.General.GearPlain
+      init {
+        templatePresentation.icon = AllIcons.General.GearPlain
 
-      add(DefaultActionGroup("Sorting", true).apply {
-        SortingMode.entries.forEach {
-          add(createToggleAction(it.title, { archiveTreeSortingMode.get() == it }, { state -> if (state) archiveTreeSortingMode.set(it) }))
-        }
-      })
+        add(
+          DefaultActionGroup("Sorting", true).apply {
+            SortingMode.entries.forEach {
+              add(
+                createToggleAction(
+                  it.title,
+                  { archiveTreeSortingMode.get() == it },
+                  { state -> if (state) archiveTreeSortingMode.set(it) },
+                )
+              )
+            }
+          }
+        )
 
-      add(createToggleAction("Show uncompressed size", { showArchiveNodeUncompressedSize.get() }, { showArchiveNodeUncompressedSize.set(it) }))
-      add(createToggleAction("Show total number of children", { showArchiveNodeTotalNumberOfChildren.get() }, { showArchiveNodeTotalNumberOfChildren.set(it) }))
+        add(
+          createToggleAction(
+            "Show uncompressed size",
+            { showArchiveNodeUncompressedSize.get() },
+            { showArchiveNodeUncompressedSize.set(it) },
+          )
+        )
+        add(
+          createToggleAction(
+            "Show total number of children",
+            { showArchiveNodeTotalNumberOfChildren.get() },
+            { showArchiveNodeTotalNumberOfChildren.set(it) },
+          )
+        )
 
-      addSeparator()
+        addSeparator()
 
-      add(createToggleAction("Open file in editor on double click", { openFileInEditorOnDoubleClick.get() }, { openFileInEditorOnDoubleClick.set(it) }))
+        add(
+          createToggleAction(
+            "Open file in editor on double click",
+            { openFileInEditorOnDoubleClick.get() },
+            { openFileInEditorOnDoubleClick.set(it) },
+          )
+        )
 
-      addSeparator()
+        addSeparator()
 
-      add(createCloseArchiveFileAction())
+        add(createCloseArchiveFileAction())
+      }
+
+      @Suppress("UnstableApiUsage")
+      override fun update(e: AnActionEvent) {
+        e.presentation.isEnabled = UIUtil.isShowing(tree!!.tree)
+      }
+
+      override fun getActionUpdateThread() = ActionUpdateThread.EDT
     }
-
-    @Suppress("UnstableApiUsage")
-    override fun update(e: AnActionEvent) {
-      e.presentation.isEnabled = UIUtil.isShowing(tree!!.tree)
-    }
-
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
-  }
 
   private fun createReloadAction(archiveFilePath: Path): AnAction =
     object : DumbAwareAction("Reload", null, AllIcons.Actions.Refresh) {
@@ -403,19 +477,20 @@ class Unarchiver(
       override fun getActionUpdateThread() = ActionUpdateThread.EDT
     }
 
-  private fun createCloseArchiveFileAction(): AnAction = object : DumbAwareAction("Close Archive File") {
+  private fun createCloseArchiveFileAction(): AnAction =
+    object : DumbAwareAction("Close Archive File") {
 
-    override fun actionPerformed(e: AnActionEvent) {
-      closeArchiveFile()
+      override fun actionPerformed(e: AnActionEvent) {
+        closeArchiveFile()
+      }
+
+      @Suppress("UnstableApiUsage")
+      override fun update(e: AnActionEvent) {
+        e.presentation.isEnabled = UIUtil.isShowing(tree!!.tree)
+      }
+
+      override fun getActionUpdateThread() = ActionUpdateThread.EDT
     }
-
-    @Suppress("UnstableApiUsage")
-    override fun update(e: AnActionEvent) {
-      e.presentation.isEnabled = UIUtil.isShowing(tree!!.tree)
-    }
-
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
-  }
 
   private fun closeArchiveFile() {
     content.removeAll()
@@ -427,148 +502,181 @@ class Unarchiver(
   private fun createNoArchiveFilePanel(): JComponent {
     val actionsPanel = panel {
       row {
-        cell(ChooseArchiveFileToOpenAction(project, null, lastSelectedOpenedDirectoryPath, openArchiveFile()).toHyperlinkLabel())
+        cell(
+          ChooseArchiveFileToOpenAction(
+              project,
+              null,
+              lastSelectedOpenedDirectoryPath,
+              openArchiveFile(),
+            )
+            .toHyperlinkLabel()
+        )
       }
       row {
-        cell(JBLabel("Drop archive file here to open", AllIcons.Actions.Download, SwingConstants.LEFT))
-      }.bottomGap(BottomGap.MEDIUM)
+          cell(
+            JBLabel(
+              "Drop archive file here to open",
+              AllIcons.Actions.Download,
+              SwingConstants.LEFT,
+            )
+          )
+        }
+        .bottomGap(BottomGap.MEDIUM)
       row {
         lateinit var supportedTypesLink: JComponent
-        supportedTypesLink = link("Supported archives and known limitations") {
-          val text = """
+        supportedTypesLink =
+          link("Supported archives and known limitations") {
+              val text =
+                """
             <p>Supported archive types: ${supportedArchiveExtensions.sorted().joinToString(", ")}</p>
             <p>The Apache Commons Compress 1.26.0 library is used for the underlining archive handling,<br>which has some <a href="https://commons.apache.org/proper/commons-compress/limitations.html">known limitations</a> (e.g., encryption is not supported).</p>
-          """.trimIndent()
-          JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder(text, null, UIUtil.getPanelBackground()) { e ->
-              if (e.eventType == HyperlinkEvent.EventType.ACTIVATED) {
-                BrowserUtil.browse(e.url)
-              }
+          """
+                  .trimIndent()
+              JBPopupFactory.getInstance()
+                .createHtmlTextBalloonBuilder(text, null, UIUtil.getPanelBackground()) { e ->
+                  if (e.eventType == HyperlinkEvent.EventType.ACTIVATED) {
+                    BrowserUtil.browse(e.url)
+                  }
+                }
+                .setDialogMode(true)
+                .setBorderColor(JBColor.border())
+                .setBlockClicksThroughBalloon(true)
+                .setRequestFocus(true)
+                .setCloseButtonEnabled(true)
+                .createBalloon()
+                .apply {
+                  setAnimationEnabled(false)
+                  show(RelativePoint.getSouthOf(supportedTypesLink), Balloon.Position.below)
+                }
             }
-            .setDialogMode(true)
-            .setBorderColor(JBColor.border())
-            .setBlockClicksThroughBalloon(true)
-            .setRequestFocus(true)
-            .setCloseButtonEnabled(true)
-            .createBalloon()
-            .apply {
-              setAnimationEnabled(false)
-              show(RelativePoint.getSouthOf(supportedTypesLink), Balloon.Position.below)
-            }
-        }.component
+            .component
       }
     }
-    return panel {
-      row {
-        cell(actionsPanel).align(Align.CENTER)
-      }.resizableRow()
-    }
+    return panel { row { cell(actionsPanel).align(Align.CENTER) }.resizableRow() }
   }
 
   private fun createReadingArchiveFilePanel() = panel {
     row {
-      cell(JBLabel("Reading archive...").apply { icon = AnimatedIcon.Default.INSTANCE })
-        .align(Align.CENTER)
-    }.resizableRow()
+        cell(JBLabel("Reading archive...").apply { icon = AnimatedIcon.Default.INSTANCE })
+          .align(Align.CENTER)
+      }
+      .resizableRow()
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private inner class ArchiveTree(
-    private val rootNode: RootNode
-  ) : FilteringTree<DefaultMutableTreeNode, ArchiveNode>(Tree(), DefaultMutableTreeNode(rootNode)) {
+  private inner class ArchiveTree(private val rootNode: RootNode) :
+    FilteringTree<DefaultMutableTreeNode, ArchiveNode>(Tree(), DefaultMutableTreeNode(rootNode)) {
 
     init {
-      tree.cellRenderer = ArchiveTreeNodeRenderer(
-        showArchiveNodeUncompressedSize = showArchiveNodeUncompressedSize,
-        showArchiveNodeTotalNumberOfChildren = showArchiveNodeTotalNumberOfChildren
-      )
+      tree.cellRenderer =
+        ArchiveTreeNodeRenderer(
+          showArchiveNodeUncompressedSize = showArchiveNodeUncompressedSize,
+          showArchiveNodeTotalNumberOfChildren = showArchiveNodeTotalNumberOfChildren,
+        )
 
-      tree.addMouseListener(createContextMenuMouseListener(Unarchiver::class.java.simpleName) { mouseEvent ->
-        DefaultActionGroup().apply {
-          add(createExtractAction())
-          add(createFactExtractAction())
+      tree.addMouseListener(
+        createContextMenuMouseListener(Unarchiver::class.java.simpleName) { mouseEvent ->
+          DefaultActionGroup().apply {
+            add(createExtractAction())
+            add(createFactExtractAction())
 
-          addSeparator()
+            addSeparator()
 
-          add(createOpenInEditorAction())
-          add(createOpenWithDefaultApplicationAction())
-          add(createOpenEnclosingDirectoryAction())
-          add(createCopyContentToClipboardAction())
+            add(createOpenInEditorAction())
+            add(createOpenWithDefaultApplicationAction())
+            add(createOpenEnclosingDirectoryAction())
+            add(createCopyContentToClipboardAction())
 
-          addSeparator()
+            addSeparator()
 
-          add(createShowSelectedElementDetailsAction(mouseEvent))
+            add(createShowSelectedElementDetailsAction(mouseEvent))
 
-          addSeparator()
+            addSeparator()
 
-          add(DefaultActionGroup("Copy", true).apply {
-            templatePresentation.icon = PlatformIcons.COPY_ICON
-            add(CopyValuesAction("Filename", { "$it Filenames" }, { (it as ArchiveNode).fileName }, null))
-            add(CopyValuesAction("Relative Path", { "$it Relative Paths" }, { (it as ArchiveNode).relativePath()?.toString() }, null))
-            add(CopyValuesAction("Absolute Path", { "$it Absolute Paths" }, { (it as ArchiveNode).absolutePath(rootNode.archiveFilePath)?.toString() }, null))
-          })
+            add(
+              DefaultActionGroup("Copy", true).apply {
+                templatePresentation.icon = PlatformIcons.COPY_ICON
+                add(
+                  CopyValuesAction(
+                    "Filename",
+                    { "$it Filenames" },
+                    { (it as ArchiveNode).fileName },
+                    null,
+                  )
+                )
+                add(
+                  CopyValuesAction(
+                    "Relative Path",
+                    { "$it Relative Paths" },
+                    { (it as ArchiveNode).relativePath()?.toString() },
+                    null,
+                  )
+                )
+                add(
+                  CopyValuesAction(
+                    "Absolute Path",
+                    { "$it Absolute Paths" },
+                    { (it as ArchiveNode).absolutePath(rootNode.archiveFilePath)?.toString() },
+                    null,
+                  )
+                )
+              }
+            )
+          }
         }
-      })
+      )
 
       if (project != null) {
         object : DoubleClickListener() {
 
-          override fun onDoubleClick(e: MouseEvent): Boolean {
-            if (!openFileInEditorOnDoubleClick.get()) {
-              return false
+            override fun onDoubleClick(e: MouseEvent): Boolean {
+              if (!openFileInEditorOnDoubleClick.get()) {
+                return false
+              }
+              openInEditor(getSelectedArchiveNodes().filterIsInstance<FileNode>(), project, false)
+              return true
             }
-            openInEditor(getSelectedArchiveNodes().filterIsInstance<FileNode>(), project, false)
-            return true
           }
-        }.installOn(tree)
+          .installOn(tree)
       }
     }
 
     private fun createCopyContentToClipboardAction() =
-      ArchiveNodeAction("Copy Content to Clipboard", { it is FileNode && it.isTextFile() }) { archiveNode, _ ->
+      ArchiveNodeAction("Copy Content to Clipboard", { it is FileNode && it.isTextFile() }) {
+        archiveNode,
+        _ ->
         ApplicationManager.getApplication().executeOnPooledThread {
           try {
             val content = rootNode.readEntry(archiveNode.archiveEntry!!)
-            CopyPasteManager.getInstance().setContents(StringSelection(content.toString(StandardCharsets.UTF_8)))
+            CopyPasteManager.getInstance()
+              .setContents(StringSelection(content.toString(StandardCharsets.UTF_8)))
           } catch (e: Exception) {
             log.warn("Failed to read archive entry: ${archiveNode.archiveEntry!!.name}", e)
             ApplicationManager.getApplication().invokeLater {
-              Messages.showErrorDialog(project, "Failed to read archive entry: ${e.message}", "Copy Content to Clipboard Failed")
+              Messages.showErrorDialog(
+                project,
+                "Failed to read archive entry: ${e.message}",
+                "Copy Content to Clipboard Failed",
+              )
             }
           }
         }
       }
 
-    override fun getNodeClass(): Class<out DefaultMutableTreeNode> = DefaultMutableTreeNode::class.java
+    override fun getNodeClass(): Class<out DefaultMutableTreeNode> =
+      DefaultMutableTreeNode::class.java
 
-    override fun createNode(archiveNode: ArchiveNode): DefaultMutableTreeNode = DefaultMutableTreeNode(archiveNode)
+    override fun createNode(archiveNode: ArchiveNode): DefaultMutableTreeNode =
+      DefaultMutableTreeNode(archiveNode)
 
     override fun getChildren(archiveNode: ArchiveNode): Iterable<ArchiveNode> =
       if (archiveNode is DirectoryNode) archiveNode.children else emptyList()
 
     override fun getText(archiveNode: ArchiveNode?): String? = archiveNode?.fileName
 
-    private fun createExtractAction() = ArchiveNodesAction("Extract...", { true }) { archiveNodes, _ ->
-      ApplicationManager.getApplication().executeOnPooledThread {
-        val archiveNodesToExtract = determineArchiveNodesToExtract(archiveNodes)
-        if (archiveNodesToExtract.archiveNodes.isEmpty()) {
-          log.info("No entries to extract found")
-          return@executeOnPooledThread
-        }
-
-        ApplicationManager.getApplication().invokeLater {
-          showExtractionDialog(rootNode, archiveNodesToExtract) { extractionContext ->
-            ApplicationManager.getApplication().executeOnPooledThread {
-              ExtractTask(project, extractionContext).queue()
-            }
-          }
-        }
-      }
-    }
-
-    private fun createFactExtractAction() =
-      ArchiveNodesAction("Fast Extract", { true }, "Extracts the selected entry into a temporary directory.") { archiveNodes, _ ->
+    private fun createExtractAction() =
+      ArchiveNodesAction("Extract...", { true }) { archiveNodes, _ ->
         ApplicationManager.getApplication().executeOnPooledThread {
           val archiveNodesToExtract = determineArchiveNodesToExtract(archiveNodes)
           if (archiveNodesToExtract.archiveNodes.isEmpty()) {
@@ -576,22 +684,48 @@ class Unarchiver(
             return@executeOnPooledThread
           }
 
-          val tempDirectory = Files.createTempDirectory("${rootNode.fileName.substringBeforeLast(".")}-")
+          ApplicationManager.getApplication().invokeLater {
+            showExtractionDialog(rootNode, archiveNodesToExtract) { extractionContext ->
+              ApplicationManager.getApplication().executeOnPooledThread {
+                ExtractTask(project, extractionContext).queue()
+              }
+            }
+          }
+        }
+      }
+
+    private fun createFactExtractAction() =
+      ArchiveNodesAction(
+        "Fast Extract",
+        { true },
+        "Extracts the selected entry into a temporary directory.",
+      ) { archiveNodes, _ ->
+        ApplicationManager.getApplication().executeOnPooledThread {
+          val archiveNodesToExtract = determineArchiveNodesToExtract(archiveNodes)
+          if (archiveNodesToExtract.archiveNodes.isEmpty()) {
+            log.info("No entries to extract found")
+            return@executeOnPooledThread
+          }
+
+          val tempDirectory =
+            Files.createTempDirectory("${rootNode.fileName.substringBeforeLast(".")}-")
           tempDirectory.toFile().deleteOnExit()
 
           ExtractTask(
-            project = project,
-            extractionContext = ExtractionContext(
-              rootNode = rootNode,
-              archiveNodes = archiveNodesToExtract.archiveNodes,
-              targetDirectoryPath = tempDirectory,
-              clearTargetDirectory = true,
-              preserveDirectoryStructure = true,
-              preserveFileAttributes = true,
-              createParentDirectories = false,
-              openTargetDirectoryAfterExtraction = true
+              project = project,
+              extractionContext =
+                ExtractionContext(
+                  rootNode = rootNode,
+                  archiveNodes = archiveNodesToExtract.archiveNodes,
+                  targetDirectoryPath = tempDirectory,
+                  clearTargetDirectory = true,
+                  preserveDirectoryStructure = true,
+                  preserveFileAttributes = true,
+                  createParentDirectories = false,
+                  openTargetDirectoryAfterExtraction = true,
+                ),
             )
-          ).queue()
+            .queue()
         }
       }
 
@@ -602,20 +736,33 @@ class Unarchiver(
 
     private fun createOpenInEditorAction() =
       ArchiveNodesAction("Open in Editor...", { it is FileNode }) { archiveNodes, e ->
-        val project = e.dataContext.getData(CommonDataKeys.PROJECT) ?: throw IllegalStateException("snh: Data missing")
+        val project =
+          e.dataContext.getData(CommonDataKeys.PROJECT)
+            ?: throw IllegalStateException("snh: Data missing")
         openInEditor(archiveNodes.map { it as FileNode }, project, true)
       }
 
-    private fun openInEditor(archiveNodes: List<FileNode>, project: Project, notifyOnError: Boolean) {
+    private fun openInEditor(
+      archiveNodes: List<FileNode>,
+      project: Project,
+      notifyOnError: Boolean,
+    ) {
       ApplicationManager.getApplication().executeOnPooledThread {
         val fileEditorManager = FileEditorManager.getInstance(project)
         val virtualFileManager = VirtualFileManager.getInstance()
-        val virtualFiles = archiveNodes.mapNotNull { virtualFileManager.findFileByUrl("jar://${it.absolutePath(rootNode.archiveFilePath)}") }
+        val virtualFiles =
+          archiveNodes.mapNotNull {
+            virtualFileManager.findFileByUrl("jar://${it.absolutePath(rootNode.archiveFilePath)}")
+          }
         ApplicationManager.getApplication().invokeLater {
           virtualFiles.forEach {
             val openEditor = fileEditorManager.openEditor(OpenFileDescriptor(project, it), true)
             if (openEditor.isEmpty() && notifyOnError) {
-              Messages.showErrorDialog(project, "Unable to open file '${it.name}' in editor.", "Open in Editor Failed")
+              Messages.showErrorDialog(
+                project,
+                "Unable to open file '${it.name}' in editor.",
+                "Open in Editor Failed",
+              )
             }
           }
         }
@@ -631,25 +778,36 @@ class Unarchiver(
       object : DumbAwareAction("Show Details...") {
 
         override fun update(e: AnActionEvent) {
-          val selectedValues = SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
+          val selectedValues =
+            SELECTED_VALUES.getData(e.dataContext)
+              ?: throw IllegalStateException("snh: Data missing")
 
-          e.presentation.isVisible = selectedValues.singleOrNull()?.let {
-            it is RootNode || (it is ArchiveNode && it.archiveEntry != null)
-          } == true
+          e.presentation.isVisible =
+            selectedValues.singleOrNull()?.let {
+              it is RootNode || (it is ArchiveNode && it.archiveEntry != null)
+            } == true
         }
 
         override fun actionPerformed(e: AnActionEvent) {
-          val selectedValues = SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
+          val selectedValues =
+            SELECTED_VALUES.getData(e.dataContext)
+              ?: throw IllegalStateException("snh: Data missing")
           val archiveNode = selectedValues.singleOrNull()?.uncheckedCastTo(ArchiveNode::class)
           if (archiveNode !is RootNode && archiveNode?.archiveEntry == null) {
             return
           }
 
-          val (title, panel) = when (archiveNode) {
-            is RootNode -> archiveNode.archiveFilePath.fileName.toString() to createArchiveFileDetails(archiveNode)
-            else -> "${archiveNode.fileName} (${if (archiveNode is DirectoryNode) "directory" else "file"})" to createArchiveEntryDetails(archiveNode)
-          }
-          JBPopupFactory.getInstance().createBalloonBuilder(panel)
+          val (title, panel) =
+            when (archiveNode) {
+              is RootNode ->
+                archiveNode.archiveFilePath.fileName.toString() to
+                  createArchiveFileDetails(archiveNode)
+              else ->
+                "${archiveNode.fileName} (${if (archiveNode is DirectoryNode) "directory" else "file"})" to
+                  createArchiveEntryDetails(archiveNode)
+            }
+          JBPopupFactory.getInstance()
+            .createBalloonBuilder(panel)
             .setTitle(title)
             .setDialogMode(true)
             .setFillColor(UIUtil.getPanelBackground())
@@ -669,243 +827,305 @@ class Unarchiver(
 
           if (archiveNode is DirectoryNode) {
             row {
-              label("Number of direct entries:")
-              label(archiveNode.children.size.toString())
-            }.layout(RowLayout.PARENT_GRID)
+                label("Number of direct entries:")
+                label(archiveNode.children.size.toString())
+              }
+              .layout(RowLayout.PARENT_GRID)
             row {
-              label("Number of all entries:")
-              label(archiveNode.totalChildren.toString())
-            }.layout(RowLayout.PARENT_GRID)
+                label("Number of all entries:")
+                label(archiveNode.totalChildren.toString())
+              }
+              .layout(RowLayout.PARENT_GRID)
           }
 
           row {
-            label("Uncompressed size${if (archiveNode is DirectoryNode) " of all entries" else ""}:")
-            label(StringUtil.formatFileSize(archiveNode.totalUncompressedSize() ?: 0))
-          }.layout(RowLayout.PARENT_GRID).bottomGap(BottomGap.NONE)
+              label(
+                "Uncompressed size${if (archiveNode is DirectoryNode) " of all entries" else ""}:"
+              )
+              label(StringUtil.formatFileSize(archiveNode.totalUncompressedSize() ?: 0))
+            }
+            .layout(RowLayout.PARENT_GRID)
+            .bottomGap(BottomGap.NONE)
           if (archiveNode.inaccurateTotalUncompressedSize) {
             row {
-              label("The uncompressed size may be inaccurate because some entries do not provide size information.")
-            }.topGap(TopGap.NONE)
+                label(
+                  "The uncompressed size may be inaccurate because some entries do not provide size information."
+                )
+              }
+              .topGap(TopGap.NONE)
           }
 
           if (archiveEntry is ZipArchiveEntry) {
             if (archiveNode is FileNode) {
               row {
-                label("Compressed size:")
-                label(StringUtil.formatFileSize(archiveEntry.compressedSize))
-              }.layout(RowLayout.PARENT_GRID)
+                  label("Compressed size:")
+                  label(StringUtil.formatFileSize(archiveEntry.compressedSize))
+                }
+                .layout(RowLayout.PARENT_GRID)
             }
 
             row {
-              label("Method:")
-              val method = ZipMethod.getMethodByCode(archiveEntry.method)
-              label(method.name.split("_").joinToString(" "))
-            }.layout(RowLayout.PARENT_GRID)
+                label("Method:")
+                val method = ZipMethod.getMethodByCode(archiveEntry.method)
+                label(method.name.split("_").joinToString(" "))
+              }
+              .layout(RowLayout.PARENT_GRID)
           }
 
           val fileTimes = FileTimes.fromArchiveEntry(archiveEntry)
           row {
-            label("Creation time:")
-            label(if (fileTimes.creationTime != null) DateFormatUtil.formatDateTime(fileTimes.creationTime.toMillis()) else "Unknown")
-          }.layout(RowLayout.PARENT_GRID)
+              label("Creation time:")
+              label(
+                if (fileTimes.creationTime != null)
+                  DateFormatUtil.formatDateTime(fileTimes.creationTime.toMillis())
+                else "Unknown"
+              )
+            }
+            .layout(RowLayout.PARENT_GRID)
           row {
-            label("Last modified time:")
-            label(if (fileTimes.lastModifiedTime != null) DateFormatUtil.formatDateTime(fileTimes.lastModifiedTime.toMillis()) else "Unknown")
-          }.layout(RowLayout.PARENT_GRID)
+              label("Last modified time:")
+              label(
+                if (fileTimes.lastModifiedTime != null)
+                  DateFormatUtil.formatDateTime(fileTimes.lastModifiedTime.toMillis())
+                else "Unknown"
+              )
+            }
+            .layout(RowLayout.PARENT_GRID)
           row {
-            label("Last access time:")
-            label(if (fileTimes.lastAccessTime != null) DateFormatUtil.formatDateTime(fileTimes.lastAccessTime.toMillis()) else "Unknown")
-          }.layout(RowLayout.PARENT_GRID)
+              label("Last access time:")
+              label(
+                if (fileTimes.lastAccessTime != null)
+                  DateFormatUtil.formatDateTime(fileTimes.lastAccessTime.toMillis())
+                else "Unknown"
+              )
+            }
+            .layout(RowLayout.PARENT_GRID)
 
           if (archiveEntry is ZipEntry) {
             row {
-              label("Comment:")
-              label(archiveEntry.comment)
-            }.layout(RowLayout.PARENT_GRID)
+                label("Comment:")
+                label(archiveEntry.comment)
+              }
+              .layout(RowLayout.PARENT_GRID)
           }
 
           if (archiveEntry is ZipEntry && archiveEntry.extra != null) {
             row {
-              label("Extra data size:")
-              label(StringUtil.formatFileSize(archiveEntry.extra.size.toLong()))
-            }.layout(RowLayout.PARENT_GRID)
+                label("Extra data size:")
+                label(StringUtil.formatFileSize(archiveEntry.extra.size.toLong()))
+              }
+              .layout(RowLayout.PARENT_GRID)
           }
         }
 
         override fun getActionUpdateThread() = ActionUpdateThread.EDT
       }
 
-    private fun createArchiveFileDetails(rootNode: RootNode) = try {
-      panel {
-        row {
-          label("Number of direct entries:")
-          label(rootNode.children.size.toString())
-        }.layout(RowLayout.PARENT_GRID)
-        row {
-          label("Number of all entries:")
-          label(rootNode.totalChildren.toString())
-        }.layout(RowLayout.PARENT_GRID)
-        val zipFileAttributes = Files.readAttributes(rootNode.archiveFilePath, BasicFileAttributes::class.java)
-        row {
-          label("Actual size on disk:")
-          label(FileUtils.byteCountToDisplaySize(zipFileAttributes.size()))
-        }.layout(RowLayout.PARENT_GRID)
-        row {
-          label("Uncompressed size of all entries:")
-          label(StringUtil.formatFileSize(rootNode.totalUncompressedSize() ?: 0))
-        }.layout(RowLayout.PARENT_GRID)
-        row {
-          label("Creation time:")
-          label(DateFormatUtil.formatDateTime(zipFileAttributes.creationTime().toMillis()))
-        }.layout(RowLayout.PARENT_GRID)
-        row {
-          label("Last modified time:")
-          label(DateFormatUtil.formatDateTime(zipFileAttributes.lastModifiedTime().toMillis()))
-        }.layout(RowLayout.PARENT_GRID)
-        row {
-          label("Last access time:")
-          label(DateFormatUtil.formatDateTime(zipFileAttributes.lastAccessTime().toMillis()))
-        }.layout(RowLayout.PARENT_GRID)
-        row {
-          label("Owner:")
-          label(Files.getOwner(rootNode.archiveFilePath).name)
-        }.layout(RowLayout.PARENT_GRID)
-        row {
-          val writable = Files.isWritable(rootNode.archiveFilePath)
-          icon(if (writable) AllIcons.Ide.Readwrite else AllIcons.Ide.Readonly).gap(RightGap.SMALL)
-          label(if (writable) "File is writeable" else "File is readonly")
+    private fun createArchiveFileDetails(rootNode: RootNode) =
+      try {
+        panel {
+          row {
+              label("Number of direct entries:")
+              label(rootNode.children.size.toString())
+            }
+            .layout(RowLayout.PARENT_GRID)
+          row {
+              label("Number of all entries:")
+              label(rootNode.totalChildren.toString())
+            }
+            .layout(RowLayout.PARENT_GRID)
+          val zipFileAttributes =
+            Files.readAttributes(rootNode.archiveFilePath, BasicFileAttributes::class.java)
+          row {
+              label("Actual size on disk:")
+              label(FileUtils.byteCountToDisplaySize(zipFileAttributes.size()))
+            }
+            .layout(RowLayout.PARENT_GRID)
+          row {
+              label("Uncompressed size of all entries:")
+              label(StringUtil.formatFileSize(rootNode.totalUncompressedSize() ?: 0))
+            }
+            .layout(RowLayout.PARENT_GRID)
+          row {
+              label("Creation time:")
+              label(DateFormatUtil.formatDateTime(zipFileAttributes.creationTime().toMillis()))
+            }
+            .layout(RowLayout.PARENT_GRID)
+          row {
+              label("Last modified time:")
+              label(DateFormatUtil.formatDateTime(zipFileAttributes.lastModifiedTime().toMillis()))
+            }
+            .layout(RowLayout.PARENT_GRID)
+          row {
+              label("Last access time:")
+              label(DateFormatUtil.formatDateTime(zipFileAttributes.lastAccessTime().toMillis()))
+            }
+            .layout(RowLayout.PARENT_GRID)
+          row {
+              label("Owner:")
+              label(Files.getOwner(rootNode.archiveFilePath).name)
+            }
+            .layout(RowLayout.PARENT_GRID)
+          row {
+            val writable = Files.isWritable(rootNode.archiveFilePath)
+            icon(if (writable) AllIcons.Ide.Readwrite else AllIcons.Ide.Readonly)
+              .gap(RightGap.SMALL)
+            label(if (writable) "File is writeable" else "File is readonly")
+          }
         }
+      } catch (e: IOException) {
+        log.warn("Failed to read parameters of file: ${rootNode.archiveFilePath}", e)
+        panel { row { label("Failed to read file attributes: ${e.message}").bold() } }
       }
-    } catch (e: IOException) {
-      log.warn("Failed to read parameters of file: ${rootNode.archiveFilePath}", e)
-      panel {
-        row {
-          label("Failed to read file attributes: ${e.message}").bold()
-        }
-      }
-    }
 
     fun getSelectedArchiveNodes(): List<ArchiveNode> =
       TreeUtil.collectSelectedPaths(tree)
         .mapNotNull {
-          it.lastPathComponent?.uncheckedCastTo(DefaultMutableTreeNode::class)
-            ?.userObject?.uncheckedCastTo(ArchiveNode::class)
+          it.lastPathComponent
+            ?.uncheckedCastTo(DefaultMutableTreeNode::class)
+            ?.userObject
+            ?.uncheckedCastTo(ArchiveNode::class)
         }
         .toList()
 
     private fun showExtractionDialog(
       rootNode: RootNode,
       archiveNodesToExtract: ArchiveNodesToExtract,
-      okCallback: (ExtractionContext) -> Unit
+      okCallback: (ExtractionContext) -> Unit,
     ) {
       object : DialogWrapper(project, tree, false, IdeModalityType.IDE) {
 
-        init {
-          title = "Extract"
-          setSize(600, 400)
-          isModal = true
-          setOKButtonText("Extract")
-          init()
-        }
-
-        override fun doOKAction() {
-          okCallback(
-            ExtractionContext(
-              rootNode = rootNode,
-              archiveNodes = archiveNodesToExtract.archiveNodes,
-              targetDirectoryPath = if (createArchiveFilenameSubDirectory.get()) {
-                Paths.get(lastSelectedTargetDirectoryPath.get()).resolve(rootNode.archiveFilePath.nameWithoutExtension())
-              }
-              else {
-                Paths.get(lastSelectedTargetDirectoryPath.get())
-              },
-              clearTargetDirectory = clearTargetDirectory.get(),
-              preserveDirectoryStructure = preserveDirectoryStructure.get(),
-              preserveFileAttributes = preserveFileAttributes.get(),
-              createParentDirectories = createParentDirectories.get(),
-              openTargetDirectoryAfterExtraction = openTargetDirectoryAfterExtraction.get()
-            )
-          )
-          super.doOKAction()
-        }
-
-        override fun createCenterPanel(): JComponent = panel {
-          row {
-            textFieldWithBrowseButton(FileChooserDescriptorFactory.createSingleFolderDescriptor().withTitle("Select Target Directory"), project)
-              .label("Target directory:")
-              .bindText(lastSelectedTargetDirectoryPath)
-              .resizableColumn()
-              .align(Align.FILL)
+          init {
+            title = "Extract"
+            setSize(600, 400)
+            isModal = true
+            setOKButtonText("Extract")
+            init()
           }
-          row {
-            checkBox("Create a sub-directory with the archive name '${rootNode.archiveFilePath.nameWithoutExtension()}'")
-              .bindSelected(createArchiveFilenameSubDirectory)
-          }
-          row {
-            checkBox("Clear target directory")
-              .bindSelected(clearTargetDirectory)
-          }.bottomGap(BottomGap.SMALL)
 
-          row {
-            checkBox("Preserve directory structure")
-              .bindSelected(preserveDirectoryStructure)
-              .gap(RightGap.SMALL)
-            contextHelp("If unselected, all files will be extracted as a flat list, ignoring the directory structure.")
-          }
-          row {
-            checkBox("Create parent directories")
-              .bindSelected(createParentDirectories)
-              .enabledIf(preserveDirectoryStructure)
-              .gap(RightGap.SMALL)
-            contextHelp("<html>For example, if selected, for the path <code>first/second/third/</code> both parent directories <code>first/second/</code> will be created, otherwise only the directory <code>third/</code>.</html>")
-          }
-          row {
-            checkBox("Preserve file attributes")
-              .bindSelected(preserveFileAttributes)
-          }.bottomGap(BottomGap.SMALL)
-
-          row {
-            checkBox("Open target directory after extraction")
-              .bindSelected(openTargetDirectoryAfterExtraction)
-          }.bottomGap(BottomGap.SMALL)
-
-          row {
-            val entriesToExtractTable = JBTable(
-              DefaultTableModel(
-                archiveNodesToExtract.displayPathsWithUncompressedSize
-                  .map { (displayPath, totalUncompressedSize) ->
-                    arrayOf(displayPath, if (totalUncompressedSize != null) StringUtil.formatFileSize(totalUncompressedSize) else "Unknown")
-                  }.toTypedArray(),
-                arrayOf("Path", "Uncompressed Size")
+          override fun doOKAction() {
+            okCallback(
+              ExtractionContext(
+                rootNode = rootNode,
+                archiveNodes = archiveNodesToExtract.archiveNodes,
+                targetDirectoryPath =
+                  if (createArchiveFilenameSubDirectory.get()) {
+                    Paths.get(lastSelectedTargetDirectoryPath.get())
+                      .resolve(rootNode.archiveFilePath.nameWithoutExtension())
+                  } else {
+                    Paths.get(lastSelectedTargetDirectoryPath.get())
+                  },
+                clearTargetDirectory = clearTargetDirectory.get(),
+                preserveDirectoryStructure = preserveDirectoryStructure.get(),
+                preserveFileAttributes = preserveFileAttributes.get(),
+                createParentDirectories = createParentDirectories.get(),
+                openTargetDirectoryAfterExtraction = openTargetDirectoryAfterExtraction.get(),
               )
             )
-            cell(ScrollPaneFactory.createScrollPane(entriesToExtractTable)).resizableColumn().align(Align.FILL)
-              .label("Entries to extract:", LabelPosition.TOP)
-          }.resizableRow().bottomGap(BottomGap.NONE)
-          row {
-            comment(
-              "Expected size on disk: ${if (archiveNodesToExtract.inaccurateTotalUncompressedSize) "+" else ""}${
+            super.doOKAction()
+          }
+
+          override fun createCenterPanel(): JComponent = panel {
+            row {
+              textFieldWithBrowseButton(
+                  FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                    .withTitle("Select Target Directory"),
+                  project,
+                )
+                .label("Target directory:")
+                .bindText(lastSelectedTargetDirectoryPath)
+                .resizableColumn()
+                .align(Align.FILL)
+            }
+            row {
+              checkBox(
+                  "Create a sub-directory with the archive name '${rootNode.archiveFilePath.nameWithoutExtension()}'"
+                )
+                .bindSelected(createArchiveFilenameSubDirectory)
+            }
+            row { checkBox("Clear target directory").bindSelected(clearTargetDirectory) }
+              .bottomGap(BottomGap.SMALL)
+
+            row {
+              checkBox("Preserve directory structure")
+                .bindSelected(preserveDirectoryStructure)
+                .gap(RightGap.SMALL)
+              contextHelp(
+                "If unselected, all files will be extracted as a flat list, ignoring the directory structure."
+              )
+            }
+            row {
+              checkBox("Create parent directories")
+                .bindSelected(createParentDirectories)
+                .enabledIf(preserveDirectoryStructure)
+                .gap(RightGap.SMALL)
+              contextHelp(
+                "<html>For example, if selected, for the path <code>first/second/third/</code> both parent directories <code>first/second/</code> will be created, otherwise only the directory <code>third/</code>.</html>"
+              )
+            }
+            row { checkBox("Preserve file attributes").bindSelected(preserveFileAttributes) }
+              .bottomGap(BottomGap.SMALL)
+
+            row {
+                checkBox("Open target directory after extraction")
+                  .bindSelected(openTargetDirectoryAfterExtraction)
+              }
+              .bottomGap(BottomGap.SMALL)
+
+            row {
+                val entriesToExtractTable =
+                  JBTable(
+                    DefaultTableModel(
+                      archiveNodesToExtract.displayPathsWithUncompressedSize
+                        .map { (displayPath, totalUncompressedSize) ->
+                          arrayOf(
+                            displayPath,
+                            if (totalUncompressedSize != null)
+                              StringUtil.formatFileSize(totalUncompressedSize)
+                            else "Unknown",
+                          )
+                        }
+                        .toTypedArray(),
+                      arrayOf("Path", "Uncompressed Size"),
+                    )
+                  )
+                cell(ScrollPaneFactory.createScrollPane(entriesToExtractTable))
+                  .resizableColumn()
+                  .align(Align.FILL)
+                  .label("Entries to extract:", LabelPosition.TOP)
+              }
+              .resizableRow()
+              .bottomGap(BottomGap.NONE)
+            row {
+                comment(
+                  "Expected size on disk: ${if (archiveNodesToExtract.inaccurateTotalUncompressedSize) "+" else ""}${
                 StringUtil.formatFileSize(
                   archiveNodesToExtract.totalUncompressedSize
                 )
               }"
-            )
-          }.topGap(TopGap.SMALL)
+                )
+              }
+              .topGap(TopGap.SMALL)
+          }
         }
-      }.show()
+        .show()
     }
 
-    private fun determineArchiveNodesToExtract(archiveNodes: List<ArchiveNode>): ArchiveNodesToExtract {
+    private fun determineArchiveNodesToExtract(
+      archiveNodes: List<ArchiveNode>
+    ): ArchiveNodesToExtract {
       val rootNode = archiveNodes.find { it is RootNode }
       return if (rootNode != null) {
         ArchiveNodesToExtract(
           archiveNodes = listOf(rootNode),
-          displayPathsWithUncompressedSize = (rootNode as RootNode).children.associate { it.relativePath to it.totalUncompressedSize() },
+          displayPathsWithUncompressedSize =
+            (rootNode as RootNode).children.associate {
+              it.relativePath to it.totalUncompressedSize()
+            },
           totalUncompressedSize = rootNode.totalUncompressedSize() ?: 0,
-          inaccurateTotalUncompressedSize = rootNode.inaccurateTotalUncompressedSize
+          inaccurateTotalUncompressedSize = rootNode.inaccurateTotalUncompressedSize,
         )
-      }
-      else {
+      } else {
         val finalArchiveNodes = mutableListOf<ArchiveNode>()
         val displayPathsWithUncompressedSize = mutableMapOf<String, Long?>()
         val relativePathToArchiveNode = archiveNodes.associateBy { it.relativePath }.toSortedMap()
@@ -919,8 +1139,7 @@ class Unarchiver(
             displayPathsWithUncompressedSize[archiveNode.relativePath] = totalUncompressedSize0
             if (totalUncompressedSize0 != null) {
               totalUncompressedSize += totalUncompressedSize0
-            }
-            else {
+            } else {
               inaccurateTotalUncompressedSize = true
             }
             previousRelativePath = relativePath
@@ -930,7 +1149,7 @@ class Unarchiver(
           archiveNodes = finalArchiveNodes,
           displayPathsWithUncompressedSize = displayPathsWithUncompressedSize,
           totalUncompressedSize = totalUncompressedSize,
-          inaccurateTotalUncompressedSize = inaccurateTotalUncompressedSize
+          inaccurateTotalUncompressedSize = inaccurateTotalUncompressedSize,
         )
       }
     }
@@ -938,21 +1157,37 @@ class Unarchiver(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private data class FileTimes(val lastModifiedTime: FileTime?, val lastAccessTime: FileTime?, val creationTime: FileTime?) {
+  private data class FileTimes(
+    val lastModifiedTime: FileTime?,
+    val lastAccessTime: FileTime?,
+    val creationTime: FileTime?,
+  ) {
 
     companion object {
 
       fun fromArchiveEntry(archiveEntry: ArchiveEntry): FileTimes {
-        val (lastModifiedTime, lastAccessTime, creationTime) = when (archiveEntry) {
-          is ZipEntry -> Triple(archiveEntry.lastModifiedTime, archiveEntry.lastAccessTime, archiveEntry.creationTime)
-          is SevenZArchiveEntry -> Triple(
-            if (archiveEntry.hasLastModifiedDate) archiveEntry.lastModifiedTime else null,
-            if (archiveEntry.hasAccessDate) archiveEntry.accessTime else null,
-            if (archiveEntry.hasCreationDate) archiveEntry.creationTime else null
-          )
+        val (lastModifiedTime, lastAccessTime, creationTime) =
+          when (archiveEntry) {
+            is ZipEntry ->
+              Triple(
+                archiveEntry.lastModifiedTime,
+                archiveEntry.lastAccessTime,
+                archiveEntry.creationTime,
+              )
+            is SevenZArchiveEntry ->
+              Triple(
+                if (archiveEntry.hasLastModifiedDate) archiveEntry.lastModifiedTime else null,
+                if (archiveEntry.hasAccessDate) archiveEntry.accessTime else null,
+                if (archiveEntry.hasCreationDate) archiveEntry.creationTime else null,
+              )
 
-          else -> Triple(archiveEntry.lastModifiedDate?.toInstant()?.let { FileTime.from(it) }, null, null)
-        }
+            else ->
+              Triple(
+                archiveEntry.lastModifiedDate?.toInstant()?.let { FileTime.from(it) },
+                null,
+                null,
+              )
+          }
         return FileTimes(lastModifiedTime, lastAccessTime, creationTime)
       }
     }
@@ -964,17 +1199,19 @@ class Unarchiver(
     @NlsActions.ActionText title: String,
     private val filter: (Any) -> Boolean,
     @NlsActions.ActionDescription description: String? = null,
-    private val actionPerformed: (List<ArchiveNode>, AnActionEvent) -> Unit
+    private val actionPerformed: (List<ArchiveNode>, AnActionEvent) -> Unit,
   ) : DumbAwareAction(title, description, null) {
 
     override fun update(e: AnActionEvent) {
-      val selectedValues = SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
+      val selectedValues =
+        SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
 
       e.presentation.isVisible = selectedValues.any(filter)
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-      val selectedValues = SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
+      val selectedValues =
+        SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
       val archiveNodes = selectedValues.filter(filter).map { it as ArchiveNode }.toList()
       actionPerformed(archiveNodes, e)
     }
@@ -987,7 +1224,7 @@ class Unarchiver(
   private class ArchiveNodeAction(
     @NlsActions.ActionText title: String,
     private val filter: (ArchiveNode) -> Boolean,
-    private val actionPerformed: (ArchiveNode, AnActionEvent) -> Unit
+    private val actionPerformed: (ArchiveNode, AnActionEvent) -> Unit,
   ) : DumbAwareAction(title) {
 
     override fun update(e: AnActionEvent) {
@@ -1001,7 +1238,8 @@ class Unarchiver(
     }
 
     private fun getSelectedArchiveNode(e: AnActionEvent): ArchiveNode? {
-      val selectedValues = SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
+      val selectedValues =
+        SELECTED_VALUES.getData(e.dataContext) ?: throw IllegalStateException("snh: Data missing")
       return selectedValues.singleOrNull()?.uncheckedCastTo(ArchiveNode::class)?.takeIf(filter)
     }
 
@@ -1015,11 +1253,11 @@ class Unarchiver(
     val icon: Icon,
     private var totalUncompressedSize: Long = 0,
     /**
-     * Must be a non-normalized path to distinguish between a directory and a file
-     * with the same name.
+     * Must be a non-normalized path to distinguish between a directory and a file with the same
+     * name.
      */
     val relativePath: String,
-    var archiveEntry: ArchiveEntry?
+    var archiveEntry: ArchiveEntry?,
   ) {
 
     var inaccurateTotalUncompressedSize = false
@@ -1028,8 +1266,7 @@ class Unarchiver(
     fun addUncompressedSize(size: Long) {
       if (size != ArchiveEntry.SIZE_UNKNOWN) {
         totalUncompressedSize += size
-      }
-      else {
+      } else {
         inaccurateTotalUncompressedSize = true
       }
     }
@@ -1046,7 +1283,9 @@ class Unarchiver(
         return null
       }
 
-      return archiveFilePath.parent.resolve("${archiveFilePath.fileName}!").resolve(Paths.get(archiveEntry!!.name))
+      return archiveFilePath.parent
+        .resolve("${archiveFilePath.fileName}!")
+        .resolve(Paths.get(archiveEntry!!.name))
     }
 
     override fun equals(other: Any?): Boolean {
@@ -1065,79 +1304,193 @@ class Unarchiver(
       fun toRelativePath(path: String) =
         if (path.startsWith("/")) path.substringAfter("/") else path
 
-      fun findInLastPathComponent(treePath: TreePath): ArchiveNode? = treePath.lastPathComponent
-        ?.safeCastTo<DefaultMutableTreeNode>()
-        ?.userObject
-        ?.safeCastTo<ArchiveNode>()
+      fun findInLastPathComponent(treePath: TreePath): ArchiveNode? =
+        treePath.lastPathComponent
+          ?.safeCastTo<DefaultMutableTreeNode>()
+          ?.userObject
+          ?.safeCastTo<ArchiveNode>()
     }
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class FileNode(
-    fileName: String,
-    archiveEntry: ArchiveEntry
-  ) : ArchiveNode(fileName, determineIcon(fileName), archiveEntry.size, toRelativePath(archiveEntry.name), archiveEntry) {
+  private class FileNode(fileName: String, archiveEntry: ArchiveEntry) :
+    ArchiveNode(
+      fileName,
+      determineIcon(fileName),
+      archiveEntry.size,
+      toRelativePath(archiveEntry.name),
+      archiveEntry,
+    ) {
 
     override fun relativePath(): Path = super.relativePath()!!
 
     override fun absolutePath(archiveFilePath: Path): Path = super.absolutePath(archiveFilePath)!!
 
-    fun isTextFile() = textFileNames.contains(fileName)
-            || textFileExtensions.contains(fileName.substringAfterLast(".").toLowerCasePreservingASCIIRules())
+    fun isTextFile() =
+      textFileNames.contains(fileName) ||
+        textFileExtensions.contains(
+          fileName.substringAfterLast(".").toLowerCasePreservingASCIIRules()
+        )
 
     companion object {
 
       private fun determineIcon(fileName: String): Icon {
         when (fileName) {
           ".htaccess" -> return AllIcons.FileTypes.Htaccess
-          "config", "init", ".gitignore", ".gitattributes", ".editorconfig", "Dockerfile", "index", "Makefile" -> return AllIcons.FileTypes.Config
-          "README", "LICENSE", "NOTICE", "CHANGELOG" -> AllIcons.FileTypes.Text
+          "config",
+          "init",
+          ".gitignore",
+          ".gitattributes",
+          ".editorconfig",
+          "Dockerfile",
+          "index",
+          "Makefile" -> return AllIcons.FileTypes.Config
+          "README",
+          "LICENSE",
+          "NOTICE",
+          "CHANGELOG" -> AllIcons.FileTypes.Text
         }
 
         return when (fileName.substringAfterLast(".").toLowerCasePreservingASCIIRules()) {
           "mf" -> AllIcons.FileTypes.Manifest
-          "zip", "tar", "jar" -> AllIcons.FileTypes.Archive
+          "zip",
+          "tar",
+          "jar" -> AllIcons.FileTypes.Archive
           "as" -> AllIcons.FileTypes.AS
           "aj" -> AllIcons.FileTypes.Aspectj
-          "config", "conf", "cfg", "ini" -> AllIcons.FileTypes.Config
-          "css", "scss", "sass" -> AllIcons.FileTypes.Css
+          "config",
+          "conf",
+          "cfg",
+          "ini" -> AllIcons.FileTypes.Config
+          "css",
+          "scss",
+          "sass" -> AllIcons.FileTypes.Css
           "dtd" -> AllIcons.FileTypes.Dtd
           "hprof" -> AllIcons.FileTypes.Hprof
-          "html", "htm" -> AllIcons.FileTypes.Html
+          "html",
+          "htm" -> AllIcons.FileTypes.Html
           "xhtml" -> AllIcons.FileTypes.Xhtml
-          "xml", "pom" -> AllIcons.FileTypes.Xml
+          "xml",
+          "pom" -> AllIcons.FileTypes.Xml
           "xsd" -> AllIcons.FileTypes.XsdFile
-          "jpg", "jpeg", "png", "gif", "bmp", "tiff", "svg", "psd", "ai", "eps", "raw", "webp", "pdf", "ico" -> AllIcons.FileTypes.Image
-          "java", "kt", "kts", "groovy", "scala" -> AllIcons.FileTypes.Java
-          "class", "jmod" -> AllIcons.FileTypes.JavaClass
+          "jpg",
+          "jpeg",
+          "png",
+          "gif",
+          "bmp",
+          "tiff",
+          "svg",
+          "psd",
+          "ai",
+          "eps",
+          "raw",
+          "webp",
+          "pdf",
+          "ico" -> AllIcons.FileTypes.Image
+          "java",
+          "kt",
+          "kts",
+          "groovy",
+          "scala" -> AllIcons.FileTypes.Java
+          "class",
+          "jmod" -> AllIcons.FileTypes.JavaClass
           "js" -> AllIcons.FileTypes.JavaScript
           "jfr" -> AllIcons.FileTypes.Jfr
           "json" -> AllIcons.FileTypes.Json
-          "yaml", "yml" -> AllIcons.FileTypes.Yaml
+          "yaml",
+          "yml" -> AllIcons.FileTypes.Yaml
           "jsp" -> AllIcons.FileTypes.Jsp
           "jspx" -> AllIcons.FileTypes.Jspx
           "properties" -> AllIcons.FileTypes.Properties
-          "txt", "text", "md", "log", "sql", "csv", "tex" -> AllIcons.FileTypes.Text
+          "txt",
+          "text",
+          "md",
+          "log",
+          "sql",
+          "csv",
+          "tex" -> AllIcons.FileTypes.Text
           else -> AllIcons.FileTypes.Any_type
         }
       }
     }
 
-    private val textFileNames = setOf(
-      "config", "init", ".gitignore", ".gitattributes", ".editorconfig",
-      "Dockerfile", "index", "Makefile", "README", "LICENSE", "NOTICE",
-      "CHANGELOG", ".htaccess"
-    )
+    private val textFileNames =
+      setOf(
+        "config",
+        "init",
+        ".gitignore",
+        ".gitattributes",
+        ".editorconfig",
+        "Dockerfile",
+        "index",
+        "Makefile",
+        "README",
+        "LICENSE",
+        "NOTICE",
+        "CHANGELOG",
+        ".htaccess",
+      )
 
-    private val textFileExtensions = setOf(
-      "txt", "html", "xml", "csv", "json", "log", "md", "css", "js", "php",
-      "py", "java", "c", "cpp", "rb", "sql", "yml", "yaml", "ini", "conf",
-      "cfg", "xml", "htm", "cs", "scala", "groovy", "sh", "bat", "ps1", "awk",
-      "sed", "tex", "r", "scss", "less", "styl", "asp", "jsp", "aspx", "xhtml",
-      "cfc", "cfm", "tpl", "twig", "handlebars", "mustache", "jsx", "tsx",
-      "kt", "kts", "mf", "config", "properties", "pom", "text", "sass"
-    )
+    private val textFileExtensions =
+      setOf(
+        "txt",
+        "html",
+        "xml",
+        "csv",
+        "json",
+        "log",
+        "md",
+        "css",
+        "js",
+        "php",
+        "py",
+        "java",
+        "c",
+        "cpp",
+        "rb",
+        "sql",
+        "yml",
+        "yaml",
+        "ini",
+        "conf",
+        "cfg",
+        "xml",
+        "htm",
+        "cs",
+        "scala",
+        "groovy",
+        "sh",
+        "bat",
+        "ps1",
+        "awk",
+        "sed",
+        "tex",
+        "r",
+        "scss",
+        "less",
+        "styl",
+        "asp",
+        "jsp",
+        "aspx",
+        "xhtml",
+        "cfc",
+        "cfm",
+        "tpl",
+        "twig",
+        "handlebars",
+        "mustache",
+        "jsx",
+        "tsx",
+        "kt",
+        "kts",
+        "mf",
+        "config",
+        "properties",
+        "pom",
+        "text",
+        "sass",
+      )
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -1146,7 +1499,7 @@ class Unarchiver(
     name: String,
     relativePath: String,
     archiveEntry: ArchiveEntry?,
-    icon: Icon = AllIcons.Nodes.Folder
+    icon: Icon = AllIcons.Nodes.Folder,
   ) : ArchiveNode(name, icon, 0, toRelativePath(relativePath), archiveEntry) {
 
     var totalChildren: Int = 0
@@ -1155,9 +1508,8 @@ class Unarchiver(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class RootNode(
-    val archiveFilePath: Path
-  ) : DirectoryNode(archiveFilePath.fileName.toString(), "", null, AllIcons.FileTypes.Archive) {
+  private class RootNode(val archiveFilePath: Path) :
+    DirectoryNode(archiveFilePath.fileName.toString(), "", null, AllIcons.FileTypes.Archive) {
 
     override fun relativePath(): Path? = null
 
@@ -1173,14 +1525,15 @@ class Unarchiver(
           }
           archiveEntry = sevenZFile.nextEntry
         }
-      }
-      else {
+      } else {
         var archiveFileInputStream = BufferedInputStream(FileInputStream(archiveFilePath.toFile()))
         if (GzipUtils.isCompressedFileName(archiveFilePath.fileName.toString())) {
-          archiveFileInputStream = BufferedInputStream(GzipCompressorInputStream(archiveFileInputStream))
+          archiveFileInputStream =
+            BufferedInputStream(GzipCompressorInputStream(archiveFileInputStream))
         }
 
-        val archiveInputStream: ArchiveInputStream<*> = ArchiveStreamFactory().createArchiveInputStream(archiveFileInputStream)
+        val archiveInputStream: ArchiveInputStream<*> =
+          ArchiveStreamFactory().createArchiveInputStream(archiveFileInputStream)
         archiveInputStream.use { archiveInputStream0 ->
           var archiveEntry = archiveInputStream0.nextEntry
           while (archiveEntry != null) {
@@ -1199,12 +1552,12 @@ class Unarchiver(
         if (archiveEntry0 == archiveEntry) {
           result = IOUtils.toByteArray(archiveInputStream())
           false
-        }
-        else {
+        } else {
           true
         }
       }
-      return result ?: throw IllegalStateException("Unable to find archive entry: ${archiveEntry.name}")
+      return result
+        ?: throw IllegalStateException("Unable to find archive entry: ${archiveEntry.name}")
     }
   }
 
@@ -1214,7 +1567,7 @@ class Unarchiver(
     private val project: Project?,
     private val tree: Tree?,
     private val lastSelectedOpenedDirectoryPath: ValueProperty<String>,
-    private val openArchiveCallback: (Path) -> Unit
+    private val openArchiveCallback: (Path) -> Unit,
   ) : DumbAwareAction("Open Archive File", null, AllIcons.Actions.MenuOpen) {
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -1230,12 +1583,14 @@ class Unarchiver(
 
     private fun openArchiveDialog() {
       ApplicationManager.getApplication().executeOnPooledThread {
-        val startPath = VirtualFileManager.getInstance().findFileByUrl(lastSelectedOpenedDirectoryPath.get())
+        val startPath =
+          VirtualFileManager.getInstance().findFileByUrl(lastSelectedOpenedDirectoryPath.get())
 
         ApplicationManager.getApplication().invokeLater {
-          val descriptor = FileChooserDescriptorFactory.createSingleFileDescriptor()
-            .withTitle("Open Archive File")
-            .withExtensionFilter("Archive files", *supportedArchiveExtensions)
+          val descriptor =
+            FileChooserDescriptorFactory.createSingleFileDescriptor()
+              .withTitle("Open Archive File")
+              .withExtensionFilter("Archive files", *supportedArchiveExtensions)
           val fileToOpen = FileChooser.chooseFile(descriptor, project, startPath)
           if (fileToOpen != null) {
             openArchiveCallback(fileToOpen.toNioPath())
@@ -1245,22 +1600,18 @@ class Unarchiver(
     }
 
     @Suppress("DialogTitleCapitalization")
-    fun toHyperlinkLabel() = HyperlinkLabel(templatePresentation.text).apply {
-      icon = templatePresentation.icon
+    fun toHyperlinkLabel() =
+      HyperlinkLabel(templatePresentation.text).apply {
+        icon = templatePresentation.icon
 
-      addHyperlinkListener {
-        openArchiveDialog()
+        addHyperlinkListener { openArchiveDialog() }
       }
-    }
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  class OpenArchiveFileInUnarchiverAction : DumbAwareAction(
-    "Unarchiver",
-    "Open archive file in the developer tool 'Unarchiver'.",
-    null
-  ) {
+  class OpenArchiveFileInUnarchiverAction :
+    DumbAwareAction("Unarchiver", "Open archive file in the developer tool 'Unarchiver'.", null) {
 
     private val supportedArchiveExtensions = Companion.supportedArchiveExtensions.toSet()
 
@@ -1276,13 +1627,15 @@ class Unarchiver(
       }
 
       var sanitizedFilePath = selectedFiles!![0].path
-      if (selectedFiles[0].fileSystem.protocol == StandardFileSystems.JAR_PROTOCOL
-        && sanitizedFilePath.endsWith(URLUtil.JAR_SEPARATOR)
+      if (
+        selectedFiles[0].fileSystem.protocol == StandardFileSystems.JAR_PROTOCOL &&
+          sanitizedFilePath.endsWith(URLUtil.JAR_SEPARATOR)
       ) {
         sanitizedFilePath = sanitizedFilePath.substringBeforeLast(URLUtil.JAR_SEPARATOR)
       }
 
-      e.project?.service<OpenDeveloperToolService>()
+      e.project
+        ?.service<OpenDeveloperToolService>()
         ?.openTool(OpenUnarchiverContext(Paths.get(sanitizedFilePath)), openUnarchiverReference)
     }
 
@@ -1290,15 +1643,15 @@ class Unarchiver(
 
     private fun isSelectedFileSupported(selectedFiles: Array<out VirtualFile>?) =
       selectedFiles?.size == 1 &&
-              selectedFiles.any { it.extension != null && supportedArchiveExtensions.contains(it.extension) }
+        selectedFiles.any {
+          it.extension != null && supportedArchiveExtensions.contains(it.extension)
+        }
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  class FilesDropHandler(
-    private val project: Project?,
-    private val openArchive: (Path) -> Unit
-  ) : TransferHandler(), EditorDropHandler, DropTargetListener {
+  class FilesDropHandler(private val project: Project?, private val openArchive: (Path) -> Unit) :
+    TransferHandler(), EditorDropHandler, DropTargetListener {
 
     override fun canImport(comp: JComponent?, transferFlavors: Array<out DataFlavor>?): Boolean {
       return canHandleDrop0(transferFlavors)
@@ -1313,7 +1666,11 @@ class Unarchiver(
       handleDrop0(event.transferable)
     }
 
-    override fun handleDrop(transferable: Transferable, project: Project?, editorWindow: EditorWindow?) {
+    override fun handleDrop(
+      transferable: Transferable,
+      project: Project?,
+      editorWindow: EditorWindow?,
+    ) {
       handleDrop0(transferable)
     }
 
@@ -1350,7 +1707,11 @@ class Unarchiver(
             return true
           }
       } catch (e: Exception) {
-        Messages.showErrorDialog(project, "Failed to handle dropped file: ${e.message}.", "Open Archive")
+        Messages.showErrorDialog(
+          project,
+          "Failed to handle dropped file: ${e.message}.",
+          "Open Archive",
+        )
       }
       return false
     }
@@ -1358,32 +1719,41 @@ class Unarchiver(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private enum class SortingMode(
-    val title: String,
-    val comparator: Comparator<ArchiveNode>
-  ) {
+  private enum class SortingMode(val title: String, val comparator: Comparator<ArchiveNode>) {
 
-    UNCOMPRESSED_SIZE_ASC("Uncompressed size (ascending)", { a, b -> compareValues(a.totalUncompressedSize(), b.totalUncompressedSize()) }),
-    UNCOMPRESSED_SIZE_DESC("Uncompressed size (descending)", { a, b -> compareValues(b.totalUncompressedSize(), a.totalUncompressedSize()) }),
+    UNCOMPRESSED_SIZE_ASC(
+      "Uncompressed size (ascending)",
+      { a, b -> compareValues(a.totalUncompressedSize(), b.totalUncompressedSize()) },
+    ),
+    UNCOMPRESSED_SIZE_DESC(
+      "Uncompressed size (descending)",
+      { a, b -> compareValues(b.totalUncompressedSize(), a.totalUncompressedSize()) },
+    ),
     FILENAME_ASC("Filename (ascending)", { a, b -> a.fileName.compareTo(b.fileName) }),
-    FILENAME_DESC("Filename (descending)", { a, b -> b.fileName.compareTo(a.fileName) })
+    FILENAME_DESC("Filename (descending)", { a, b -> b.fileName.compareTo(a.fileName) }),
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
   private class ArchiveTreeNodeRenderer(
     val showArchiveNodeUncompressedSize: ValueProperty<Boolean>,
-    val showArchiveNodeTotalNumberOfChildren: ValueProperty<Boolean>
+    val showArchiveNodeTotalNumberOfChildren: ValueProperty<Boolean>,
   ) : NodeRenderer() {
 
-    override fun customizeCellRenderer(tree: JTree,
-                                       value: Any,
-                                       selected: Boolean,
-                                       expanded: Boolean,
-                                       leaf: Boolean,
-                                       row: Int,
-                                       hasFocus: Boolean) {
-      val archiveNode = value.uncheckedCastTo(DefaultMutableTreeNode::class).userObject.uncheckedCastTo(ArchiveNode::class)
+    override fun customizeCellRenderer(
+      tree: JTree,
+      value: Any,
+      selected: Boolean,
+      expanded: Boolean,
+      leaf: Boolean,
+      row: Int,
+      hasFocus: Boolean,
+    ) {
+      val archiveNode =
+        value
+          .uncheckedCastTo(DefaultMutableTreeNode::class)
+          .userObject
+          .uncheckedCastTo(ArchiveNode::class)
 
       icon = archiveNode.icon
       append(archiveNode.fileName, SimpleTextAttributes.REGULAR_ATTRIBUTES)
@@ -1392,7 +1762,9 @@ class Unarchiver(
       if (showArchiveNodeUncompressedSize.get()) {
         archiveNode.totalUncompressedSize()?.let {
           if (!(it == 0L && archiveNode.inaccurateTotalUncompressedSize)) {
-            metaInformation.add("${if (archiveNode.inaccurateTotalUncompressedSize) "~" else ""}${StringUtil.formatFileSize(it)}")
+            metaInformation.add(
+              "${if (archiveNode.inaccurateTotalUncompressedSize) "~" else ""}${StringUtil.formatFileSize(it)}"
+            )
           }
         }
       }
@@ -1416,7 +1788,7 @@ class Unarchiver(
     val createParentDirectories: Boolean,
     val preserveDirectoryStructure: Boolean,
     val preserveFileAttributes: Boolean,
-    val openTargetDirectoryAfterExtraction: Boolean
+    val openTargetDirectoryAfterExtraction: Boolean,
   )
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -1425,20 +1797,18 @@ class Unarchiver(
     val archiveNodes: List<ArchiveNode>,
     val displayPathsWithUncompressedSize: Map<String, Long?>,
     val totalUncompressedSize: Long,
-    val inaccurateTotalUncompressedSize: Boolean
+    val inaccurateTotalUncompressedSize: Boolean,
   )
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class ExtractTask(
-    project: Project?,
-    private val extractionContext: ExtractionContext
-  ) : Task.ConditionalModal(
-    project,
-    "Extracting ${extractionContext.rootNode.fileName}",
-    true,
-    DEAF
-  ) {
+  private class ExtractTask(project: Project?, private val extractionContext: ExtractionContext) :
+    Task.ConditionalModal(
+      project,
+      "Extracting ${extractionContext.rootNode.fileName}",
+      true,
+      DEAF,
+    ) {
 
     override fun run(progressIndicator: ProgressIndicator) {
       progressIndicator.checkCanceled()
@@ -1446,12 +1816,12 @@ class Unarchiver(
 
       if (!Files.exists(extractionContext.targetDirectoryPath)) {
         Files.createDirectories(extractionContext.targetDirectoryPath)
-      }
-      else {
+      } else {
         if (!Files.isDirectory(extractionContext.targetDirectoryPath)) {
-          throw IllegalArgumentException("The target path '${extractionContext.targetDirectoryPath}' already exists but it is not a directory")
-        }
-        else if (extractionContext.clearTargetDirectory) {
+          throw IllegalArgumentException(
+            "The target path '${extractionContext.targetDirectoryPath}' already exists but it is not a directory"
+          )
+        } else if (extractionContext.clearTargetDirectory) {
           FileUtils.cleanDirectory(extractionContext.targetDirectoryPath.toFile())
         }
       }
@@ -1463,15 +1833,25 @@ class Unarchiver(
         progressIndicator.text2 = archiveNode.relativePath
 
         when (archiveNode) {
-          is DirectoryNode -> preparedFileNodeExtractions.putAll(
-            prepareDirectoryNode(archiveNode, extractionContext.targetDirectoryPath, extractionContext)
-          )
+          is DirectoryNode ->
+            preparedFileNodeExtractions.putAll(
+              prepareDirectoryNode(
+                archiveNode,
+                extractionContext.targetDirectoryPath,
+                extractionContext,
+              )
+            )
 
-          is FileNode -> prepareStandaloneFileNodeExtraction(archiveNode, extractionContext).let { (archiveEntry, path) ->
-            preparedFileNodeExtractions[archiveEntry.name] = path
-          }
+          is FileNode ->
+            prepareStandaloneFileNodeExtraction(archiveNode, extractionContext).let {
+              (archiveEntry, path) ->
+              preparedFileNodeExtractions[archiveEntry.name] = path
+            }
 
-          else -> throw IllegalStateException("Unknown archive node type: ${archiveNode::class.qualifiedName}")
+          else ->
+            throw IllegalStateException(
+              "Unknown archive node type: ${archiveNode::class.qualifiedName}"
+            )
         }
       }
 
@@ -1484,10 +1864,13 @@ class Unarchiver(
           progressIndicator.text =
             "Extracting $numOfFileNodesToExtract file${if (numOfFileNodesToExtract == 1) "s" else ""} (${archiveEntryToTargetFilePathToCopy.size} remaining)..."
           progressIndicator.text2 = archiveEntry.name
-          progressIndicator.fraction = (numOfFileNodesToExtract - archiveEntryToTargetFilePathToCopy.size.toDouble()) / numOfFileNodesToExtract
+          progressIndicator.fraction =
+            (numOfFileNodesToExtract - archiveEntryToTargetFilePathToCopy.size.toDouble()) /
+              numOfFileNodesToExtract
 
           val targetPath = archiveEntryToTargetFilePathToCopy[archiveEntry.name]!!
-          Files.newOutputStream(targetPath, WRITE, CREATE_NEW, TRUNCATE_EXISTING).use { outputStream ->
+          Files.newOutputStream(targetPath, WRITE, CREATE_NEW, TRUNCATE_EXISTING).use { outputStream
+            ->
             IOUtils.copy(archiveInputStream(), outputStream)
           }
           archiveEntryToTargetFilePathToCopy.remove(archiveEntry.name)
@@ -1498,7 +1881,9 @@ class Unarchiver(
         archiveEntryToTargetFilePathToCopy.isNotEmpty()
       }
       if (archiveEntryToTargetFilePathToCopy.isNotEmpty()) {
-        throw IllegalStateException("Unable to find archive entries: ${archiveEntryToTargetFilePathToCopy.map { it.key }.joinToString(", ")}")
+        throw IllegalStateException(
+          "Unable to find archive entries: ${archiveEntryToTargetFilePathToCopy.map { it.key }.joinToString(", ")}"
+        )
       }
     }
 
@@ -1512,8 +1897,7 @@ class Unarchiver(
     override fun onSuccess() {
       if (extractionContext.openTargetDirectoryAfterExtraction) {
         BrowserUtil.browse(extractionContext.targetDirectoryPath)
-      }
-      else {
+      } else {
         notifyAboutExtractionResult(extractionContext)
       }
     }
@@ -1521,59 +1905,67 @@ class Unarchiver(
     private fun prepareDirectoryNode(
       directoryNode: DirectoryNode,
       baseDirectoryPath: Path,
-      extractionContext: ExtractionContext
+      extractionContext: ExtractionContext,
     ): Map<String, Path> {
-      val directoryPath = if (extractionContext.preserveDirectoryStructure) {
-        val relativeDirectoryPath = if (extractionContext.createParentDirectories) {
-          Paths.get(directoryNode.relativePath)
+      val directoryPath =
+        if (extractionContext.preserveDirectoryStructure) {
+          val relativeDirectoryPath =
+            if (extractionContext.createParentDirectories) {
+              Paths.get(directoryNode.relativePath)
+            } else {
+              Path.of(directoryNode.fileName)
+            }
+          val directoryPath =
+            Files.createDirectories(baseDirectoryPath.resolve(relativeDirectoryPath))
+          if (extractionContext.preserveFileAttributes && directoryNode.archiveEntry != null) {
+            restoreFileAttributes(directoryNode.archiveEntry!!, directoryPath)
+          }
+          directoryPath
+        } else {
+          baseDirectoryPath
         }
-        else {
-          Path.of(directoryNode.fileName)
-        }
-        val directoryPath = Files.createDirectories(baseDirectoryPath.resolve(relativeDirectoryPath))
-        if (extractionContext.preserveFileAttributes && directoryNode.archiveEntry != null) {
-          restoreFileAttributes(directoryNode.archiveEntry!!, directoryPath)
-        }
-        directoryPath
-      }
-      else {
-        baseDirectoryPath
-      }
 
       val preparedFileNodeExtractions = mutableMapOf<String, Path>()
       directoryNode.children.forEach { archiveNode ->
         when (archiveNode) {
-          is DirectoryNode -> preparedFileNodeExtractions.putAll(
-            prepareDirectoryNode(archiveNode, directoryPath, extractionContext)
-          )
+          is DirectoryNode ->
+            preparedFileNodeExtractions.putAll(
+              prepareDirectoryNode(archiveNode, directoryPath, extractionContext)
+            )
 
           is FileNode -> {
             val filePath = directoryPath.resolve(archiveNode.fileName)
             preparedFileNodeExtractions[archiveNode.archiveEntry!!.name] = filePath
           }
 
-          else -> throw IllegalStateException("Unknown archive node type: ${archiveNode::class.qualifiedName}")
+          else ->
+            throw IllegalStateException(
+              "Unknown archive node type: ${archiveNode::class.qualifiedName}"
+            )
         }
       }
       return preparedFileNodeExtractions
     }
 
     /**
-     * A [FileNode] is "standalone" if its parent [DirectoryNode] is not
-     * extracted. This method creates the associated directory structure mmit.
+     * A [FileNode] is "standalone" if its parent [DirectoryNode] is not extracted. This method
+     * creates the associated directory structure mmit.
      */
     private fun prepareStandaloneFileNodeExtraction(
       fileNode: FileNode,
-      extractionContext: ExtractionContext
+      extractionContext: ExtractionContext,
     ): Pair<ArchiveEntry, Path> {
-      val filePath = if (extractionContext.preserveDirectoryStructure && extractionContext.createParentDirectories) {
-        val targetPath = extractionContext.targetDirectoryPath.resolve(Paths.get(fileNode.relativePath))
-        Files.createDirectories(targetPath.parent)
-        targetPath
-      }
-      else {
-        extractionContext.targetDirectoryPath.resolve(Paths.get(fileNode.fileName))
-      }
+      val filePath =
+        if (
+          extractionContext.preserveDirectoryStructure && extractionContext.createParentDirectories
+        ) {
+          val targetPath =
+            extractionContext.targetDirectoryPath.resolve(Paths.get(fileNode.relativePath))
+          Files.createDirectories(targetPath.parent)
+          targetPath
+        } else {
+          extractionContext.targetDirectoryPath.resolve(Paths.get(fileNode.fileName))
+        }
 
       return fileNode.archiveEntry!! to filePath
     }
@@ -1581,7 +1973,8 @@ class Unarchiver(
     private fun notifyAboutExtractionResult(extractionContext: ExtractionContext) {
       val numOfExtractedEntries = extractionContext.archiveNodes.size
       NotificationUtils.notifyOnToolWindow(
-        message = "$numOfExtractedEntries ${if (numOfExtractedEntries == 1) "entry" else "entries"} have been extracted to: ${extractionContext.targetDirectoryPath}",
+        message =
+          "$numOfExtractedEntries ${if (numOfExtractedEntries == 1) "entry" else "entries"} have been extracted to: ${extractionContext.targetDirectoryPath}",
         project = project,
         notificationType = NotificationType.INFORMATION,
         object : DumbAwareAction("Open Target Directory") {
@@ -1589,7 +1982,7 @@ class Unarchiver(
           override fun actionPerformed(e: AnActionEvent) {
             BrowserUtil.browse(extractionContext.targetDirectoryPath)
           }
-        }
+        },
       )
     }
   }
@@ -1602,15 +1995,13 @@ class Unarchiver(
 
   class Factory : DeveloperUiToolFactory<Unarchiver> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Unarchiver",
-      contentTitle = CONTENT_TITLE
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "Unarchiver", contentTitle = CONTENT_TITLE)
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> Unarchiver) = {
       assert(ID == context.id)
       Unarchiver(project, it, parentDisposable)
@@ -1644,7 +2035,9 @@ class Unarchiver(
     private val supportedArchiveExtensions: Array<String> =
       // Keep in sync with `org.apache.commons.compress.compressors.gzip.GzipUtils`
       setOf("tgz", "taz", "svgz", "cpgz", "wmz", "emz", "gz", "z")
-        .plus(ArchiveStreamFactory.findAvailableArchiveInputStreamProviders().map { it.key.lowercase() })
+        .plus(
+          ArchiveStreamFactory.findAvailableArchiveInputStreamProviders().map { it.key.lowercase() }
+        )
         .sorted()
         .toTypedArray()
 
@@ -1656,7 +2049,7 @@ class Unarchiver(
       attributes.setTimes(
         fileTimes.lastModifiedTime ?: oldAttributes.lastModifiedTime(),
         fileTimes.lastAccessTime ?: oldAttributes.lastAccessTime(),
-        fileTimes.creationTime ?: oldAttributes.creationTime()
+        fileTimes.creationTime ?: oldAttributes.creationTime(),
       )
     }
   }

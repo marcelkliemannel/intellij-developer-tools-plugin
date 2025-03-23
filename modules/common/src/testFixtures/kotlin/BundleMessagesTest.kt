@@ -1,4 +1,3 @@
-
 import IoUtils.collectAllFiles
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.extension
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.nameWithoutExtension
@@ -17,71 +16,109 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.*
+import java.util.Properties
 
 abstract class BundleMessagesTest : IdeaTest() {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
-  abstract fun `test that all additional languages are containing the same message keys and parameter counts`(): List<DynamicNode>
+  abstract fun `test that all additional languages are containing the same message keys and parameter counts`():
+    List<DynamicNode>
 
-  protected fun `do test that all additional languages are containing the same message keys and parameter counts`(): List<DynamicNode> =
+  protected fun `do test that all additional languages are containing the same message keys and parameter counts`():
+    List<DynamicNode> =
     messagesBundles.map {
-      val additionalLanguageToMessages: Map<String, Map<String, String>> = it.languageToMessages.filter { it.key != REFERENCE_LANGUAGE_KEY }
-      dynamicContainer(it.bundleName, it.referenceLanguageMessages().map { (referenceLanguageMessageKey, referenceLanguageMessageValue) ->
-        dynamicContainer(referenceLanguageMessageKey, additionalLanguageToMessages.map { (additionalLanguageKey, additionalLanguageMessages) ->
-          dynamicTest(additionalLanguageKey) {
-            assertThat(additionalLanguageMessages).containsKey(referenceLanguageMessageKey)
-            assertThat(countUniqueParameters(additionalLanguageMessages[referenceLanguageMessageKey]!!))
-              .isEqualTo(countUniqueParameters(referenceLanguageMessageValue))
-          }
-        })
-      })
+      val additionalLanguageToMessages: Map<String, Map<String, String>> =
+        it.languageToMessages.filter { it.key != REFERENCE_LANGUAGE_KEY }
+      dynamicContainer(
+        it.bundleName,
+        it.referenceLanguageMessages().map {
+          (referenceLanguageMessageKey, referenceLanguageMessageValue) ->
+          dynamicContainer(
+            referenceLanguageMessageKey,
+            additionalLanguageToMessages.map { (additionalLanguageKey, additionalLanguageMessages)
+              ->
+              dynamicTest(additionalLanguageKey) {
+                assertThat(additionalLanguageMessages).containsKey(referenceLanguageMessageKey)
+                assertThat(
+                    countUniqueParameters(additionalLanguageMessages[referenceLanguageMessageKey]!!)
+                  )
+                  .isEqualTo(countUniqueParameters(referenceLanguageMessageValue))
+              }
+            },
+          )
+        },
+      )
     }
 
-  abstract fun `test that all message(messageKey, params) calls are referencing to an existing message key and are using the correct parameters count`(): List<DynamicNode>
+  abstract fun `test that all message(messageKey, params) calls are referencing to an existing message key and are using the correct parameters count`():
+    List<DynamicNode>
 
-  protected fun `do test that all message(messageKey, params) calls are referencing to an existing message key and are using the correct parameters count`(): List<DynamicNode> =
-    collectAllMessageBundleUsages().groupBy { it.className }.map { (className, allMessageBundleUsagesInClass) ->
-      dynamicContainer(className, allMessageBundleUsagesInClass.groupBy { it.bundleName }.map { (bundleName, allMessageBundleUsages) ->
-        val messagesBundleReferenceLanguageMessages = getMessagesBundle(bundleName).referenceLanguageMessages()
+  protected fun `do test that all message(messageKey, params) calls are referencing to an existing message key and are using the correct parameters count`():
+    List<DynamicNode> =
+    collectAllMessageBundleUsages()
+      .groupBy { it.className }
+      .map { (className, allMessageBundleUsagesInClass) ->
+        dynamicContainer(
+          className,
+          allMessageBundleUsagesInClass
+            .groupBy { it.bundleName }
+            .map { (bundleName, allMessageBundleUsages) ->
+              val messagesBundleReferenceLanguageMessages =
+                getMessagesBundle(bundleName).referenceLanguageMessages()
 
-        val bundleExistsTest = dynamicTest("Bundle `$bundleName` exists") { assertThat(messagesBundles).anyMatch { it.bundleName == bundleName } }
+              val bundleExistsTest =
+                dynamicTest("Bundle `$bundleName` exists") {
+                  assertThat(messagesBundles).anyMatch { it.bundleName == bundleName }
+                }
 
-        val messageKeysAndParametersCountTests = allMessageBundleUsages.map { messageBundleUsage ->
-          dynamicTest(messageBundleUsage.displayableText) {
-            assertThat(messagesBundleReferenceLanguageMessages).containsKey(messageBundleUsage.messageKey)
-            assertThat(messageBundleUsage.parametersCount)
-              .isEqualTo(countUniqueParameters(messagesBundleReferenceLanguageMessages[messageBundleUsage.messageKey]!!))
-          }
-        }
+              val messageKeysAndParametersCountTests =
+                allMessageBundleUsages.map { messageBundleUsage ->
+                  dynamicTest(messageBundleUsage.displayableText) {
+                    assertThat(messagesBundleReferenceLanguageMessages)
+                      .containsKey(messageBundleUsage.messageKey)
+                    assertThat(messageBundleUsage.parametersCount)
+                      .isEqualTo(
+                        countUniqueParameters(
+                          messagesBundleReferenceLanguageMessages[messageBundleUsage.messageKey]!!
+                        )
+                      )
+                  }
+                }
 
-        dynamicContainer(bundleName, listOf(bundleExistsTest) + messageKeysAndParametersCountTests)
-      })
-    }
+              dynamicContainer(
+                bundleName,
+                listOf(bundleExistsTest) + messageKeysAndParametersCountTests,
+              )
+            },
+        )
+      }
 
   abstract fun `test that all keys in the messages bundle are used`(): List<DynamicNode>
 
   protected fun `do test that all keys in the messages bundle are used`(): List<DynamicNode> {
     val usedMessageKeys = collectAllMessageBundleUsages().map { it.messageKey }
     return messagesBundles.map { messageBundle ->
-      dynamicContainer(messageBundle.bundleName, messageBundle.referenceLanguageMessages().keys.map {
-        dynamicTest(it) { assertThat(usedMessageKeys).contains(it) }
-      })
+      dynamicContainer(
+        messageBundle.bundleName,
+        messageBundle.referenceLanguageMessages().keys.map {
+          dynamicTest(it) { assertThat(usedMessageKeys).contains(it) }
+        },
+      )
     }
   }
 
   /**
-   * This base method only collects all calls to `$BundleName.message(messageKey, ...params)`,
-   * if the `messageKey` is a [String]. Overridden methods may add additional
-   * [MessagesBundleUsage].
+   * This base method only collects all calls to `$BundleName.message(messageKey, ...params)`, if
+   * the `messageKey` is a [String]. Overridden methods may add additional [MessagesBundleUsage].
    */
   protected open fun collectAllMessageBundleUsages(): List<MessagesBundleUsage> =
     moduleKotlinClassesKotlinMain.flatMap { classFile ->
       val usages = mutableListOf<MessagesBundleUsage>()
 
-      classFile.readClass()
+      classFile
+        .readClass()
         .accept(MessageCallsClassVisitor(classFile.nameWithoutExtension(), usages), 0)
 
       return usages
@@ -102,11 +139,13 @@ abstract class BundleMessagesTest : IdeaTest() {
 
   data class MessagesBundle(
     val bundleName: String,
-    val languageToMessages: MutableMap<String, Map<String, String>> = mutableMapOf<String, Map<String, String>>()
+    val languageToMessages: MutableMap<String, Map<String, String>> =
+      mutableMapOf<String, Map<String, String>>(),
   ) {
 
-    fun referenceLanguageMessages(): Map<String, String> = languageToMessages[REFERENCE_LANGUAGE_KEY]
-      ?: error("Bundle `$bundleName` is missing the reference language")
+    fun referenceLanguageMessages(): Map<String, String> =
+      languageToMessages[REFERENCE_LANGUAGE_KEY]
+        ?: error("Bundle `$bundleName` is missing the reference language")
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -116,8 +155,7 @@ abstract class BundleMessagesTest : IdeaTest() {
     val bundleName: String,
     val messageKey: String,
     val parametersCount: Int,
-
-    val displayableText: String = messageKey
+    val displayableText: String = messageKey,
   )
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -125,22 +163,23 @@ abstract class BundleMessagesTest : IdeaTest() {
   class MessageCallsMethodVisitor(
     private val className: String,
     methodVisitor: MethodVisitor,
-    private val usages: MutableList<MessagesBundleUsage>
+    private val usages: MutableList<MessagesBundleUsage>,
   ) : MethodVisitor(Opcodes.ASM9, methodVisitor) {
 
     private var lastStringLdcInsn: String? = null
     private var lastIconstInsn: Int? = null
 
     override fun visitInsn(opcode: Int) {
-      lastIconstInsn = when(opcode) {
-        Opcodes.ICONST_0 -> 0
-        Opcodes.ICONST_1 -> 1
-        Opcodes.ICONST_2 -> 2
-        Opcodes.ICONST_3 -> 3
-        Opcodes.ICONST_4 -> 4
-        Opcodes.ICONST_5 -> 4
-        else -> lastIconstInsn
-      }
+      lastIconstInsn =
+        when (opcode) {
+          Opcodes.ICONST_0 -> 0
+          Opcodes.ICONST_1 -> 1
+          Opcodes.ICONST_2 -> 2
+          Opcodes.ICONST_3 -> 3
+          Opcodes.ICONST_4 -> 4
+          Opcodes.ICONST_5 -> 4
+          else -> lastIconstInsn
+        }
 
       super.visitInsn(opcode)
     }
@@ -158,7 +197,7 @@ abstract class BundleMessagesTest : IdeaTest() {
       owner: String,
       name: String,
       descriptor: String,
-      isInterface: Boolean
+      isInterface: Boolean,
     ) {
       if (name == "message") {
         val type = Type.getMethodType(descriptor)
@@ -169,7 +208,7 @@ abstract class BundleMessagesTest : IdeaTest() {
               className = className,
               bundleName = owner.substringAfterLast("/"),
               messageKey = lastStringLdcInsn ?: error("No latest LDC instruction captured"),
-              parametersCount = lastIconstInsn ?: error("No last ICONST instruction captured")
+              parametersCount = lastIconstInsn ?: error("No last ICONST instruction captured"),
             )
           )
         }
@@ -183,14 +222,14 @@ abstract class BundleMessagesTest : IdeaTest() {
 
   class MessageCallsClassVisitor(
     private val fileName: String,
-    private val usages: MutableList<MessagesBundleUsage>
+    private val usages: MutableList<MessagesBundleUsage>,
   ) : ClassVisitor(Opcodes.ASM9, ClassWriter(0)) {
     override fun visitMethod(
       access: Int,
       name: String,
       descriptor: String,
       signature: String?,
-      exceptions: Array<out String>?
+      exceptions: Array<out String>?,
     ): MethodVisitor {
       val methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions)
       return MessageCallsMethodVisitor(fileName, methodVisitor, usages)
@@ -203,8 +242,10 @@ abstract class BundleMessagesTest : IdeaTest() {
 
     lateinit var messagesBundles: List<MessagesBundle>
       private set
+
     lateinit var kotlinSourceFiles: List<Path>
       private set
+
     lateinit var moduleKotlinClassesKotlinMain: List<Path>
       private set
 
@@ -216,10 +257,14 @@ abstract class BundleMessagesTest : IdeaTest() {
       messagesBundles = collectAllMessageBundles(File("src/main/resources/message"))
       assertThat(messagesBundles).hasSizeGreaterThanOrEqualTo(1)
 
-      kotlinSourceFiles = Paths.get("src/main/kotlin").collectAllFiles().filter { it.extension() == "kt" }
+      kotlinSourceFiles =
+        Paths.get("src/main/kotlin").collectAllFiles().filter { it.extension() == "kt" }
       assertThat(kotlinSourceFiles).hasSizeGreaterThanOrEqualTo(1)
 
-      moduleKotlinClassesKotlinMain = Paths.get("build/classes/kotlin/main").collectAllFiles().filter { it.extension() == "class" }
+      moduleKotlinClassesKotlinMain =
+        Paths.get("build/classes/kotlin/main").collectAllFiles().filter {
+          it.extension() == "class"
+        }
       assertThat(moduleKotlinClassesKotlinMain).hasSizeGreaterThanOrEqualTo(1)
     }
 
@@ -236,12 +281,13 @@ abstract class BundleMessagesTest : IdeaTest() {
 
           val bundleName = if (parts.size > 1) parts[0] else filename
           val languageKey = if (parts.size > 1) parts[1] else REFERENCE_LANGUAGE_KEY
-          val properties = Properties().apply {
-            file.inputStream().use { load(it) }
-          }
+          val properties = Properties().apply { file.inputStream().use { load(it) } }
 
           val messagesBundle = result.getOrPut(bundleName) { MessagesBundle(bundleName) }
-          messagesBundle.languageToMessages.put(languageKey, properties.stringPropertyNames().associate { it to properties.getProperty(it) })
+          messagesBundle.languageToMessages.put(
+            languageKey,
+            properties.stringPropertyNames().associate { it to properties.getProperty(it) },
+          )
         }
 
       return result.values.toList()

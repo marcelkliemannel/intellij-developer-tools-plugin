@@ -32,9 +32,14 @@ class ObjectMapperService {
   // -- Exported Methods ---------------------------------------------------- //
 
   fun jsonMapper(): JsonMapper {
-    if (jsonMapper == null || lastJsonHandlingModificationsCounter != DeveloperToolsApplicationSettings.jsonHandling.modificationsCounter) {
+    if (
+      jsonMapper == null ||
+        lastJsonHandlingModificationsCounter !=
+          DeveloperToolsApplicationSettings.jsonHandling.modificationsCounter
+    ) {
       jsonMapper = createJsonMapper()
-      lastJsonHandlingModificationsCounter = DeveloperToolsApplicationSettings.jsonHandling.modificationsCounter
+      lastJsonHandlingModificationsCounter =
+        DeveloperToolsApplicationSettings.jsonHandling.modificationsCounter
     }
 
     return jsonMapper!!
@@ -53,9 +58,7 @@ class ObjectMapperService {
       return ""
     }
 
-    return jsonMapper()
-      .writerWithDefaultPrettyPrinter()
-      .writeValueAsString(this)
+    return jsonMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this)
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -63,85 +66,87 @@ class ObjectMapperService {
   fun createJsonMapper(): JsonMapper {
     val settings = DeveloperToolsApplicationSettings.jsonHandling
 
-    return JsonMapper.builder().apply {
-      // Writing settings
-      if (settings.writeQuoteFieldNames.get()) {
-        enable(JsonWriteFeature.QUOTE_FIELD_NAMES.mappedFeature())
-      } else {
-        disable(JsonWriteFeature.QUOTE_FIELD_NAMES.mappedFeature())
-      }
+    return JsonMapper.builder()
+      .apply {
+        // Writing settings
+        if (settings.writeQuoteFieldNames.get()) {
+          enable(JsonWriteFeature.QUOTE_FIELD_NAMES.mappedFeature())
+        } else {
+          disable(JsonWriteFeature.QUOTE_FIELD_NAMES.mappedFeature())
+        }
 
-      if (settings.writeNanAsStrings.get()) {
-        enable(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS)
-      } else {
-        disable(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS)
-      }
+        if (settings.writeNanAsStrings.get()) {
+          enable(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS)
+        } else {
+          disable(JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS)
+        }
 
-      if (settings.writeNumbersAsStrings.get()) {
-        enable(JsonWriteFeature.WRITE_NUMBERS_AS_STRINGS.mappedFeature())
-      } else {
-        disable(JsonWriteFeature.WRITE_NUMBERS_AS_STRINGS.mappedFeature())
-      }
+        if (settings.writeNumbersAsStrings.get()) {
+          enable(JsonWriteFeature.WRITE_NUMBERS_AS_STRINGS.mappedFeature())
+        } else {
+          disable(JsonWriteFeature.WRITE_NUMBERS_AS_STRINGS.mappedFeature())
+        }
 
-      if (settings.writeEscapeNonAscii.get()) {
-        enable(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature())
-      } else {
-        disable(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature())
-      }
+        if (settings.writeEscapeNonAscii.get()) {
+          enable(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature())
+        } else {
+          disable(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature())
+        }
 
-      if (settings.writeHexUpperCase.get()) {
-        enable(JsonWriteFeature.WRITE_HEX_UPPER_CASE.mappedFeature())
-      } else {
-        disable(JsonWriteFeature.WRITE_HEX_UPPER_CASE.mappedFeature())
-      }
+        if (settings.writeHexUpperCase.get()) {
+          enable(JsonWriteFeature.WRITE_HEX_UPPER_CASE.mappedFeature())
+        } else {
+          disable(JsonWriteFeature.WRITE_HEX_UPPER_CASE.mappedFeature())
+        }
 
-      val indenter = DefaultIndenter(" ".repeat(settings.writeIntentionSpaces.get()), System.lineSeparator())
-      val prettyPrinter = DefaultPrettyPrinter()
-        .withObjectIndenter(indenter)
-        .withArrayIndenter(indenter)
-      defaultPrettyPrinter(prettyPrinter)
+        val indenter =
+          DefaultIndenter(" ".repeat(settings.writeIntentionSpaces.get()), System.lineSeparator())
+        val prettyPrinter =
+          DefaultPrettyPrinter().withObjectIndenter(indenter).withArrayIndenter(indenter)
+        defaultPrettyPrinter(prettyPrinter)
 
-      // Reading settings
-      if (settings.readAllowJavaComments.get()) {
-        enable(JsonReadFeature.ALLOW_JAVA_COMMENTS.mappedFeature())
+        // Reading settings
+        if (settings.readAllowJavaComments.get()) {
+          enable(JsonReadFeature.ALLOW_JAVA_COMMENTS.mappedFeature())
+        }
+        if (settings.readAllowYamlComments.get()) {
+          enable(JsonReadFeature.ALLOW_YAML_COMMENTS.mappedFeature())
+        }
+        if (settings.readAllowSingleQuotes.get()) {
+          enable(JsonReadFeature.ALLOW_SINGLE_QUOTES.mappedFeature())
+        }
+        if (settings.readAllowUnquotedFieldNames.get()) {
+          enable(JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES.mappedFeature())
+        }
+        if (settings.readAllowUnescapedControlChars.get()) {
+          enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature())
+        }
+        if (settings.readAllowBackslashEscapingAnyCharacter.get()) {
+          enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER.mappedFeature())
+        }
+        if (settings.readAllowLeadingZerosForNumbers.get()) {
+          enable(JsonReadFeature.ALLOW_LEADING_ZEROS_FOR_NUMBERS.mappedFeature())
+        }
+        if (settings.readAllowLeadingPlusSignForNumbers.get()) {
+          enable(JsonReadFeature.ALLOW_LEADING_PLUS_SIGN_FOR_NUMBERS.mappedFeature())
+        }
+        if (settings.readAllowLeadingDecimalPointForNumbers.get()) {
+          enable(JsonReadFeature.ALLOW_LEADING_DECIMAL_POINT_FOR_NUMBERS.mappedFeature())
+        }
+        if (settings.readAllowTrailingDecimalPointForNumbers.get()) {
+          enable(JsonReadFeature.ALLOW_TRAILING_DECIMAL_POINT_FOR_NUMBERS.mappedFeature())
+        }
+        if (settings.readAllowNonNumericNumbers.get()) {
+          enable(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS)
+        }
+        if (settings.readAllowMissingValues.get()) {
+          enable(JsonReadFeature.ALLOW_MISSING_VALUES.mappedFeature())
+        }
+        if (settings.readAllowTrailingComma.get()) {
+          enable(JsonReadFeature.ALLOW_TRAILING_COMMA.mappedFeature())
+        }
       }
-      if (settings.readAllowYamlComments.get()) {
-        enable(JsonReadFeature.ALLOW_YAML_COMMENTS.mappedFeature())
-      }
-      if (settings.readAllowSingleQuotes.get()) {
-        enable(JsonReadFeature.ALLOW_SINGLE_QUOTES.mappedFeature())
-      }
-      if (settings.readAllowUnquotedFieldNames.get()) {
-        enable(JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES.mappedFeature())
-      }
-      if (settings.readAllowUnescapedControlChars.get()) {
-        enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature())
-      }
-      if (settings.readAllowBackslashEscapingAnyCharacter.get()) {
-        enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER.mappedFeature())
-      }
-      if (settings.readAllowLeadingZerosForNumbers.get()) {
-        enable(JsonReadFeature.ALLOW_LEADING_ZEROS_FOR_NUMBERS.mappedFeature())
-      }
-      if (settings.readAllowLeadingPlusSignForNumbers.get()) {
-        enable(JsonReadFeature.ALLOW_LEADING_PLUS_SIGN_FOR_NUMBERS.mappedFeature())
-      }
-      if (settings.readAllowLeadingDecimalPointForNumbers.get()) {
-        enable(JsonReadFeature.ALLOW_LEADING_DECIMAL_POINT_FOR_NUMBERS.mappedFeature())
-      }
-      if (settings.readAllowTrailingDecimalPointForNumbers.get()) {
-        enable(JsonReadFeature.ALLOW_TRAILING_DECIMAL_POINT_FOR_NUMBERS.mappedFeature())
-      }
-      if (settings.readAllowNonNumericNumbers.get()) {
-        enable(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS)
-      }
-      if (settings.readAllowMissingValues.get()) {
-        enable(JsonReadFeature.ALLOW_MISSING_VALUES.mappedFeature())
-      }
-      if (settings.readAllowTrailingComma.get()) {
-        enable(JsonReadFeature.ALLOW_TRAILING_COMMA.mappedFeature())
-      }
-    }.build()
+      .build()
   }
 
   // -- Inner Type ---------------------------------------------------------- //

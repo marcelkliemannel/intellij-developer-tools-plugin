@@ -19,30 +19,35 @@ class CodeFormattingConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   context: DeveloperUiToolContext,
-  project: Project?
-) : TextConverter(
-  textConverterContext = TextConverterContext(
-    convertActionTitle = "Convert",
-    revertActionTitle = "Convert",
-    sourceTitle = "First",
-    targetTitle = "Second",
-    sourceErrorHolder = ErrorHolder(),
-    targetErrorHolder = ErrorHolder(),
-    diffSupport = DiffSupport(
-      title = "Text Format Converter"
-    )
+  project: Project?,
+) :
+  TextConverter(
+    textConverterContext =
+      TextConverterContext(
+        convertActionTitle = "Convert",
+        revertActionTitle = "Convert",
+        sourceTitle = "First",
+        targetTitle = "Second",
+        sourceErrorHolder = ErrorHolder(),
+        targetErrorHolder = ErrorHolder(),
+        diffSupport = DiffSupport(title = "Text Format Converter"),
+      ),
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+    context = context,
+    project = project,
   ),
-  configuration = configuration,
-  parentDisposable = parentDisposable,
-  context = context,
-  project = project
-), DeveloperToolConfiguration.ChangeListener {
+  DeveloperToolConfiguration.ChangeListener {
   // -- Properties ---------------------------------------------------------- //
 
   private var firstLanguage = configuration.register("firstLanguage", Language.JSON)
   private var secondLanguage = configuration.register("secondLanguage", Language.YAML)
 
-  private val codeStyles by lazy { LanguageCodeStyleSettingsProvider.EP_NAME.extensionList.associate { it.language.id to it.language } }
+  private val codeStyles by lazy {
+    LanguageCodeStyleSettingsProvider.EP_NAME.extensionList.associate {
+      it.language.id to it.language
+    }
+  }
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
@@ -53,27 +58,18 @@ class CodeFormattingConverter(
   }
 
   override fun Panel.buildTopConfigurationUi() {
-    row {
-      comboBox(Language.entries)
-        .label("First language:")
-        .bindItem(firstLanguage)
-    }
+    row { comboBox(Language.entries).label("First language:").bindItem(firstLanguage) }
   }
 
   override fun Panel.buildMiddleSecondConfigurationUi() {
-    row {
-      comboBox(Language.entries)
-        .label("Second language:")
-        .bindItem(secondLanguage)
-    }
+    row { comboBox(Language.entries).label("Second language:").bindItem(secondLanguage) }
   }
 
   override fun toTarget(text: String) {
     covert(textConverterContext.sourceErrorHolder!!) {
       if (text.isBlank()) {
         targetText.set("")
-      }
-      else {
+      } else {
         targetText.set(secondLanguage.get().asString(firstLanguage.get().parse(text)))
       }
     }
@@ -83,8 +79,7 @@ class CodeFormattingConverter(
     covert(textConverterContext.targetErrorHolder!!) {
       if (text.isBlank()) {
         sourceText.set("")
-      }
-      else {
+      } else {
         sourceText.set(firstLanguage.get().asString(secondLanguage.get().parse(text)))
       }
     }
@@ -120,7 +115,7 @@ class CodeFormattingConverter(
   private enum class Language(
     val title: String,
     val languageId: String,
-    val objectMapper: (ObjectMapperService) -> ObjectMapper
+    val objectMapper: (ObjectMapperService) -> ObjectMapper,
   ) {
 
     JSON("JSON", "JSON", { it.jsonMapper() }),
@@ -131,8 +126,7 @@ class CodeFormattingConverter(
 
     override fun toString(): String = title
 
-    fun parse(text: String): JsonNode =
-      objectMapper(ObjectMapperService.instance).readTree(text)
+    fun parse(text: String): JsonNode = objectMapper(ObjectMapperService.instance).readTree(text)
 
     fun asString(root: JsonNode): String =
       objectMapper(ObjectMapperService.instance).writeValueAsString(root)
@@ -142,15 +136,13 @@ class CodeFormattingConverter(
 
   class Factory : DeveloperUiToolFactory<CodeFormattingConverter> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Text Format",
-      contentTitle = "Text Format Converter"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "Text Format", contentTitle = "Text Format Converter")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> CodeFormattingConverter) = { configuration ->
       CodeFormattingConverter(configuration, parentDisposable, context, project)
     }

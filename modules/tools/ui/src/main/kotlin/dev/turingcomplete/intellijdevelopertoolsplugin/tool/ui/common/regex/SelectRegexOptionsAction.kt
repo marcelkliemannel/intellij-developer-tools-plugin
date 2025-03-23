@@ -21,7 +21,7 @@ import javax.swing.JComponent
 
 class SelectRegexOptionsAction(
   private val parentComponent: () -> JComponent,
-  private val selectedRegexOptionFlag: ObservableMutableProperty<Int>
+  private val selectedRegexOptionFlag: ObservableMutableProperty<Int>,
 ) : DumbAwareAction("Regular Expression Options", null, AllIcons.General.GearPlain) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -35,22 +35,26 @@ class SelectRegexOptionsAction(
       return
     }
 
-    currentDialog = JBPopupFactory.getInstance().createBalloonBuilder(createRegexOptionPanel())
-      .setDialogMode(true)
-      .setFillColor(UIUtil.getPanelBackground())
-      .setBorderColor(JBColor.border())
-      .setBlockClicksThroughBalloon(true)
-      .setRequestFocus(true)
-      .createBalloon()
-      .apply {
-        setAnimationEnabled(false)
-        addListener(object : JBPopupListener {
-          override fun onClosed(event: LightweightWindowEvent) {
-            currentDialog = null
-          }
-        })
-        show(RelativePoint.getSouthOf(parentComponent()), Balloon.Position.below)
-      }
+    currentDialog =
+      JBPopupFactory.getInstance()
+        .createBalloonBuilder(createRegexOptionPanel())
+        .setDialogMode(true)
+        .setFillColor(UIUtil.getPanelBackground())
+        .setBorderColor(JBColor.border())
+        .setBlockClicksThroughBalloon(true)
+        .setRequestFocus(true)
+        .createBalloon()
+        .apply {
+          setAnimationEnabled(false)
+          addListener(
+            object : JBPopupListener {
+              override fun onClosed(event: LightweightWindowEvent) {
+                currentDialog = null
+              }
+            }
+          )
+          show(RelativePoint.getSouthOf(parentComponent()), Balloon.Position.below)
+        }
   }
 
   override fun getActionUpdateThread() = ActionUpdateThread.EDT
@@ -62,17 +66,20 @@ class SelectRegexOptionsAction(
     val regexOptionCheckBox = mutableMapOf<RegexOption, JBCheckBox>()
 
     val setSelectedRegexOptionFlag: () -> Unit = {
-      selectedRegexOptionFlag.set(regexOptionCheckBox.filter { it.value.isSelected }.map { it.key.patternFlag }.sum())
+      selectedRegexOptionFlag.set(
+        regexOptionCheckBox.filter { it.value.isSelected }.map { it.key.patternFlag }.sum()
+      )
     }
 
     val selectedRegexOptionFlag = selectedRegexOptionFlag.get()
     RegexOption.entries.forEach { regexOption ->
       row {
-        regexOptionCheckBox[regexOption] = checkBox(regexOption.title)
-          .comment(regexOption.description)
-          .applyToComponent { isSelected = regexOption.isSelected(selectedRegexOptionFlag) }
-          .whenStateChangedFromUi { setSelectedRegexOptionFlag() }
-          .component
+        regexOptionCheckBox[regexOption] =
+          checkBox(regexOption.title)
+            .comment(regexOption.description)
+            .applyToComponent { isSelected = regexOption.isSelected(selectedRegexOptionFlag) }
+            .whenStateChangedFromUi { setSelectedRegexOptionFlag() }
+            .component
       }
     }
   }
@@ -84,12 +91,13 @@ class SelectRegexOptionsAction(
 
     fun createActionButton(selectedRegexOptionFlag: ObservableMutableProperty<Int>): ActionButton {
       lateinit var actionButton: ActionButton
-      actionButton = ActionButton(
-        SelectRegexOptionsAction({ actionButton }, selectedRegexOptionFlag),
-        null,
-        SelectRegexOptionsAction::class.java.name,
-        DEFAULT_MINIMUM_BUTTON_SIZE
-      )
+      actionButton =
+        ActionButton(
+          SelectRegexOptionsAction({ actionButton }, selectedRegexOptionFlag),
+          null,
+          SelectRegexOptionsAction::class.java.name,
+          DEFAULT_MINIMUM_BUTTON_SIZE,
+        )
       return actionButton
     }
   }

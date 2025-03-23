@@ -21,7 +21,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.Passwor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_LOWERCASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_UPPERCASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.NONE
-import io.ktor.util.*
 import org.apache.commons.text.RandomStringGenerator
 import java.security.SecureRandom
 import javax.swing.JComponent
@@ -30,13 +29,14 @@ class PasswordGenerator(
   project: Project?,
   context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
-) : OneLineTextGenerator(
-  context = context,
-  project = project,
-  configuration = configuration,
-  parentDisposable = parentDisposable
-) {
+  parentDisposable: Disposable,
+) :
+  OneLineTextGenerator(
+    context = context,
+    project = project,
+    configuration = configuration,
+    parentDisposable = parentDisposable,
+  ) {
   // -- Properties ---------------------------------------------------------- //
 
   private var length = configuration.register("length", DEFAULT_LENGTH)
@@ -52,37 +52,42 @@ class PasswordGenerator(
   override fun Panel.buildConfigurationUi() {
     rowsRange {
       row {
-        textField()
-          .label("Length:")
-          .validateLongValue(LongRange(1, 100))
-          .bindIntTextImproved(length)
-      }.layout(RowLayout.PARENT_GRID)
+          textField()
+            .label("Length:")
+            .validateLongValue(LongRange(1, 100))
+            .bindIntTextImproved(length)
+        }
+        .layout(RowLayout.PARENT_GRID)
 
       row {
-        comboBox(LettersMode.entries)
-          .label("Letters:")
-          .bindItem(lettersMode)
-          .validationInfo(validateAtLeastOneCharacter())
-          .component
-      }.layout(RowLayout.PARENT_GRID)
+          comboBox(LettersMode.entries)
+            .label("Letters:")
+            .bindItem(lettersMode)
+            .validationInfo(validateAtLeastOneCharacter())
+            .component
+        }
+        .layout(RowLayout.PARENT_GRID)
 
       row {
-        checkBox("Add digits")
-          .bindSelected(addDigits)
-          .validationInfo(validateAtLeastOneCharacter())
-          .align(Align.FILL)
-      }.layout(RowLayout.PARENT_GRID)
+          checkBox("Add digits")
+            .bindSelected(addDigits)
+            .validationInfo(validateAtLeastOneCharacter())
+            .align(Align.FILL)
+        }
+        .layout(RowLayout.PARENT_GRID)
 
       row {
-        val addSymbolsCheckBox = checkBox("Add symbols:")
-          .bindSelected(addSymbols)
-          .validationInfo(validateAtLeastOneCharacter())
-          .component
-        expandableTextField()
-          .bindText(symbols)
-          .enabledIf(addSymbolsCheckBox.selected)
-          .align(Align.FILL)
-      }.layout(RowLayout.PARENT_GRID)
+          val addSymbolsCheckBox =
+            checkBox("Add symbols:")
+              .bindSelected(addSymbols)
+              .validationInfo(validateAtLeastOneCharacter())
+              .component
+          expandableTextField()
+            .bindText(symbols)
+            .enabledIf(addSymbolsCheckBox.selected)
+            .align(Align.FILL)
+        }
+        .layout(RowLayout.PARENT_GRID)
     }
   }
 
@@ -96,22 +101,23 @@ class PasswordGenerator(
       .generate(length, length)
   }
 
-  private fun validateAtLeastOneCharacter(): ValidationInfoBuilder.(JComponent) -> ValidationInfo? = {
-    if (collectCharacters().isEmpty()) {
-      ValidationInfo("At least one character must be provided")
+  private fun validateAtLeastOneCharacter(): ValidationInfoBuilder.(JComponent) -> ValidationInfo? =
+    {
+      if (collectCharacters().isEmpty()) {
+        ValidationInfo("At least one character must be provided")
+      } else {
+        null
+      }
     }
-    else {
-      null
-    }
-  }
 
   private fun collectCharacters(): CharArray {
-    var characters = when (lettersMode.get()) {
-      NONE -> ""
-      ASCII_ALPHABET -> ASCII_ALPHABET_LOWERCASE + ASCII_ALPHABET_UPPERCASE
-      ASCII_ALPHABET_ONLY_LOWERCASE -> ASCII_ALPHABET_LOWERCASE
-      ASCII_ALPHABET_ONLY_UPPERCASE -> ASCII_ALPHABET_UPPERCASE
-    }
+    var characters =
+      when (lettersMode.get()) {
+        NONE -> ""
+        ASCII_ALPHABET -> ASCII_ALPHABET_LOWERCASE + ASCII_ALPHABET_UPPERCASE
+        ASCII_ALPHABET_ONLY_LOWERCASE -> ASCII_ALPHABET_LOWERCASE
+        ASCII_ALPHABET_ONLY_UPPERCASE -> ASCII_ALPHABET_UPPERCASE
+      }
 
     if (addDigits.get()) {
       characters += DIGITS
@@ -141,15 +147,16 @@ class PasswordGenerator(
 
   class Factory : DeveloperUiToolFactory<PasswordGenerator> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Password Generator",
-      contentTitle = "Password Generator"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(
+        menuTitle = "Password Generator",
+        contentTitle = "Password Generator",
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> PasswordGenerator) = { configuration ->
       PasswordGenerator(project, context, configuration, parentDisposable)
     }

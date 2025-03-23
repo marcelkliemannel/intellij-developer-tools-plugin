@@ -30,75 +30,71 @@ object GitHubUtils {
     onStart: () -> Unit,
     onSuccess: () -> Unit,
     onThrowable: (Throwable) -> Unit,
-    onFinished: () -> Unit
-  ) = object : Task.Backgroundable(project, "Downloading files from GitHub") {
+    onFinished: () -> Unit,
+  ) =
+    object : Task.Backgroundable(project, "Downloading files from GitHub") {
 
-    override fun run(indicator: ProgressIndicator) {
-      onStart()
-      indicator.isIndeterminate = true
+      override fun run(indicator: ProgressIndicator) {
+        onStart()
+        indicator.isIndeterminate = true
 
-      val httpClient = OkHttpClient.Builder()
-        .applyIntelliJProxySettings(repositoryUrl)
-        .build()
+        val httpClient = OkHttpClient.Builder().applyIntelliJProxySettings(repositoryUrl).build()
 
-      val fileNamesToDownloadUrls = fetchFiles(httpClient, repositoryUrl).filter { preDownloadFilter(it.key) }
-      indicator.isIndeterminate = false
+        val fileNamesToDownloadUrls =
+          fetchFiles(httpClient, repositoryUrl).filter { preDownloadFilter(it.key) }
+        indicator.isIndeterminate = false
 
-      var index = 1
-      var errors = 0
-      fileNamesToDownloadUrls.forEach { fileName, downloadUrl ->
-        if (indicator.isCanceled) {
-          return@forEach
-        }
+        var index = 1
+        var errors = 0
+        fileNamesToDownloadUrls.forEach { fileName, downloadUrl ->
+          if (indicator.isCanceled) {
+            return@forEach
+          }
 
-        indicator.text = "Downloading $fileName"
-        indicator.fraction = index.toDouble() / fileNamesToDownloadUrls.size
+          indicator.text = "Downloading $fileName"
+          indicator.fraction = index.toDouble() / fileNamesToDownloadUrls.size
 
-        val targetPath = destinationPath.resolve(fileName)
-        val success = downloadFile(httpClient, downloadUrl, targetPath)
-        if (!success) {
-          errors++
-        }
-        else {
-          indicator.text = "Analyzing $fileName"
-          val keepFile = afterDownloadFilter(targetPath)
-          if (!keepFile) {
-            try {
-              Files.deleteIfExists(targetPath)
-            }
-            catch (e: Exception) {
-              log.warn("Failed to delete file: $targetPath", e)
+          val targetPath = destinationPath.resolve(fileName)
+          val success = downloadFile(httpClient, downloadUrl, targetPath)
+          if (!success) {
+            errors++
+          } else {
+            indicator.text = "Analyzing $fileName"
+            val keepFile = afterDownloadFilter(targetPath)
+            if (!keepFile) {
+              try {
+                Files.deleteIfExists(targetPath)
+              } catch (e: Exception) {
+                log.warn("Failed to delete file: $targetPath", e)
+              }
             }
           }
+          index++
         }
-        index++
+        if (errors > 0) {
+          throw Exception("Failed to download $errors of ${fileNamesToDownloadUrls.size} files")
+        }
+        indicator.text = "All files downloaded"
       }
-      if (errors > 0) {
-        throw Exception("Failed to download $errors of ${fileNamesToDownloadUrls.size} files")
+
+      override fun onThrowable(error: Throwable) {
+        onThrowable(error)
       }
-      indicator.text = "All files downloaded"
-    }
 
-    override fun onThrowable(error: Throwable) {
-      onThrowable(error)
-    }
+      override fun onFinished() {
+        onFinished()
+      }
 
-    override fun onFinished() {
-      onFinished()
+      override fun onSuccess() {
+        onSuccess()
+      }
     }
-
-    override fun onSuccess() {
-      onSuccess()
-    }
-  }
 
   private fun fetchFiles(httpClient: OkHttpClient, repositoryUrl: String): Map<String, String> {
-    val apiUrl = repositoryUrl.replace("https://github.com/", "https://api.github.com/repos/") + "/contents"
-    val request = Request.Builder()
-      .get()
-      .url(apiUrl)
-      .header("Accept", "application/vnd.github.v3+json")
-      .build()
+    val apiUrl =
+      repositoryUrl.replace("https://github.com/", "https://api.github.com/repos/") + "/contents"
+    val request =
+      Request.Builder().get().url(apiUrl).header("Accept", "application/vnd.github.v3+json").build()
 
     val response = httpClient.newCall(request).execute()
     if (response.code == 200) {
@@ -109,8 +105,7 @@ object GitHubUtils {
           .associate { it["name"].asText() to it["download_url"].asText() }
       }
       throw Exception("No HTTP body received from $apiUrl")
-    }
-    else {
+    } else {
       throw Exception("Failed to fetch file list from $apiUrl: HTTP ${response.code}")
     }
   }
@@ -118,12 +113,9 @@ object GitHubUtils {
   private fun downloadFile(
     httpClient: OkHttpClient,
     downloadUrl: String,
-    targetPath: Path
+    targetPath: Path,
   ): Boolean {
-    val request = Request.Builder()
-      .get()
-      .url(downloadUrl)
-      .build()
+    val request = Request.Builder().get().url(downloadUrl).build()
 
     log.info("Downloading $downloadUrl to $targetPath")
 
@@ -134,8 +126,7 @@ object GitHubUtils {
         Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING)
         true
       } == true
-    }
-    else {
+    } else {
       log.warn("Failed to download $downloadUrl to $targetPath: HTTP ${response.code}")
       false
     }

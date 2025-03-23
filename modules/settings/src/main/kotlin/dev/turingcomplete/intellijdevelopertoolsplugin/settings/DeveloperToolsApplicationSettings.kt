@@ -20,14 +20,16 @@ import java.security.Security
 @State(
   name = "DeveloperToolsApplicationSettingsV1",
   storages = [Storage("developer-tools.xml")],
-  category = SettingsCategory.TOOLS
+  category = SettingsCategory.TOOLS,
 )
 class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
   // -- Properties ---------------------------------------------------------- //
 
   val generalSettings: GeneralSettings by lazy { SettingsHandler.create(GeneralSettings::class) }
   val internalSettings: InternalSettings by lazy { SettingsHandler.create(InternalSettings::class) }
-  val jsonHandling: JsonHandlingSettings by lazy { SettingsHandler.create(JsonHandlingSettings::class) }
+  val jsonHandling: JsonHandlingSettings by lazy {
+    SettingsHandler.create(JsonHandlingSettings::class)
+  }
 
   private val allSettings = listOf<Settings>(generalSettings, internalSettings, jsonHandling)
 
@@ -35,7 +37,8 @@ class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
 
   init {
     try {
-      val bouncyCastleProviderClass = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider")
+      val bouncyCastleProviderClass =
+        Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider")
       val bouncyCastleProvider = bouncyCastleProviderClass.getConstructor().newInstance()
       Security.addProvider(bouncyCastleProvider as Provider)
     } catch (e: Exception) {
@@ -55,9 +58,7 @@ class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
       settingsContainer.settingProperties
         .filter { it.value.isModified() }
         .forEach { settingName, settingProperty ->
-          settingProperty.toPersistent()?.let {
-            settingsElement.setAttribute(settingName, it)
-          }
+          settingProperty.toPersistent()?.let { settingsElement.setAttribute(settingName, it) }
         }
 
       root.addContent(settingsElement)
@@ -70,18 +71,19 @@ class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
     applyLegacy(state)
 
     state.children.forEach { settingsElement ->
-      val settings = allSettings
-        .map { it.settingsContainer() }
-        .firstOrNull { settingsContainer -> settingsContainer.kclass.simpleName == settingsElement.name }
+      val settings =
+        allSettings
+          .map { it.settingsContainer() }
+          .firstOrNull { settingsContainer ->
+            settingsContainer.kclass.simpleName == settingsElement.name
+          }
       if (settings == null) {
         log.warn("Can't find settings class: ${settingsElement.name}")
         return@forEach
       }
 
       settings.settingProperties.forEach { (settingName, property) ->
-        settingsElement.getAttributeValue(settingName)?.let {
-          property.fromPersistent(it)
-        }
+        settingsElement.getAttributeValue(settingName)?.let { property.fromPersistent(it) }
       }
     }
   }
@@ -99,19 +101,22 @@ class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
     state.attributes.iterator().run {
       while (hasNext()) {
         val attribute = next()
-        val transformedValue: String? = when(attribute.name) {
-          "selectedActionHandlingInstance" -> when(attribute.value) {
-            "Tool Window" -> TOOL_WINDOW.name
-            "Dialog" -> DIALOG.name
-            else -> null
+        val transformedValue: String? =
+          when (attribute.name) {
+            "selectedActionHandlingInstance" ->
+              when (attribute.value) {
+                "Tool Window" -> TOOL_WINDOW.name
+                "Dialog" -> DIALOG.name
+                else -> null
+              }
+            else -> attribute.value
           }
-          else -> attribute.value
-        }
         if (transformedValue != null) {
-          val targetSettingsElement = when(attribute.name) {
-            "promoteAddOpenMainDialogActionToMainToolbar" -> internalSettingsElement
-            else -> generalSettingsElement
-          }
+          val targetSettingsElement =
+            when (attribute.name) {
+              "promoteAddOpenMainDialogActionToMainToolbar" -> internalSettingsElement
+              else -> generalSettingsElement
+            }
           targetSettingsElement.setAttribute(attribute.name, transformedValue)
         }
         remove()
@@ -130,7 +135,9 @@ class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
     private val log = logger<DeveloperToolsInstanceSettings>()
 
     val instance: DeveloperToolsApplicationSettings
-      get() = ApplicationManager.getApplication().getService(DeveloperToolsApplicationSettings::class.java)
+      get() =
+        ApplicationManager.getApplication()
+          .getService(DeveloperToolsApplicationSettings::class.java)
 
     val generalSettings: GeneralSettings
       get() = instance.generalSettings

@@ -13,9 +13,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.message.SettingsBundle
 
-class GeneralSettingsConfigurable : SettingsConfigurable<GeneralSettings>(
-  settings = generalSettings
-) {
+class GeneralSettingsConfigurable :
+  SettingsConfigurable<GeneralSettings>(settings = generalSettings) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
@@ -23,7 +22,11 @@ class GeneralSettingsConfigurable : SettingsConfigurable<GeneralSettings>(
   override fun getDisplayName(): @NlsContexts.ConfigurableName String? =
     SettingsBundle.message("general-settings.title")
 
-  override fun buildGroupSettingsUi(panel: Panel, group: SettingsGroup, groupSettings: List<AnySettingProperty>) {
+  override fun buildGroupSettingsUi(
+    panel: Panel,
+    group: SettingsGroup,
+    groupSettings: List<AnySettingProperty>,
+  ) {
     when (group.id) {
       ACTION_HANDLING_GROUP_ID -> {
         with(panel) {

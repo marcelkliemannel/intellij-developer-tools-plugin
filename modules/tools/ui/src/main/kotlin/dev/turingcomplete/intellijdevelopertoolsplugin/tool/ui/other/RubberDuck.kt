@@ -31,23 +31,36 @@ class RubberDuck(parentDisposable: Disposable) : DeveloperUiTool(parentDisposabl
              line to a rubber duck or any other inanimate object. The act of explaining the code helps 
              the programmer to identify errors and logic mistakes in their code. This technique is widely 
              used in software development to improve code quality and debugging efficiency.
-            </html>""".trimMargin()
+            </html>"""
+            .trimMargin()
         )
       )
     }
 
     row {
-      cell(BorderLayoutPanel().apply {
-        RubberDuck::class.java.getResourceAsStream("/dev/turingcomplete/intellijdevelopertoolsplugin/rubber-duck-yellow.png")?.use {
-          val read = ImageIO.read(it)
-          val scaledInstance = read.getScaledInstance(read.width.div(2), read.height.div(2), SCALE_SMOOTH)
-          addToCenter(JLabel(ImageIcon(scaledInstance)))
-        }
-      }).align(Align.CENTER)
-    }.resizableRow()
+        cell(
+            BorderLayoutPanel().apply {
+              RubberDuck::class
+                .java
+                .getResourceAsStream(
+                  "/dev/turingcomplete/intellijdevelopertoolsplugin/rubber-duck-yellow.png"
+                )
+                ?.use {
+                  val read = ImageIO.read(it)
+                  val scaledInstance =
+                    read.getScaledInstance(read.width.div(2), read.height.div(2), SCALE_SMOOTH)
+                  addToCenter(JLabel(ImageIcon(scaledInstance)))
+                }
+            }
+          )
+          .align(Align.CENTER)
+      }
+      .resizableRow()
 
     row {
-      comment("Image by <a href='https://www.pexels.com/photo/yellow-duck-toy-beside-green-duck-toy-132464/'>Anthony</a>") {
+      comment(
+        "Image by <a href='https://www.pexels.com/photo/yellow-duck-toy-beside-green-duck-toy-132464/'>Anthony</a>"
+      ) {
         BrowserUtil.browse(it.url)
       }
     }
@@ -58,15 +71,13 @@ class RubberDuck(parentDisposable: Disposable) : DeveloperUiTool(parentDisposabl
 
   class Factory : DeveloperUiToolFactory<RubberDuck> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "Rubber Duck",
-      contentTitle = "Rubber Duck Debugging"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "Rubber Duck", contentTitle = "Rubber Duck Debugging")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
+      context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> RubberDuck) = { RubberDuck(parentDisposable) }
   }
 

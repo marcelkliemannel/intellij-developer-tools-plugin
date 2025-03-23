@@ -15,7 +15,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.DataGenerator
 class DataGeneratorActionGroup : DefaultActionGroup("Insert Generated Data", true) {
   // -- Properties ---------------------------------------------------------- //
 
-  private val dataGeneratorActions: Array<AnAction> = dataGenerators.map { createDataGeneratorAction(it) }.toTypedArray()
+  private val dataGeneratorActions: Array<AnAction> =
+    dataGenerators.map { createDataGeneratorAction(it) }.toTypedArray()
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
@@ -31,20 +32,21 @@ class DataGeneratorActionGroup : DefaultActionGroup("Insert Generated Data", tru
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun createDataGeneratorAction(dataGeneratorBase: DataGeneratorBase): AnAction = when(dataGeneratorBase) {
-    is DataGenerator -> DataGeneratorAction(dataGeneratorBase)
-    is DataGeneratorsGroup -> object: DefaultActionGroup(dataGeneratorBase.title, true) {
+  private fun createDataGeneratorAction(dataGeneratorBase: DataGeneratorBase): AnAction =
+    when (dataGeneratorBase) {
+      is DataGenerator -> DataGeneratorAction(dataGeneratorBase)
+      is DataGeneratorsGroup ->
+        object : DefaultActionGroup(dataGeneratorBase.title, true) {
 
-      override fun getChildren(e: AnActionEvent?): Array<AnAction> =
-        dataGeneratorBase.children.map { createDataGeneratorAction(it) }.toTypedArray()
+          override fun getChildren(e: AnActionEvent?): Array<AnAction> =
+            dataGeneratorBase.children.map { createDataGeneratorAction(it) }.toTypedArray()
+        }
     }
-  }
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class DataGeneratorAction(
-    private val dataGenerator: DataGenerator
-  ) : DumbAwareAction(dataGenerator.title, dataGenerator.toolText, null) {
+  private class DataGeneratorAction(private val dataGenerator: DataGenerator) :
+    DumbAwareAction(dataGenerator.title, dataGenerator.toolText, null) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(CommonDataKeys.EDITOR) ?: return
@@ -54,8 +56,7 @@ class DataGeneratorActionGroup : DefaultActionGroup("Insert Generated Data", tru
         val selectionEnd = editor.selectionModel.selectionEnd
         if (selectionEnd > selectionStart) {
           it.document.replaceString(selectionStart, selectionEnd, result)
-        }
-        else {
+        } else {
           val currentOffset = editor.caretModel.offset
           it.document.insertString(currentOffset, result)
           editor.caretModel.moveToOffset(currentOffset + result.length)

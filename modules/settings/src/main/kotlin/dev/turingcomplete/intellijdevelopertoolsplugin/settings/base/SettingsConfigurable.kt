@@ -13,16 +13,14 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsHandler.settingsContainer
 import javax.swing.JComponent
 
-abstract class SettingsConfigurable<T: Settings>(
-  protected val settings: T,
-) : Configurable {
+abstract class SettingsConfigurable<T : Settings>(protected val settings: T) : Configurable {
   // -- Properties ---------------------------------------------------------- //
 
   private val derivatedSettingsContainer = settings.settingsContainer().derivate()
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
-  
+
   final override fun createComponent(): JComponent? = panel {
     derivatedSettingsContainer.settingProperties
       .asSequence()
@@ -30,21 +28,20 @@ abstract class SettingsConfigurable<T: Settings>(
       .forEach { group, settings ->
         if (group != null) {
           group(group.titleBundleKey) {
-            group.descriptionBundleKey.nullIfEmpty()?.let {
-              row {
-                comment(it)
-              }
-            }
+            group.descriptionBundleKey.nullIfEmpty()?.let { row { comment(it) } }
             buildGroupSettingsUi(this, group, settings)
           }
-        }
-        else {
+        } else {
           settings.forEach { buildSettingUi(it) }
         }
       }
   }
 
-  protected open fun buildGroupSettingsUi(panel: Panel, group: SettingsGroup, groupSettings: List<AnySettingProperty>) {
+  protected open fun buildGroupSettingsUi(
+    panel: Panel,
+    group: SettingsGroup,
+    groupSettings: List<AnySettingProperty>,
+  ) {
     groupSettings.forEach { panel.buildSettingUi(it) }
   }
 
@@ -60,27 +57,33 @@ abstract class SettingsConfigurable<T: Settings>(
 
   protected fun Panel.buildSettingUi(settingProperty: AnySettingProperty) {
     row {
-      when (settingProperty) {
-        is BooleanSettingProperty -> {
-          val checkBox = checkBox(settingProperty.title).bindSelected(settingProperty)
-          settingProperty.description?.let { checkBox.comment(it) }
-        }
+        when (settingProperty) {
+          is BooleanSettingProperty -> {
+            val checkBox = checkBox(settingProperty.title).bindSelected(settingProperty)
+            settingProperty.description?.let { checkBox.comment(it) }
+          }
 
-        is IntSettingProperty -> {
-          val intRange = IntRange(start = settingProperty.settingValue.min, endInclusive = settingProperty.settingValue.max)
-          val intTextField = intTextField(intRange).bindIntText(settingProperty)
-          intTextField.label(settingProperty.title)
-          settingProperty.description?.let { intTextField.comment(it) }
-        }
+          is IntSettingProperty -> {
+            val intRange =
+              IntRange(
+                start = settingProperty.settingValue.min,
+                endInclusive = settingProperty.settingValue.max,
+              )
+            val intTextField = intTextField(intRange).bindIntText(settingProperty)
+            intTextField.label(settingProperty.title)
+            settingProperty.description?.let { intTextField.comment(it) }
+          }
 
-        is EnumSettingProperty<*> -> {
-          val comboBox = comboBox(settingProperty.getAllEnumValues())
-            .bindItem(settingProperty.uncheckedCastTo<MutableProperty<Enum<*>?>>())
-            .label(settingProperty.title)
-          settingProperty.description?.let { comboBox.comment(it) }
+          is EnumSettingProperty<*> -> {
+            val comboBox =
+              comboBox(settingProperty.getAllEnumValues())
+                .bindItem(settingProperty.uncheckedCastTo<MutableProperty<Enum<*>?>>())
+                .label(settingProperty.title)
+            settingProperty.description?.let { comboBox.comment(it) }
+          }
         }
       }
-    }.layout(RowLayout.PARENT_GRID)
+      .layout(RowLayout.PARENT_GRID)
   }
 
   // -- Private Methods ----------------------------------------------------- //

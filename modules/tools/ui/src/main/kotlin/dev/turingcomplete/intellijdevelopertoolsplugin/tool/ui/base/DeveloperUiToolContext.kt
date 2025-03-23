@@ -1,12 +1,7 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base
 
-/**
- * Context information from the extension point in the `plugin.xml`.
- */
-data class DeveloperUiToolContext(
-  val id: String,
-  val prioritizeVerticalLayout: Boolean
-) {
+/** Context information from the extension point in the `plugin.xml`. */
+data class DeveloperUiToolContext(val id: String, val prioritizeVerticalLayout: Boolean) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //

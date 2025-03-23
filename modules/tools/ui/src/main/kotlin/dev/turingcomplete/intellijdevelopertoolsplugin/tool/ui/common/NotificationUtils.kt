@@ -15,12 +15,13 @@ object NotificationUtils {
     message: String,
     project: Project?,
     notificationType: NotificationType = NotificationType.INFORMATION,
-    vararg actions: AnAction
+    vararg actions: AnAction,
   ) {
     ApplicationManager.getApplication().invokeLater {
-      val notification = NotificationGroupManager.getInstance()
-        .getNotificationGroup("Developer Tools Plugin Notifications")
-        .createNotification(message, notificationType)
+      val notification =
+        NotificationGroupManager.getInstance()
+          .getNotificationGroup("Developer Tools Plugin Notifications")
+          .createNotification(message, notificationType)
 
       actions.forEach { notification.addAction(it) }
 

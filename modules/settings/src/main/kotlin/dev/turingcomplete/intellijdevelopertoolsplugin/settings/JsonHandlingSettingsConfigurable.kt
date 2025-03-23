@@ -5,9 +5,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsAp
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsConfigurable
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.message.SettingsBundle
 
-class JsonHandlingSettingsConfigurable : SettingsConfigurable<JsonHandlingSettings>(
-  settings = jsonHandling
-) {
+class JsonHandlingSettingsConfigurable :
+  SettingsConfigurable<JsonHandlingSettings>(settings = jsonHandling) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //

@@ -17,12 +17,14 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
   // -- Exported Methods ---------------------------------------------------- //
 
   @TestFactory
-  override fun `test that all additional languages are containing the same message keys and parameter counts`(): List<DynamicNode> =
+  override fun `test that all additional languages are containing the same message keys and parameter counts`():
+    List<DynamicNode> =
     `do test that all additional languages are containing the same message keys and parameter counts`()
 
   @TestFactory
   @RunMethodInEdt(writeIntent = RunMethodInEdt.WriteIntentMode.True)
-  override fun `test that all message(messageKey, params) calls are referencing to an existing message key and are using the correct parameters count`(): List<DynamicNode> =
+  override fun `test that all message(messageKey, params) calls are referencing to an existing message key and are using the correct parameters count`():
+    List<DynamicNode> =
     `do test that all message(messageKey, params) calls are referencing to an existing message key and are using the correct parameters count`()
 
   @TestFactory
@@ -40,17 +42,20 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
 
       settingsGroupAnnotationUsages.forEach {
         listOfNotNull(
-          "titleBundleKey" to it.titleBundleKey,
-          "descriptionBundleKey" to it.descriptionBundleKey
-        ).filter { (_, messageKey) -> messageKey != null }.map { (type, messageKey) ->
-          MessagesBundleUsage(
-            className = classFile.nameWithoutExtension(),
-            bundleName = SettingsBundle::class.simpleName!!,
-            messageKey = messageKey!!,
-            parametersCount = 0,
-            displayableText = "$messageKey ($type property for group ID: ${it.id})"
+            "titleBundleKey" to it.titleBundleKey,
+            "descriptionBundleKey" to it.descriptionBundleKey,
           )
-        }.forEach { allMessageBundleUsages.add(it) }
+          .filter { (_, messageKey) -> messageKey != null }
+          .map { (type, messageKey) ->
+            MessagesBundleUsage(
+              className = classFile.nameWithoutExtension(),
+              bundleName = SettingsBundle::class.simpleName!!,
+              messageKey = messageKey!!,
+              parametersCount = 0,
+              displayableText = "$messageKey ($type property for group ID: ${it.id})",
+            )
+          }
+          .forEach { allMessageBundleUsages.add(it) }
       }
     }
 
@@ -76,7 +81,7 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
 
   private class SettingsGroupUsageAnnotationVisitor(
     val settingsGroupAnnotationUsages: MutableList<SettingsGroupAnnotationUsage>
-  ): AnnotationVisitor(Opcodes.ASM9) {
+  ) : AnnotationVisitor(Opcodes.ASM9) {
 
     private var id: String? = null
     private var titleBundleKey: String? = null
@@ -92,11 +97,12 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
 
     override fun visitEnd() {
       if (id != null) {
-        val settingsGroupAnnotationUsage = SettingsGroupAnnotationUsage(
-          id = id!!,
-          titleBundleKey = titleBundleKey!!,
-          descriptionBundleKey = descriptionBundleKey
-        )
+        val settingsGroupAnnotationUsage =
+          SettingsGroupAnnotationUsage(
+            id = id!!,
+            titleBundleKey = titleBundleKey!!,
+            descriptionBundleKey = descriptionBundleKey,
+          )
         settingsGroupAnnotationUsages.add(settingsGroupAnnotationUsage)
 
         id = null
@@ -123,7 +129,7 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
   private data class SettingsGroupAnnotationUsage(
     val id: String,
     val titleBundleKey: String,
-    val descriptionBundleKey: String?
+    val descriptionBundleKey: String?,
   )
 
   // -- Companion Object ---------------------------------------------------- //

@@ -23,7 +23,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 class TextDiffViewer(
   configuration: DeveloperToolConfiguration,
   private val project: Project?,
-  parentDisposable: Disposable
+  parentDisposable: Disposable,
 ) : DeveloperUiTool(parentDisposable) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -40,25 +40,34 @@ class TextDiffViewer(
 
   override fun Panel.buildUi() {
     row {
-      val firstDiffContent = createDiffContent(firstText)
-      val secondDiffContent = createDiffContent(secondText)
-      val diffComponent = DiffManagerEx.getInstance().createRequestPanel(project, parentDisposable, null).apply {
-        setRequest(SimpleDiffRequest(null, firstDiffContent, secondDiffContent, null, null))
-      }.component
-      cell(diffComponent).resizableColumn().align(Align.FILL)
-    }.resizableRow()
+        val firstDiffContent = createDiffContent(firstText)
+        val secondDiffContent = createDiffContent(secondText)
+        val diffComponent =
+          DiffManagerEx.getInstance()
+            .createRequestPanel(project, parentDisposable, null)
+            .apply {
+              setRequest(SimpleDiffRequest(null, firstDiffContent, secondDiffContent, null, null))
+            }
+            .component
+        cell(diffComponent).resizableColumn().align(Align.FILL)
+      }
+      .resizableRow()
   }
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun createDiffContent(textProperty: ValueProperty<String>) : DiffContent {
-    val document = EditorFactory.getInstance().createDocument(textProperty.get()).apply {
-      addDocumentListener(object : DocumentListener {
-        override fun documentChanged(event: DocumentEvent) {
-          textProperty.set(event.document.text, TEXT_CHANGE_FROM_DOCUMENT_LISTENER)
-        }
-      }, parentDisposable)
-    }
+  private fun createDiffContent(textProperty: ValueProperty<String>): DiffContent {
+    val document =
+      EditorFactory.getInstance().createDocument(textProperty.get()).apply {
+        addDocumentListener(
+          object : DocumentListener {
+            override fun documentChanged(event: DocumentEvent) {
+              textProperty.set(event.document.text, TEXT_CHANGE_FROM_DOCUMENT_LISTENER)
+            }
+          },
+          parentDisposable,
+        )
+      }
 
     textProperty.afterChangeConsumeEvent(parentDisposable) { event ->
       if (event.id != TEXT_CHANGE_FROM_DOCUMENT_LISTENER) {
@@ -74,23 +83,19 @@ class TextDiffViewer(
   class Factory : DeveloperUiToolFactory<TextDiffViewer> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(
-        menuTitle = "Text Diff",
-        contentTitle = "Text Diff Viewer"
-      )
+      DeveloperUiToolPresentation(menuTitle = "Text Diff", contentTitle = "Text Diff Viewer")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> TextDiffViewer) =
-      { configuration ->
-        TextDiffViewer(
-          configuration = configuration,
-          project = project,
-          parentDisposable = parentDisposable
-        )
-      }
+      context: DeveloperUiToolContext,
+    ): ((DeveloperToolConfiguration) -> TextDiffViewer) = { configuration ->
+      TextDiffViewer(
+        configuration = configuration,
+        project = project,
+        parentDisposable = parentDisposable,
+      )
+    }
   }
 
   // -- Companion Object ---------------------------------------------------- //
@@ -99,16 +104,20 @@ class TextDiffViewer(
 
     private const val TEXT_CHANGE_FROM_DOCUMENT_LISTENER = "documentChangeListener"
 
-    private val FIRST_TEXT_EXAMPLE = """
+    private val FIRST_TEXT_EXAMPLE =
+      """
       The sky is blue,
       The sun is shining,
       And the birds are singing.
-      """.trimIndent()
+      """
+        .trimIndent()
 
-    private val SECOND_TEXT_EXAMPLE = """
+    private val SECOND_TEXT_EXAMPLE =
+      """
       The sky is gray,
       The rain is pouring,
       And the birds are silent.
-      """.trimIndent()
+      """
+        .trimIndent()
   }
 }

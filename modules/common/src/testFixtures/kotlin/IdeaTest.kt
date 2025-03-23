@@ -24,9 +24,8 @@ abstract class IdeaTest {
   @BeforeEach
   fun beforeEach() {
     disposable = TestDisposable(this::class)
-    fixture = IdeaTestFixtureFactory.getFixtureFactory().createFixtureBuilder("test").fixture.apply {
-      setUp()
-    }
+    fixture = IdeaTestFixtureFactory.getFixtureFactory().createFixtureBuilder("test").fixture
+    fixture.setUp()
   }
 
   @AfterEach
@@ -43,8 +42,7 @@ abstract class IdeaTest {
 
     constructor(testClass: KClass<*>) : this(id = testClass.simpleName!!)
 
-    override fun dispose() {
-    }
+    override fun dispose() {}
 
     override fun toString(): String = id
   }

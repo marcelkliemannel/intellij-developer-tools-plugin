@@ -20,24 +20,23 @@ open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", fal
   private val escapeActionGroup by lazy {
     createActionGroup(
       title = "Escape",
-      actions = EscapersUnescapers.commonEscaper.map { escaper ->
-        EscapeAction(escaper) { getSourceText(it) }
-      }
+      actions =
+        EscapersUnescapers.commonEscaper.map { escaper ->
+          EscapeAction(escaper) { getSourceText(it) }
+        },
     )
   }
   private val unescapeActionGroup by lazy {
     createActionGroup(
       title = "Unescape",
-      actions = EscapersUnescapers.commonUnescaper.map { unescaper ->
-        UnescapeAction(unescaper) { getSourceText(it) }
-      }
+      actions =
+        EscapersUnescapers.commonUnescaper.map { unescaper ->
+          UnescapeAction(unescaper) { getSourceText(it) }
+        },
     )
   }
   private val encoderDecoderActions: Array<AnAction> by lazy {
-    arrayOf(
-      escapeActionGroup,
-      unescapeActionGroup
-    )
+    arrayOf(escapeActionGroup, unescapeActionGroup)
   }
 
   // -- Initialization ------------------------------------------------------ //
@@ -45,7 +44,8 @@ open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", fal
 
   final override fun update(e: AnActionEvent) {
     val editor = e.getData(EDITOR)
-    e.presentation.isVisible = editor != null && editor.document.isWritable && getSourceText(e) != null
+    e.presentation.isVisible =
+      editor != null && editor.document.isWritable && getSourceText(e) != null
   }
 
   final override fun getChildren(e: AnActionEvent?): Array<AnAction> = encoderDecoderActions
@@ -59,18 +59,19 @@ open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", fal
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun createActionGroup(title: String, actions: List<AnAction>) = object : DefaultActionGroup(title, true) {
+  private fun createActionGroup(title: String, actions: List<AnAction>) =
+    object : DefaultActionGroup(title, true) {
 
-    private val decoderActions: Array<AnAction> = actions.toTypedArray()
+      private val decoderActions: Array<AnAction> = actions.toTypedArray()
 
-    override fun getChildren(e: AnActionEvent?): Array<AnAction> = decoderActions
-  }
+      override fun getChildren(e: AnActionEvent?): Array<AnAction> = decoderActions
+    }
 
   // -- Inner Type ---------------------------------------------------------- //
 
   private class EscapeAction(
     val escaper: Escaper,
-    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?
+    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?,
   ) : DumbAwareAction(escaper.title, escaper.actionName, null) {
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -84,7 +85,7 @@ open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", fal
 
   private class UnescapeAction(
     val unescaper: Unescaper,
-    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?
+    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?,
   ) : DumbAwareAction(unescaper.title, unescaper.actionName, null) {
 
     override fun actionPerformed(e: AnActionEvent) {

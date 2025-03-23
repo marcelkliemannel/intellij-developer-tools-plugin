@@ -7,42 +7,60 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 
 @TestApplication
 class CliCommandConverterTest {
   // -- Properties ---------------------------------------------------------- //
 
-  @TestDisposable
-  lateinit var disposable: Disposable
+  @TestDisposable lateinit var disposable: Disposable
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
   @Test
   fun `test toTarget()`() {
-    val cliCommandConverter = CliCommandConverter(DeveloperToolConfiguration("Test", UUID.randomUUID(), emptyMap()), disposable, context, null)
+    val cliCommandConverter =
+      CliCommandConverter(
+        DeveloperToolConfiguration("Test", UUID.randomUUID(), emptyMap()),
+        disposable,
+        context,
+        null,
+      )
     cliCommandConverter.toTarget("  app -foo   --baz ---baz     -foo-bar \"foo -baz\"   '-foo-bar'")
     val actual = cliCommandConverter.targetText()
-    assertThat(actual).isEqualTo("""
+    assertThat(actual)
+      .isEqualTo(
+        """
 app \
   -foo \
   --baz \
   ---baz \
   -foo-bar "foo -baz" '-foo-bar'
-    """.trimIndent())
+    """
+          .trimIndent()
+      )
   }
 
   @Test
   fun `test toSource()`() {
-    val cliCommandConverter = CliCommandConverter(DeveloperToolConfiguration("Test", UUID.randomUUID(), emptyMap()), disposable, context, null)
-    cliCommandConverter.toSource("""
+    val cliCommandConverter =
+      CliCommandConverter(
+        DeveloperToolConfiguration("Test", UUID.randomUUID(), emptyMap()),
+        disposable,
+        context,
+        null,
+      )
+    cliCommandConverter.toSource(
+      """
 app \
   -foo \
   --baz \
   ---baz \
   -foo-bar "foo -baz" '-foo-bar'
-    """.trimIndent())
+    """
+        .trimIndent()
+    )
     val actual = cliCommandConverter.sourceText()
     assertThat(actual).isEqualTo("app -foo --baz ---baz -foo-bar \"foo -baz\" '-foo-bar'")
   }

@@ -34,13 +34,17 @@ import java.text.DecimalFormat
 import java.time.Duration
 import javax.swing.JComponent
 
-class TimeConverter(
-  configuration: DeveloperToolConfiguration,
-  parentDisposable: Disposable
-) : MathContextUnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Time") {
+class TimeConverter(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
+  MathContextUnitConverter(CONFIGURATION_KEY_PREFIX, configuration, parentDisposable, "Time") {
   // -- Properties ---------------------------------------------------------- //
 
-  private val nanoseconds = configuration.register("${CONFIGURATION_KEY_PREFIX}timeNanoseconds", ZERO, INPUT, NANOSECONDS_EXAMPLE)
+  private val nanoseconds =
+    configuration.register(
+      "${CONFIGURATION_KEY_PREFIX}timeNanoseconds",
+      ZERO,
+      INPUT,
+      NANOSECONDS_EXAMPLE,
+    )
 
   private val nanosecondsFormatted = ValueProperty("0")
   private val millisecondsFormatted = ValueProperty("0")
@@ -68,41 +72,42 @@ class TimeConverter(
       val valueProperty: ValueProperty<String>,
       val changeOrigin: ChangeOrigin,
       val contextHelp: String? = null,
-      val detail: ValueProperty<String>? = null
+      val detail: ValueProperty<String>? = null,
     )
 
     listOf(
-      TimeField("Nanoseconds", nanosecondsFormatted, NANOSECONDS),
-      TimeField("Milliseconds", millisecondsFormatted, MILLISECONDS),
-      TimeField("Seconds", secondsFormatted, SECONDS),
-      TimeField("Minutes", minutesFormatted, MINUTES, null, minutesDetail),
-      TimeField("Hours", hoursFormatted, HOURS, null, hoursDetail),
-      TimeField("Days", daysFormatted, DAYS, null, daysDetail),
-      TimeField("Months", monthsFormatted, MONTHS, "One month is equal to 30.416 days (365/12)."),
-      TimeField("Years", yearsFormatted, YEARS),
-      TimeField("Decades", decadesFormatted, DECADES),
-      TimeField("Centuries", centuriesFormatted, CENTURIES),
-      TimeField("Millenniums", millenniumsFormatted, MILLENNIUMS),
-    ).forEach { (title, valueProperty, changeOrigin, contextHelp, detail) ->
-      row {
-        lateinit var textField: JBTextField
-        textField = textField()
-          .validateBigDecimalValue(ZERO, mathContext) { it.parseBigDecimal() }
-          .label("$title:")
-          .bindText(valueProperty)
-          .whenTextChangedFromUi { convert(changeOrigin, textField) }
-          .columns(15)
-          .component
-        if (detail != null) {
-          comment("")
-            .bindText(detail)
-            .visibleIf(PropertyComponentPredicate(detail, "").not())
-        }
-        if (contextHelp != null) {
-          contextHelp(contextHelp)
-        }
-      }.layout(RowLayout.PARENT_GRID)
-    }
+        TimeField("Nanoseconds", nanosecondsFormatted, NANOSECONDS),
+        TimeField("Milliseconds", millisecondsFormatted, MILLISECONDS),
+        TimeField("Seconds", secondsFormatted, SECONDS),
+        TimeField("Minutes", minutesFormatted, MINUTES, null, minutesDetail),
+        TimeField("Hours", hoursFormatted, HOURS, null, hoursDetail),
+        TimeField("Days", daysFormatted, DAYS, null, daysDetail),
+        TimeField("Months", monthsFormatted, MONTHS, "One month is equal to 30.416 days (365/12)."),
+        TimeField("Years", yearsFormatted, YEARS),
+        TimeField("Decades", decadesFormatted, DECADES),
+        TimeField("Centuries", centuriesFormatted, CENTURIES),
+        TimeField("Millenniums", millenniumsFormatted, MILLENNIUMS),
+      )
+      .forEach { (title, valueProperty, changeOrigin, contextHelp, detail) ->
+        row {
+            lateinit var textField: JBTextField
+            textField =
+              textField()
+                .validateBigDecimalValue(ZERO, mathContext) { it.parseBigDecimal() }
+                .label("$title:")
+                .bindText(valueProperty)
+                .whenTextChangedFromUi { convert(changeOrigin, textField) }
+                .columns(15)
+                .component
+            if (detail != null) {
+              comment("").bindText(detail).visibleIf(PropertyComponentPredicate(detail, "").not())
+            }
+            if (contextHelp != null) {
+              contextHelp(contextHelp)
+            }
+          }
+          .layout(RowLayout.PARENT_GRID)
+      }
   }
 
   override fun doSync() {
@@ -114,32 +119,53 @@ class TimeConverter(
   private fun convert(
     changeOrigin: ChangeOrigin? = null,
     changeOriginComponent: JComponent? = null,
-    changeOriginAsNanoseconds: BigDecimal? = null
+    changeOriginAsNanoseconds: BigDecimal? = null,
   ) {
     if (changeOriginComponent != null && validate().any { it.component == changeOriginComponent }) {
       return
     }
 
     try {
-      val monthToNanoseconds = BigDecimal.valueOf(365L).divide(BigDecimal.valueOf(12L), mathContext).multiply(
-        DAYS_TO_NANOSECONDS, mathContext)
+      val monthToNanoseconds =
+        BigDecimal.valueOf(365L)
+          .divide(BigDecimal.valueOf(12L), mathContext)
+          .multiply(DAYS_TO_NANOSECONDS, mathContext)
       val millenniumsToNanoseconds = CENTURIES_TO_NANOSECONDS.multiply(TEN, mathContext)
 
-      val changeOriginAsNanosecondsToUse: BigDecimal? = when (changeOrigin) {
-        NANOSECONDS -> nanosecondsFormatted.get().parseBigDecimal()
-        MILLISECONDS -> millisecondsFormatted.get().parseBigDecimal().multiply(MILLISECONDS_TO_NANOSECONDS, mathContext)
-        SECONDS -> secondsFormatted.get().parseBigDecimal().multiply(SECONDS_TO_NANOSECONDS, mathContext)
-        MINUTES -> minutesFormatted.get().parseBigDecimal().multiply(MINUTES_TO_NANOSECONDS, mathContext)
-        HOURS -> hoursFormatted.get().parseBigDecimal().multiply(HOURS_TO_NANOSECONDS, mathContext)
-        DAYS -> daysFormatted.get().parseBigDecimal().multiply(DAYS_TO_NANOSECONDS, mathContext)
-        WEEKS -> weeksFormatted.get().parseBigDecimal().multiply(WEEK_TO_NANOSECONDS, mathContext)
-        MONTHS -> monthsFormatted.get().parseBigDecimal().multiply(monthToNanoseconds, mathContext)
-        YEARS -> yearsFormatted.get().parseBigDecimal().multiply(YEARS_TO_NANOSECONDS, mathContext)
-        DECADES -> decadesFormatted.get().parseBigDecimal().multiply(DECADES_TO_NANOSECONDS, mathContext)
-        CENTURIES -> centuriesFormatted.get().parseBigDecimal().multiply(CENTURIES_TO_NANOSECONDS, mathContext)
-        MILLENNIUMS -> millenniumsFormatted.get().parseBigDecimal().multiply(millenniumsToNanoseconds, mathContext)
-        else -> changeOriginAsNanoseconds!!
-      }
+      val changeOriginAsNanosecondsToUse: BigDecimal? =
+        when (changeOrigin) {
+          NANOSECONDS -> nanosecondsFormatted.get().parseBigDecimal()
+          MILLISECONDS ->
+            millisecondsFormatted
+              .get()
+              .parseBigDecimal()
+              .multiply(MILLISECONDS_TO_NANOSECONDS, mathContext)
+          SECONDS ->
+            secondsFormatted.get().parseBigDecimal().multiply(SECONDS_TO_NANOSECONDS, mathContext)
+          MINUTES ->
+            minutesFormatted.get().parseBigDecimal().multiply(MINUTES_TO_NANOSECONDS, mathContext)
+          HOURS ->
+            hoursFormatted.get().parseBigDecimal().multiply(HOURS_TO_NANOSECONDS, mathContext)
+          DAYS -> daysFormatted.get().parseBigDecimal().multiply(DAYS_TO_NANOSECONDS, mathContext)
+          WEEKS -> weeksFormatted.get().parseBigDecimal().multiply(WEEK_TO_NANOSECONDS, mathContext)
+          MONTHS ->
+            monthsFormatted.get().parseBigDecimal().multiply(monthToNanoseconds, mathContext)
+          YEARS ->
+            yearsFormatted.get().parseBigDecimal().multiply(YEARS_TO_NANOSECONDS, mathContext)
+          DECADES ->
+            decadesFormatted.get().parseBigDecimal().multiply(DECADES_TO_NANOSECONDS, mathContext)
+          CENTURIES ->
+            centuriesFormatted
+              .get()
+              .parseBigDecimal()
+              .multiply(CENTURIES_TO_NANOSECONDS, mathContext)
+          MILLENNIUMS ->
+            millenniumsFormatted
+              .get()
+              .parseBigDecimal()
+              .multiply(millenniumsToNanoseconds, mathContext)
+          else -> changeOriginAsNanoseconds!!
+        }
       if (changeOriginAsNanosecondsToUse == null) {
         return
       }
@@ -153,7 +179,8 @@ class TimeConverter(
         nanosecondsFormatted.set(nanoseconds.get().toFormatted())
       }
       if (changeOrigin != MILLISECONDS) {
-        val milliseconds = changeOriginAsNanosecondsToUse.divide(MILLISECONDS_TO_NANOSECONDS, mathContext)
+        val milliseconds =
+          changeOriginAsNanosecondsToUse.divide(MILLISECONDS_TO_NANOSECONDS, mathContext)
         millisecondsFormatted.set(milliseconds.toFormatted())
       }
       if (changeOrigin != SECONDS) {
@@ -190,7 +217,8 @@ class TimeConverter(
         centuriesFormatted.set(centuries.toFormatted())
       }
       if (changeOrigin != MILLENNIUMS) {
-        val millenniums = changeOriginAsNanosecondsToUse.divide(millenniumsToNanoseconds, mathContext)
+        val millenniums =
+          changeOriginAsNanosecondsToUse.divide(millenniumsToNanoseconds, mathContext)
         millenniumsFormatted.set(millenniums.toFormatted())
       }
 
@@ -203,7 +231,8 @@ class TimeConverter(
   private fun formatDetails(days: BigDecimal, hours: BigDecimal, minutes: BigDecimal) {
     try {
       run {
-        val daysAsNanos = days.multiply(DAYS_TO_NANOSECONDS, mathContext).setScale(0, mathContext.roundingMode)
+        val daysAsNanos =
+          days.multiply(DAYS_TO_NANOSECONDS, mathContext).setScale(0, mathContext.roundingMode)
         if (daysAsNanos.isWithinLongRange()) {
           val duration = Duration.ofNanos(daysAsNanos.longValueExact())
           daysDetail.set(
@@ -214,14 +243,14 @@ class TimeConverter(
               append("${DETAILS_FORMAT.format(duration.toSecondsPart())}s")
             }
           )
-        }
-        else {
+        } else {
           daysDetail.set("")
         }
       }
 
       run {
-        val hoursAsNanos = hours.multiply(HOURS_TO_NANOSECONDS, mathContext).setScale(0, mathContext.roundingMode)
+        val hoursAsNanos =
+          hours.multiply(HOURS_TO_NANOSECONDS, mathContext).setScale(0, mathContext.roundingMode)
         if (hoursAsNanos.isWithinLongRange()) {
           val duration = Duration.ofNanos(hoursAsNanos.longValueExact())
           hoursDetail.set(
@@ -231,14 +260,16 @@ class TimeConverter(
               append("${DETAILS_FORMAT.format(duration.toSecondsPart())}s")
             }
           )
-        }
-        else {
+        } else {
           hoursDetail.set("")
         }
       }
 
       run {
-        val minutesAsNanos = minutes.multiply(MINUTES_TO_NANOSECONDS, mathContext).setScale(0, mathContext.roundingMode)
+        val minutesAsNanos =
+          minutes
+            .multiply(MINUTES_TO_NANOSECONDS, mathContext)
+            .setScale(0, mathContext.roundingMode)
         if (minutesAsNanos.isWithinLongRange()) {
           val duration = Duration.ofNanos(minutesAsNanos.longValueExact())
           minutesDetail.set(
@@ -247,8 +278,7 @@ class TimeConverter(
               append("${DETAILS_FORMAT.format(duration.toSecondsPart())}s")
             }
           )
-        }
-        else {
+        } else {
           minutesDetail.set("")
         }
       }
@@ -275,7 +305,7 @@ class TimeConverter(
     YEARS,
     DECADES,
     CENTURIES,
-    MILLENNIUMS
+    MILLENNIUMS,
   }
 
   // -- Inner Type ---------------------------------------------------------- //

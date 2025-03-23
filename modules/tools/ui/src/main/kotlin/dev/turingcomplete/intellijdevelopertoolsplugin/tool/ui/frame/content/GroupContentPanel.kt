@@ -16,34 +16,49 @@ import org.jdesktop.swingx.VerticalLayout
 import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants
 
-class GroupContentPanel(groupNode: GroupNode, private val onContentNodeSelection: (ContentNode) -> Unit) {
+class GroupContentPanel(
+  groupNode: GroupNode,
+  private val onContentNodeSelection: (ContentNode) -> Unit,
+) {
   // -- Properties ---------------------------------------------------------- //
 
-  val panel: DialogPanel = panel {
-    row {
-      label(groupNode.developerUiToolGroup.detailTitle).applyToComponent { font = JBFont.label().asBold() }
-      bottomGap(BottomGap.NONE)
-    }
-
-    indent {
-      row {
-        val component = createDeveloperToolLinksPanel(groupNode)
-        val componentWrapper = ScrollPaneFactory.createScrollPane(component, true).apply {
-          horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
-          verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
+  val panel: DialogPanel =
+    panel {
+        row {
+          label(groupNode.developerUiToolGroup.detailTitle).applyToComponent {
+            font = JBFont.label().asBold()
+          }
+          bottomGap(BottomGap.NONE)
         }
-        cell(componentWrapper).align(Align.FILL)
-      }.resizableRow()
-    }
-  }.apply { border = JBEmptyBorder(0, 8, 0, 8) }
 
-  private fun createDeveloperToolLinksPanel(groupNode: GroupNode) = object : JPanel(VerticalLayout(UIUtil.DEFAULT_VGAP)) {
-    init {
-      groupNode.children().asSequence().filterIsInstance(DeveloperToolNode::class.java).forEach { developerToolNode ->
-        add(ActionLink(developerToolNode.developerUiToolPresentation.groupedMenuTitle) { onContentNodeSelection(developerToolNode) })
+        indent {
+          row {
+              val component = createDeveloperToolLinksPanel(groupNode)
+              val componentWrapper =
+                ScrollPaneFactory.createScrollPane(component, true).apply {
+                  horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
+                  verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
+                }
+              cell(componentWrapper).align(Align.FILL)
+            }
+            .resizableRow()
+        }
+      }
+      .apply { border = JBEmptyBorder(0, 8, 0, 8) }
+
+  private fun createDeveloperToolLinksPanel(groupNode: GroupNode) =
+    object : JPanel(VerticalLayout(UIUtil.DEFAULT_VGAP)) {
+      init {
+        groupNode.children().asSequence().filterIsInstance(DeveloperToolNode::class.java).forEach {
+          developerToolNode ->
+          add(
+            ActionLink(developerToolNode.developerUiToolPresentation.groupedMenuTitle) {
+              onContentNodeSelection(developerToolNode)
+            }
+          )
+        }
       }
     }
-  }
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //

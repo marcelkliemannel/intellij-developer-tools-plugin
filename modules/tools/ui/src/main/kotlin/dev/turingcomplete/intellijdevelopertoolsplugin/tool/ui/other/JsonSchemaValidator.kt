@@ -34,12 +34,13 @@ class JsonSchemaValidator(
   private val context: DeveloperUiToolContext,
   private val configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
-  private val project: Project?
+  private val project: Project?,
 ) : DeveloperUiTool(parentDisposable) {
   // -- Properties ---------------------------------------------------------- //
 
   private var liveValidation = configuration.register("liveValidation", true)
-  private val schemaText = configuration.register("schemaText", "", PropertyType.INPUT, EXAMPLE_SCHEMA)
+  private val schemaText =
+    configuration.register("schemaText", "", PropertyType.INPUT, EXAMPLE_SCHEMA)
   private val dataText = configuration.register("dataText", "", PropertyType.INPUT, EXAMPLE_DATA)
 
   private val schemaEditor by lazy { this.createSchemaEditor() }
@@ -47,7 +48,8 @@ class JsonSchemaValidator(
   private val dataEditor by lazy { this.createDataEditor() }
   private val dataErrorHolder = ErrorHolder()
 
-  private val validationState: ObservableMutableProperty<ValidationState> = AtomicProperty(ValidationState.VALIDATED)
+  private val validationState: ObservableMutableProperty<ValidationState> =
+    AtomicProperty(ValidationState.VALIDATED)
   private val validationError: ObservableMutableProperty<String> = AtomicProperty("")
 
   // -- Initialization ------------------------------------------------------ //
@@ -64,15 +66,16 @@ class JsonSchemaValidator(
 
   override fun Panel.buildUi() {
     row {
-      cell(schemaEditor.component).align(Align.FILL)
-        .validationOnApply(schemaEditor.bindValidator(schemaErrorHolder.asValidation()))
-        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
-    }.resizableRow()
+        cell(schemaEditor.component)
+          .align(Align.FILL)
+          .validationOnApply(schemaEditor.bindValidator(schemaErrorHolder.asValidation()))
+          .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
+      }
+      .resizableRow()
 
     row {
-      val liveValidationCheckBox = checkBox("Live validation")
-        .bindSelected(liveValidation)
-        .gap(RightGap.SMALL)
+      val liveValidationCheckBox =
+        checkBox("Live validation").bindSelected(liveValidation).gap(RightGap.SMALL)
 
       button("Validate") { validateSchema() }
         .enabledIf(liveValidationCheckBox.selected.not())
@@ -80,25 +83,30 @@ class JsonSchemaValidator(
     }
 
     row {
-      cell(dataEditor.component).align(Align.FILL)
-        .validationOnApply(dataEditor.bindValidator(dataErrorHolder.asValidation()))
-        .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
-    }.resizableRow()
+        cell(dataEditor.component)
+          .align(Align.FILL)
+          .validationOnApply(dataEditor.bindValidator(dataErrorHolder.asValidation()))
+          .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
+      }
+      .resizableRow()
 
     row {
-      icon(AllIcons.General.InspectionsOK).gap(RightGap.SMALL)
-      label("Data matches schema")
-    }.visibleIf(PropertyComponentPredicate(validationState, ValidationState.VALIDATED))
+        icon(AllIcons.General.InspectionsOK).gap(RightGap.SMALL)
+        label("Data matches schema")
+      }
+      .visibleIf(PropertyComponentPredicate(validationState, ValidationState.VALIDATED))
 
     row {
-      icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
-      label("").bindText(validationError)
-    }.visibleIf(PropertyComponentPredicate(validationState, ValidationState.ERROR))
+        icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
+        label("").bindText(validationError)
+      }
+      .visibleIf(PropertyComponentPredicate(validationState, ValidationState.ERROR))
 
     row {
-      icon(AllIcons.General.Warning).gap(RightGap.SMALL)
-      label("Invalid input")
-    }.visibleIf(PropertyComponentPredicate(validationState, ValidationState.INVALID_INPUT))
+        icon(AllIcons.General.Warning).gap(RightGap.SMALL)
+        label("Invalid input")
+      }
+      .visibleIf(PropertyComponentPredicate(validationState, ValidationState.INVALID_INPUT))
   }
 
   override fun afterBuildUi() {
@@ -115,23 +123,25 @@ class JsonSchemaValidator(
 
     val jsonMapper = ObjectMapperService.instance.jsonMapper()
 
-    val schema: JsonSchema? = try {
-      val schemaNode = jsonMapper.readTree(schemaEditor.text)
-      val versionFlag = SpecVersionDetector.detect(schemaNode)
-      JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7).getSchema(schemaEditor.text)
-    } catch (e: Exception) {
-      schemaErrorHolder.add(e)
-      validationState.set(ValidationState.INVALID_INPUT)
-      null
-    }
+    val schema: JsonSchema? =
+      try {
+        val schemaNode = jsonMapper.readTree(schemaEditor.text)
+        val versionFlag = SpecVersionDetector.detect(schemaNode)
+        JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7).getSchema(schemaEditor.text)
+      } catch (e: Exception) {
+        schemaErrorHolder.add(e)
+        validationState.set(ValidationState.INVALID_INPUT)
+        null
+      }
 
-    val dataNode: JsonNode? = try {
-      jsonMapper.readTree(dataEditor.text)
-    } catch (e: Exception) {
-      dataErrorHolder.add(e)
-      validationState.set(ValidationState.INVALID_INPUT)
-      null
-    }
+    val dataNode: JsonNode? =
+      try {
+        jsonMapper.readTree(dataEditor.text)
+      } catch (e: Exception) {
+        dataErrorHolder.add(e)
+        validationState.set(ValidationState.INVALID_INPUT)
+        null
+      }
 
     // The `validate` in this class is not used as a validation mechanism. We
     // make use of its text field error UI to display the `errorHolder`.
@@ -141,8 +151,7 @@ class JsonSchemaValidator(
       val errors = schema.validate(dataNode)
       if (errors.isEmpty()) {
         validationState.set(ValidationState.VALIDATED)
-      }
-      else {
+      } else {
         validationState.set(ValidationState.ERROR)
         validationError.set(
           """
@@ -150,7 +159,8 @@ class JsonSchemaValidator(
             Data does not match schema:<br />
               ${errors.joinToString(separator = "<br />") { "- $it" }}
             </html>
-          """.trimIndent()
+          """
+            .trimIndent()
         )
       }
     }
@@ -158,41 +168,43 @@ class JsonSchemaValidator(
 
   private fun createSchemaEditor() =
     AdvancedEditor(
-      id = "schema",
-      context = context,
-      configuration = configuration,
-      project = project,
-      title = "JSON schema",
-      editorMode = INPUT,
-      parentDisposable = parentDisposable,
-      initialLanguage = JsonLanguage.INSTANCE,
-      textProperty = schemaText,
-    ).apply {
-      onTextChangeFromUi {
-        if (liveValidation.get()) {
-          validateSchema()
+        id = "schema",
+        context = context,
+        configuration = configuration,
+        project = project,
+        title = "JSON schema",
+        editorMode = INPUT,
+        parentDisposable = parentDisposable,
+        initialLanguage = JsonLanguage.INSTANCE,
+        textProperty = schemaText,
+      )
+      .apply {
+        onTextChangeFromUi {
+          if (liveValidation.get()) {
+            validateSchema()
+          }
         }
       }
-    }
 
   private fun createDataEditor() =
     AdvancedEditor(
-      id = "data",
-      context = context,
-      configuration = configuration,
-      project = project,
-      title = "JSON data",
-      editorMode = INPUT,
-      parentDisposable = parentDisposable,
-      initialLanguage = JsonLanguage.INSTANCE,
-      textProperty = dataText,
-    ).apply {
-      onTextChangeFromUi {
-        if (liveValidation.get()) {
-          validateSchema()
+        id = "data",
+        context = context,
+        configuration = configuration,
+        project = project,
+        title = "JSON data",
+        editorMode = INPUT,
+        parentDisposable = parentDisposable,
+        initialLanguage = JsonLanguage.INSTANCE,
+        textProperty = dataText,
+      )
+      .apply {
+        onTextChangeFromUi {
+          if (liveValidation.get()) {
+            validateSchema()
+          }
         }
       }
-    }
 
   // -- Inner Type ---------------------------------------------------------- //
 
@@ -200,31 +212,31 @@ class JsonSchemaValidator(
 
     VALIDATED,
     ERROR,
-    INVALID_INPUT
+    INVALID_INPUT,
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<JsonSchemaValidator> {
 
-    override fun getDeveloperUiToolPresentation() = DeveloperUiToolPresentation(
-      menuTitle = "JSON Schema",
-      contentTitle = "JSON Schema Validator"
-    )
+    override fun getDeveloperUiToolPresentation() =
+      DeveloperUiToolPresentation(menuTitle = "JSON Schema", contentTitle = "JSON Schema Validator")
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
       parentDisposable: Disposable,
-      context: DeveloperUiToolContext
-    ): ((DeveloperToolConfiguration) -> JsonSchemaValidator) =
-      { configuration -> JsonSchemaValidator(context, configuration, parentDisposable, project) }
+      context: DeveloperUiToolContext,
+    ): ((DeveloperToolConfiguration) -> JsonSchemaValidator) = { configuration ->
+      JsonSchemaValidator(context, configuration, parentDisposable, project)
+    }
   }
 
   // -- Companion Object ---------------------------------------------------- //
 
   companion object {
 
-    private val EXAMPLE_SCHEMA = """
+    private val EXAMPLE_SCHEMA =
+      """
 {
   "${'$'}id": "https://example.com/person.schema.json",
   "${'$'}schema": "https://json-schema.org/draft/2020-12/schema",
@@ -246,13 +258,16 @@ class JsonSchemaValidator(
     }
   }
 }
-    """.trimIndent()
-    private val EXAMPLE_DATA = """
+    """
+        .trimIndent()
+    private val EXAMPLE_DATA =
+      """
 {
   "firstName": "John",
   "lastName": "Doe",
   "age": 21
 }
-    """.trimIndent()
+    """
+        .trimIndent()
   }
 }
