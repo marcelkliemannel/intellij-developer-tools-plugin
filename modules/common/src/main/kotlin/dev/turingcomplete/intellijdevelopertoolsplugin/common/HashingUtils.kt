@@ -8,7 +8,7 @@ object HashingUtils {
 
   val commonMessageDigests: List<MessageDigest>
 
-  private val algorithms = listOf<String>("MD5, SHA-1", "SHA-256", "SHA-512", "SHA3-256", "SHA3-512")
+  private val algorithms = listOf<String>("MD5", "SHA-1", "SHA-256", "SHA-512", "SHA3-256", "SHA3-512")
 
   // -- Initialization ---------------------------------------------------------------------------------------------- //
 

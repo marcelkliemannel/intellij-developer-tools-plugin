@@ -8,7 +8,7 @@ import com.intellij.psi.util.elementType
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedText
 import org.jetbrains.kotlin.lexer.KtTokens
 
-internal object PsiKotlinUtils {
+object PsiKotlinUtils {
   // -- Variables --------------------------------------------------------------------------------------------------- //
 
   private val textElementKtTokens = setOf(KtTokens.REGULAR_STRING_PART, KtTokens.IDENTIFIER)

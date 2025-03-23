@@ -10,7 +10,7 @@ import com.intellij.psi.PsiJavaToken
 import com.intellij.psi.util.elementType
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedText
 
-internal object PsiJavaUtils {
+object PsiJavaUtils {
   // -- Variables --------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //

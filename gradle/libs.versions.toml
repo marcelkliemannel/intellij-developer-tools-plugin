@@ -10,6 +10,7 @@ commons-text = "1.10.0"
 commons-codec = "1.15"
 commons-io = "2.15.1"
 commons-compress = "1.26.0"
+commons-csv = "1.10.0"
 ulid-creator = "5.2.3"
 csscolor4j = "1.0.0"
 okhttp = "4.12.0"
@@ -21,8 +22,10 @@ sql-formatter = "2.0.4"
 assertj = "3.25.3"
 # See bundled version: https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
 kotlin = "2.1.10"
-intellij-platform = "2.3.0"
+intellij-platform = "2.4.0"
 changelog = "2.2.0"
+asm = "9.7.1"
+spotless = "7.0.2"
 
 [libraries]
 jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson" }
@@ -37,6 +40,7 @@ jsonpath = { group = "com.jayway.jsonpath", name = "json-path", version.ref = "j
 json-schema-validator = { group = "com.networknt", name = "json-schema-validator", version.ref = "json-schema-validator" }
 commons-text = { group = "org.apache.commons", name = "commons-text", version.ref = "commons-text" }
 commons-codec = { group = "commons-codec", name = "commons-codec", version.ref = "commons-codec" }
+commons-csv = { group = "org.apache.commons", name = "commons-csv", version.ref = "commons-csv" }
 commons-io = { group = "commons-io", name = "commons-io", version.ref = "commons-io" }
 commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }
 ulid-creator = { group = "com.github.f4b6a3", name = "ulid-creator", version.ref = "ulid-creator" }
@@ -56,12 +60,12 @@ text-case-converter-kotlin-extension = { group = "dev.turingcomplete", name = "t
 
 assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj" }
 
+asm = { group = "org.ow2.asm", name = "asm", version.ref = "asm" }
+
 junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
 junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit" }
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
 junit4 = { group = "junit", name = "junit", version = "4.13.2" }
-
-kotlin-compiler = { group = "org.jetbrains.kotlin", name = "kotlin-compiler", version.ref = "kotlin" }
 
 [bundles]
 zxing = ["zxing-core", "zxing-javase"]
@@ -74,3 +78,4 @@ text-case-converter = ["text-case-converter", "text-case-converter-kotlin-extens
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
+spotless = { id = "spotless-plugin-gradle", version.ref = "spotless" }

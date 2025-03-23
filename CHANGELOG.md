@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Setting "Dialog is modal" was reset to its default value (false), due to overhaul of the internal settings handling.
+
 ### Removed
 
 ### Fixed

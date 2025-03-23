@@ -2,10 +2,10 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.edito
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.util.TextRange
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.tool.editor.action.EscapeUnescapeActionGroup
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.action.EscapeUnescapeActionGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.PsiJavaUtils
 
-internal class EscapeUnescapeJavaCodeActionGroup : EscapeUnescapeActionGroup() {
+class EscapeUnescapeJavaCodeActionGroup : EscapeUnescapeActionGroup() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //

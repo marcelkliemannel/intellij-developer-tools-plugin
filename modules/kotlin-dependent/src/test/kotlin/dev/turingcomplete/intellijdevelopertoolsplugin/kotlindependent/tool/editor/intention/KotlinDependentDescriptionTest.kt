@@ -1,40 +1,27 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.kotlindependent.tool.editor.intention
 
-import DescriptionTest
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
+import IntentionDescriptionTest
+import org.junit.jupiter.api.DynamicNode
+import org.junit.jupiter.api.TestFactory
 
-class KotlinDependentDescriptionTest : DescriptionTest() {
+class KotlinDependentDescriptionTest : IntentionDescriptionTest() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
-  @ParameterizedTest
-  @MethodSource("intentionActionSimpleClassNames")
-  override fun testIntentionActionDescriptionHtmlFileExist(intentionActionSimpleClassName: String) {
-    super.doTestIntentionActionDescriptionHtmlFileExist(intentionActionSimpleClassName)
-  }
+  @TestFactory
+  override fun `test intention action description HTML file exists`(): List<DynamicNode> =
+    super.`do test intention action description HTML file exists`()
 
-  @ParameterizedTest
-  @MethodSource("intentionActionSimpleClassNames")
-  override fun testIntentionActionBeforeTemplateFileExist(intentionActionSimpleClassName: String) {
-    super.doTestIntentionActionBeforeTemplateFileExist(intentionActionSimpleClassName)
-  }
+  @TestFactory
+  override fun `test intention action before template file exists`(): List<DynamicNode> =
+    super.`do test intention action before template file exists`()
 
-  @ParameterizedTest
-  @MethodSource("intentionActionSimpleClassNames")
-  override fun testIntentionActionAfterTemplateFileExist(intentionActionSimpleClassName: String) {
-    super.doTestIntentionActionAfterTemplateFileExist(intentionActionSimpleClassName)
-  }
+  @TestFactory
+  override fun `test intention action after template file exists`(): List<DynamicNode> =
+    super.`do test intention action after template file exists`()
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
   // -- Companion Object -------------------------------------------------------------------------------------------- //
-
-  companion object {
-
-    @JvmStatic
-    fun intentionActionSimpleClassNames() =
-      intentionActionSimpleClassNames("dev.turingcomplete.intellijdevelopertoolsplugin.kotlindependent.tool.editor.intention")
-  }
 }

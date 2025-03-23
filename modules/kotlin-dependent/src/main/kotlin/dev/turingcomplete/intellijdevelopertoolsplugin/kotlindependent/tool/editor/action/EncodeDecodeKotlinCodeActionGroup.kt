@@ -2,10 +2,10 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.kotlindependent.tool.edi
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.util.TextRange
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.tool.editor.action.EncodeDecodeActionGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin.kotlindependent.PsiKotlinUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.action.EncodeDecodeActionGroup
 
-internal class EncodeDecodeKotlinCodeActionGroup : EncodeDecodeActionGroup() {
+class EncodeDecodeKotlinCodeActionGroup : EncodeDecodeActionGroup() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //

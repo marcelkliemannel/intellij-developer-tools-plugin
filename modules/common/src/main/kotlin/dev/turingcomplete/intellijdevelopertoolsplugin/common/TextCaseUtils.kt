@@ -10,7 +10,7 @@ object TextCaseUtils {
 
   private val spacesPattern = Regex("\\s+")
 
-  private val textCasesWithWithoutSplitWords = setOf(
+  private val textCasesWithoutSplitWords = setOf(
     StandardTextCases.LOWER_CASE,
     StandardTextCases.UPPER_CASE,
     StandardTextCases.INVERTED_CASE,
@@ -24,7 +24,7 @@ object TextCaseUtils {
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   fun determineWordsSplitter(text: String, targetTextCase: TextCase): WordsSplitter {
-    if (textCasesWithWithoutSplitWords.contains(targetTextCase)) {
+    if (textCasesWithoutSplitWords.contains(targetTextCase)) {
       return StandardWordsSplitters.NOOP
     }
 

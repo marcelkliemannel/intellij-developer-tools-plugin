@@ -66,5 +66,11 @@ fun String.decodeFromAscii() =
 fun MatchGroupCollection.getOrNull(index: Int): MatchGroup? =
   if (index in 0 until size) this[index] else null
 
+fun <T : Enum<T>> KClass<T>.findEnumValueByName(name: String): T? =
+  this.java.enumConstants?.find { it.name == name }
+
+fun <T : Enum<T>> KClass<T>.getEnumValueByNameOrThrow(name: String): T =
+  this.java.enumConstants?.find { it.name == name } ?: error("Enum value $name not found in $this")
+
 // -- Private Methods ----------------------------------------------------------------------------------------------- //
 // -- Type ---------------------------------------------------------------------------------------------------------- //

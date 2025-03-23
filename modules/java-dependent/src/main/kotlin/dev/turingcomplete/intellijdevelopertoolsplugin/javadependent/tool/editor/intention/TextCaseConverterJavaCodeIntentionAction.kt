@@ -3,10 +3,10 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.edito
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.tool.editor.intention.TextCaseConverterIntentionAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.PsiJavaUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.TextCaseConverterIntentionAction
 
-internal class TextCaseConverterJavaCodeIntentionAction : TextCaseConverterIntentionAction() {
+class TextCaseConverterJavaCodeIntentionAction : TextCaseConverterIntentionAction() {
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //
   // -- Exported Methods -------------------------------------------------------------------------------------------- //

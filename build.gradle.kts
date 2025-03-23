@@ -17,6 +17,7 @@ plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.intellij.platform)
   alias(libs.plugins.changelog)
+//  alias(libs.plugins.spotless)
 }
 
 subprojects {
@@ -60,7 +61,7 @@ allprojects {
   tasks {
     withType<KotlinCompile> {
       compilerOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
+        freeCompilerArgs = listOf("-Xjsr305=strict", "-opt-in=kotlin.ExperimentalStdlibApi")
         jvmTarget.set(JvmTarget.JVM_21)
       }
     }
@@ -78,47 +79,19 @@ dependencies {
     zipSigner()
 
     pluginModule(project(":common"))
+    pluginModule(project(":settings"))
+    pluginModule(project(":tools-editor"))
+    pluginModule(project(":tools-ui"))
     if (platform == "IC") {
       pluginModule(project(":java-dependent"))
       pluginModule(project(":kotlin-dependent"))
     }
   }
 
-  implementation(libs.bundles.jackson)
-  implementation(libs.uuid.generator) {
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
-  implementation(libs.jsonpath) {
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
-  implementation(libs.json.schema.validator) {
-    exclude("org.apache.commons", "commons-lang3")
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
-  implementation(libs.commons.text)
-  implementation(libs.commons.codec)
-  implementation(libs.commons.io)
-  implementation(libs.commons.compress)
-  implementation(libs.ulid.creator)
-  implementation(libs.csscolor4j)
-  implementation(libs.okhttp)
-  implementation(libs.jfiglet)
-  implementation(libs.jnanoid)
-  implementation(libs.jose4j) {
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
-  implementation(libs.named.regexp)
-  implementation(libs.sql.formatter)
-  implementation(libs.bundles.zxing)
-  implementation(libs.bundles.text.case.converter)
-
   testImplementation(libs.assertj.core)
   testImplementation(libs.bundles.junit.implementation)
   testRuntimeOnly(libs.bundles.junit.runtime)
-  // Required for the PSI Kotlin structure in tests. It needs to be compile-only
-  // as some parts are clashing with the IntelliJ platform dependency and
-  // causing the tests initialisation to fail.
-  testCompileOnly(libs.kotlin.compiler)
+  testImplementation(libs.commons.csv)
   testImplementation(testFixtures(project(":common")))
 }
 
@@ -171,7 +144,7 @@ changelog {
   groups.set(listOf("Added", "Changed", "Removed", "Fixed"))
 }
 
-val writeChangelogToFileTask = tasks.create("writeChangelogToFile") {
+val writeChangelogToFileTask = tasks.register("writeChangelogToFile") {
   val generatedResourcesDir = layout.buildDirectory.dir("generated-resources/changelog").get()
   outputs.dir(generatedResourcesDir)
 
