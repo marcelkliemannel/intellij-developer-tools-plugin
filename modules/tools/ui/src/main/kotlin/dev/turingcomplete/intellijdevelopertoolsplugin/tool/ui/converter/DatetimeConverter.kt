@@ -32,6 +32,7 @@ import com.intellij.util.text.OrdinalFormat.formatEnglish
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.LocaleContainer.Companion.ALL_AVAILABLE_LOCALES
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.not
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
@@ -41,7 +42,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindLongTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.changeFont
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.not
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.DatetimeConverter.ConversionOrigin.DAY
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.DatetimeConverter.ConversionOrigin.HOUR
@@ -433,7 +433,7 @@ class DatetimeConverter(
       }
       .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_SECONDS) }
       .enabledIf(formattedIndividual.not())
-      .visibleIf(ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsOffset ?: false })
+      .visibleIf(ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsOffset == true })
       .gap(RightGap.SMALL)
     checkBox("Add time zone")
       .bindSelected(formattedStandardFormatAddTimeZone)
@@ -444,7 +444,7 @@ class DatetimeConverter(
       .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_SECONDS) }
       .enabledIf(formattedIndividual.not())
       .visibleIf(
-        ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsTimeZone ?: false }
+        ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsTimeZone == true }
       )
   }
 

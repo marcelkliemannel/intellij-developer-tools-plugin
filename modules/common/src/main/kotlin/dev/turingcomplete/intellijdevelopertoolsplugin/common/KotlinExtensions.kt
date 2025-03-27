@@ -1,5 +1,8 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.common
 
+import com.intellij.openapi.observable.properties.ObservableMutableProperty
+import com.intellij.openapi.observable.util.transform
+import java.math.BigDecimal
 import java.security.MessageDigest
 import java.util.Base64
 import java.util.HexFormat
@@ -7,9 +10,12 @@ import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
 // -- Properties ---------------------------------------------------------- //
-// -- Initialization ------------------------------------------------------ //
 
+val longMaxValue = BigDecimal(Long.MAX_VALUE)
+val longMinValue = BigDecimal(Long.MIN_VALUE)
 private val asciiEncodedRegex = "\\\\u([0-9a-fA-F]{4})".toRegex()
+
+// -- Initialization ------------------------------------------------------ //
 
 // -- Exported Methods ---------------------------------------------------- //
 
@@ -81,6 +87,16 @@ fun <T : Enum<T>> KClass<T>.findEnumValueByName(name: String): T? =
 
 fun <T : Enum<T>> KClass<T>.getEnumValueByNameOrThrow(name: String): T =
   this.java.enumConstants?.find { it.name == name } ?: error("Enum value $name not found in $this")
+
+operator fun ObservableMutableProperty<Boolean>.not(): ObservableMutableProperty<Boolean> =
+  transform({ !it }) { !it }
+
+fun BigDecimal.isWithinLongRange(): Boolean = (this <= longMaxValue) && (this >= longMinValue)
+
+fun <T : Enum<T>> KClass<T>.valueOf(name: String): T {
+  return this.java.enumConstants?.firstOrNull { it.name == name }
+    ?: error("Enum $this does not have a constant with name: $name")
+}
 
 // -- Private Methods  ---------------------------------------------------- //
 // -- Inner Type ---------------------------------------------------------- //

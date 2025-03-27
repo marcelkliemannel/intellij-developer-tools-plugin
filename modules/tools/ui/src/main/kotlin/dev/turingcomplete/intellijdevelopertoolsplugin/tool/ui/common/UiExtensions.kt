@@ -8,7 +8,6 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
-import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.JBColor
@@ -38,13 +37,8 @@ import javax.swing.JTable
 import javax.swing.JTextField
 import javax.swing.ToolTipManager
 import javax.swing.border.CompoundBorder
-import kotlin.reflect.KClass
 
 // -- Properties ---------------------------------------------------------- //
-
-val longMaxValue = BigDecimal(Long.MAX_VALUE)
-val longMinValue = BigDecimal(Long.MIN_VALUE)
-
 // -- Exported Methods ---------------------------------------------------- //
 
 /** The UI DSL only verifies the range of an `intTextField` on a user input. */
@@ -235,7 +229,7 @@ fun JTable.setContextMenu(place: String, actionGroup: ActionGroup) {
           ActionManager.getInstance()
             .createActionPopupMenu(place, actionGroup)
             .component
-            .show(e.getComponent(), e.x, e.y)
+            .show(e.component, e.x, e.y)
         }
       }
     }
@@ -265,11 +259,6 @@ fun Color.toJBColor() = this as? JBColor ?: JBColor(this, this)
 
 @Suppress("UNCHECKED_CAST") fun <T> TabInfo.castedObject(): T = this.`object` as T
 
-operator fun ObservableMutableProperty<Boolean>.not(): ObservableMutableProperty<Boolean> =
-  transform({ !it }) { !it }
-
-fun BigDecimal.isWithinLongRange(): Boolean = (this <= longMaxValue) && (this >= longMinValue)
-
 fun Cell<JComponent>.registerDynamicToolTip(toolTipText: () -> String?) {
   this.component.toolTipText = null
   ToolTipManager.sharedInstance().registerComponent(this.component)
@@ -281,11 +270,6 @@ fun Cell<JComponent>.registerDynamicToolTip(toolTipText: () -> String?) {
       }
     }
   )
-}
-
-fun <T : Enum<T>> KClass<T>.valueOf(name: String): T {
-  return this.java.enumConstants?.firstOrNull { it.name == name }
-    ?: error("Enum $this does not have a constant with name: $name")
 }
 
 // -- Private Methods  ---------------------------------------------------- //
