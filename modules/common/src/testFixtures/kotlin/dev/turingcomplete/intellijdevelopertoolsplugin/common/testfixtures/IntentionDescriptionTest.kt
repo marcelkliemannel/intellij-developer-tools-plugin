@@ -1,5 +1,7 @@
-import IoUtils.collectAllFiles
+package dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures
+
 import com.intellij.codeInsight.intention.IntentionAction
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.IoUtils.collectAllFiles
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.DynamicTest
@@ -15,11 +17,13 @@ abstract class IntentionDescriptionTest {
 
   fun `do test intention action description HTML file exists`(): List<DynamicNode> =
     getAllIntentionActionClasses()
-      .map { "intentionDescriptions/${it.simpleName}/description.html" }
+      .map { "/intentionDescriptions/${it.simpleName}/description.html" }
       .map {
         DynamicTest.dynamicTest(it) {
-          val descriptionHtml = IntentionDescriptionTest::class.java.getResource(it)
-          assertThat(descriptionHtml).isNotNull()
+          val descriptionHtml = this::class.java.getResource(it)
+          assertThat(descriptionHtml)
+            .describedAs("Intention action description HTML file `${it}` exists")
+            .isNotNull()
         }
       }
 
@@ -44,13 +48,14 @@ abstract class IntentionDescriptionTest {
     templatePosition: String,
   ): String {
     val languageInfix = if (intentionActionSimpleClassName.contains("Kotlin")) "kt" else "java"
-    return "intentionDescriptions/$intentionActionSimpleClassName/$templatePosition.$languageInfix.template"
+    return "/intentionDescriptions/$intentionActionSimpleClassName/$templatePosition.$languageInfix.template"
   }
 
   private fun testDescriptionTemplateExists(descriptionTemplateRelativePath: String) {
-    val descriptionTemplate =
-      IntentionDescriptionTest::class.java.getResource(descriptionTemplateRelativePath)
-    assertThat(descriptionTemplate).isNotNull()
+    val descriptionTemplate = this::class.java.getResource(descriptionTemplateRelativePath)
+    assertThat(descriptionTemplate)
+      .describedAs("Description template `$descriptionTemplateRelativePath` exists")
+      .isNotNull()
   }
 
   private fun getAllIntentionActionClasses(): List<Class<*>> {

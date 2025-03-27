@@ -1,4 +1,3 @@
-
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
@@ -20,9 +19,7 @@ plugins {
   alias(libs.plugins.spotless)
 }
 
-subprojects {
-  apply(plugin = "org.jetbrains.intellij.platform.module")
-}
+subprojects { apply(plugin = "org.jetbrains.intellij.platform.module") }
 
 val platform = properties("platform")
 
@@ -38,9 +35,7 @@ allprojects {
     mavenLocal()
     mavenCentral()
 
-    intellijPlatform {
-      defaultRepositories()
-    }
+    intellijPlatform { defaultRepositories() }
   }
 
   dependencies {
@@ -51,19 +46,20 @@ allprojects {
       testFramework(TestFrameworkType.Platform)
       testFramework(TestFrameworkType.JUnit5)
     }
-  }
 
-  spotless {
-    kotlin {
-      ktfmt().googleStyle()
+    configurations.all {
+      resolutionStrategy.eachDependency {
+        if (requested.group == "org.ow2.asm" && requested.name.startsWith("asm")) {
+          useVersion(libs.versions.asm.get())
+          because("Ensure all subprojects use a consistent ASM version")
+        }
+      }
     }
   }
 
-  java {
-    toolchain {
-      languageVersion.set(JavaLanguageVersion.of(21))
-    }
-  }
+  spotless { kotlin { ktfmt().googleStyle() } }
+
+  java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
 
   tasks {
     withType<KotlinCompile> {
@@ -78,9 +74,7 @@ allprojects {
       systemProperty("java.awt.headless", "false")
     }
 
-    named("check") {
-      dependsOn("spotlessCheck")
-    }
+    named("check") { dependsOn("spotlessCheck") }
   }
 }
 
@@ -116,17 +110,17 @@ intellijPlatform {
     changeNotes.set(
       provider {
         changelog.renderItem(changelog.get(project.version as String), Changelog.OutputType.HTML)
-      },
+      }
     )
   }
 
   signing {
     val jetbrainsDir = File(System.getProperty("user.home"), ".jetbrains")
     certificateChain.set(
-      project.provider { File(jetbrainsDir, "plugin-sign-chain.crt").readText() },
+      project.provider { File(jetbrainsDir, "plugin-sign-chain.crt").readText() }
     )
     privateKey.set(
-      project.provider { File(jetbrainsDir, "plugin-sign-private-key.pem").readText() },
+      project.provider { File(jetbrainsDir, "plugin-sign-private-key.pem").readText() }
     )
     password.set(project.provider { properties("jetbrains.sign-plugin.password") })
   }
@@ -134,13 +128,7 @@ intellijPlatform {
   publishing {
     token.set(project.provider { properties("jetbrains.marketplace.token") })
     channels.set(
-      listOf(
-        properties("pluginVersion")
-          .split('-')
-          .getOrElse(1) { "default" }
-          .split('.')
-          .first(),
-      ),
+      listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first())
     )
   }
 
@@ -154,7 +142,7 @@ intellijPlatform {
         INVALID_PLUGIN,
         // Will fail for non-IC IDEs
         // MISSING_DEPENDENCIES
-      ),
+      )
     )
 
     ides {
@@ -190,32 +178,38 @@ val writeChangelogToFileTask =
     }
   }
 
-sourceSets {
-  main {
-    resources {
-      srcDir(writeChangelogToFileTask)
-    }
+sourceSets { main { resources { srcDir(writeChangelogToFileTask) } } }
+
+val integrationTest: SourceSet by
+  sourceSets.creating {
+    compileClasspath += sourceSets["test"].compileClasspath
+    runtimeClasspath += sourceSets["test"].runtimeClasspath
   }
-}
+
+idea { module.testSources = module.testSources + files(integrationTest.allSource.srcDirs) }
 
 tasks {
   named("publishPlugin") {
     dependsOn("check")
 
-    doFirst {
-      check(platform == "IC") { "Expected platform 'IC', but was: '$platform'" }
+    doFirst { check(platform == "IC") { "Expected platform 'IC', but was: '$platform'" } }
+  }
+
+  named("buildSearchableOptions") { enabled = false }
+
+  named<RunIdeTask>("runIde") {
+    jvmArgumentProviders += CommandLineArgumentProvider {
+      // https://kotlin.github.io/analysis-api/testing-in-k2-locally.html
+      listOf("-Didea.kotlin.plugin.use.k2=true")
     }
   }
 
-  named("buildSearchableOptions") {
-    enabled = false
+  register<Test>("integrationTest") {
+    group = "verification"
+    testClassesDirs = integrationTest.output.classesDirs
+    classpath = integrationTest.runtimeClasspath
+    useJUnitPlatform()
   }
 
-  named<RunIdeTask>("runIde") {
-    jvmArgumentProviders +=
-      CommandLineArgumentProvider {
-        // https://kotlin.github.io/analysis-api/testing-in-k2-locally.html
-        listOf("-Didea.kotlin.plugin.use.k2=true")
-      }
-  }
+  named("check") { dependsOn("integrationTest") }
 }

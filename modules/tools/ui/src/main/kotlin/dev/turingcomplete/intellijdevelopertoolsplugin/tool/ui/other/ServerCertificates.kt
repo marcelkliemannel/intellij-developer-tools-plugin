@@ -165,10 +165,8 @@ class ServerCertificates(
       icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
       label(
           UiToolsBundle.message(
-            UiToolsBundle.message(
-              "server-certificates.fetch-server-certificates-failed",
-              "${e::class.simpleName}: ${e.message}",
-            )
+            "server-certificates.fetch-server-certificates-failed",
+            "${e::class.simpleName}: ${e.message}",
           )
         )
         .align(Align.FILL)
@@ -399,7 +397,7 @@ class ServerCertificates(
     private val url: String,
   ) :
     AnAction(
-      UiToolsBundle.message("server-certificates.export-action-title", formatName.uppercase()),
+      UiToolsBundle.message("server-certificates.export-action-title", formatName),
       null,
       AllIcons.Actions.MenuSaveall,
     ) {
@@ -420,9 +418,10 @@ class ServerCertificates(
         }
         onSuccess(e)
       } catch (exception: Exception) {
+        val errorMessage = exception.message ?: ""
         Messages.showErrorDialog(
           e.project,
-          UiToolsBundle.message("server-certificates.export-failed", exception.message ?: ""),
+          UiToolsBundle.message("server-certificates.export-failed", errorMessage),
           e.presentation.text,
         )
       }

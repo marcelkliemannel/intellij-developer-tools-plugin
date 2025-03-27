@@ -1,6 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.editor.intention
 
-import IntentionDescriptionTest
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.IntentionDescriptionTest
 import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.TestFactory
 

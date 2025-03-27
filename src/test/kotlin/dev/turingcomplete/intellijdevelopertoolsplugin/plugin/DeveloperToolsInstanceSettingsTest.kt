@@ -1,7 +1,5 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.plugin
 
-import IdeaTest
-import PluginUtils.getPluginVersion
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.util.JDOMUtil
@@ -9,12 +7,11 @@ import com.intellij.ui.JBColor
 import com.intellij.util.application
 import com.intellij.util.xmlb.XmlSerializer
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.LocaleContainer
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.IdeaTest
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.PluginUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings.Companion.builtInConfigurationPropertyTypes
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings.Companion.configurationPropertyTypesByNamesAndLegacyValueTypes
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings.StatePropertyValueConverter
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
@@ -23,15 +20,12 @@ import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
 import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DynamicContainer
-import org.junit.jupiter.api.DynamicContainer.dynamicContainer
 import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.DynamicTest
-import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import java.math.BigDecimal
@@ -39,8 +33,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.StandardOpenOption.CREATE
-import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
+import java.nio.file.StandardOpenOption
 import java.time.ZoneId
 import java.util.Locale
 import kotlin.io.path.bufferedReader
@@ -58,9 +51,9 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
   @Test
   fun `Check various configurations persistent states`() {
-    DeveloperToolsApplicationSettings.generalSettings.saveConfigurations.set(true)
-    DeveloperToolsApplicationSettings.generalSettings.saveInputs.set(true)
-    DeveloperToolsApplicationSettings.generalSettings.saveSensitiveInputs.set(true)
+    DeveloperToolsApplicationSettings.Companion.generalSettings.saveConfigurations.set(true)
+    DeveloperToolsApplicationSettings.Companion.generalSettings.saveInputs.set(true)
+    DeveloperToolsApplicationSettings.Companion.generalSettings.saveSensitiveInputs.set(true)
 
     val settings =
       object : DeveloperToolsInstanceSettings() {
@@ -72,12 +65,12 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     val developerUiTools = instantiateAllDeveloperUiTools(settings)
 
     // Delete all example values
-    DeveloperToolsApplicationSettings.generalSettings.loadExamples.set(false)
+    DeveloperToolsApplicationSettings.Companion.generalSettings.loadExamples.set(false)
     resetAllConfigurations(developerUiTools, settings, false)
 
     // Expect: No configurations have persisted because there are no property changes
     // (The persistent state will only include configuration with modified properties)
-    assertThat(settings.getState().developerToolsConfigurations).isEmpty()
+    Assertions.assertThat(settings.getState().developerToolsConfigurations).isEmpty()
 
     // Set the values to the example value, despite `loadExamples` is disabled
     modifyAllConfigurationProperties(developerUiTools, settings) { property ->
@@ -91,7 +84,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     // configurations until the application was restarted. Therefore, during the
     // modification check, we will always check if the value is equal to the
     // example.)
-    assertThat(settings.getState().developerToolsConfigurations).isEmpty()
+    Assertions.assertThat(settings.getState().developerToolsConfigurations).isEmpty()
 
     // Set the values to the default value
     modifyAllConfigurationProperties(developerUiTools, settings) { property ->
@@ -99,20 +92,20 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     }
 
     // Expect: No configurations have persisted because there are no property changes
-    assertThat(settings.getState().developerToolsConfigurations).isEmpty()
+    Assertions.assertThat(settings.getState().developerToolsConfigurations).isEmpty()
 
     // Load all example values
-    DeveloperToolsApplicationSettings.generalSettings.loadExamples.set(true)
+    DeveloperToolsApplicationSettings.Companion.generalSettings.loadExamples.set(true)
     resetAllConfigurations(developerUiTools, settings, true)
 
     // Expect: No configurations have persisted because there are no property changes
-    assertThat(settings.getState().developerToolsConfigurations).isEmpty()
+    Assertions.assertThat(settings.getState().developerToolsConfigurations).isEmpty()
 
     // Set the values to a random value
     setConfigurationPropertiesToRandomValues(developerUiTools, settings)
 
     // Expect: All configurations (with properties) have been persisted
-    assertThat(settings.getState().developerToolsConfigurations)
+    Assertions.assertThat(settings.getState().developerToolsConfigurations)
       .hasSize(
         developerUiTools
           .filter {
@@ -141,33 +134,34 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
           Pair(BigDecimal(1.234), "1.2339999999999999857891452847979962825775146484375"),
       )
 
-    return builtInConfigurationPropertyTypes.map { (type, propertyType) ->
-      dynamicTest(type.qualifiedName!!) {
-        assertThat(testVectors).containsKey(type)
+    return DeveloperToolsInstanceSettings.Companion.builtInConfigurationPropertyTypes.map {
+      (type, propertyType) ->
+      DynamicTest.dynamicTest(type.qualifiedName!!) {
+        Assertions.assertThat(testVectors).containsKey(type)
         val (inputValue, persistedValue) = testVectors[type]!!
-        assertThat(propertyType.toPersistent(inputValue)).isEqualTo(persistedValue)
-        assertThat(propertyType.fromPersistent(persistedValue)).isEqualTo(inputValue)
+        Assertions.assertThat(propertyType.toPersistent(inputValue)).isEqualTo(persistedValue)
+        Assertions.assertThat(propertyType.fromPersistent(persistedValue)).isEqualTo(inputValue)
       }
     }
   }
 
   @Test
   fun `Legacy settings import test data for current plugin version exists`() {
-    val legacyImportDirForPluginVersion = legacyImportDir.resolve(getPluginVersion())
-    assertThat(legacyImportDirForPluginVersion).exists()
+    val legacyImportDirForPluginVersion = legacyImportDir.resolve(PluginUtils.getPluginVersion())
+    Assertions.assertThat(legacyImportDirForPluginVersion).exists()
   }
 
   @Test
   @Disabled
   fun `Create legacy settings import test data for current plugin version`() {
-    val legacyImportDirForPluginVersion = legacyImportDir.resolve(getPluginVersion())
+    val legacyImportDirForPluginVersion = legacyImportDir.resolve(PluginUtils.getPluginVersion())
     if (Files.notExists(legacyImportDirForPluginVersion)) {
       legacyImportDirForPluginVersion.createDirectories()
     }
 
-    DeveloperToolsApplicationSettings.generalSettings.saveConfigurations.set(true)
-    DeveloperToolsApplicationSettings.generalSettings.saveInputs.set(true)
-    DeveloperToolsApplicationSettings.generalSettings.saveSensitiveInputs.set(true)
+    DeveloperToolsApplicationSettings.Companion.generalSettings.saveConfigurations.set(true)
+    DeveloperToolsApplicationSettings.Companion.generalSettings.saveInputs.set(true)
+    DeveloperToolsApplicationSettings.Companion.generalSettings.saveSensitiveInputs.set(true)
 
     val settings =
       object : DeveloperToolsInstanceSettings() {
@@ -180,7 +174,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
     legacyImportDirForPluginVersion
       .resolve(EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME)
-      .writer(options = arrayOf(CREATE, TRUNCATE_EXISTING))
+      .writer(options = arrayOf(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))
       .use { writer ->
         CSVPrinter(
             writer,
@@ -190,7 +184,9 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
             settings.getState().developerToolsConfigurations!!.forEach {
               it.properties!!.forEach { property ->
                 val persistedValue =
-                  StatePropertyValueConverter().toString(property.value!!).split("|", limit = 2)
+                  DeveloperToolsInstanceSettings.StatePropertyValueConverter()
+                    .toString(property.value!!)
+                    .split("|", limit = 2)
                 printer.printRecord(
                   it.developerToolId,
                   property.key!!,
@@ -205,7 +201,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
     legacyImportDirForPluginVersion
       .resolve(PERSISTED_STATE_XML_FILENAME)
-      .writer(options = arrayOf(CREATE, TRUNCATE_EXISTING))
+      .writer(options = arrayOf(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))
       .use { writer ->
         val element = XmlSerializer.serialize(settings.getState())
         writer.write(JDOMUtil.write(element))
@@ -219,9 +215,9 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
       val expectedConfigurationPropertiesCsvFile =
         legacyImportVersionDir.resolve(EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME)
 
-      DeveloperToolsApplicationSettings.generalSettings.saveConfigurations.set(true)
-      DeveloperToolsApplicationSettings.generalSettings.saveInputs.set(true)
-      DeveloperToolsApplicationSettings.generalSettings.saveSensitiveInputs.set(true)
+      DeveloperToolsApplicationSettings.Companion.generalSettings.saveConfigurations.set(true)
+      DeveloperToolsApplicationSettings.Companion.generalSettings.saveInputs.set(true)
+      DeveloperToolsApplicationSettings.Companion.generalSettings.saveSensitiveInputs.set(true)
 
       val restoredSettings =
         object : DeveloperToolsInstanceSettings() {
@@ -252,31 +248,36 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
       val checkProperty: (ExpectedConfigurationProperty) -> DynamicTest =
         { (developerToolId, propertyId, propertyValueType, propertyValue, propertyType) ->
-          dynamicTest(propertyId) {
+          DynamicTest.dynamicTest(propertyId) {
             val developerToolConfiguration =
               restoredSettings.getDeveloperToolConfigurations(developerToolId)[0]
 
-            assertThat(developerToolConfiguration.persistentProperties).containsKey(propertyId)
+            Assertions.assertThat(developerToolConfiguration.persistentProperties)
+              .containsKey(propertyId)
             val property = developerToolConfiguration.persistentProperties[propertyId]
 
-            assertThat(configurationPropertyTypesByNamesAndLegacyValueTypes)
+            Assertions.assertThat(
+                DeveloperToolsInstanceSettings.Companion
+                  .configurationPropertyTypesByNamesAndLegacyValueTypes
+              )
               .containsKey(propertyValueType)
             val developerToolConfigurationPropertyType =
-              configurationPropertyTypesByNamesAndLegacyValueTypes[propertyValueType]
+              DeveloperToolsInstanceSettings.Companion
+                .configurationPropertyTypesByNamesAndLegacyValueTypes[propertyValueType]
 
             val expectedValue =
               developerToolConfigurationPropertyType!!.fromPersistent(propertyValue)
-            assertThat(property!!.value).isEqualTo(expectedValue)
+            Assertions.assertThat(property!!.value).isEqualTo(expectedValue)
 
-            assertThat(property.type.name).isEqualTo(propertyType)
+            Assertions.assertThat(property.type.name).isEqualTo(propertyType)
           }
         }
 
-      dynamicContainer(
+      DynamicContainer.dynamicContainer(
         legacyImportVersionDir.fileName.toString(),
         expectedConfigurationProperties
           .groupBy { it.developerToolId }
-          .map { dynamicContainer(it.key, it.value.map(checkProperty)) },
+          .map { DynamicContainer.dynamicContainer(it.key, it.value.map(checkProperty)) },
       )
     }
 
@@ -361,7 +362,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
   ): List<DeveloperUiToolWrapper<*>> {
     val developerUiTools = mutableListOf<DeveloperUiToolWrapper<*>>()
 
-    DeveloperUiToolFactoryEp.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
+    DeveloperUiToolFactoryEp.Companion.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
       val developerUiToolFactory: DeveloperUiToolFactory<*> =
         developerToolFactoryEp.createInstance(application)
       val context = DeveloperUiToolContext(developerToolFactoryEp.id, false)

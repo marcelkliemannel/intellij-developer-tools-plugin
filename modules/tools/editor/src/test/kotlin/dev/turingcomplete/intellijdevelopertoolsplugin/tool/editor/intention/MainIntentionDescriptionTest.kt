@@ -1,10 +1,10 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention
 
-import IntentionDescriptionTest
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.IntentionDescriptionTest
 import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.TestFactory
 
-class GeneralDependentDescriptionTest : IntentionDescriptionTest() {
+class MainIntentionDescriptionTest : IntentionDescriptionTest() {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //

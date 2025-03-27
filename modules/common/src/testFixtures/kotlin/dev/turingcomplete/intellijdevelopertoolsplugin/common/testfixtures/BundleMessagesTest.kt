@@ -1,6 +1,8 @@
-import IoUtils.collectAllFiles
+package dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures
+
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.extension
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.nameWithoutExtension
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.IoUtils.collectAllFiles
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DynamicContainer.dynamicContainer
@@ -103,7 +105,9 @@ abstract class BundleMessagesTest : IdeaTest() {
       dynamicContainer(
         messageBundle.bundleName,
         messageBundle.referenceLanguageMessages().keys.map {
-          dynamicTest(it) { assertThat(usedMessageKeys).contains(it) }
+          dynamicTest(it) {
+            assertThat(usedMessageKeys).describedAs("No unused messages bundle keys").contains(it)
+          }
         },
       )
     }
@@ -114,14 +118,14 @@ abstract class BundleMessagesTest : IdeaTest() {
    * the `messageKey` is a [String]. Overridden methods may add additional [MessagesBundleUsage].
    */
   protected open fun collectAllMessageBundleUsages(): List<MessagesBundleUsage> =
-    moduleKotlinClassesKotlinMain.flatMap { classFile ->
+    classFilesToScanForMessagesBundleUsages().flatMap { classFile ->
       val usages = mutableListOf<MessagesBundleUsage>()
 
       classFile
         .readClass()
         .accept(MessageCallsClassVisitor(classFile.nameWithoutExtension(), usages), 0)
 
-      return usages
+      usages
     }
 
   protected fun Path.readClass() = ClassReader(Files.readAllBytes(this))
@@ -129,6 +133,13 @@ abstract class BundleMessagesTest : IdeaTest() {
   protected fun getMessagesBundle(bundleName: String) =
     messagesBundles.firstOrNull { it.bundleName == bundleName }
       ?: error("Bundle `$bundleName` not found")
+
+  protected open fun classFilesToScanForMessagesBundleUsages(): List<Path> {
+    val classFiles =
+      Paths.get("build/classes/kotlin/main").collectAllFiles().filter { it.extension() == "class" }
+    assertThat(classFiles).hasSizeGreaterThanOrEqualTo(1)
+    return classFiles
+  }
 
   // -- Private Methods ----------------------------------------------------- //
 
@@ -168,6 +179,7 @@ abstract class BundleMessagesTest : IdeaTest() {
 
     private var lastStringLdcInsn: String? = null
     private var lastIconstInsn: Int? = null
+    private var lastIconstInsnPrecedingAnewArray: Int? = null
 
     override fun visitInsn(opcode: Int) {
       lastIconstInsn =
@@ -182,6 +194,14 @@ abstract class BundleMessagesTest : IdeaTest() {
         }
 
       super.visitInsn(opcode)
+    }
+
+    override fun visitTypeInsn(opcode: Int, type: String?) {
+      if (opcode == Opcodes.ANEWARRAY) {
+        lastIconstInsnPrecedingAnewArray = lastIconstInsn
+      }
+
+      super.visitTypeInsn(opcode, type)
     }
 
     override fun visitLdcInsn(value: Any?) {
@@ -208,7 +228,9 @@ abstract class BundleMessagesTest : IdeaTest() {
               className = className,
               bundleName = owner.substringAfterLast("/"),
               messageKey = lastStringLdcInsn ?: error("No latest LDC instruction captured"),
-              parametersCount = lastIconstInsn ?: error("No last ICONST instruction captured"),
+              parametersCount =
+                lastIconstInsnPrecedingAnewArray
+                  ?: error("No last ICONST before ANEWARRAY instruction captured"),
             )
           )
         }
@@ -246,9 +268,6 @@ abstract class BundleMessagesTest : IdeaTest() {
     lateinit var kotlinSourceFiles: List<Path>
       private set
 
-    lateinit var moduleKotlinClassesKotlinMain: List<Path>
-      private set
-
     private const val REFERENCE_LANGUAGE_KEY = "en"
 
     @BeforeAll
@@ -260,12 +279,6 @@ abstract class BundleMessagesTest : IdeaTest() {
       kotlinSourceFiles =
         Paths.get("src/main/kotlin").collectAllFiles().filter { it.extension() == "kt" }
       assertThat(kotlinSourceFiles).hasSizeGreaterThanOrEqualTo(1)
-
-      moduleKotlinClassesKotlinMain =
-        Paths.get("build/classes/kotlin/main").collectAllFiles().filter {
-          it.extension() == "class"
-        }
-      assertThat(moduleKotlinClassesKotlinMain).hasSizeGreaterThanOrEqualTo(1)
     }
 
     private fun collectAllMessageBundles(messagesBundlesDir: File): List<MessagesBundle> {

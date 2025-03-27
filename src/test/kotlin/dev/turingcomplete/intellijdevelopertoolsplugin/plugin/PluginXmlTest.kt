@@ -58,7 +58,7 @@ class PluginXmlTest {
     val missingReferencedFiles =
       referencedFiles.filter {
         println("Loading file: $it")
-        PluginXmlTest::class.java.getResource(it) == null
+        this::class.java.getResource(it) == null
       }
 
     assertThat(missingReferencedFiles).describedAs("No missing referenced files").isEmpty()

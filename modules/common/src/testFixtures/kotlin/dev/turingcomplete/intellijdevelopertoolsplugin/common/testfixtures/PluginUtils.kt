@@ -1,3 +1,5 @@
+package dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures
+
 import java.nio.file.Paths
 import java.util.Properties
 import kotlin.io.path.inputStream

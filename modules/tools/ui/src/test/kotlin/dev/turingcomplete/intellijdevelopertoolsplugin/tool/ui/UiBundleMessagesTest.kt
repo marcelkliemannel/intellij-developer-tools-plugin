@@ -1,7 +1,7 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui
 
-import BundleMessagesTest
 import com.intellij.testFramework.junit5.RunMethodInEdt
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.BundleMessagesTest
 import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.TestFactory
 

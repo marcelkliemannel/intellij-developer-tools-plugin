@@ -1,3 +1,4 @@
+package dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer

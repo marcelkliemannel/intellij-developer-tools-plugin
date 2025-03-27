@@ -1,10 +1,11 @@
-package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter
+package dev.turingcomplete.intellijdevelopertoolsplugin.plugin
 
 import com.intellij.openapi.Disposable
 import com.intellij.testFramework.junit5.TestApplication
 import com.intellij.testFramework.junit5.TestDisposable
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.CliCommandConverter
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.UUID

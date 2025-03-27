@@ -8,7 +8,6 @@ import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.ToolsMenuTree
 import javax.swing.Action
 import javax.swing.JComponent
 
@@ -32,7 +31,7 @@ class ChangelogDialog(project: Project?, parentComponent: JComponent) :
         panel {
             row {
                 text(
-                    ToolsMenuTree::class.java.getResource(CHANGELOG_HTML_FILE)?.readText()
+                    this::class.java.getResource(CHANGELOG_HTML_FILE)?.readText()
                       ?: "Couldn't find 'What's New' text"
                   )
                   .resizableColumn()
