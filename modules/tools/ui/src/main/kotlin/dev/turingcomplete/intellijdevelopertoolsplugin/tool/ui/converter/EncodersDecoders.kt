@@ -14,8 +14,7 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 
-// -- Properties
-// ---------------------------------------------------------------------------------------------------- //
+// -- Properties ---------------------------------------------------------- //
 
 val encoderDecoderTextConverterContext =
   TextConverter.TextConverterContext(
@@ -25,14 +24,9 @@ val encoderDecoderTextConverterContext =
     targetTitle = "Encoded",
   )
 
-// -- Exposed Methods
-// -----------------------------------------------------------------------------------------------
-// //
-// -- Private Methods
-// -----------------------------------------------------------------------------------------------
-// //
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Exported Methods ---------------------------------------------------- //
+// -- Private Methods  ---------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 class Base32EncoderDecoder(
   configuration: DeveloperToolConfiguration,
@@ -75,8 +69,7 @@ class Base32EncoderDecoder(
   }
 }
 
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 class Base64EncoderDecoder(
   configuration: DeveloperToolConfiguration,
@@ -119,8 +112,7 @@ class Base64EncoderDecoder(
   }
 }
 
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 class UrlBase64EncoderDecoder(
   configuration: DeveloperToolConfiguration,
@@ -163,8 +155,7 @@ class UrlBase64EncoderDecoder(
   }
 }
 
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 class MimeBase64EncoderDecoder(
   configuration: DeveloperToolConfiguration,
@@ -207,8 +198,7 @@ class MimeBase64EncoderDecoder(
   }
 }
 
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 class AsciiEncoderDecoder(
   configuration: DeveloperToolConfiguration,
@@ -251,8 +241,7 @@ class AsciiEncoderDecoder(
   }
 }
 
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 class UrlEncodingEncoderDecoder(
   configuration: DeveloperToolConfiguration,
@@ -295,5 +284,4 @@ class UrlEncodingEncoderDecoder(
   }
 }
 
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //

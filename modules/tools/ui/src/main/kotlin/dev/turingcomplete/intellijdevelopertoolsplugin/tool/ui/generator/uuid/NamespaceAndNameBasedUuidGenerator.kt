@@ -13,8 +13,8 @@ import com.intellij.ui.dsl.builder.text
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.NamespaceAndNameBasedUuidGenerator.NamespaceMode.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.NamespaceAndNameBasedUuidGenerator.NamespaceMode.PREDEFINED
 import java.security.MessageDigest

@@ -11,12 +11,12 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.selected
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.bindIntTextImproved
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindIntTextImproved
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_LOWERCASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_UPPERCASE

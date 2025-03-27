@@ -6,14 +6,12 @@ import java.util.HexFormat
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
-// -- Properties
-// ---------------------------------------------------------------------------------------------------- //
+// -- Properties ---------------------------------------------------------- //
+// -- Initialization ------------------------------------------------------ //
 
 private val asciiEncodedRegex = "\\\\u([0-9a-fA-F]{4})".toRegex()
 
-// -- Exposed Methods
-// -----------------------------------------------------------------------------------------------
-// //
+// -- Exported Methods ---------------------------------------------------- //
 
 inline fun <reified T> Any.safeCastTo(): T? = this as? T
 
@@ -84,8 +82,5 @@ fun <T : Enum<T>> KClass<T>.findEnumValueByName(name: String): T? =
 fun <T : Enum<T>> KClass<T>.getEnumValueByNameOrThrow(name: String): T =
   this.java.enumConstants?.find { it.name == name } ?: error("Enum value $name not found in $this")
 
-// -- Private Methods
-// -----------------------------------------------------------------------------------------------
-// //
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Private Methods  ---------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //

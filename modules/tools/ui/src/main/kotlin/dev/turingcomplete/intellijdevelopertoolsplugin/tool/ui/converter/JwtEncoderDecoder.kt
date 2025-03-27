@@ -44,8 +44,6 @@ import com.intellij.util.ExceptionUtil
 import com.intellij.util.text.DateFormatUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.decodeBase64String
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.registerDynamicToolTip
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.setValidationResultBorder
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
@@ -62,6 +60,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEd
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.SimpleToggleAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.registerDynamicToolTip
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.setValidationResultBorder
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.ChangeOrigin.ENCODED
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.ChangeOrigin.HEADER_OR_PAYLOAD
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.ChangeOrigin.SIGNATURE_CONFIGURATION

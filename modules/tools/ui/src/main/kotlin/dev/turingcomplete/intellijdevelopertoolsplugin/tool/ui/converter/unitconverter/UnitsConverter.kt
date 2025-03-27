@@ -8,13 +8,13 @@ import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.util.ui.JBUI.Borders
 import com.intellij.util.ui.components.BorderLayoutPanel
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.ScrollPaneBuilder
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.ResetListener
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ScrollPaneBuilder
 import javax.swing.ScrollPaneConstants
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener

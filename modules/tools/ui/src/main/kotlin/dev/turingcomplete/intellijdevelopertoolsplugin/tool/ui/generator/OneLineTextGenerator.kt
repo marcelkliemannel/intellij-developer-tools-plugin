@@ -18,8 +18,6 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.monospaceFont
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.not
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
@@ -28,6 +26,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEd
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.BooleanComponentPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.CopyAction.Companion.CONTENT_DATA_KEY
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.monospaceFont
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.not
 import java.awt.Font
 
 abstract class OneLineTextGenerator(

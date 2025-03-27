@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugin.common
+package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.DataProvider
@@ -12,6 +12,9 @@ import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.ColumnInfo
 import com.intellij.util.ui.ListTableModel
 import com.intellij.util.ui.UIUtil
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.CopyValuesAction
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.PluginCommonDataKeys
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
 import java.awt.Dimension
 import javax.swing.ListSelectionModel
 import javax.swing.SortOrder

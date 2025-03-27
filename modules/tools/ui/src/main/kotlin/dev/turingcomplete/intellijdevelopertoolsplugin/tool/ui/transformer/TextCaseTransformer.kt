@@ -8,11 +8,11 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.selected
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.AUTOMATIC_DETECTION
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.FIXED_TEXT_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.INDIVIDUAL_DELIMITER

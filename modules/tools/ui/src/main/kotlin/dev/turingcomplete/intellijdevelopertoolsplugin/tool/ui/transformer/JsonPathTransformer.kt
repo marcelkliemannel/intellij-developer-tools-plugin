@@ -35,7 +35,6 @@ import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.JsonPathException
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
@@ -44,6 +43,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.copyable
 import org.intellij.lang.annotations.Language
 import javax.swing.JComponent
 

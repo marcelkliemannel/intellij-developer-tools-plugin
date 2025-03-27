@@ -9,11 +9,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.TextConverter.TextConverterContext
 import org.apache.commons.text.StringEscapeUtils
 
-// -- Properties
-// ---------------------------------------------------------------------------------------------------- //
-// -- Exposed Methods
-// -----------------------------------------------------------------------------------------------
-// //
+// -- Properties ---------------------------------------------------------- //
+// -- Exported Methods ---------------------------------------------------- //
 
 fun createEscapeUnescapeContext(title: String) =
   TextConverterContext(
@@ -24,11 +21,8 @@ fun createEscapeUnescapeContext(title: String) =
     diffSupport = TextConverter.DiffSupport(title = title),
   )
 
-// -- Private Methods
-// -----------------------------------------------------------------------------------------------
-// //
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Private Methods  ---------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 class HtmlEntitiesEscape(
   configuration: DeveloperToolConfiguration,
@@ -75,8 +69,7 @@ class HtmlEntitiesEscape(
   }
 }
 
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 class JavaStringEscape(
   configuration: DeveloperToolConfiguration,
@@ -123,8 +116,7 @@ class JavaStringEscape(
   }
 }
 
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 class JsonTextEscape(
   configuration: DeveloperToolConfiguration,
@@ -171,8 +163,7 @@ class JsonTextEscape(
   }
 }
 
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 class CsvTextEscape(
   configuration: DeveloperToolConfiguration,
@@ -219,8 +210,7 @@ class CsvTextEscape(
   }
 }
 
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 class XmlTextEscape(
   configuration: DeveloperToolConfiguration,

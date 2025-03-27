@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugin.common
+package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common
 
 import com.intellij.lang.Language
 import com.intellij.openapi.actionSystem.ActionGroup
@@ -40,15 +40,12 @@ import javax.swing.ToolTipManager
 import javax.swing.border.CompoundBorder
 import kotlin.reflect.KClass
 
-// -- Properties
-// ---------------------------------------------------------------------------------------------------- //
+// -- Properties ---------------------------------------------------------- //
 
 val longMaxValue = BigDecimal(Long.MAX_VALUE)
 val longMinValue = BigDecimal(Long.MIN_VALUE)
 
-// -- Exposed Methods
-// -----------------------------------------------------------------------------------------------
-// //
+// -- Exported Methods ---------------------------------------------------- //
 
 /** The UI DSL only verifies the range of an `intTextField` on a user input. */
 @Suppress("UnstableApiUsage")
@@ -291,19 +288,15 @@ fun <T : Enum<T>> KClass<T>.valueOf(name: String): T {
     ?: error("Enum $this does not have a constant with name: $name")
 }
 
-// -- Private Methods
-// -----------------------------------------------------------------------------------------------
-// //
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Private Methods  ---------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 enum class ValidateMinIntValueSide {
   MIN,
   MAX,
 }
 
-// -- Type
-// ---------------------------------------------------------------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //
 
 enum class ToolBarPlace(val horizontal: Boolean) {
 

@@ -47,11 +47,6 @@ import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
 import com.intellij.util.ui.JBUI
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValidateMinIntValueSide
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.bindIntTextImproved
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.toJBColor
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.validateLongValue
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.validateMinMaxValueRelation
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
@@ -60,6 +55,11 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ValidateMinIntValueSide
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindIntTextImproved
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.toJBColor
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateLongValue
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateMinMaxValueRelation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.LEVEL_BITS
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.LEVEL_ENUM_NAME
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.UNSUPPORTED

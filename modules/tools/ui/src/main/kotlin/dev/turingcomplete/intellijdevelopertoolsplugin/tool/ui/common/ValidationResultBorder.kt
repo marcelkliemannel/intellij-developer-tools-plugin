@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugin.common
+package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common
 
 import com.intellij.util.ObjectUtils
 import com.intellij.util.ui.JBUI

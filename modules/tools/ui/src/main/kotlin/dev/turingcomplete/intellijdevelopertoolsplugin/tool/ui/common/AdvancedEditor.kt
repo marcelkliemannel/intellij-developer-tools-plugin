@@ -48,11 +48,7 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getEditor
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.ToolBarPlace
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValidationResultBorder
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.setLanguage
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.wrapWithToolBar
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings.Companion.generalSettings

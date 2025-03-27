@@ -20,7 +20,6 @@ import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.util.ui.JBUI
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.toJBColor
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
@@ -29,6 +28,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.NotBlankInputValidator
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.toJBColor
 import java.awt.Color
 import java.util.Locale
 import javax.swing.border.LineBorder

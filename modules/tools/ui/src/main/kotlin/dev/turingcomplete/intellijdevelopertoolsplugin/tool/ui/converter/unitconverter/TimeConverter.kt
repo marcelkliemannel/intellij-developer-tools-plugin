@@ -10,11 +10,11 @@ import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.layout.not
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.isWithinLongRange
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.validateBigDecimalValue
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.PropertyComponentPredicate
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.isWithinLongRange
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateBigDecimalValue
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.CENTURIES
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.DAYS
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.TimeConverter.ChangeOrigin.DECADES

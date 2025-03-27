@@ -19,14 +19,14 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.bindLongTextImproved
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.not
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.CopyAction
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindLongTextImproved
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.not
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateLongValue
 import java.time.format.DateTimeFormatter
 
 class UlidGenerator(

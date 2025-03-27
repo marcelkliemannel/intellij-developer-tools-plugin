@@ -15,9 +15,9 @@ import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.LocaleContainer
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.LocaleContainer.Companion.ALL_AVAILABLE_LOCALES
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.bindIntTextImproved
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindIntTextImproved
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateLongValue
 import java.math.BigDecimal
 import java.math.MathContext
 import java.text.DecimalFormat

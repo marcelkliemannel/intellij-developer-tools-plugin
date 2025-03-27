@@ -9,7 +9,6 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.Alarm
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.SimpleTable
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextStatisticUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
@@ -19,13 +18,14 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor.EditorMode
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.SimpleTable
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.simpleColumnInfo
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.TextStatistic.OpenTextStatisticContext
-import javax.swing.SortOrder
 import org.apache.commons.text.StringEscapeUtils
+import javax.swing.SortOrder
 
 class TextStatistic(
   private val context: DeveloperUiToolContext,

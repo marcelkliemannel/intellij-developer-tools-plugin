@@ -35,7 +35,6 @@ import com.intellij.util.ui.ListTableModel
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.PluginCommonDataKeys
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.extension
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.setContextMenu
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
@@ -43,6 +42,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.simpleColumnInfo
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.setContextMenu
 import java.awt.Dimension
 import java.net.URLClassLoader
 import java.nio.file.Files

@@ -11,9 +11,9 @@ import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.toHexMacAddress
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.LOCAL_INTERFACE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.RANDOM

@@ -35,7 +35,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.PluginCommonDataKeys
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.getOrNull
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.setContextMenu
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
@@ -46,6 +45,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEd
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.RegexTextField
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.SelectRegexOptionsAction
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.setContextMenu
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.RegularExpressionMatcher.MatchResultType.MATCH
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.RegularExpressionMatcher.MatchResultType.NAMED_GROUP
