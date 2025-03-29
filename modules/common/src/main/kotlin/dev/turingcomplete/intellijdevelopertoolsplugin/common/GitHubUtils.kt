@@ -7,11 +7,11 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.OkHttpClientUtils.applyIntelliJProxySettings
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 object GitHubUtils {
   // -- Properties ---------------------------------------------------------- //

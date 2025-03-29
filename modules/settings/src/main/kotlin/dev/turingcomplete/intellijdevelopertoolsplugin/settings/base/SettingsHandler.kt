@@ -3,6 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.settings.base
 import com.jetbrains.rd.generator.nova.GenerationSpec.Companion.nullIfEmpty
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingValue.Companion.findAmbiguousSettingValueAnnotation
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsGroup.Companion.defaultSettingsGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.message.SettingsBundle
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
@@ -37,13 +38,13 @@ object SettingsHandler {
     val settingProperties: LinkedHashMap<String, AnySettingProperty> by lazy {
       collectSettingsProperties()
     }
-    private var modificationsCounter: Int = 0
 
     override fun invoke(proxy: Any, method: Method, args: Array<out Any>?): Any? {
       val methodName = method.name
       val noArgs = args?.isEmpty() != false
       return when {
-        methodName == "getModificationsCounter" && noArgs -> modificationsCounter
+        methodName == "getModificationsCounter" && noArgs ->
+          settingProperties.map { it.value.modificationsCounter }.sum()
 
         methodName == "getSetting" && args?.size == 1 ->
           settingProperties[args.first()] ?: error("Setting `${args.first()}` does not exist")
@@ -51,19 +52,6 @@ object SettingsHandler {
         methodName.startsWith("get") && noArgs -> {
           val settingName = methodName.removePrefix("get").replaceFirstChar { it.lowercase() }
           settingProperties[settingName] ?: error("Setting `$settingName` does not exist")
-        }
-
-        methodName.startsWith("set") && args?.size == 1 -> {
-          val settingName = methodName.removePrefix("set").replaceFirstChar { it.lowercase() }
-          val setting =
-            settingProperties[settingName] ?: error("Setting `$settingName` does not exist")
-          val value = args.first()
-          if (setting.get() != value) {
-            setting.set(value)
-            modificationsCounter++
-            setting
-          }
-          null
         }
 
         else -> error("Unknown method: $methodName(${args?.joinToString() ?: ""})")
@@ -75,22 +63,28 @@ object SettingsHandler {
     private fun collectSettingsProperties(): LinkedHashMap<String, AnySettingProperty> {
       val settingsGroups = kclass.findAnnotations<SettingsGroup>().associateBy { it.id }
 
+      fun String.getSettingsGroup(): SettingsGroup =
+        this.nullIfEmpty()?.let { settingsGroups[it] ?: error("Unknown settings group ID: $it") }
+          ?: defaultSettingsGroup
+
       return kclass.memberProperties
         .filter { it.name != "modificationsCounter" }
         .associateTo(LinkedHashMap()) { property ->
           val setting = property.findAnnotation<Setting>()
           val internalSetting = property.findAnnotation<InternalSetting>()
-          val (title, description, settingsGroup) =
+          val (descriptor, settingsGroup) =
             if (setting != null && internalSetting == null) {
-              Triple(
-                SettingsBundle.message(setting.titleBundleKey),
-                setting.descriptionBundleKey.nullIfEmpty()?.let { SettingsBundle.message(it) },
-                setting.groupId.nullIfEmpty()?.let {
-                  settingsGroups[it] ?: error("Unknown settings group ID: $it")
-                },
+              Pair(
+                SettingProperty.Descriptor(
+                  title = SettingsBundle.message(setting.titleBundleKey),
+                  description =
+                    setting.descriptionBundleKey.nullIfEmpty()?.let { SettingsBundle.message(it) },
+                  order = setting.order,
+                ),
+                setting.groupId.getSettingsGroup(),
               )
             } else if (setting == null && internalSetting != null) {
-              Triple("", "", null)
+              Pair(null, internalSetting.groupId.getSettingsGroup())
             } else {
               error(
                 "Property `${property.name}` requires either ${Setting::class.simpleName} or ${InternalSetting::class.simpleName} annotation"
@@ -107,24 +101,21 @@ object SettingsHandler {
             when (settingValue) {
               is IntValue ->
                 IntSettingProperty(
-                  title = title,
-                  description = description,
+                  descriptor = descriptor,
                   group = settingsGroup,
                   settingValue = settingValue,
                 )
 
               is BooleanValue ->
                 BooleanSettingProperty(
-                  title = title,
-                  description = description,
+                  descriptor = descriptor,
                   group = settingsGroup,
                   settingValue = settingValue,
                 )
 
               is EnumValue<*> ->
                 EnumSettingProperty(
-                  title = title,
-                  description = description,
+                  descriptor = descriptor,
                   group = settingsGroup,
                   settingValue = settingValue,
                 )
@@ -159,6 +150,4 @@ object SettingsHandler {
       settingProperties.forEach { it.value.set(parent.settingProperties[it.key]!!.get()) }
     }
   }
-
-  // -- Inner Type ---------------------------------------------------------- //
 }

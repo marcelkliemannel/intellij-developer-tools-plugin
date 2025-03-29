@@ -12,9 +12,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.GeneralSettings.
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.Settings
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsHandler.settingsContainer
-import org.jdom.Element
 import java.security.Provider
 import java.security.Security
+import org.jdom.Element
 
 @Service
 @State(

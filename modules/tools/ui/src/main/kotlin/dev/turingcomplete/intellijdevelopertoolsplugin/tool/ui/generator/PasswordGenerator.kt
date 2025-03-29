@@ -21,9 +21,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.Passwor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_LOWERCASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_UPPERCASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.NONE
-import org.apache.commons.text.RandomStringGenerator
 import java.security.SecureRandom
 import javax.swing.JComponent
+import org.apache.commons.text.RandomStringGenerator
 
 class PasswordGenerator(
   project: Project?,

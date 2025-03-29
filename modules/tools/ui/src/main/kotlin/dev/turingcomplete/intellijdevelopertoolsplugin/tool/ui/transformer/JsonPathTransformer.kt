@@ -44,8 +44,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.copyable
-import org.intellij.lang.annotations.Language
 import javax.swing.JComponent
+import org.intellij.lang.annotations.Language
 
 class JsonPathTransformer(
   context: DeveloperUiToolContext,

@@ -4,25 +4,26 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.findEnumValueByNam
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.getEnumValueByNameOrThrow
 
 class EnumSettingProperty<T : Enum<T>>(
-  title: String,
-  description: String?,
-  group: SettingsGroup?,
+  descriptor: Descriptor?,
+  group: SettingsGroup,
   settingValue: EnumValue<T>,
 ) :
   SettingProperty<T, EnumValue<T>>(
-    title = title,
-    description = description,
+    descriptor = descriptor,
     group = group,
     settingValue = settingValue,
     initialValue = getDefaultValue(settingValue),
   ) {
   // -- Properties ---------------------------------------------------------- //
+
+  private val defaultValue = getDefaultValue(settingValue)
+
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
   override fun toPersistent(): String? {
     val value = get()
-    return if (value != getDefaultValue(settingValue)) {
+    return if (value != defaultValue) {
       value.name
     } else {
       null

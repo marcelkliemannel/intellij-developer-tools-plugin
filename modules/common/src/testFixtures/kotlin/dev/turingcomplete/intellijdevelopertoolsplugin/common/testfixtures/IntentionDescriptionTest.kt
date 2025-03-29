@@ -2,11 +2,11 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures
 
 import com.intellij.codeInsight.intention.IntentionAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.IoUtils.collectAllFiles
+import java.io.File
+import java.lang.reflect.Modifier
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.DynamicTest
-import java.io.File
-import java.lang.reflect.Modifier
 
 abstract class IntentionDescriptionTest {
   // -- Properties ---------------------------------------------------------- //

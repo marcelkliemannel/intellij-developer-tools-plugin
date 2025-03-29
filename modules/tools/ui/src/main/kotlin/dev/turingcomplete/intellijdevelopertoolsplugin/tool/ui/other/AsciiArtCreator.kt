@@ -129,6 +129,10 @@ class AsciiArtCreator(
     syncFonts()
   }
 
+  override fun reset() {
+    createAsciiArt()
+  }
+
   // -- Private Methods ----------------------------------------------------- //
 
   private fun downloadAdditionalAsciiArtFonts(downloadFontsButton: JButton) {

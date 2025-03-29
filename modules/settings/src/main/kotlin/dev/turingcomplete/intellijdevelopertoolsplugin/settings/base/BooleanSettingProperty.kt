@@ -2,14 +2,12 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.settings.base
 
 @Suppress("UNCHECKED_CAST")
 class BooleanSettingProperty(
-  title: String,
-  description: String?,
-  group: SettingsGroup?,
+  descriptor: Descriptor?,
+  group: SettingsGroup,
   settingValue: BooleanValue,
 ) :
   SettingProperty<Boolean, BooleanValue>(
-    title = title,
-    description = description,
+    descriptor = descriptor,
     group = group,
     settingValue = settingValue,
     initialValue = settingValue.defaultValue,

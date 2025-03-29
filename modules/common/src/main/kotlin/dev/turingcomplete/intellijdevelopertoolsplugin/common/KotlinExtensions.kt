@@ -77,7 +77,8 @@ fun String.decodeFromAscii() =
     charCode.toChar().toString()
   }
 
-fun String.decodeBase64String(): String = String(Base64.getDecoder().decode(this))
+fun String.decodeBase64String(): String =
+  if (this.isNotEmpty()) String(Base64.getDecoder().decode(this)) else ""
 
 fun MatchGroupCollection.getOrNull(index: Int): MatchGroup? =
   if (index in 0 until size) this[index] else null

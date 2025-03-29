@@ -420,7 +420,7 @@ class AdvancedEditor(
     override fun documentChanged(event: DocumentEvent) {
       val currentText = event.document.text
 
-      textProperty.set(value = currentText, changeId = TEXT_CHANGE_FROM_DOCUMENT_LISTENER)
+      textProperty.set(newValue = currentText, changeId = TEXT_CHANGE_FROM_DOCUMENT_LISTENER)
 
       if (editor.getUserData(editorActiveKey)!!) {
         onTextChangeFromUi.forEach { it(currentText) }

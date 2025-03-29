@@ -48,8 +48,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AnActionOp
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.createPopup
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.awt.datatransfer.StringSelection
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
@@ -74,6 +72,8 @@ import javax.net.ssl.X509TrustManager
 import javax.security.auth.x500.X500Principal
 import javax.swing.JComponent
 import javax.swing.event.HyperlinkEvent
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 class ServerCertificates(
   private val project: Project?,

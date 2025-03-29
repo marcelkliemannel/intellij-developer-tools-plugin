@@ -2,14 +2,14 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.common
 
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.util.net.JdkProxyProvider
-import okhttp3.OkHttpClient
-import okhttp3.Protocol
 import java.io.IOException
 import java.net.Proxy
 import java.net.ProxySelector
 import java.net.SocketAddress
 import java.net.URI
 import java.util.Collections
+import okhttp3.OkHttpClient
+import okhttp3.Protocol
 
 object OkHttpClientUtils {
   // -- Properties ---------------------------------------------------------- //

@@ -10,4 +10,14 @@ annotation class SettingsGroup(
   val id: String,
   @PropertyKey(resourceBundle = SETTINGS_BUNDLE_ID) val titleBundleKey: String,
   @PropertyKey(resourceBundle = SETTINGS_BUNDLE_ID) val descriptionBundleKey: String = "",
-)
+  val order: Int,
+) {
+
+  companion object {
+
+    fun SettingsGroup.isDefaultGroup(): Boolean = this == defaultSettingsGroup
+
+    val defaultSettingsGroup =
+      SettingsGroup(id = "defaultGroup", titleBundleKey = "", descriptionBundleKey = "", order = -1)
+  }
+}

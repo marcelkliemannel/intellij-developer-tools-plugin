@@ -7,8 +7,8 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
-import org.jetbrains.annotations.Nls
 import javax.swing.JComponent
+import org.jetbrains.annotations.Nls
 
 data class DeveloperUiToolPresentation(
   @Nls(capitalization = Nls.Capitalization.Title) val menuTitle: String,

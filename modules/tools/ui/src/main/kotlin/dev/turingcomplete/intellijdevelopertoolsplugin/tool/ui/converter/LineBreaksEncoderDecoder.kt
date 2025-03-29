@@ -33,8 +33,8 @@ class LineBreaksEncoderDecoder(
   override fun toTarget(text: String) {
     targetText.set(
       when (lineBreakDecoding.get()) {
-        LineBreak.CRLF -> StringUtil.convertLineSeparators(text, "\r\n")
-        LineBreak.LF -> StringUtil.convertLineSeparators(text, "\n")
+        LineBreak.CRLF -> StringUtil.convertLineSeparators(text, "\\r\\n")
+        LineBreak.LF -> StringUtil.convertLineSeparators(text, "\\n")
       }
     )
   }
@@ -55,12 +55,12 @@ class LineBreaksEncoderDecoder(
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //
 
-  private enum class LineBreak(val title: String) {
+  private enum class LineBreak(val displayText: String) {
 
-    CRLF("\r\n"),
-    LF("\n");
+    CRLF("\\r\\n"),
+    LF("\\n");
 
-    override fun toString(): String = title
+    override fun toString(): String = displayText
   }
 
   // -- Inner Type ---------------------------------------------------------- //

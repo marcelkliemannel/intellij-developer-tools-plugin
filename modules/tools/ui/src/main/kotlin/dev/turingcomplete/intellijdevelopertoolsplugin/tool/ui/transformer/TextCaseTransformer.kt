@@ -19,9 +19,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextC
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.TextCase.COBOL_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.TextCase.STRICT_CAMEL_CASE
 import dev.turingcomplete.textcaseconverter.StandardTextCases
+import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 import dev.turingcomplete.textcaseconverter.toTextCase
 import dev.turingcomplete.textcaseconverter.toWordsSplitter
-import dev.turingcomplete.textcaseconverter.TextCase as StandardTextCase
 
 class TextCaseTransformer(
   context: DeveloperUiToolContext,

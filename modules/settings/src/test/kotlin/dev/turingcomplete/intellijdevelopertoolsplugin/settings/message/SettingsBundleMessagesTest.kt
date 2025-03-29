@@ -5,6 +5,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.nameWithoutExtensi
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.BundleMessagesTest
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.Setting
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsGroup
+import java.nio.file.Path
 import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.TestFactory
 import org.objectweb.asm.AnnotationVisitor
@@ -12,7 +13,6 @@ import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
-import java.nio.file.Path
 
 class SettingsBundleMessagesTest : BundleMessagesTest() {
   // -- Properties ---------------------------------------------------------- //

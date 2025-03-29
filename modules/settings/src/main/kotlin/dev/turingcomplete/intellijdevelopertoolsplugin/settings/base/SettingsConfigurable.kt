@@ -1,7 +1,7 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.settings.base
 
 import com.intellij.openapi.options.Configurable
-import com.intellij.ui.dsl.builder.MutableProperty
+import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.bindIntText
@@ -10,8 +10,11 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import com.jetbrains.rd.generator.nova.GenerationSpec.Companion.nullIfEmpty
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsGroup.Companion.isDefaultGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsHandler.settingsContainer
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.message.SettingsBundle
 import javax.swing.JComponent
+import kotlin.reflect.full.createInstance
 
 abstract class SettingsConfigurable<T : Settings>(protected val settings: T) : Configurable {
   // -- Properties ---------------------------------------------------------- //
@@ -24,15 +27,20 @@ abstract class SettingsConfigurable<T : Settings>(protected val settings: T) : C
   final override fun createComponent(): JComponent? = panel {
     derivatedSettingsContainer.settingProperties
       .asSequence()
+      .filter { it.value.descriptor != null }
       .groupBy({ it.value.group }, { it.value })
+      .toSortedMap { firstGroup, secondGroup ->
+        (firstGroup?.order ?: 0).compareTo(secondGroup?.order ?: 0)
+      }
       .forEach { group, settings ->
-        if (group != null) {
-          group(group.titleBundleKey) {
-            group.descriptionBundleKey.nullIfEmpty()?.let { row { comment(it) } }
-            buildGroupSettingsUi(this, group, settings)
-          }
+        val sortedSettings = settings.sortedBy { it.descriptor!!.order }
+        if (group.isDefaultGroup()) {
+          sortedSettings.forEach { buildSettingUi(it) }
         } else {
-          settings.forEach { buildSettingUi(it) }
+          group(SettingsBundle.message(group.titleBundleKey)) {
+            group.descriptionBundleKey.nullIfEmpty()?.let { row { comment(it) } }
+            buildGroupSettingsUi(this, group, sortedSettings)
+          }
         }
       }
   }
@@ -56,11 +64,12 @@ abstract class SettingsConfigurable<T : Settings>(protected val settings: T) : C
   }
 
   protected fun Panel.buildSettingUi(settingProperty: AnySettingProperty) {
+    val descriptor = settingProperty.descriptor as SettingProperty.Descriptor
     row {
         when (settingProperty) {
           is BooleanSettingProperty -> {
-            val checkBox = checkBox(settingProperty.title).bindSelected(settingProperty)
-            settingProperty.description?.let { checkBox.comment(it) }
+            val checkBox = checkBox(descriptor.title).bindSelected(settingProperty)
+            descriptor.description?.let { checkBox.comment(it) }
           }
 
           is IntSettingProperty -> {
@@ -70,16 +79,26 @@ abstract class SettingsConfigurable<T : Settings>(protected val settings: T) : C
                 endInclusive = settingProperty.settingValue.max,
               )
             val intTextField = intTextField(intRange).bindIntText(settingProperty)
-            intTextField.label(settingProperty.title)
-            settingProperty.description?.let { intTextField.comment(it) }
+            intTextField.label(descriptor.title)
+            descriptor.description?.let { intTextField.comment(it) }
           }
 
           is EnumSettingProperty<*> -> {
+            val enumValueRenderer =
+              SimpleListCellRenderer.create<Any> { label, value, _ ->
+                label.text =
+                  settingProperty.settingValue.displayTextProvider
+                    .createInstance()
+                    .toDisplayTextUncheckedCast(value)
+              }
             val comboBox =
-              comboBox(settingProperty.getAllEnumValues())
-                .bindItem(settingProperty.uncheckedCastTo<MutableProperty<Enum<*>?>>())
-                .label(settingProperty.title)
-            settingProperty.description?.let { comboBox.comment(it) }
+              comboBox(
+                  settingProperty.getAllEnumValues().uncheckedCastTo<List<Any>>(),
+                  enumValueRenderer,
+                )
+                .bindItem(settingProperty)
+                .label(descriptor.title)
+            descriptor.description?.let { comboBox.comment(it) }
           }
         }
       }

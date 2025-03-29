@@ -1,11 +1,11 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.common
 
+import java.security.spec.PKCS8EncodedKeySpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import java.security.spec.PKCS8EncodedKeySpec
 
 class CryptoUtilsTest {
   // -- Properties ---------------------------------------------------------- //

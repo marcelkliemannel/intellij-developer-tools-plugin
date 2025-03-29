@@ -72,6 +72,17 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEnco
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.ECDSA
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.HMAC
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.RSA
+import java.security.Key
+import java.security.KeyFactory
+import java.security.spec.PKCS8EncodedKeySpec
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Base64
+import java.util.Objects
+import java.util.StringJoiner
+import javax.swing.Icon
+import javax.swing.JComponent
 import org.apache.commons.codec.binary.Base32
 import org.jose4j.jws.AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256
 import org.jose4j.jws.AlgorithmIdentifiers.ECDSA_USING_P384_CURVE_AND_SHA384
@@ -84,17 +95,6 @@ import org.jose4j.jws.AlgorithmIdentifiers.RSA_USING_SHA384
 import org.jose4j.jws.AlgorithmIdentifiers.RSA_USING_SHA512
 import org.jose4j.jws.JsonWebSignature
 import org.jose4j.keys.HmacKey
-import java.security.Key
-import java.security.KeyFactory
-import java.security.spec.PKCS8EncodedKeySpec
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Base64
-import java.util.Objects
-import java.util.StringJoiner
-import javax.swing.Icon
-import javax.swing.JComponent
 
 class JwtEncoderDecoder(
   private val context: DeveloperUiToolContext,
@@ -197,7 +197,7 @@ class JwtEncoderDecoder(
     if (context.prioritizeVerticalLayout) {
       row {
           cell(
-              Splitter(true, 0.5f).apply {
+              Splitter(true, 0.3f).apply {
                 firstComponent = createHeaderEditorComponent()
                 secondComponent = createPayloadEditorComponent()
               }
@@ -681,7 +681,7 @@ class JwtEncoderDecoder(
           header.set(jwtParts[0])
           headerErrorHolder.add(error)
         }
-        parseAsJson(jwtParts[0].decodeBase64String(), handleError) {
+        parseAsJson(text = jwtParts[0], textIsBase64 = true, handleError) {
           parseHeader(it)
           header.set(ObjectMapperService.instance.prettyPrintJson(it))
         }
@@ -695,7 +695,7 @@ class JwtEncoderDecoder(
           payload.set(jwtParts[1])
           payloadErrorHolder.add(error)
         }
-        parseAsJson(jwtParts[1].decodeBase64String(), handleError) {
+        parseAsJson(text = jwtParts[1], textIsBase64 = true, handleError) {
           payload.set(ObjectMapperService.instance.prettyPrintJson(it))
         }
       } else {
@@ -765,7 +765,8 @@ class JwtEncoderDecoder(
     }
 
     fun setAlgorithmInHeader() {
-      parseAsJson(header.get(), { headerErrorHolder.add(it) }) { headerNode ->
+      parseAsJson(text = header.get(), textIsBase64 = false, { headerErrorHolder.add(it) }) {
+        headerNode ->
         if (headerNode is ObjectNode) {
           headerNode.put("alg", signature.algorithm.get().jwtHeaderValue)
           header.set(ObjectMapperService.instance.prettyPrintJson(headerNode))
@@ -796,11 +797,13 @@ class JwtEncoderDecoder(
 
     private fun parseAsJson(
       text: String,
+      textIsBase64: Boolean,
       handleError: (Exception) -> Unit,
       handleResult: (JsonNode) -> Unit,
     ) {
       try {
-        val jsonNode = ObjectMapperService.instance.jsonMapper().readTree(text)
+        val actualText = if (textIsBase64) text.decodeBase64String() else text
+        val jsonNode = ObjectMapperService.instance.jsonMapper().readTree(actualText)
         handleResult(jsonNode)
       } catch (e: Exception) {
         handleError(e)
@@ -929,24 +932,55 @@ class JwtEncoderDecoder(
     val description: String,
   ) {
 
-    ISSUER("iss", "Issuer", "The issuer of the JWT."),
-    SUBJECT("sub", "Subject", "The subject of the JWT (e.g., the user)."),
-    AUDIENCE("aud", "Audience", "The recipient for which the JWT is intended."),
-    EXPIRATION_TIME("exp", "Expiration Time", "The time after which the JWT expires."),
-    NOT_BEFORE_TIME(
-      "nbf",
-      "Not Before Time",
-      "The time before which the JWT must not be accepted for processing.",
+    TYP(fieldName = "typ", title = "Type", description = "Indicating that this token is a JWT."),
+    ISSUER(fieldName = "iss", title = "Issuer", description = "The issuer of the JWT."),
+    SUBJECT(fieldName = "sub", title = "Subject", description = "The subject of the JWT."),
+    AUDIENCE(fieldName = "aud", title = "Audience", description = "The recipient of the JWT."),
+    EXPIRATION_TIME(
+      fieldName = "exp",
+      title = "Expiration Time",
+      description = "JWT expiration time.",
     ),
-    ISSUED_AT_TIME("iat", "Issued at Time", "The time at which the JWT was issued."),
-    JWT_ID("jti", "JWT ID", "An Unique identifier of this JWT."),
-    ALG("alg", "Algorithm", "The algorithm to calculate the signature of this JWT."),
-    AZP("azp", "Authorized Party", "The party to which the JWT was issued."),
-    SID("sid", "Session ID", "An unique session ID."),
-    NONCE("nonce", "Nonce", "A value used to associate a client session with this JWT."),
-    AT_HASH("at_hash", "Access Token Hash Value", "The hash of an access token."),
-    C_HASH("c_hash", "Code Hash Value", "The hash of a code."),
-    ACT("act", "Actor", "The has of an access token.");
+    NOT_BEFORE_TIME(
+      fieldName = "nbf",
+      title = "Not Before Time",
+      description = "JWT valid after this time.",
+    ),
+    ISSUED_AT_TIME(
+      fieldName = "iat",
+      title = "Issued at Time",
+      description = "JWT issued at this time.",
+    ),
+    JWT_ID(fieldName = "jti", title = "JWT ID", description = "A unique identifier for the JWT."),
+    ALG(
+      fieldName = "alg",
+      title = "Algorithm",
+      description = "The algorithm to calculate the signature of this JWT.",
+    ),
+    AZP(
+      fieldName = "azp",
+      title = "Authorized Party",
+      description = "The party to which the JWT was issued.",
+    ),
+    SID(fieldName = "sid", title = "Session ID", description = "An unique session ID."),
+    NONCE(
+      fieldName = "nonce",
+      title = "Nonce",
+      description = "A value used to associate a client session with this JWT.",
+    ),
+    AT_HASH(
+      fieldName = "at_hash",
+      title = "Access Token Hash Value",
+      description = "The hash of an access token.",
+    ),
+    C_HASH(fieldName = "c_hash", title = "Code Hash Value", description = "The hash of a code."),
+    ACT(fieldName = "act", title = "Actor", description = "The has of an access token."),
+    AUTH_TIME(
+      fieldName = "auth_time",
+      title = "Authentication Time",
+      description = "Time of user authentication.",
+    ),
+    SCOPE(fieldName = "scope", title = "Scope", description = "Permissions granted to the token.");
 
     override fun toString(): String = "<html>$title ($fieldName)<br/>$description</html>"
 
@@ -982,6 +1016,7 @@ class JwtEncoderDecoder(
 
   private class ExtendedJsonWebSignature : JsonWebSignature() {
 
+    @Suppress("RedundantVisibilityModifier") // False-positive
     public override fun setEncodedHeader(encodedHeader: String?) {
       super.setEncodedHeader(encodedHeader)
     }
@@ -1004,7 +1039,7 @@ class JwtEncoderDecoder(
 
     private val UNIX_TIMESTAMP_SECONDS_JSON_VALUE_REGEX =
       Regex(":\\s*(?<unixTimestampSeconds>\\b\\d{1,10}\\b)")
-    private val CLAIM_REGEX = Regex("\\s?\"(?<name>[a-zA-Z]+)\":")
+    private val CLAIM_REGEX = Regex("\\s?\"(?<name>[a-zA-Z]+)\"\\s?:")
     private const val UNIX_TIMESTAMP_HIGHLIGHT_LAYER = HighlighterLayer.SELECTION - 1
     private const val CLAIM_REGEX_MATCH_HIGHLIGHT_LAYER = UNIX_TIMESTAMP_HIGHLIGHT_LAYER - 1
 

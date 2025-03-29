@@ -8,9 +8,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.LanguageTextField
 import com.intellij.util.ui.JBFont
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
+import java.lang.Boolean.TRUE
 import org.intellij.lang.regexp.RegExpLanguage
 import org.intellij.lang.regexp.intention.CheckRegExpForm
-import java.lang.Boolean.TRUE
 
 class RegexTextField(
   project: Project?,

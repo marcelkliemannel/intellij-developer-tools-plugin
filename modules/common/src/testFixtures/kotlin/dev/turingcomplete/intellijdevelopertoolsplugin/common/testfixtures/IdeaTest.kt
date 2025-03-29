@@ -7,9 +7,9 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.junit5.RunInEdt
 import com.intellij.testFramework.junit5.RunMethodInEdt
 import com.intellij.testFramework.junit5.TestApplication
+import kotlin.reflect.KClass
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import kotlin.reflect.KClass
 
 @RunInEdt(allMethods = false)
 @TestApplication

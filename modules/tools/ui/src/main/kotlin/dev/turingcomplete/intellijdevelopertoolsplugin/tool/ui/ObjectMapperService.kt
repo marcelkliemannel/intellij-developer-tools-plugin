@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.json.JsonReadFeature
 import com.fasterxml.jackson.core.json.JsonWriteFeature
 import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+import com.fasterxml.jackson.core.util.Separators
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper
@@ -58,7 +59,7 @@ class ObjectMapperService {
       return ""
     }
 
-    return jsonMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this)
+    return jsonMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode)
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -99,11 +100,20 @@ class ObjectMapperService {
           disable(JsonWriteFeature.WRITE_HEX_UPPER_CASE.mappedFeature())
         }
 
-        val indenter =
-          DefaultIndenter(" ".repeat(settings.writeIntentionSpaces.get()), System.lineSeparator())
-        val prettyPrinter =
-          DefaultPrettyPrinter().withObjectIndenter(indenter).withArrayIndenter(indenter)
-        defaultPrettyPrinter(prettyPrinter)
+        val indent = " ".repeat(settings.writeIntentionSpaces.get())
+        val lineSeparator = System.lineSeparator()
+        val indenter = DefaultIndenter(indent, lineSeparator)
+        defaultPrettyPrinter(
+          DefaultPrettyPrinter()
+            .withObjectIndenter(indenter)
+            .withArrayIndenter(indenter)
+            .withSeparators(
+              Separators.createDefaultInstance()
+                .withObjectFieldValueSpacing(settings.writeSpacingObjectFieldValue.get())
+                .withObjectEntrySpacing(settings.writeSpacingObjectEntry.get())
+                .withArrayValueSpacing(settings.writeSpacingArrayValue.get())
+            )
+        )
 
         // Reading settings
         if (settings.readAllowJavaComments.get()) {

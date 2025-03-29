@@ -12,9 +12,9 @@ import com.intellij.util.ui.UIUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.ContentNode
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.DeveloperToolNode
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.GroupNode
-import org.jdesktop.swingx.VerticalLayout
 import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants
+import org.jdesktop.swingx.VerticalLayout
 
 class GroupContentPanel(
   groupNode: GroupNode,

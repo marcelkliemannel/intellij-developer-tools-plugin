@@ -4,8 +4,8 @@ plugins {
 }
 
 dependencies {
-  implementation(libs.bundles.text.case.converter)
-  implementation(libs.okhttp)
+  api(libs.bundles.text.case.converter)
+  api(libs.okhttp)
 
   testImplementation(libs.assertj.core)
   testImplementation(libs.bundles.junit.implementation)

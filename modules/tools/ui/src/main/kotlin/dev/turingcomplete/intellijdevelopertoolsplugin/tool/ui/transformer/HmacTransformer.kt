@@ -27,10 +27,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateNo
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE32
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE64
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.RAW
-import org.apache.commons.codec.binary.Base32
 import java.security.Security
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import org.apache.commons.codec.binary.Base32
 
 class HmacTransformer(
   context: DeveloperUiToolContext,

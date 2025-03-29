@@ -3,6 +3,11 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.extension
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.nameWithoutExtension
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.IoUtils.collectAllFiles
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.Properties
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DynamicContainer.dynamicContainer
@@ -14,11 +19,6 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.Properties
 
 abstract class BundleMessagesTest : IdeaTest() {
   // -- Properties ---------------------------------------------------------- //

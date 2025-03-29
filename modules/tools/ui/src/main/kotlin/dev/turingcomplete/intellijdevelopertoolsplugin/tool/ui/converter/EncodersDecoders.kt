@@ -8,11 +8,11 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
-import org.apache.commons.codec.binary.Base32
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.Base64
+import org.apache.commons.codec.binary.Base32
 
 // -- Properties ---------------------------------------------------------- //
 

@@ -10,6 +10,8 @@ open class ValueProperty<T>(initialValue: T) : ObservableMutableProperty<T> {
 
   private val value = AtomicReference(initialValue)
   private val changeDispatcher = SingleEventDispatcher.create<ChangeEvent<T>>()
+  var modificationsCounter: Int = 0
+    private set
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
@@ -28,10 +30,15 @@ open class ValueProperty<T>(initialValue: T) : ObservableMutableProperty<T> {
     @Suppress("UNCHECKED_CAST") set(value as T, changeId)
   }
 
-  fun set(value: T, changeId: String?, fireEvent: Boolean = true) {
-    val oldValue = this.value.getAndSet(value)
+  fun set(newValue: T, changeId: String?, fireEvent: Boolean = true) {
+    val oldValue = this.value.getAndSet(newValue)
+
+    if (oldValue != newValue) {
+      modificationsCounter++
+    }
+
     if (fireEvent) {
-      changeDispatcher.fireEvent(ChangeEvent(changeId, oldValue, value))
+      changeDispatcher.fireEvent(ChangeEvent(changeId, oldValue, newValue))
     }
   }
 

@@ -24,8 +24,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.ha
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.TextStatistic.OpenTextStatisticContext
-import org.apache.commons.text.StringEscapeUtils
 import javax.swing.SortOrder
+import org.apache.commons.text.StringEscapeUtils
 
 class TextStatistic(
   private val context: DeveloperUiToolContext,
@@ -48,7 +48,6 @@ class TextStatistic(
   private val sentencesCounter = TextMetric("Sentences")
   private val averageWordsPerSentenceCounter = TextMetric("Average words per sentence")
   private val paragraphsCounter = TextMetric("Paragraphs")
-  private val characterCounter = TextMetric("Characters")
   private val uniqueCharactersCounter = TextMetric("Unique characters")
   private val lettersCounter = TextMetric("Letters")
   private val digitsCounter = TextMetric("Digits")
@@ -137,7 +136,6 @@ class TextStatistic(
           sentencesCounter,
           averageWordsPerSentenceCounter,
           paragraphsCounter,
-          characterCounter,
           uniqueCharactersCounter,
           lettersCounter,
           digitsCounter,
@@ -207,7 +205,6 @@ class TextStatistic(
       sentencesCounter.value = sentencesCount.toString()
       averageWordsPerSentenceCounter.value = "%.2f".format(averageWordsPerSentence)
       paragraphsCounter.value = paragraphsCount.toString()
-      characterCounter.value = charactersCount.toString()
       uniqueCharactersCounter.value = uniqueCharacters.size.toString()
       lettersCounter.value = lettersCount.toString()
       digitsCounter.value = digitsCount.toString()

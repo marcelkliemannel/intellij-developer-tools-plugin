@@ -5,12 +5,12 @@ import com.fasterxml.uuid.Generators
 import com.github.f4b6a3.ulid.UlidCreator
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.HashingUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.toHexString
-import org.jetbrains.annotations.Nls
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import org.jetbrains.annotations.Nls
 
 object DataGenerators {
   // -- Variables ----------------------------------------------------------- //

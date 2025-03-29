@@ -10,11 +10,11 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.HashingUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.decodeFromAscii
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.encodeToAscii
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.toHexString
-import org.apache.commons.codec.binary.Base32
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.Base64
+import org.apache.commons.codec.binary.Base32
 
 object EncodersDecoders {
   // -- Variables ----------------------------------------------------------- //

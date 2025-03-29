@@ -1,15 +1,9 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.settings.base
 
 @Suppress("UNCHECKED_CAST")
-class IntSettingProperty(
-  title: String,
-  description: String?,
-  group: SettingsGroup?,
-  settingValue: IntValue,
-) :
+class IntSettingProperty(descriptor: Descriptor?, group: SettingsGroup, settingValue: IntValue) :
   SettingProperty<Int, IntValue>(
-    title = title,
-    description = description,
+    descriptor = descriptor,
     group = group,
     settingValue = settingValue,
     initialValue = settingValue.defaultValue,
