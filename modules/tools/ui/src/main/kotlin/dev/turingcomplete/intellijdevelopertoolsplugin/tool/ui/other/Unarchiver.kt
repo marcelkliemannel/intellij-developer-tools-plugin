@@ -3,7 +3,6 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other
 import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.CommonActionsManager
-import com.intellij.ide.dnd.FileCopyPasteUtil
 import com.intellij.ide.util.treeView.NodeRenderer
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
@@ -17,12 +16,10 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.EditorDropHandler
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
-import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -81,6 +78,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.FileDropHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.NotificationUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.createContextMenuMouseListener
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.createToggleAction
@@ -89,14 +87,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.ha
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolService
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.Unarchiver.OpenUnarchiverContext
-import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
-import java.awt.datatransfer.Transferable
 import java.awt.dnd.DropTarget
-import java.awt.dnd.DropTargetDragEvent
-import java.awt.dnd.DropTargetDropEvent
-import java.awt.dnd.DropTargetEvent
-import java.awt.dnd.DropTargetListener
 import java.awt.event.MouseEvent
 import java.io.BufferedInputStream
 import java.io.FileInputStream
@@ -117,7 +109,6 @@ import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.JTree
 import javax.swing.SwingConstants
-import javax.swing.TransferHandler
 import javax.swing.event.HyperlinkEvent
 import javax.swing.table.DefaultTableModel
 import javax.swing.tree.DefaultMutableTreeNode
@@ -193,7 +184,7 @@ class Unarchiver(
   // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildUi() {
-    content.dropTarget = DropTarget(content, FilesDropHandler(project, openArchiveFile()))
+    content.dropTarget = DropTarget(content, FileDropHandler(project, openArchiveFile()))
     content.addToCenter(noArchiveFilePanel)
 
     row { cell(content).resizableColumn().align(Align.FILL) }.resizableRow()
@@ -1646,75 +1637,6 @@ class Unarchiver(
         selectedFiles.any {
           it.extension != null && supportedArchiveExtensions.contains(it.extension)
         }
-  }
-
-  // -- Inner Type ---------------------------------------------------------- //
-
-  class FilesDropHandler(private val project: Project?, private val openArchive: (Path) -> Unit) :
-    TransferHandler(), EditorDropHandler, DropTargetListener {
-
-    override fun canImport(comp: JComponent?, transferFlavors: Array<out DataFlavor>?): Boolean {
-      return canHandleDrop0(transferFlavors)
-    }
-
-    override fun canHandleDrop(transferFlavors: Array<out DataFlavor>): Boolean {
-      return canHandleDrop0(transferFlavors)
-    }
-
-    override fun drop(event: DropTargetDropEvent) {
-      event.acceptDrop(event.dropAction)
-      handleDrop0(event.transferable)
-    }
-
-    override fun handleDrop(
-      transferable: Transferable,
-      project: Project?,
-      editorWindow: EditorWindow?,
-    ) {
-      handleDrop0(transferable)
-    }
-
-    override fun importData(comp: JComponent?, transferable: Transferable): Boolean {
-      return handleDrop0(transferable)
-    }
-
-    override fun dragEnter(dtde: DropTargetDragEvent?) {
-      // Nothing to do
-    }
-
-    override fun dragOver(dtde: DropTargetDragEvent?) {
-      // Nothing to do
-    }
-
-    override fun dropActionChanged(dtde: DropTargetDragEvent?) {
-      // Nothing to do
-    }
-
-    override fun dragExit(dte: DropTargetEvent?) {
-      // Nothing to do
-    }
-
-    private fun canHandleDrop0(transferFlavors: Array<out DataFlavor>?): Boolean {
-      return transferFlavors != null && FileCopyPasteUtil.isFileListFlavorAvailable(transferFlavors)
-    }
-
-    private fun handleDrop0(transferable: Transferable): Boolean {
-      try {
-        FileCopyPasteUtil.getFiles(transferable)
-          ?.takeIf { it.size == 1 }
-          ?.let {
-            openArchive(it[0])
-            return true
-          }
-      } catch (e: Exception) {
-        Messages.showErrorDialog(
-          project,
-          "Failed to handle dropped file: ${e.message}.",
-          "Open Archive",
-        )
-      }
-      return false
-    }
   }
 
   // -- Inner Type ---------------------------------------------------------- //

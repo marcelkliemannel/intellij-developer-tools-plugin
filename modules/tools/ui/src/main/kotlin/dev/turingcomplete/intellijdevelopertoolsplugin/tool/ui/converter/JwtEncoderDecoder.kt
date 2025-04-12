@@ -755,7 +755,7 @@ class JwtEncoderDecoder(
         val encodedSignature = signature.compute(encodedHeader, encodedPayload)
         if (encodedSignature == null) {
           encoded.set("")
-          signatureErrorHolder.addIfEmpty(
+          signatureErrorHolder.addIfNoErrors(
             "Unable to compute signature due signature configuration errors"
           )
         } else {

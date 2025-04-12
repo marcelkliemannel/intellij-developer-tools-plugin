@@ -2,6 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.StreamReadFeature
 import com.fasterxml.jackson.core.json.JsonReadFeature
 import com.fasterxml.jackson.core.json.JsonWriteFeature
 import com.fasterxml.jackson.core.util.DefaultIndenter
@@ -69,6 +70,8 @@ class ObjectMapperService {
 
     return JsonMapper.builder()
       .apply {
+        enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
+
         // Writing settings
         if (settings.writeQuoteFieldNames.get()) {
           enable(JsonWriteFeature.QUOTE_FIELD_NAMES.mappedFeature())

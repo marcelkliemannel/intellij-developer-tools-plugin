@@ -9,6 +9,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 
 class LineBreaksEncoderDecoder(
   configuration: DeveloperToolConfiguration,
@@ -16,12 +17,12 @@ class LineBreaksEncoderDecoder(
   context: DeveloperUiToolContext,
   project: Project?,
 ) :
-  TextConverter(
-    textConverterContext = encoderDecoderTextConverterContext,
+  EncoderDecoder(
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
     project = project,
+    title = UiToolsBundle.message("line-breaks-encoder-decoder.title"),
   ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -30,26 +31,28 @@ class LineBreaksEncoderDecoder(
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
-  override fun toTarget(text: String) {
-    targetText.set(
-      when (lineBreakDecoding.get()) {
-        LineBreak.CRLF -> StringUtil.convertLineSeparators(text, "\\r\\n")
-        LineBreak.LF -> StringUtil.convertLineSeparators(text, "\\n")
-      }
-    )
-  }
+  override fun doConvertToTarget(source: ByteArray): ByteArray =
+    when (lineBreakDecoding.get()) {
+      LineBreak.CRLF -> StringUtil.convertLineSeparators(String(source), "\\r\\n")
+      LineBreak.LF -> StringUtil.convertLineSeparators(String(source), "\\n")
+    }.toByteArray()
 
-  override fun toSource(text: String) {
-    // The target input is not depending on the selected line break decoding,
-    // because the user can put anything into the editor without changing the
-    // configuration first.
-    sourceText.set(
-      text.replace("\r\n", System.lineSeparator()).replace("\n", System.lineSeparator())
-    )
-  }
+  /**
+   * The target input is not depending on the selected line break decoding, because the user can put
+   * anything into the editor without changing the configuration first.
+   */
+  override fun doConvertToSource(target: ByteArray): ByteArray =
+    String(target)
+      .replace("\\r\\n", System.lineSeparator())
+      .replace("\\n", System.lineSeparator())
+      .toByteArray()
 
-  override fun Panel.buildMiddleFirstConfigurationUi() {
-    row { comboBox(LineBreak.entries).label("Decode line break to:").bindItem(lineBreakDecoding) }
+  override fun Panel.buildTargetTopConfigurationUi() {
+    row {
+      comboBox(LineBreak.entries)
+        .label(UiToolsBundle.message("line-breaks-encoder-decoder.line-break-decoding"))
+        .bindItem(lineBreakDecoding)
+    }
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -69,8 +72,9 @@ class LineBreaksEncoderDecoder(
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "Line Breaks",
-        contentTitle = "Line Breaks Encoder/Decoder",
+        menuTitle = UiToolsBundle.message("line-breaks-encoder-decoder.title"),
+        groupedMenuTitle = UiToolsBundle.message("line-breaks-encoder-decoder.grouped-menu-title"),
+        contentTitle = UiToolsBundle.message("line-breaks-encoder-decoder.content-title"),
       )
 
     override fun getDeveloperUiToolCreator(

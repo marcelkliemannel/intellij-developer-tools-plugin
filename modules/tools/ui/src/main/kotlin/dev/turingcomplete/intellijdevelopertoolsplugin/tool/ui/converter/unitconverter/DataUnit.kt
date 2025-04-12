@@ -188,21 +188,21 @@ object DataUnits {
   ) {
 
     fun toBits(value: BigDecimal, mathContext: MathContext): BigDecimal {
-      val conversationFactor =
+      val conversionFactor =
         when (baseDataUnit) {
           BIT -> numberSystem.base.pow(exponent, mathContext)
           BYTE -> numberSystem.base.pow(exponent, mathContext).multiply(bigDecimalEight)
         }
-      return value.multiply(conversationFactor, mathContext)
+      return value.multiply(conversionFactor, mathContext)
     }
 
     fun fromBits(value: BigDecimal, mathContext: MathContext): BigDecimal {
-      val conversationFactor =
+      val conversionFactor =
         when (baseDataUnit) {
           BIT -> numberSystem.base.pow(exponent, mathContext)
           BYTE -> numberSystem.base.pow(exponent, mathContext).multiply(bigDecimalEight)
         }
-      return value.divide(conversationFactor, mathContext)
+      return value.divide(conversionFactor, mathContext)
     }
 
     override fun toString(): String = name

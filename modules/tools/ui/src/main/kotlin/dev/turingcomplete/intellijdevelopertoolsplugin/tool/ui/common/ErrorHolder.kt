@@ -1,5 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common
 
+import com.fasterxml.jackson.core.JacksonException
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ComponentPredicate
@@ -9,6 +10,7 @@ import javax.swing.JComponent
 class ErrorHolder(
   // Icon must be used in a `text()` cell, a `label()` cell will not work.
   private val addErrorIconToMessage: Boolean = false,
+  // Needs to be false if the error is presented in a label
   private val surroundMessageWithHtml: Boolean = true,
 ) {
   // -- Properties ---------------------------------------------------------- //
@@ -21,12 +23,12 @@ class ErrorHolder(
   // -- Exposed Methods ----------------------------------------------------- //
 
   fun add(prefix: String, error: Throwable) {
-    errors.add("$prefix ${error.message ?: error::class.java.simpleName}")
+    errors.add("$prefix ${determineMessage(error)}")
     fireChange()
   }
 
   fun add(error: Throwable) {
-    errors.add(error.message ?: error::class.java.simpleName)
+    errors.add(determineMessage(error))
     fireChange()
   }
 
@@ -35,7 +37,7 @@ class ErrorHolder(
     fireChange()
   }
 
-  fun addIfEmpty(message: String) {
+  fun addIfNoErrors(message: String) {
     if (errors.isNotEmpty()) {
       return
     }
@@ -89,7 +91,23 @@ class ErrorHolder(
       }
     }
 
+  fun catchException(task: () -> Unit) {
+    try {
+      clear()
+      task()
+    } catch (e: Exception) {
+      add(e)
+    }
+  }
+
   // -- Private Methods ----------------------------------------------------- //
+
+  private fun determineMessage(error: Throwable): String =
+    when {
+      error is JacksonException -> "${error.originalMessage}; ${error.location.offsetDescription()}"
+      error.message != null -> error.message!!
+      else -> error::class.simpleName ?: "unknown"
+    }
 
   private fun formatErrors(): String? =
     errors.let {

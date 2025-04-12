@@ -14,6 +14,7 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.UIBundle
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBRadioButton
+import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Cell
@@ -22,6 +23,7 @@ import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.ui.tabs.TabInfo
 import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.JBFont
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Color
 import java.awt.Font
@@ -37,6 +39,7 @@ import javax.swing.JTable
 import javax.swing.JTextField
 import javax.swing.ToolTipManager
 import javax.swing.border.CompoundBorder
+import javax.swing.event.ChangeListener
 
 // -- Properties ---------------------------------------------------------- //
 // -- Exported Methods ---------------------------------------------------- //
@@ -199,17 +202,29 @@ fun JComponent.wrapWithToolBar(
 
     when (toolBarPlace) {
       ToolBarPlace.LEFT -> {
-        addToLeft(actionToolbar.component)
+        addToLeft(actionToolbar.component.withNoLeftBorderInset())
         addToCenter(this@wrapWithToolBar)
       }
 
       ToolBarPlace.RIGHT,
       ToolBarPlace.APPEND -> {
         addToCenter(this@wrapWithToolBar)
-        addToRight(actionToolbar.component)
+        addToRight(actionToolbar.component.withNoRightBorderInset())
       }
     }
   }
+}
+
+fun JComponent.withNoRightBorderInset(): JComponent {
+  val insets = border?.getBorderInsets(this) ?: JBUI.emptyInsets()
+  border = JBUI.Borders.empty(insets.top, insets.left, insets.bottom, 0)
+  return this
+}
+
+fun JComponent.withNoLeftBorderInset(): JComponent {
+  val insets = border?.getBorderInsets(this) ?: JBUI.emptyInsets()
+  border = JBUI.Borders.empty(insets.top, 0, insets.bottom, insets.right)
+  return this
 }
 
 fun JTable.setContextMenu(place: String, actionGroup: ActionGroup) {
@@ -270,6 +285,12 @@ fun Cell<JComponent>.registerDynamicToolTip(toolTipText: () -> String?) {
       }
     }
   )
+}
+
+fun JBTabbedPane.onSelectionChanged(onSelectionChanged: (JComponent) -> Unit): JBTabbedPane {
+  addChangeListener(ChangeListener { onSelectionChanged(selectedComponent as JComponent) })
+
+  return this
 }
 
 // -- Private Methods  ---------------------------------------------------- //

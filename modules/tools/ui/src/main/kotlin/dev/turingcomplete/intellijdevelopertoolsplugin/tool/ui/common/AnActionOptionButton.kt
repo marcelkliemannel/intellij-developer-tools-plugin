@@ -42,4 +42,5 @@ class AnActionOptionButton(mainAction: AnAction, vararg additionalActions: AnAct
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

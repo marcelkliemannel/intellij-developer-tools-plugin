@@ -336,20 +336,26 @@ class AdvancedEditor(
       }
     )
 
-    diffSupport?.let {
+    if (diffSupport != null) {
       actions.add(
         dumbAwareAction(
-          GeneralBundle.message("advanced-editor.show-diff-with-title", it.secondTitle),
-          AllIcons.Actions.Diff,
+          title =
+            GeneralBundle.message("advanced-editor.show-diff-with-title", diffSupport.secondTitle),
+          icon = AllIcons.Actions.Diff,
+          isEnabledAndVisible = diffSupport.enabled?.let { { it.get() } } ?: { true },
         ) { e ->
           val editor = e.getEditor()
           val firstText = runReadAction { editor.document.text }
           UiUtils.showDiffDialog(
-            title = GeneralBundle.message("advanced-editor.show-diff-with-title", it.secondTitle),
+            title =
+              GeneralBundle.message(
+                "advanced-editor.show-diff-with-title",
+                diffSupport.secondTitle,
+              ),
             firstTitle = firstTitle,
-            secondTitle = it.secondTitle,
+            secondTitle = diffSupport.secondTitle,
             firstText = firstText,
-            secondText = it.secondText(),
+            secondText = diffSupport.secondText(),
           )
         }
       )
@@ -606,7 +612,12 @@ class AdvancedEditor(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  data class DiffSupport(val title: String, val secondTitle: String, val secondText: () -> String)
+  data class DiffSupport(
+    val title: String,
+    val secondTitle: String,
+    val secondText: () -> String,
+    val enabled: ValueProperty<Boolean>? = null,
+  )
 
   // -- Inner Type ---------------------------------------------------------- //
 

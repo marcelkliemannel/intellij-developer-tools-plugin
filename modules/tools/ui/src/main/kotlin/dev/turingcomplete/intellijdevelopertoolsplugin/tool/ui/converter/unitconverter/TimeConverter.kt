@@ -40,10 +40,10 @@ class TimeConverter(configuration: DeveloperToolConfiguration, parentDisposable:
 
   private val nanoseconds =
     configuration.register(
-      "${CONFIGURATION_KEY_PREFIX}timeNanoseconds",
-      ZERO,
-      INPUT,
-      NANOSECONDS_EXAMPLE,
+      key = "${CONFIGURATION_KEY_PREFIX}timeNanoseconds",
+      defaultValue = ZERO,
+      propertyType = INPUT,
+      example = NANOSECONDS_EXAMPLE,
     )
 
   private val nanosecondsFormatted = ValueProperty("0")

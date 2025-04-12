@@ -8,6 +8,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -15,15 +16,6 @@ import java.util.Base64
 import org.apache.commons.codec.binary.Base32
 
 // -- Properties ---------------------------------------------------------- //
-
-val encoderDecoderTextConverterContext =
-  TextConverter.TextConverterContext(
-    convertActionTitle = "Encode",
-    revertActionTitle = "Decode",
-    sourceTitle = "Decoded",
-    targetTitle = "Encoded",
-  )
-
 // -- Exported Methods ---------------------------------------------------- //
 // -- Private Methods  ---------------------------------------------------- //
 // -- Inner Type ---------------------------------------------------------- //
@@ -34,29 +26,25 @@ class Base32EncoderDecoder(
   context: DeveloperUiToolContext,
   project: Project?,
 ) :
-  TextConverter(
-    textConverterContext = encoderDecoderTextConverterContext,
+  EncoderDecoder(
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
     project = project,
+    title = UiToolsBundle.message("base32-encoding.title"),
   ) {
 
-  override fun toTarget(text: String) {
-    targetText.set(Base32().encodeToString(text.encodeToByteArray()))
-  }
+  override fun doConvertToTarget(source: ByteArray): ByteArray = Base32().encode(source)
 
-  override fun toSource(text: String) {
-    sourceText.set(Base32().decode(text).decodeToString())
-  }
+  override fun doConvertToSource(target: ByteArray): ByteArray = Base32().decode(target)
 
   class Factory : DeveloperUiToolFactory<Base32EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "Base32 Encoding",
-        groupedMenuTitle = "Base32",
-        contentTitle = "Base32 Encoder/Decoder",
+        menuTitle = UiToolsBundle.message("base32-encoding.menu-title"),
+        groupedMenuTitle = UiToolsBundle.message("base32-encoding.grouped-menu-title"),
+        contentTitle = UiToolsBundle.message("base32-encoding.title"),
       )
 
     override fun getDeveloperUiToolCreator(
@@ -77,29 +65,25 @@ class Base64EncoderDecoder(
   context: DeveloperUiToolContext,
   project: Project?,
 ) :
-  TextConverter(
-    textConverterContext = encoderDecoderTextConverterContext,
+  EncoderDecoder(
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
     project = project,
+    title = UiToolsBundle.message("base64-encoding.title"),
   ) {
 
-  override fun toTarget(text: String) {
-    targetText.set(Base64.getEncoder().encodeToString(text.encodeToByteArray()))
-  }
+  override fun doConvertToTarget(source: ByteArray): ByteArray = Base64.getEncoder().encode(source)
 
-  override fun toSource(text: String) {
-    sourceText.set(Base64.getDecoder().decode(text).decodeToString())
-  }
+  override fun doConvertToSource(target: ByteArray): ByteArray = Base64.getDecoder().decode(target)
 
   class Factory : DeveloperUiToolFactory<Base64EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "Base64 Encoding",
-        groupedMenuTitle = "Base64",
-        contentTitle = "Base64 Encoder/Decoder",
+        menuTitle = UiToolsBundle.message("base64-encoding.menu-title"),
+        groupedMenuTitle = UiToolsBundle.message("base64-encoding.grouped-menu-title"),
+        contentTitle = UiToolsBundle.message("base64-encoding.title"),
       )
 
     override fun getDeveloperUiToolCreator(
@@ -120,29 +104,27 @@ class UrlBase64EncoderDecoder(
   context: DeveloperUiToolContext,
   project: Project?,
 ) :
-  TextConverter(
-    textConverterContext = encoderDecoderTextConverterContext,
+  EncoderDecoder(
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
     project = project,
+    title = UiToolsBundle.message("url-base64-encoding.title"),
   ) {
 
-  override fun toTarget(text: String) {
-    targetText.set(Base64.getUrlEncoder().encodeToString(text.encodeToByteArray()))
-  }
+  override fun doConvertToTarget(source: ByteArray): ByteArray =
+    Base64.getUrlEncoder().encode(source)
 
-  override fun toSource(text: String) {
-    sourceText.set(Base64.getUrlDecoder().decode(text).decodeToString())
-  }
+  override fun doConvertToSource(target: ByteArray): ByteArray =
+    Base64.getUrlDecoder().decode(target)
 
   class Factory : DeveloperUiToolFactory<UrlBase64EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "URL Base64 Encoding",
-        groupedMenuTitle = "URL Base64",
-        contentTitle = "URL Base64 Encoder/Decoder",
+        menuTitle = UiToolsBundle.message("url-base64-encoding.menu-title"),
+        groupedMenuTitle = UiToolsBundle.message("url-base64-encoding.grouped-menu-title"),
+        contentTitle = UiToolsBundle.message("url-base64-encoding.title"),
       )
 
     override fun getDeveloperUiToolCreator(
@@ -163,29 +145,27 @@ class MimeBase64EncoderDecoder(
   context: DeveloperUiToolContext,
   project: Project?,
 ) :
-  TextConverter(
-    textConverterContext = encoderDecoderTextConverterContext,
+  EncoderDecoder(
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
     project = project,
+    title = UiToolsBundle.message("mime-base64-encoding.title"),
   ) {
 
-  override fun toTarget(text: String) {
-    targetText.set(Base64.getMimeEncoder().encodeToString(text.encodeToByteArray()))
-  }
+  override fun doConvertToTarget(source: ByteArray): ByteArray =
+    Base64.getMimeEncoder().encode(source)
 
-  override fun toSource(text: String) {
-    sourceText.set(Base64.getMimeDecoder().decode(text).decodeToString())
-  }
+  override fun doConvertToSource(target: ByteArray): ByteArray =
+    Base64.getMimeDecoder().decode(target)
 
   class Factory : DeveloperUiToolFactory<MimeBase64EncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "MIME Base64 Encoding",
-        groupedMenuTitle = "MIME Base64",
-        contentTitle = "MIME Base64 Encoder/Decoder",
+        menuTitle = UiToolsBundle.message("mime-base64-encoding.menu-title"),
+        groupedMenuTitle = UiToolsBundle.message("mime-base64-encoding.grouped-menu-title"),
+        contentTitle = UiToolsBundle.message("mime-base64-encoding.title"),
       )
 
     override fun getDeveloperUiToolCreator(
@@ -206,29 +186,25 @@ class AsciiEncoderDecoder(
   context: DeveloperUiToolContext,
   project: Project?,
 ) :
-  TextConverter(
-    textConverterContext = encoderDecoderTextConverterContext,
+  EncoderDecoder(
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
     project = project,
+    title = UiToolsBundle.message("ascii-encoding.title"),
   ) {
 
-  override fun toTarget(text: String) {
-    targetText.set(text.encodeToAscii())
-  }
+  override fun doConvertToTarget(source: ByteArray): ByteArray = source.encodeToAscii()
 
-  override fun toSource(text: String) {
-    sourceText.set(text.decodeFromAscii())
-  }
+  override fun doConvertToSource(target: ByteArray): ByteArray = target.decodeFromAscii()
 
   class Factory : DeveloperUiToolFactory<AsciiEncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "ASCII Encoding",
-        groupedMenuTitle = "ASCII",
-        contentTitle = "ASCII Encoder/Decoder",
+        menuTitle = UiToolsBundle.message("ascii-encoding.menu-title"),
+        groupedMenuTitle = UiToolsBundle.message("ascii-encoding.grouped-menu-title"),
+        contentTitle = UiToolsBundle.message("ascii-encoding.title"),
       )
 
     override fun getDeveloperUiToolCreator(
@@ -249,29 +225,27 @@ class UrlEncodingEncoderDecoder(
   context: DeveloperUiToolContext,
   project: Project?,
 ) :
-  TextConverter(
-    textConverterContext = encoderDecoderTextConverterContext,
+  EncoderDecoder(
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
     project = project,
+    title = UiToolsBundle.message("url-encoding.title"),
   ) {
 
-  override fun toTarget(text: String) {
-    targetText.set(URLEncoder.encode(text, StandardCharsets.UTF_8))
-  }
+  override fun doConvertToTarget(source: ByteArray): ByteArray =
+    URLEncoder.encode(String(source), StandardCharsets.UTF_8.name()).toByteArray()
 
-  override fun toSource(text: String) {
-    sourceText.set(URLDecoder.decode(text, StandardCharsets.UTF_8))
-  }
+  override fun doConvertToSource(target: ByteArray): ByteArray =
+    URLDecoder.decode(String(target), StandardCharsets.UTF_8.name()).toByteArray()
 
   class Factory : DeveloperUiToolFactory<UrlEncodingEncoderDecoder> {
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "URL Encoding",
-        groupedMenuTitle = "URL",
-        contentTitle = "URL Encoding Encoder/Decoder",
+        menuTitle = UiToolsBundle.message("url-encoding.menu-title"),
+        groupedMenuTitle = UiToolsBundle.message("url-encoding.grouped-menu-title"),
+        contentTitle = UiToolsBundle.message("url-encoding.title"),
       )
 
     override fun getDeveloperUiToolCreator(

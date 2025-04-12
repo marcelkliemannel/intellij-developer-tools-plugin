@@ -48,12 +48,23 @@ object UiUtils {
     DiffManager.getInstance().showDiff(null, request)
   }
 
-  fun dumbAwareAction(title: String, icon: Icon? = null, action: (AnActionEvent) -> Unit) =
+  fun dumbAwareAction(
+    title: String,
+    icon: Icon? = null,
+    isEnabledAndVisible: () -> Boolean = { true },
+    action: (AnActionEvent) -> Unit,
+  ) =
     object : DumbAwareAction(title, null, icon) {
+
+      override fun update(e: AnActionEvent) {
+        e.presentation.isEnabledAndVisible = isEnabledAndVisible()
+      }
 
       override fun actionPerformed(e: AnActionEvent) {
         action(e)
       }
+
+      override fun getActionUpdateThread() = ActionUpdateThread.EDT
     }
 
   @Suppress("UnstableApiUsage")

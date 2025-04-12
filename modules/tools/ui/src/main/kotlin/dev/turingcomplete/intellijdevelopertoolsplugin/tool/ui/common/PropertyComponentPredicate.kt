@@ -29,4 +29,10 @@ class PropertyComponentPredicate<T>(
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //
   // -- Companion Object ---------------------------------------------------- //
+
+  companion object {
+
+    fun <T> ObservableProperty<T>.createPredicate(expectedValue: T): PropertyComponentPredicate<T> =
+      PropertyComponentPredicate(this, expectedValue)
+  }
 }

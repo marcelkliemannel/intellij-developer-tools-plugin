@@ -10,6 +10,8 @@ import com.intellij.ui.ScrollPaneFactory.createScrollPane
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBEmptyBorder
+import com.intellij.util.ui.JBInsets
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Dimension
 import javax.swing.JComponent
@@ -46,7 +48,7 @@ abstract class DeveloperUiTool(protected val parentDisposable: Disposable) :
       object : BorderLayoutPanel(), DataProvider {
 
         init {
-          border = JBEmptyBorder(12, 16, 16, 16)
+          border = JBEmptyBorder(wrapperInsets())
           addToCenter(component)
         }
 
@@ -61,6 +63,8 @@ abstract class DeveloperUiTool(protected val parentDisposable: Disposable) :
 
     return wrapper
   }
+
+  open fun wrapperInsets(): JBInsets = JBUI.insets(12, 16, 16, 16)
 
   abstract fun Panel.buildUi()
 

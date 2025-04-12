@@ -13,6 +13,9 @@ import kotlin.reflect.cast
 
 val longMaxValue = BigDecimal(Long.MAX_VALUE)
 val longMinValue = BigDecimal(Long.MIN_VALUE)
+
+val emptyByteArray = ByteArray(0)
+
 private val asciiEncodedRegex = "\\\\u([0-9a-fA-F]{4})".toRegex()
 
 // -- Initialization ------------------------------------------------------ //
@@ -71,11 +74,26 @@ fun Long?.compareTo(other: Long?): Int {
 fun String.encodeToAscii() =
   this.map { if (it.code > 127) "\\u%04x".format(it.code) else it.toString() }.joinToString("")
 
+fun ByteArray.encodeToAscii(): ByteArray =
+  this.joinToString("") {
+      if (it.toInt() and 0xFF > 127) "\\u%04x".format(it.toInt() and 0xFF)
+      else it.toInt().toChar().toString()
+    }
+    .toByteArray()
+
 fun String.decodeFromAscii() =
   asciiEncodedRegex.replace(this) { matchResult ->
     val charCode = matchResult.groupValues[1].toInt(16)
     charCode.toChar().toString()
   }
+
+fun ByteArray.decodeFromAscii(): ByteArray =
+  asciiEncodedRegex
+    .replace(this.toString(Charsets.UTF_8)) { matchResult ->
+      val charCode = matchResult.groupValues[1].toInt(16)
+      charCode.toChar().toString()
+    }
+    .toByteArray()
 
 fun String.decodeBase64String(): String =
   if (this.isNotEmpty()) String(Base64.getDecoder().decode(this)) else ""

@@ -4,6 +4,8 @@
 
 ### Added
 
+- All encoding/decoding and escaping/unescaping tools now also support reading from and writing to files.
+
 ### Changed
 
 - Setting "Dialog is modal" was reset to its default value (false), due to overhaul of the internal settings handling.
@@ -145,7 +147,7 @@
 
 ### Added
 
-- Add automatic input text case detection to the text case converter 
+- Add automatic input text case detection to the text case converter
 - Add escape/unescape as editor actions and code intentions
 - Add new tool: Text Statistic
 - Add support for the "Dot Text Case"
