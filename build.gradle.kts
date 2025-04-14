@@ -46,15 +46,6 @@ allprojects {
       testFramework(TestFrameworkType.Platform)
       testFramework(TestFrameworkType.JUnit5)
     }
-
-    configurations.all {
-      resolutionStrategy.eachDependency {
-        if (requested.group == "org.ow2.asm" && requested.name.startsWith("asm")) {
-          useVersion(libs.versions.asm.get())
-          because("Ensure all subprojects use a consistent ASM version")
-        }
-      }
-    }
   }
 
   spotless { kotlin { ktfmt().googleStyle() } }

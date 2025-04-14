@@ -28,7 +28,7 @@ class DeveloperToolConfiguration(
   private val changeListeners = CopyOnWriteArrayList<ChangeListener>()
   private val resetListeners = CopyOnWriteArrayList<ResetListener>()
   var isResetting = false
-    set
+    private set
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //

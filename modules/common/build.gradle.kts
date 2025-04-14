@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.utils.extendsFrom
+
 plugins {
   `java-test-fixtures`
   id("org.jetbrains.intellij.platform.module")
@@ -11,7 +13,11 @@ dependencies {
   testImplementation(libs.bundles.junit.implementation)
   testRuntimeOnly(libs.bundles.junit.runtime)
 
-  testFixturesApi(libs.asm)
+  intellijPlatform {
+    testBundledPlugins("org.jetbrains.kotlin")
+  }
+  configurations.testFixturesApi.extendsFrom(configurations.intellijPlatformTestBundledPlugins)
+
   testFixturesImplementation(libs.assertj.core)
   testFixturesImplementation(libs.bundles.junit.implementation)
 }

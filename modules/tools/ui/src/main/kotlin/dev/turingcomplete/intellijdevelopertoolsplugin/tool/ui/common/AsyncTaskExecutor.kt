@@ -49,8 +49,9 @@ class AsyncTaskExecutor(
 
   private fun processQueue() {
     coroutineScope.launch {
-      while (taskQueue.isNotEmpty()) {
-        val (task, delayMillis) = taskQueue.poll()
+      while (true) {
+        val item = taskQueue.poll() ?: break
+        val (task, delayMillis) = item
         if (delayMillis > 0) {
           delay(delayMillis)
         }

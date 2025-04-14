@@ -122,7 +122,7 @@ abstract class Converter(
   override fun Panel.buildUi() {
     row {
         cell(
-            Splitter(true, 0.5f).apply {
+            Splitter(true, 0.48f).apply {
               firstComponent = com.intellij.ui.dsl.builder.panel { buildSourceUi() }
               secondComponent =
                 com.intellij.ui.dsl.builder.panel {
@@ -135,6 +135,8 @@ abstract class Converter(
           .resizableColumn()
       }
       .resizableRow()
+
+    buildBottomConfigurationUi()
   }
 
   override fun wrapperInsets(): JBInsets =
@@ -161,6 +163,10 @@ abstract class Converter(
   }
 
   open fun Panel.buildTargetTopConfigurationUi() {
+    // Override if needed
+  }
+
+  open fun Panel.buildBottomConfigurationUi() {
     // Override if needed
   }
 

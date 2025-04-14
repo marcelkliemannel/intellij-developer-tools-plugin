@@ -172,10 +172,6 @@
             id="url-encoding-encoder-decoder"
             groupId="encoder-decoder"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.UrlEncodingEncoderDecoder$Factory"/>
-    <developerUiTool
-            id="line-breaks-encoder-decoder"
-            groupId="encoder-decoder"
-            implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.LineBreaksEncoderDecoder$Factory"/>
 
     <!-- text-escape -->
     <developerUiTool
@@ -198,6 +194,10 @@
             id="xml-text-escape"
             groupId="text-escape"
             implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.XmlTextEscaperUnescaper$Factory"/>
+      <developerUiTool
+              id="escape-sequence-escaper-unescaper"
+              groupId="text-escape"
+              implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.EscapeSequencesEscaperUnescaper$Factory"/>
 
     <!-- cryptography -->
     <developerUiTool
@@ -407,8 +407,8 @@
             type="com.github.vertical_blank.sqlformatter.languages.Dialect"
             legacyId="com.github.vertical_blank.sqlformatter.languages.Dialect"/>
     <developerToolConfigurationEnumPropertyType
-            id="LineBreaksEncoderDecoder-LineBreak"
-            type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.LineBreaksEncoderDecoder$LineBreak"
+            id="EscapeSequencesEncoderDecoder-LineBreak"
+            type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.EscapeSequencesEscaperUnescaper$LineBreak"
             legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.LineBreaksEncoderDecoder$LineBreak"/>
     <developerToolConfigurationEnumPropertyType
             id="TextSortingTransformer-SortingOrder"

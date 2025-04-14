@@ -40,12 +40,24 @@ class CliCommandConverter(
   // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildTargetTopConfigurationUi() {
-    row { textField().label("Line break delimiter:").bindText(lineBreakDelimiter) }
+    row {
+      textField()
+        .label(UiToolsBundle.message("cli-command-converter.line-break-delimiter"))
+        .bindText(lineBreakDelimiter)
+    }
   }
 
   override fun ConversionSideHandler.initSourceConversionSide() {
-    addTextInputOutputHandler("source", DEFAULT_SOURCE_TEXT)
+    addTextInputOutputHandler(id = "source", exampleText = EXAMPLE_SOURCE_TEXT)
     addFileInputOutputHandler("source")
+  }
+
+  override fun ConversionSideHandler.initTargetConversionSide() {
+    addTextInputOutputHandler(
+      id = "target",
+      exampleText = String(doConvertToTarget(EXAMPLE_SOURCE_TEXT.toByteArray())),
+    )
+    addFileInputOutputHandler("target")
   }
 
   override fun doConvertToTarget(source: ByteArray): ByteArray {
@@ -125,7 +137,7 @@ class CliCommandConverter(
     private val defaultLineBreakDelimiter = if (OS.CURRENT == OS.Windows) "^" else "\\"
     private val cliCommandAllArgumentsSplitRegex = Regex("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'")
 
-    private const val DEFAULT_SOURCE_TEXT =
+    private const val EXAMPLE_SOURCE_TEXT =
       "python script.py --input-file=input.txt --output-file=output.txt --verbose"
   }
 }

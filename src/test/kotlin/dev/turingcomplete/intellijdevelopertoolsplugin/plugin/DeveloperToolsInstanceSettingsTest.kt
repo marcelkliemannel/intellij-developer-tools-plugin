@@ -34,12 +34,14 @@ import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DynamicContainer
 import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 
@@ -70,7 +72,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
     // Expect: No configurations have persisted because there are no property changes
     // (The persistent state will only include configuration with modified properties)
-    Assertions.assertThat(settings.getState().developerToolsConfigurations).isEmpty()
+    assertThat(settings.getState().developerToolsConfigurations).isEmpty()
 
     // Set the values to the example value, despite `loadExamples` is disabled
     modifyAllConfigurationProperties(developerUiTools, settings) { property ->
@@ -84,7 +86,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     // configurations until the application was restarted. Therefore, during the
     // modification check, we will always check if the value is equal to the
     // example.)
-    Assertions.assertThat(settings.getState().developerToolsConfigurations).isEmpty()
+    assertThat(settings.getState().developerToolsConfigurations).isEmpty()
 
     // Set the values to the default value
     modifyAllConfigurationProperties(developerUiTools, settings) { property ->
@@ -92,20 +94,20 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     }
 
     // Expect: No configurations have persisted because there are no property changes
-    Assertions.assertThat(settings.getState().developerToolsConfigurations).isEmpty()
+    assertThat(settings.getState().developerToolsConfigurations).isEmpty()
 
     // Load all example values
     DeveloperToolsApplicationSettings.Companion.generalSettings.loadExamples.set(true)
     resetAllConfigurations(developerUiTools, settings, true)
 
     // Expect: No configurations have persisted because there are no property changes
-    Assertions.assertThat(settings.getState().developerToolsConfigurations).isEmpty()
+    assertThat(settings.getState().developerToolsConfigurations).isEmpty()
 
     // Set the values to a random value
     setConfigurationPropertiesToRandomValues(developerUiTools, settings)
 
     // Expect: All configurations (with properties) have been persisted
-    Assertions.assertThat(settings.getState().developerToolsConfigurations)
+    assertThat(settings.getState().developerToolsConfigurations)
       .hasSize(
         developerUiTools
           .filter {
@@ -136,11 +138,11 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
     return DeveloperToolsInstanceSettings.Companion.builtInConfigurationPropertyTypes.map {
       (type, propertyType) ->
-      DynamicTest.dynamicTest(type.qualifiedName!!) {
-        Assertions.assertThat(testVectors).containsKey(type)
+      dynamicTest(type.qualifiedName!!) {
+        assertThat(testVectors).containsKey(type)
         val (inputValue, persistedValue) = testVectors[type]!!
-        Assertions.assertThat(propertyType.toPersistent(inputValue)).isEqualTo(persistedValue)
-        Assertions.assertThat(propertyType.fromPersistent(persistedValue)).isEqualTo(inputValue)
+        assertThat(propertyType.toPersistent(inputValue)).isEqualTo(persistedValue)
+        assertThat(propertyType.fromPersistent(persistedValue)).isEqualTo(inputValue)
       }
     }
   }
@@ -148,7 +150,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
   @Test
   fun `Legacy settings import test data for current plugin version exists`() {
     val legacyImportDirForPluginVersion = legacyImportDir.resolve(PluginUtils.getPluginVersion())
-    Assertions.assertThat(legacyImportDirForPluginVersion).exists()
+    assertThat(legacyImportDirForPluginVersion).exists()
   }
 
   @Test
@@ -248,15 +250,14 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
       val checkProperty: (ExpectedConfigurationProperty) -> DynamicTest =
         { (developerToolId, propertyId, propertyValueType, propertyValue, propertyType) ->
-          DynamicTest.dynamicTest(propertyId) {
+          dynamicTest(propertyId) {
             val developerToolConfiguration =
               restoredSettings.getDeveloperToolConfigurations(developerToolId)[0]
 
-            Assertions.assertThat(developerToolConfiguration.persistentProperties)
-              .containsKey(propertyId)
+            assertThat(developerToolConfiguration.persistentProperties).containsKey(propertyId)
             val property = developerToolConfiguration.persistentProperties[propertyId]
 
-            Assertions.assertThat(
+            assertThat(
                 DeveloperToolsInstanceSettings.Companion
                   .configurationPropertyTypesByNamesAndLegacyValueTypes
               )
@@ -267,9 +268,9 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
             val expectedValue =
               developerToolConfigurationPropertyType!!.fromPersistent(propertyValue)
-            Assertions.assertThat(property!!.value).isEqualTo(expectedValue)
+            assertThat(property!!.value).isEqualTo(expectedValue)
 
-            Assertions.assertThat(property.type.name).isEqualTo(propertyType)
+            assertThat(property.type.name).isEqualTo(propertyType)
           }
         }
 

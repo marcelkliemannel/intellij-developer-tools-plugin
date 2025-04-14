@@ -68,7 +68,7 @@ app \
           .trimIndent()
           .toByteArray()
       )
-    assertThat(actual).isEqualTo("app -foo --baz ---baz -foo-bar \"foo -baz\" '-foo-bar'")
+    assertThat(String(actual)).isEqualTo("app -foo --baz ---baz -foo-bar \"foo -baz\" '-foo-bar'")
   }
 
   // -- Private Methods ----------------------------------------------------- //

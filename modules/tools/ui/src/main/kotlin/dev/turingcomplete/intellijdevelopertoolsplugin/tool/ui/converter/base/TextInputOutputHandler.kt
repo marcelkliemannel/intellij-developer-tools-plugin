@@ -26,6 +26,7 @@ class TextInputOutputHandler(
   private val liveConversionRequested: (TextInputOutputHandler) -> Unit,
   private val diffSupport: AdvancedEditor.DiffSupport? = null,
   defaultText: String = "",
+  exampleText: String? = null,
 ) :
   InputOutputHandler(
     id = id,
@@ -36,7 +37,7 @@ class TextInputOutputHandler(
   ) {
   // -- Properties ---------------------------------------------------------- //
 
-  private var inputOutputText = configuration.register("${id}Text", defaultText, INPUT)
+  private var inputOutputText = configuration.register("${id}Text", defaultText, INPUT, exampleText)
 
   private lateinit var advancedEditor: AdvancedEditor
 

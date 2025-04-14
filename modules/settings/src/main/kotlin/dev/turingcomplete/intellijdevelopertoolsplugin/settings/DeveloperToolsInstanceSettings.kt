@@ -228,8 +228,12 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
         val actualValue = valueAndType[1]
         val configurationPropertyType =
           configurationPropertyTypesByNamesAndLegacyValueTypes[valueType]
-        check(configurationPropertyType != null) { "Missing property value type: $valueType" }
-        return configurationPropertyType.fromPersistent(actualValue)
+        return if (configurationPropertyType == null) {
+          log.warn("Missing property type: $valueType")
+          null
+        } else {
+          configurationPropertyType.fromPersistent(actualValue)
+        }
       } catch (e: Exception) {
         log.warn("Failed to load configuration property of value: $value", e)
         null

@@ -22,9 +22,8 @@ sql-formatter = "2.0.4"
 assertj = "3.25.3"
 # See bundled version: https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
 kotlin = "2.1.10"
-intellij-platform = "2.4.0"
+intellij-platform = "2.5.0"
 changelog = "2.2.0"
-asm = "9.7.1"
 spotless = "7.0.2"
 
 [libraries]
@@ -59,8 +58,6 @@ text-case-converter = { group = "dev.turingcomplete", name = "text-case-converte
 text-case-converter-kotlin-extension = { group = "dev.turingcomplete", name = "text-case-converter-kotlin-extension", version.ref = "text-case-converter" }
 
 assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj" }
-
-asm = { group = "org.ow2.asm", name = "asm", version.ref = "asm" }
 
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 

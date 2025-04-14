@@ -3,6 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
 
@@ -28,7 +29,8 @@ object IoUtils {
   }
 
   fun Path.collectAllFiles(): List<Path> {
-    check(this.isDirectory())
+    check(this.exists()) { "Path `$this` does not exists" }
+    check(this.isDirectory()) { "Path `$this` is not a directory" }
 
     return Files.walk(this).filter { it.isRegularFile() }.toList()
   }

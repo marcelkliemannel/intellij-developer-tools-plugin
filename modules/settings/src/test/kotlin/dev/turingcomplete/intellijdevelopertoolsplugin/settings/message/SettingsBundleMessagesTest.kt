@@ -6,13 +6,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.Bundl
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.Setting
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsGroup
 import java.nio.file.Path
+import org.jetbrains.kotlin.psi.KtClassOrObject
+import org.jetbrains.kotlin.psi.KtProperty
 import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.TestFactory
-import org.objectweb.asm.AnnotationVisitor
-import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.MethodVisitor
-import org.objectweb.asm.Opcodes
 
 class SettingsBundleMessagesTest : BundleMessagesTest() {
   // -- Properties ---------------------------------------------------------- //
@@ -35,8 +32,8 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
   override fun `test that all keys in the messages bundle are used`(): List<DynamicNode> =
     `do test that all keys in the messages bundle are used`()
 
-  override fun classFilesToScanForMessagesBundleUsages(): List<Path> {
-    return super.classFilesToScanForMessagesBundleUsages().filter {
+  override fun kotlinSourceFilesToScanForMessagesBundleUsages(): List<Path> {
+    return super.kotlinSourceFilesToScanForMessagesBundleUsages().filter {
       // Will falsely see `modificationsCounter` LDC instruction as `message` argument
       it.fileName.toString() != "SettingsHandler\$SettingsContainer.class"
     }
@@ -45,30 +42,36 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
   override fun collectAllMessageBundleUsages(): List<MessagesBundleUsage> {
     val allMessageBundleUsages = super.collectAllMessageBundleUsages().toMutableList()
 
-    classFilesToScanForMessagesBundleUsages().forEach { classFile ->
-      val settingsRelatedAnnotationUsages = mutableListOf<SettingsRelatedAnnotationUsage>()
+    val settingsRelatedAnnotations =
+      setOf(Setting::class.simpleName!!, SettingsGroup::class.simpleName!!)
 
-      classFile
-        .readClass()
-        .accept(SettingsRelatedUsageClassVisitor(settingsRelatedAnnotationUsages), 0)
+    kotlinSourceFilesToScanForMessagesBundleUsages().forEach { kotlinSourceFile ->
+      val toKtFile = kotlinSourceFile.toKtFile()
+      toKtFile
+        .traverseElement(KtProperty::class)
+        .plus(toKtFile.traverseElement(KtClassOrObject::class))
+        .flatMap { it.annotationEntries }
+        .filter { settingsRelatedAnnotations.contains(it.shortName!!.asString()) }
+        .map {
+          val args = it.valueArguments.associateBy { it.getArgumentName()?.asName?.asString() }
 
-      settingsRelatedAnnotationUsages.forEach {
-        listOfNotNull(
-            "titleBundleKey" to it.titleBundleKey,
-            "descriptionBundleKey" to it.descriptionBundleKey,
-          )
-          .filter { (_, messageKey) -> messageKey != null }
-          .map { (type, messageKey) ->
-            MessagesBundleUsage(
-              className = classFile.nameWithoutExtension(),
-              bundleName = SettingsBundle::class.simpleName!!,
-              messageKey = messageKey!!,
-              parametersCount = 0,
-              displayableText = "$messageKey ($type property for group ID: ${it.id})",
+          listOfNotNull(
+              "titleBundleKey" to args["titleBundleKey"],
+              "descriptionBundleKey" to args["descriptionBundleKey"],
             )
-          }
-          .forEach { allMessageBundleUsages.add(it) }
-      }
+            .map { it.first to it.second?.getArgumentExpression()?.text?.trim('"') }
+            .filter { (_, messageKey) -> messageKey != null }
+            .map { (type, messageKey) ->
+              MessagesBundleUsage(
+                className = kotlinSourceFile.nameWithoutExtension(),
+                bundleName = SettingsBundle::class.simpleName!!,
+                messageKey = messageKey!!,
+                parametersCount = 0,
+                displayableText = "$messageKey ($type)",
+              )
+            }
+            .forEach { allMessageBundleUsages.add(it) }
+        }
     }
 
     return allMessageBundleUsages
@@ -76,106 +79,5 @@ class SettingsBundleMessagesTest : BundleMessagesTest() {
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //
-
-  private class SettingsRelatedUsageClassVisitor(
-    val settingsRelatedAnnotationUsages: MutableList<SettingsRelatedAnnotationUsage>
-  ) : ClassVisitor(Opcodes.ASM9, ClassWriter(0)) {
-
-    override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? {
-      if (settingsRelatedAnnotationsInternalNames.any { descriptor.contains(it) }) {
-        return SettingsGroupUsageAnnotationVisitor(settingsRelatedAnnotationUsages)
-      }
-      return super.visitAnnotation(descriptor, visible)
-    }
-
-    /**
-     * The annotations on a properties in a Kotlin source file will be added as getter methods to a
-     * separated nested class with the name `DefaultImpls`.
-     */
-    override fun visitMethod(
-      access: Int,
-      name: String?,
-      descriptor: String?,
-      signature: String?,
-      exceptions: Array<out String?>?,
-    ): MethodVisitor? {
-      return SettingsRelatedUsageMethodVisitor(settingsRelatedAnnotationUsages)
-    }
-  }
-
-  // -- Inner Type ---------------------------------------------------------- //
-
-  private class SettingsRelatedUsageMethodVisitor(
-    val settingsRelatedAnnotationUsages: MutableList<SettingsRelatedAnnotationUsage>
-  ) : MethodVisitor(Opcodes.ASM9) {
-
-    override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? {
-      if (settingsRelatedAnnotationsInternalNames.any { descriptor.contains(it) }) {
-        return SettingsGroupUsageAnnotationVisitor(settingsRelatedAnnotationUsages)
-      }
-      return super.visitAnnotation(descriptor, visible)
-    }
-  }
-
-  // -- Inner Type ---------------------------------------------------------- //
-
-  private class SettingsGroupUsageAnnotationVisitor(
-    val settingsRelatedAnnotationUsages: MutableList<SettingsRelatedAnnotationUsage>
-  ) : AnnotationVisitor(Opcodes.ASM9) {
-
-    private var id: String? = null
-    private var titleBundleKey: String? = null
-    private var descriptionBundleKey: String? = null
-
-    override fun visitAnnotation(name: String?, descriptor: String?): AnnotationVisitor? {
-      return SettingsGroupUsageAnnotationVisitor(settingsRelatedAnnotationUsages)
-    }
-
-    override fun visitArray(name: String?): AnnotationVisitor? {
-      return SettingsGroupUsageAnnotationVisitor(settingsRelatedAnnotationUsages)
-    }
-
-    override fun visitEnd() {
-      if (titleBundleKey != null) {
-        val settingsRelatedAnnotationUsage =
-          SettingsRelatedAnnotationUsage(
-            id = id,
-            titleBundleKey = titleBundleKey!!,
-            descriptionBundleKey = descriptionBundleKey,
-          )
-        settingsRelatedAnnotationUsages.add(settingsRelatedAnnotationUsage)
-
-        id = null
-        titleBundleKey = null
-        descriptionBundleKey = null
-      }
-
-      super.visitEnd()
-    }
-
-    override fun visit(name: String, value: Any?) {
-      when (name) {
-        "id" -> id = value as String
-        "titleBundleKey" -> titleBundleKey = value as String
-        "descriptionBundleKey" -> descriptionBundleKey = value as String
-      }
-      super.visit(name, value)
-    }
-  }
-
-  // -- Inner Type ---------------------------------------------------------- //
-
-  private data class SettingsRelatedAnnotationUsage(
-    val id: String?,
-    val titleBundleKey: String,
-    val descriptionBundleKey: String?,
-  )
-
   // -- Companion Object ---------------------------------------------------- //
-
-  companion object {
-
-    private val settingsRelatedAnnotationsInternalNames: List<String> =
-      listOf(SettingsGroup::class, Setting::class).map { it.qualifiedName!!.replace(".", "/") }
-  }
 }

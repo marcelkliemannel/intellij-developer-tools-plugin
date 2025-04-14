@@ -5,12 +5,15 @@
 ### Added
 
 - All encoding/decoding and escaping/unescaping tools now also support reading from and writing to files.
+- New "Escape Sequence" tool for escaping/unescaping line breaks, tabs, backslashes, and single/double quotes.
 
 ### Changed
 
 - Setting "Dialog is modal" was reset to its default value (false), due to overhaul of the internal settings handling.
 
 ### Removed
+
+- The "Line Breaks Encoding" tool has been replaced by the new "Escape Sequence" tool.
 
 ### Fixed
 

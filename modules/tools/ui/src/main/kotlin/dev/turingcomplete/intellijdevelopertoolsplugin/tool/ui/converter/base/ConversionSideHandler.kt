@@ -66,7 +66,11 @@ class ConversionSideHandler(
     return component
   }
 
-  fun addTextInputOutputHandler(id: String, defaultText: String = ""): TextInputOutputHandler {
+  fun addTextInputOutputHandler(
+    id: String,
+    defaultText: String = "",
+    exampleText: String? = null,
+  ): TextInputOutputHandler {
     val textInputOutputHandler =
       TextInputOutputHandler(
         id = id,
@@ -81,6 +85,7 @@ class ConversionSideHandler(
         },
         diffSupport = diffSupport,
         defaultText = defaultText,
+        exampleText = exampleText,
       )
     inputOutputHandlers.add(textInputOutputHandler)
     return textInputOutputHandler

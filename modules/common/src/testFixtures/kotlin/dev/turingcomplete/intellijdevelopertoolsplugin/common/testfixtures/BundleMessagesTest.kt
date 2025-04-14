@@ -1,27 +1,36 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.ui.UIBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.extension
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.nameWithoutExtension
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.IoUtils.collectAllFiles
 import java.io.File
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.Properties
+import kotlin.io.path.nameWithoutExtension
+import kotlin.reflect.KClass
 import org.assertj.core.api.Assertions.assertThat
+import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtNameReferenceExpression
+import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DynamicContainer.dynamicContainer
 import org.junit.jupiter.api.DynamicNode
 import org.junit.jupiter.api.DynamicTest.dynamicTest
-import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.MethodVisitor
-import org.objectweb.asm.Opcodes
-import org.objectweb.asm.Type
 
 abstract class BundleMessagesTest : IdeaTest() {
   // -- Properties ---------------------------------------------------------- //
+
+  private val psiManager: PsiManager by lazy { PsiManager.getInstance(fixture.project) }
+
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
@@ -35,21 +44,23 @@ abstract class BundleMessagesTest : IdeaTest() {
         it.languageToMessages.filter { it.key != REFERENCE_LANGUAGE_KEY }
       dynamicContainer(
         it.bundleName,
-        it.referenceLanguageMessages().map {
-          (referenceLanguageMessageKey, referenceLanguageMessageValue) ->
-          dynamicContainer(
-            referenceLanguageMessageKey,
-            additionalLanguageToMessages.map { (additionalLanguageKey, additionalLanguageMessages)
-              ->
-              dynamicTest(additionalLanguageKey) {
-                assertThat(additionalLanguageMessages).containsKey(referenceLanguageMessageKey)
-                assertThat(
-                    countUniqueParameters(additionalLanguageMessages[referenceLanguageMessageKey]!!)
-                  )
-                  .isEqualTo(countUniqueParameters(referenceLanguageMessageValue))
-              }
-            },
-          )
+        additionalLanguageToMessages.map { (additionalLanguageKey, additionalLanguageMessages) ->
+          val testSameMessageKeys =
+            dynamicTest("Same message keys") {
+              assertThat(it.referenceLanguageMessages().keys)
+                .containsExactlyInAnyOrderElementsOf(additionalLanguageMessages.keys)
+            }
+          val sameParameterCounts =
+            dynamicContainer(
+              "Language messages have same parameter counts",
+              additionalLanguageMessages.map { (key, _) ->
+                dynamicTest(key) {
+                  assertThat(countUniqueParameters(additionalLanguageMessages[key]!!))
+                    .isEqualTo(countUniqueParameters(it.referenceLanguageMessages()[key]!!))
+                }
+              },
+            )
+          dynamicContainer(additionalLanguageKey, listOf(testSameMessageKeys, sameParameterCounts))
         },
       )
     }
@@ -65,6 +76,7 @@ abstract class BundleMessagesTest : IdeaTest() {
         dynamicContainer(
           className,
           allMessageBundleUsagesInClass
+            .filter { !internalBundleNames.contains(it.bundleName) }
             .groupBy { it.bundleName }
             .map { (bundleName, allMessageBundleUsages) ->
               val messagesBundleReferenceLanguageMessages =
@@ -118,28 +130,62 @@ abstract class BundleMessagesTest : IdeaTest() {
    * the `messageKey` is a [String]. Overridden methods may add additional [MessagesBundleUsage].
    */
   protected open fun collectAllMessageBundleUsages(): List<MessagesBundleUsage> =
-    classFilesToScanForMessagesBundleUsages().flatMap { classFile ->
-      val usages = mutableListOf<MessagesBundleUsage>()
+    kotlinSourceFilesToScanForMessagesBundleUsages().flatMap { kotlinSourceFile ->
+      kotlinSourceFile.toKtFile().traverseElement(KtDotQualifiedExpression::class).mapNotNull {
+        ktDotQualifiedExpression ->
+        val receiver = ktDotQualifiedExpression.receiverExpression
+        if (receiver !is KtNameReferenceExpression) return@mapNotNull null
 
-      classFile
-        .readClass()
-        .accept(MessageCallsClassVisitor(classFile.nameWithoutExtension(), usages), 0)
+        val referenceName = receiver.getReferencedName()
+        val callExpression = ktDotQualifiedExpression.selectorExpression as? KtCallExpression
+        val methodName = callExpression?.calleeExpression?.text
+        if (methodName != "message") {
+          return@mapNotNull null
+        }
 
-      usages
+        val parameters = callExpression.valueArguments
+        val firstArgExpression =
+          parameters.getOrNull(0)?.getArgumentExpression() as? KtStringTemplateExpression
+            ?: return@mapNotNull null
+
+        // Reject if the string contains interpolation
+        if (firstArgExpression.hasInterpolation()) {
+          return@mapNotNull null
+        }
+
+        val messageKey = firstArgExpression.entries.joinToString("") { it.text }
+
+        return@mapNotNull MessagesBundleUsage(
+          className = kotlinSourceFile.nameWithoutExtension,
+          bundleName = referenceName,
+          messageKey = messageKey,
+          parametersCount = parameters.size - 1,
+        )
+      }
     }
 
-  protected fun Path.readClass() = ClassReader(Files.readAllBytes(this))
+  protected fun Path.toKtFile(): KtFile {
+    val virtualFile = LocalFileSystem.getInstance().findFileByNioFile(this)!!
+    return ApplicationManager.getApplication().runReadAction<PsiFile?> {
+      psiManager.findFile(virtualFile)
+    } as KtFile
+  }
 
   protected fun getMessagesBundle(bundleName: String) =
     messagesBundles.firstOrNull { it.bundleName == bundleName }
       ?: error("Bundle `$bundleName` not found")
 
-  protected open fun classFilesToScanForMessagesBundleUsages(): List<Path> {
+  protected open fun kotlinSourceFilesToScanForMessagesBundleUsages(): List<Path> {
     val classFiles =
-      Paths.get("build/classes/kotlin/main").collectAllFiles().filter { it.extension() == "class" }
+      Paths.get("src/main/kotlin").collectAllFiles().filter {
+        setOf("kt", "kts").contains(it.extension())
+      }
     assertThat(classFiles).hasSizeGreaterThanOrEqualTo(1)
     return classFiles
   }
+
+  protected fun <T : KtElement> KtElement.traverseElement(type: KClass<T>): List<T> =
+    PsiTreeUtil.collectElementsOfType(this, type.java).toList()
 
   // -- Private Methods ----------------------------------------------------- //
 
@@ -169,95 +215,6 @@ abstract class BundleMessagesTest : IdeaTest() {
     val displayableText: String = messageKey,
   )
 
-  // -- Inner Type ---------------------------------------------------------- //
-
-  class MessageCallsMethodVisitor(
-    private val className: String,
-    methodVisitor: MethodVisitor,
-    private val usages: MutableList<MessagesBundleUsage>,
-  ) : MethodVisitor(Opcodes.ASM9, methodVisitor) {
-
-    private var lastStringLdcInsn: String? = null
-    private var lastIconstInsn: Int? = null
-    private var lastIconstInsnPrecedingAnewArray: Int? = null
-
-    override fun visitInsn(opcode: Int) {
-      lastIconstInsn =
-        when (opcode) {
-          Opcodes.ICONST_0 -> 0
-          Opcodes.ICONST_1 -> 1
-          Opcodes.ICONST_2 -> 2
-          Opcodes.ICONST_3 -> 3
-          Opcodes.ICONST_4 -> 4
-          Opcodes.ICONST_5 -> 4
-          else -> lastIconstInsn
-        }
-
-      super.visitInsn(opcode)
-    }
-
-    override fun visitTypeInsn(opcode: Int, type: String?) {
-      if (opcode == Opcodes.ANEWARRAY) {
-        lastIconstInsnPrecedingAnewArray = lastIconstInsn
-      }
-
-      super.visitTypeInsn(opcode, type)
-    }
-
-    override fun visitLdcInsn(value: Any?) {
-      if (value is String) {
-        lastStringLdcInsn = value
-      }
-
-      super.visitLdcInsn(value)
-    }
-
-    override fun visitMethodInsn(
-      opcode: Int,
-      owner: String,
-      name: String,
-      descriptor: String,
-      isInterface: Boolean,
-    ) {
-      if (name == "message") {
-        val type = Type.getMethodType(descriptor)
-        val argumentTypes = type.argumentTypes
-        if (argumentTypes.isNotEmpty() && argumentTypes[0] == Type.getType(String::class.java)) {
-          usages.add(
-            MessagesBundleUsage(
-              className = className,
-              bundleName = owner.substringAfterLast("/"),
-              messageKey = lastStringLdcInsn ?: error("No latest LDC instruction captured"),
-              parametersCount =
-                lastIconstInsnPrecedingAnewArray
-                  ?: error("No last ICONST before ANEWARRAY instruction captured"),
-            )
-          )
-        }
-      }
-
-      super.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
-    }
-  }
-
-  // -- Inner Type ---------------------------------------------------------- //
-
-  class MessageCallsClassVisitor(
-    private val fileName: String,
-    private val usages: MutableList<MessagesBundleUsage>,
-  ) : ClassVisitor(Opcodes.ASM9, ClassWriter(0)) {
-    override fun visitMethod(
-      access: Int,
-      name: String,
-      descriptor: String,
-      signature: String?,
-      exceptions: Array<out String>?,
-    ): MethodVisitor {
-      val methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions)
-      return MessageCallsMethodVisitor(fileName, methodVisitor, usages)
-    }
-  }
-
   // -- Companion Object ---------------------------------------------------- //
 
   companion object {
@@ -269,6 +226,8 @@ abstract class BundleMessagesTest : IdeaTest() {
       private set
 
     private const val REFERENCE_LANGUAGE_KEY = "en"
+
+    private val internalBundleNames = setOf(UIBundle::class.simpleName!!)
 
     @BeforeAll
     @JvmStatic
