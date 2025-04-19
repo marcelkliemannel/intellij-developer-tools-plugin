@@ -38,18 +38,26 @@ class DeveloperToolConfiguration(
     defaultValue: T,
     propertyType: PropertyType = PropertyType.CONFIGURATION,
     example: T? = null,
+    legacyKey: String? = null,
   ): ValueProperty<T> =
     properties[key]?.let { reuseExistingProperty(it) }
-      ?: createNewProperty(defaultValue, propertyType, key, createExampleProvider(example))
+      ?: createNewProperty(
+        defaultValue,
+        propertyType,
+        key,
+        legacyKey,
+        createExampleProvider(example),
+      )
 
   fun <T : Any> registerWithExampleProvider(
     key: String,
     defaultValue: T,
     propertyType: PropertyType = PropertyType.CONFIGURATION,
+    legacyKey: String? = null,
     example: (() -> T)? = null,
   ): ValueProperty<T> =
     properties[key]?.let { reuseExistingProperty(it) }
-      ?: createNewProperty(defaultValue, propertyType, key, example)
+      ?: createNewProperty(defaultValue, propertyType, key, legacyKey, example)
 
   fun addChangeListener(parentDisposable: Disposable, changeListener: ChangeListener) {
     changeListeners.add(changeListener)
@@ -114,10 +122,12 @@ class DeveloperToolConfiguration(
     defaultValue: T,
     propertyType: PropertyType,
     key: String,
+    legacyKey: String? = null,
     example: (() -> T)?,
   ): ValueProperty<T> {
     val type = assertPersistableType(defaultValue::class)
-    val existingPropertyValue = persistentProperties[key]?.value
+    val existingPropertyValue =
+      persistentProperties[key]?.value ?: legacyKey?.let { persistentProperties[it]?.value }
     val initialValue: T =
       type.safeCast(existingPropertyValue)
         ?: let {
@@ -132,6 +142,7 @@ class DeveloperToolConfiguration(
         defaultValue = defaultValue,
         example = example,
         type = propertyType,
+        legacyKey = legacyKey,
       )
     return valueProperty
   }
@@ -157,6 +168,7 @@ class DeveloperToolConfiguration(
     val defaultValue: Any,
     val example: (() -> Any)?,
     val type: PropertyType,
+    val legacyKey: String? = null,
   ) {
 
     fun reset(loadExamples: Boolean) {

@@ -7,13 +7,11 @@ import com.intellij.openapi.components.SettingsCategory
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.logger
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.CryptoUtils.registerBouncyCastleProvider
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.GeneralSettings.ActionHandlingInstance.DIALOG
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.GeneralSettings.ActionHandlingInstance.TOOL_WINDOW
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.Settings
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.base.SettingsHandler.settingsContainer
-import java.security.Provider
-import java.security.Security
 import org.jdom.Element
 
 @Service
@@ -31,16 +29,13 @@ class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
     SettingsHandler.create(JsonHandlingSettings::class)
   }
 
-  private val allSettings = listOf<Settings>(generalSettings, internalSettings, jsonHandling)
+  private val allSettings = listOf(generalSettings, internalSettings, jsonHandling)
 
   // -- Initialization ------------------------------------------------------ //
 
   init {
     try {
-      val bouncyCastleProviderClass =
-        Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider")
-      val bouncyCastleProvider = bouncyCastleProviderClass.getConstructor().newInstance()
-      Security.addProvider(bouncyCastleProvider as Provider)
+      registerBouncyCastleProvider()
     } catch (e: Exception) {
       log.debug("Can't load BouncyCastleProvider", e)
     }

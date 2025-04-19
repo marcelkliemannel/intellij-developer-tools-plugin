@@ -16,7 +16,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 
 class CodeStyleFormatting(
-  private val codeStyles: List<CodeStyle>,
+  val codeStyles: List<CodeStyle>,
   project: Project,
   context: DeveloperUiToolContext,
   configuration: DeveloperToolConfiguration,

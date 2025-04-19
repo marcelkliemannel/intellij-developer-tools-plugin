@@ -1,3 +1,4 @@
+
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
@@ -89,6 +90,7 @@ dependencies {
   testRuntimeOnly(libs.bundles.junit.runtime)
   testImplementation(libs.commons.csv)
   testImplementation(testFixtures(project(":common")))
+  testImplementation(testFixtures(project(":tools-ui")))
 }
 
 intellijPlatform {
@@ -171,14 +173,6 @@ val writeChangelogToFileTask =
 
 sourceSets { main { resources { srcDir(writeChangelogToFileTask) } } }
 
-val integrationTest: SourceSet by
-  sourceSets.creating {
-    compileClasspath += sourceSets["test"].compileClasspath
-    runtimeClasspath += sourceSets["test"].runtimeClasspath
-  }
-
-idea { module.testSources = module.testSources + files(integrationTest.allSource.srcDirs) }
-
 tasks {
   named("publishPlugin") {
     dependsOn("check")
@@ -194,13 +188,4 @@ tasks {
       listOf("-Didea.kotlin.plugin.use.k2=true")
     }
   }
-
-  register<Test>("integrationTest") {
-    group = "verification"
-    testClassesDirs = integrationTest.output.classesDirs
-    classpath = integrationTest.runtimeClasspath
-    useJUnitPlatform()
-  }
-
-  named("check") { dependsOn("integrationTest") }
 }

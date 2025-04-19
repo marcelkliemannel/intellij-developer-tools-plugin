@@ -242,11 +242,12 @@ class AsciiArtCreator(
 
       this.fontResources.clear()
       this.fontResources.putAll(fontResources)
-      fontFileNamesComboBoxModel.setFileNames(fontResources.keys)
 
       if (!fontResources.containsKey(selectedFontFileName.get())) {
         selectedFontFileName.set(DEFAULT_BUILT_IN_FILE_NAME)
       }
+
+      fontFileNamesComboBoxModel.setFileNames(fontResources.keys, selectedFontFileName.get())
 
       createAsciiArt()
     }
@@ -266,13 +267,13 @@ class AsciiArtCreator(
 
     override fun getElementAt(index: Int): String? = fontFileNames[index]
 
-    fun setFileNames(fileNames: Collection<String>) {
+    fun setFileNames(fileNames: Collection<String>, selectedFontFileName: String) {
       fontFileNames.clear()
       fontFileNames.addAll(fileNames.sorted())
 
       if (fileNames.isNotEmpty()) {
         // This will also call `fireContentsChanged`
-        selectedItem = fileNames.first()
+        selectedItem = selectedFontFileName
       } else {
         fireContentsChanged(this, -1, -1)
       }

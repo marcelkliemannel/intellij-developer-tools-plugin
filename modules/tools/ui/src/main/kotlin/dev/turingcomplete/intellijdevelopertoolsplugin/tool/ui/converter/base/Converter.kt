@@ -44,9 +44,9 @@ abstract class Converter(
 
   private var liveConversionEnabled = configuration.register("liveConversion", true)
 
-  private val conversionEnabled = ValueProperty<Boolean>(true)
-  private val liveConversionSupported = ValueProperty<Boolean>(true)
-  private val textDiffSupported = ValueProperty<Boolean>(true)
+  private val conversionEnabled = ValueProperty(true)
+  private val liveConversionSupported = ValueProperty(true)
+  private val textDiffSupported = ValueProperty(true)
 
   protected lateinit var sourceConversionSideHandler: ConversionSideHandler
   protected lateinit var targetConversionSideHandler: ConversionSideHandler

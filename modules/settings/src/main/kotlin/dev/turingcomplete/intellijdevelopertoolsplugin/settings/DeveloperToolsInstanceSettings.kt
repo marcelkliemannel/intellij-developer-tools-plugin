@@ -329,7 +329,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
             id = String::class.qualifiedName!!,
             typeClass = String::class,
             doFromPersistent = { it },
-            doToPersistent = { it.toString() },
+            doToPersistent = { it },
           ),
           SimplePropertyType(
             id = JBColor::class.qualifiedName!!,

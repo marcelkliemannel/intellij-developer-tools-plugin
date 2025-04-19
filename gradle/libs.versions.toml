@@ -65,12 +65,14 @@ junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", v
 junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit" }
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
 junit4 = { group = "junit", name = "junit", version = "4.13.2" }
+# See: https://docs.gradle.org/8.12/userguide/upgrading_version_8.html#manually_declaring_dependencies
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
 
 [bundles]
 zxing = ["zxing-core", "zxing-javase"]
 jackson = ["jackson-core", "jackson-databind", "jackson-dataformat-yaml", "jackson-dataformat-xml", "jackson-dataformat-properties", "jackson-dataformat-toml"]
 junit-implementation = ["junit-jupiter-api", "junit-jupiter-params"]
-junit-runtime = ["junit-jupiter-engine", "junit4"]
+junit-runtime = ["junit-jupiter-engine", "junit4", "junit-platform-launcher"]
 text-case-converter = ["text-case-converter", "text-case-converter-kotlin-extension"]
 
 [plugins]

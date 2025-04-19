@@ -39,7 +39,6 @@ import javax.swing.JTable
 import javax.swing.JTextField
 import javax.swing.ToolTipManager
 import javax.swing.border.CompoundBorder
-import javax.swing.event.ChangeListener
 
 // -- Properties ---------------------------------------------------------- //
 // -- Exported Methods ---------------------------------------------------- //
@@ -288,7 +287,7 @@ fun Cell<JComponent>.registerDynamicToolTip(toolTipText: () -> String?) {
 }
 
 fun JBTabbedPane.onSelectionChanged(onSelectionChanged: (JComponent) -> Unit): JBTabbedPane {
-  addChangeListener(ChangeListener { onSelectionChanged(selectedComponent as JComponent) })
+  addChangeListener { onSelectionChanged(selectedComponent as JComponent) }
 
   return this
 }

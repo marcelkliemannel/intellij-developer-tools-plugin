@@ -1,4 +1,7 @@
-apply(plugin = "org.jetbrains.intellij.platform.module")
+plugins {
+  `java-test-fixtures`
+  id("org.jetbrains.intellij.platform.module")
+}
 
 dependencies {
   implementation(project(":common"))
@@ -35,4 +38,7 @@ dependencies {
   testImplementation(libs.bundles.junit.implementation)
   testRuntimeOnly(libs.bundles.junit.runtime)
   testImplementation(testFixtures(project(":common")))
+
+  testFixturesApi(project(":common"))
+  testFixturesApi(project(":settings"))
 }

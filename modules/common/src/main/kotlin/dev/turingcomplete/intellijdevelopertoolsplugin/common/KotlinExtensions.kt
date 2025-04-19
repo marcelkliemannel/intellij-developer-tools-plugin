@@ -117,5 +117,13 @@ fun <T : Enum<T>> KClass<T>.valueOf(name: String): T {
     ?: error("Enum $this does not have a constant with name: $name")
 }
 
+inline fun <T, U> Iterable<T>.ifNotEmpty(action: Iterable<T>.() -> U): U? =
+  if (this.any()) action(this) else null
+
+inline fun <T> Collection<T>.random(except: (T) -> Boolean): T =
+  this.filter { !except(it) }.random()
+
+inline fun <T> Array<T>.random(except: (T) -> Boolean): T = this.filter { !except(it) }.random()
+
 // -- Private Methods  ---------------------------------------------------- //
 // -- Inner Type ---------------------------------------------------------- //

@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijdevelopertoolsplugin.plugin
+package dev.turingcomplete.intellijdevelopertoolsplugin.integrationtest
 
 import com.intellij.openapi.Disposable
 import com.intellij.testFramework.junit5.TestApplication

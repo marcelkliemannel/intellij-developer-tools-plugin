@@ -84,21 +84,24 @@ class AdvancedEditor(
 
   private var softWraps =
     configuration.register(
-      "${context.id}-${id}-softWraps",
-      fixedEditorSoftWraps ?: generalSettings.editorSoftWraps.get(),
-      CONFIGURATION,
+      key = "${id}-editor-softWraps",
+      defaultValue = fixedEditorSoftWraps ?: generalSettings.editorSoftWraps.get(),
+      propertyType = CONFIGURATION,
+      legacyKey = "${context.id}-${id}-softWraps",
     )
   private var showSpecialCharacters =
     configuration.register(
-      "${context.id}-${id}-showSpecialCharacters",
-      generalSettings.editorShowSpecialCharacters.get(),
-      CONFIGURATION,
+      key = "${id}-editor-showSpecialCharacters",
+      defaultValue = generalSettings.editorShowSpecialCharacters.get(),
+      propertyType = CONFIGURATION,
+      legacyKey = "${context.id}-${id}-showSpecialCharacters",
     )
   private var showWhitespaces =
     configuration.register(
-      "${context.id}-${id}-showWhitespaces",
-      generalSettings.editorShowWhitespaces.get(),
-      CONFIGURATION,
+      key = "${id}-editor-showWhitespaces",
+      defaultValue = generalSettings.editorShowWhitespaces.get(),
+      propertyType = CONFIGURATION,
+      legacyKey = "${context.id}-${id}-showWhitespaces",
     )
 
   private var onTextChangeFromUi = mutableListOf<((String) -> Unit)>()

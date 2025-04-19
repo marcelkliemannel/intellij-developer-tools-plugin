@@ -7,8 +7,11 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.junit5.RunInEdt
 import com.intellij.testFramework.junit5.RunMethodInEdt
 import com.intellij.testFramework.junit5.TestApplication
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.CryptoUtils.registerBouncyCastleProvider
 import kotlin.reflect.KClass
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 
 @RunInEdt(allMethods = false)
@@ -49,4 +52,20 @@ abstract class IdeaTest {
   }
 
   // -- Companion Object ---------------------------------------------------- //
+
+  companion object {
+
+    @BeforeAll
+    @JvmStatic
+    fun beforeAll() {
+      registerBouncyCastleProvider()
+      System.setProperty("java.awt.headless", "true")
+    }
+
+    @AfterAll
+    @JvmStatic
+    fun afterAll() {
+      System.setProperty("java.awt.headless", "false")
+    }
+  }
 }

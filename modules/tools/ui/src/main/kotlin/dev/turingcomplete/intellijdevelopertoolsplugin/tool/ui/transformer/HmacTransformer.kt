@@ -62,7 +62,7 @@ class HmacTransformer(
   // -- Initialization ------------------------------------------------------ //
 
   init {
-    check(algorithms.isNotEmpty())
+    check(hmacAlgorithms.isNotEmpty())
 
     secretKey.afterChange {
       if (!isDisposed && liveTransformation.get()) {
@@ -78,9 +78,10 @@ class HmacTransformer(
 
     // Validate if selected algorithm is still available
     val selectedAlgorithm = selectedAlgorithm.get()
-    if (algorithms.find { it.algorithm == selectedAlgorithm } == null) {
+    if (hmacAlgorithms.find { it.algorithm == selectedAlgorithm } == null) {
       this.selectedAlgorithm.set(
-        (algorithms.find { it.algorithm.equals(DEFAULT_ALGORITHM, true) } ?: algorithms.first())
+        (hmacAlgorithms.find { it.algorithm.equals(DEFAULT_ALGORITHM, true) }
+            ?: hmacAlgorithms.first())
           .algorithm
       )
     }
@@ -116,10 +117,10 @@ class HmacTransformer(
   @Suppress("UnstableApiUsage")
   override fun Panel.buildTopConfigurationUi() {
     row {
-      comboBox(algorithms)
+      comboBox(hmacAlgorithms)
         .label("Algorithm:")
         .applyToComponent {
-          selectedItem = algorithms.find { it.algorithm == selectedAlgorithm.get() }
+          selectedItem = hmacAlgorithms.find { it.algorithm == selectedAlgorithm.get() }
         }
         .whenItemSelectedFromUi { selectedAlgorithm.set(it.algorithm) }
     }
@@ -162,7 +163,7 @@ class HmacTransformer(
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //
 
-  private data class HmacAlgorithm(val title: String, val algorithm: String) {
+  data class HmacAlgorithm(val title: String, val algorithm: String) {
 
     override fun toString(): String = title
   }
@@ -188,7 +189,7 @@ class HmacTransformer(
       parentDisposable: Disposable,
       context: DeveloperUiToolContext,
     ): ((DeveloperToolConfiguration) -> HmacTransformer)? {
-      if (algorithms.isEmpty()) {
+      if (hmacAlgorithms.isEmpty()) {
         return null
       }
 
@@ -203,7 +204,7 @@ class HmacTransformer(
     private const val DEFAULT_ALGORITHM = "HMACSHA256"
     private const val SECRET_KEY_DEFAULT = ""
 
-    private val algorithms: List<HmacAlgorithm> by lazy {
+    val hmacAlgorithms: List<HmacAlgorithm> by lazy {
       Security.getAlgorithms("Mac")
         .asSequence()
         .filter { it.startsWith("HMAC") }

@@ -325,7 +325,7 @@ class JwtEncoderDecoder(
   }
 
   override fun afterBuildUi() {
-    convert(HEADER_OR_PAYLOAD)
+    convertFromUi(ENCODED)
   }
 
   override fun reset() {
@@ -617,7 +617,7 @@ class JwtEncoderDecoder(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private enum class SignatureAlgorithmKind(val keyFactory: KeyFactory?) {
+  enum class SignatureAlgorithmKind(val keyFactory: KeyFactory?) {
 
     HMAC(null),
     RSA(KeyFactory.getInstance("RSA")),
@@ -626,7 +626,7 @@ class JwtEncoderDecoder(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private enum class SignatureAlgorithm(
+  enum class SignatureAlgorithm(
     val jwtHeaderValue: String,
     val kind: SignatureAlgorithmKind,
     @Suppress("unused") // May be used for JWK validation
