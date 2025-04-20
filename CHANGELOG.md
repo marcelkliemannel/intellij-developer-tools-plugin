@@ -6,6 +6,7 @@
 
 - All encoding/decoding and escaping/unescaping tools now also support reading from and writing to files.
 - New "Escape Sequence" tool for escaping/unescaping line breaks, tabs, backslashes, and single/double quotes.
+- Added a setting to control the number of decimal places in the "Color Picker" tool.
 
 ### Changed
 
@@ -16,6 +17,8 @@
 - The "Line Breaks Encoding" tool has been replaced by the new "Escape Sequence" tool.
 
 ### Fixed
+
+- The `hsl/hsla` CSS color value wasn't correctly calculated in the "Color Picker" tool.
 
 ## 6.4.0 - 2025-03-18
 

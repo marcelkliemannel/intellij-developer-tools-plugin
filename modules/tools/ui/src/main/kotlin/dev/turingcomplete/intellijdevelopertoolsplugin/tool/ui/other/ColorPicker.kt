@@ -13,14 +13,18 @@ import com.intellij.ui.colorpicker.ColorPickerModel
 import com.intellij.ui.colorpicker.MaterialGraphicalColorPipetteProvider
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.BottomGap
+import com.intellij.ui.dsl.builder.COLUMNS_TINY
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.columns
+import com.intellij.ui.dsl.builder.whenTextChangedFromUi
 import com.intellij.util.ui.JBUI
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
@@ -28,12 +32,13 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.NotBlankInputValidator
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.toJBColor
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateLongValue
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.awt.Color
 import java.util.Locale
 import javax.swing.border.LineBorder
-import kotlin.math.max
-import kotlin.math.min
 
 class ColorPicker(
   private val project: Project?,
@@ -44,6 +49,9 @@ class ColorPicker(
 
   private val selectedColor: ValueProperty<JBColor> =
     configuration.register("selectedColor", JBColor.MAGENTA.toJBColor(), INPUT)
+
+  private val decimalPlaces: ValueProperty<Int> =
+    configuration.register("decimalPlaces", 2, CONFIGURATION)
 
   private val cssRgb = AtomicProperty("")
   private val cssRgbWithAlpha = AtomicProperty("")
@@ -57,10 +65,8 @@ class ColorPicker(
   // -- Initialization ------------------------------------------------------ //
 
   init {
-    setCssValues(selectedColor.get())
-
     selectedColor.afterChangeConsumeEvent(parentDisposable) {
-      setCssValues(it.newValue)
+      setCssValues()
       if (it.id?.equals(COLOR_SELECTION_CHANGE_ID) != true) {
         colorPickerModel.setColor(it.newValue)
       }
@@ -93,7 +99,7 @@ class ColorPicker(
       }
       .bottomGap(BottomGap.MEDIUM)
 
-    group("CSS Colors") {
+    group(UiToolsBundle.message("color-picker.css-colors.title")) {
       row {
           label("").bindText(cssRgb).gap(RightGap.SMALL)
 
@@ -138,12 +144,12 @@ class ColorPicker(
         .bottomGap(BottomGap.NONE)
 
       row {
-          button("Parse CSS Color Value") {
+          button(UiToolsBundle.message("color-picker.parse-css-color-action.title")) {
             val inputDialog =
               Messages.InputDialog(
                 project,
-                "CSS color value:",
-                PARSE_CSS_VALUE_DIALOG_TITLE,
+                UiToolsBundle.message("color-picker.parse-css-color-action.input"),
+                UiToolsBundle.message("color-picker.parse-css-color-action.title"),
                 null,
                 "",
                 NotBlankInputValidator(),
@@ -154,26 +160,22 @@ class ColorPicker(
         }
         .topGap(TopGap.NONE)
     }
+
+    collapsibleGroup(UiToolsBundle.message("color-picker.settings.title")) {
+      row {
+        textField()
+          .label(UiToolsBundle.message("color-picker.settings.decimal-places"))
+          .bindIntTextImproved(decimalPlaces)
+          .validateLongValue(LongRange(1, 4))
+          .columns(COLUMNS_TINY)
+          .whenTextChangedFromUi { setCssValues() }
+      }
+    }
   }
 
-  private fun parseCssColorValue(inputString: String): JBColor? =
-    try {
-      val color = org.silentsoft.csscolor4j.Color.valueOf(inputString)
-      JBColor(
-        Color(color.red, color.green, color.blue, (color.opacity * 255.0).toInt()),
-        Color(color.red, color.green, color.blue, (color.opacity * 255.0).toInt()),
-      )
-    } catch (e: IllegalArgumentException) {
-      Messages.showErrorDialog(project, e.message, PARSE_CSS_VALUE_DIALOG_TITLE)
-      null
-    } catch (_: Exception) {
-      Messages.showErrorDialog(
-        project,
-        "Unable to parse input value.",
-        PARSE_CSS_VALUE_DIALOG_TITLE,
-      )
-      null
-    }
+  override fun afterBuildUi() {
+    setCssValues()
+  }
 
   override fun getData(dataId: String): Any? =
     when {
@@ -186,86 +188,138 @@ class ColorPicker(
       else -> null
     }
 
-  // -- Private Methods ----------------------------------------------------- //
-
-  private fun setCssValues(color: Color) {
+  fun createCssValues(color: Color): CssValues {
     val red = color.red
     val green = color.green
     val blue = color.blue
     val alpha = color.alpha
-    cssRgb.set("<html><code><b>rgb($red, $green, $blue)</b></code></html>")
-    cssRgbWithAlpha.set(
-      "<html><code><b>rgba($red, $green, $blue, ${"%.2f".format(Locale.US, alpha / 255.0)})</b></code></html>"
-    )
-    cssHex.set(
-      "<html><code><b>${"#%02X%02X%02X".format(Locale.US, red, green, blue)}</b></code></html>"
-    )
-    cssHexWithAlpha.set(
-      "<html><code><b>${"#%02X%02X%02X%02X".format(Locale.US, red, green, blue, alpha)}</b></code></html>"
-    )
     val hsl = rgbToHsl(red, green, blue)
-    cssHls.set(
-      "<html><code><b>${"hsl(%.2f, %.2f%%, %.2f%%)".format(Locale.US, hsl[0], hsl[1] * 100, hsl[2] * 100)}</b></code></html>"
-    )
-    cssHlsWithAlpha.set(
-      "<html><code><b>${
-        "hsla(%.2f, %.2f%%, %.2f%%, %.2f)".format(
-          Locale.US,
-          hsl[0],
-          hsl[1] * 100,
-          hsl[2] * 100,
-          alpha / 255.0,
-        )
-      }</b></code></html>"
+    return CssValues(
+      rgb = formatCssRgb(red = red, green = green, blue = blue),
+      rgbWithAlpha = formatCssRgb(red = red, green = green, blue = blue, alpha = alpha),
+      hex = "#%02X%02X%02X".format(Locale.US, red, green, blue),
+      hexWithAlpha = "#%02X%02X%02X%02X".format(Locale.US, red, green, blue, alpha),
+      hls = formatCssHsl(hsl),
+      hlsWithAlpha = formatCssHsl(hsl, alpha),
     )
   }
 
-  private fun rgbToHsl(red: Int, green: Int, blue: Int): FloatArray {
-    val r = red / 255f
-    val g = green / 255f
-    val b = blue / 255f
+  // -- Private Methods ----------------------------------------------------- //
 
-    val max = max(max(r.toDouble(), g.toDouble()), b.toDouble()).toFloat()
-    val min = min(min(r.toDouble(), g.toDouble()), b.toDouble()).toFloat()
-
-    var h: Float
-    val s: Float
-    val l = (max + min) / 2
-
-    if (max == min) {
-      s = 0f
-      h = s
-    } else {
-      val d = max - min
-      s = if (l > 0.5) d / (2 - max - min) else d / (max + min)
-
-      h =
-        when (max) {
-          r -> {
-            (g - b) / d + (if (g < b) 6 else 0)
-          }
-
-          g -> {
-            (b - r) / d + 2
-          }
-
-          else -> {
-            (r - g) / d + 4
-          }
-        }
-
-      h /= 6f
+  private fun parseCssColorValue(inputString: String): JBColor? =
+    try {
+      val color = org.silentsoft.csscolor4j.Color.valueOf(inputString)
+      JBColor(
+        Color(color.red, color.green, color.blue, (color.opacity * 255.0).toInt()),
+        Color(color.red, color.green, color.blue, (color.opacity * 255.0).toInt()),
+      )
+    } catch (e: IllegalArgumentException) {
+      Messages.showErrorDialog(
+        project,
+        e.message,
+        UiToolsBundle.message("color-picker.parse-css-color-action.title"),
+      )
+      null
+    } catch (_: Exception) {
+      Messages.showErrorDialog(
+        project,
+        UiToolsBundle.message("color-picker.parse-css-color-action.error.message"),
+        UiToolsBundle.message("color-picker.parse-css-color-action.title"),
+      )
+      null
     }
 
-    return floatArrayOf(h, s, l)
+  private fun setCssValues() {
+    setCssValues(createCssValues(selectedColor.get()))
   }
+
+  private fun setCssValues(cssValues: CssValues) {
+    fun String.formatHtml(): String = "<html><code><b>${this}</b></code></html>"
+
+    cssRgb.set(cssValues.rgb.formatHtml())
+    cssRgbWithAlpha.set(cssValues.rgbWithAlpha.formatHtml())
+    cssHex.set(cssValues.hex.formatHtml())
+    cssHexWithAlpha.set(cssValues.hexWithAlpha.formatHtml())
+    cssHls.set(cssValues.hls.formatHtml())
+    cssHlsWithAlpha.set(cssValues.hlsWithAlpha.formatHtml())
+  }
+
+  private fun rgbToHsl(r: Int, g: Int, b: Int): Triple<Float, Float, Float> {
+    val rNorm = r / 255f
+    val gNorm = g / 255f
+    val bNorm = b / 255f
+
+    val max = maxOf(rNorm, gNorm, bNorm)
+    val min = minOf(rNorm, gNorm, bNorm)
+    val l = (max + min) / 2f
+
+    if (max == min) {
+      return Triple(0f, 0f, l * 100) // achromatic
+    }
+
+    val d = max - min
+    val s = if (l > 0.5f) d / (2f - max - min) else d / (max + min)
+
+    val h =
+      when (max) {
+        rNorm -> ((gNorm - bNorm) / d + if (gNorm < bNorm) 6 else 0)
+        gNorm -> ((bNorm - rNorm) / d + 2)
+        else -> ((rNorm - gNorm) / d + 4)
+      } / 6f
+
+    return Triple(h * 360, s * 100, l * 100)
+  }
+
+  private fun formatCssRgb(red: Int, green: Int, blue: Int, alpha: Int? = null): String {
+    return if (alpha != null) {
+      val alphaNormalized = alpha.coerceIn(0, 255) / 255f
+      val aStr = formatNumber(alphaNormalized)
+      "rgba($red, $green, $blue, $aStr)"
+    } else {
+      "rgb($red, $green, $blue)"
+    }
+  }
+
+  private fun formatCssHsl(hsl: Triple<Float, Float, Float>, alpha: Int? = null): String {
+    val (h, s, l) = hsl
+    val hStr = formatNumber(h)
+    val sStr = formatNumber(s) + "%"
+    val lStr = formatNumber(l) + "%"
+
+    return if (alpha != null) {
+      val alphaNormalized = alpha.coerceIn(0, 255) / 255f
+      val aStr = formatNumber(alphaNormalized)
+      "hsla($hStr, $sStr, $lStr, $aStr)"
+    } else {
+      "hsl($hStr, $sStr, $lStr)"
+    }
+  }
+
+  fun formatNumber(value: Float): String {
+    val rounded = String.format(Locale.US, "%.${decimalPlaces.get()}f", value)
+    return rounded.trimEnd('0').trimEnd('.')
+  }
+
+  // -- Inner Type ---------------------------------------------------------- //
+
+  data class CssValues(
+    val rgb: String,
+    val rgbWithAlpha: String,
+    val hex: String,
+    val hexWithAlpha: String,
+    val hls: String,
+    val hlsWithAlpha: String,
+  )
 
   // -- Inner Type ---------------------------------------------------------- //
 
   class Factory : DeveloperUiToolFactory<ColorPicker> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Color Picker", contentTitle = "Color Picker")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("color-picker.title"),
+        contentTitle = UiToolsBundle.message("color-picker.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
@@ -281,8 +335,6 @@ class ColorPicker(
   companion object {
 
     private const val COLOR_SELECTION_CHANGE_ID = "colorSelection"
-
-    private const val PARSE_CSS_VALUE_DIALOG_TITLE = "Parse CSS Color Value"
 
     private val cssRgbDataKey = DataKey.create<String>("cssRgb")
     private val cssRgbWithAlphaDataKey = DataKey.create<String>("cssRgbWithAlpha")
