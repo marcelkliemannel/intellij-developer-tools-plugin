@@ -119,7 +119,6 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
       parentDisposable = parentDisposable,
       settings = settings,
       groupNodeSelectionEnabled = false,
-      promoteMainDialog = true,
       prioritizeVerticalLayout = true,
     ) {
 
@@ -128,7 +127,7 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     private var lastGeneralSettingsModificationsCounter = generalSettings.modificationsCounter
 
     init {
-      toolsMenuTreeWrapper = toolsMenuTree.createWrapperComponent(innerContentPanel)
+      toolsMenuTreeWrapper = toolsMenuTree.createWrapperComponent(contentPanel)
       Disposer.register(parentDisposable) { toolsMenuTreeWrapper = null }
     }
 

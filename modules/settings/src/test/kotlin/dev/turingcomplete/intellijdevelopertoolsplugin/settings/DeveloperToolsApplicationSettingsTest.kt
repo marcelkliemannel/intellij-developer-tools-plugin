@@ -126,7 +126,8 @@ class DeveloperToolsApplicationSettingsTest {
         "editorSoftWraps",
         "hideWorkbenchTabsOnSingleTab",
         "loadExamples",
-        "promoteAddOpenMainDialogActionToMainToolbar",
+        // Removed with 6.4.0
+        // "promoteAddOpenMainDialogActionToMainToolbar",
         "saveConfigurations",
         "saveInputs",
         "saveSensitiveInputs",
@@ -136,26 +137,18 @@ class DeveloperToolsApplicationSettingsTest {
         "toolsMenuTreeShowGroupNodes",
       )
 
-    val getSettings: (String) -> Settings = { legacyAttributeName ->
-      when (legacyAttributeName) {
-        "promoteAddOpenMainDialogActionToMainToolbar" ->
-          developerToolsApplicationSettings.internalSettings
-        else -> developerToolsApplicationSettings.generalSettings
-      }
-    }
-
     val modifiedLegacyAttributes: Map<String, Any> =
-      legacyAttributeNames.associate { legacyAttributeName ->
+      legacyAttributeNames.associateWith { legacyAttributeName ->
         val initialValue =
-          getSettings(legacyAttributeName)
+          developerToolsApplicationSettings.generalSettings
             .getSetting<Any, Annotation, AnySettingProperty>(legacyAttributeName)
             .get()
-        legacyAttributeName to initialValue.modifyValue()
+        initialValue.modifyValue()
       }
 
     val legacyState =
       """
-      <component 
+      <component
         name="DeveloperToolsApplicationSettingsV1"
         ${modifiedLegacyAttributes.asSequence().joinToString(" ") { "${it.key}=\"${it.value}\"" }}
       />
@@ -165,8 +158,13 @@ class DeveloperToolsApplicationSettingsTest {
 
     legacyAttributeNames.forEach { legacyAttributeName ->
       val settingProperty =
-        getSettings(legacyAttributeName)
-          .getSetting<Any, Annotation, AnySettingProperty>(legacyAttributeName)
+        developerToolsApplicationSettings.generalSettings.getSetting<
+          Any,
+          Annotation,
+          AnySettingProperty,
+        >(
+          legacyAttributeName
+        )
       assertThat(settingProperty.isModified()).describedAs(legacyAttributeName).isTrue
       assertThat(settingProperty.get())
         .describedAs(legacyAttributeName)
@@ -222,7 +220,7 @@ class DeveloperToolsApplicationSettingsTest {
         arguments(
           { it: DeveloperToolsApplicationSettings -> it.internalSettings },
           "InternalSettings",
-          setOf("promoteAddOpenMainDialogActionToMainToolbar"),
+          setOf<String>(),
         ),
       )
   }

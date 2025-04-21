@@ -107,11 +107,7 @@ class DeveloperToolsApplicationSettings : PersistentStateComponent<Element> {
             else -> attribute.value
           }
         if (transformedValue != null) {
-          val targetSettingsElement =
-            when (attribute.name) {
-              "promoteAddOpenMainDialogActionToMainToolbar" -> internalSettingsElement
-              else -> generalSettingsElement
-            }
+          val targetSettingsElement = generalSettingsElement
           targetSettingsElement.setAttribute(attribute.name, transformedValue)
         }
         remove()
