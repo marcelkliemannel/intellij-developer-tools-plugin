@@ -1,6 +1,8 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base
 
+import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.getUserData
 import com.intellij.openapi.ui.putUserData
@@ -12,6 +14,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.TitledTabbedPane
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.onSelectionChanged
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.TextInputOutputHandler.BytesToTextMode
 import javax.swing.JComponent
 
 class ConversionSideHandler(
@@ -23,6 +26,7 @@ class ConversionSideHandler(
   private val conversionEnabled: ValueProperty<Boolean>,
   private val liveConversionRequested: () -> Unit,
   private val diffSupport: AdvancedEditor.DiffSupport,
+  private val inputOutputDirection: InputOutputDirection,
 ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -37,13 +41,10 @@ class ConversionSideHandler(
   fun createComponent(): JComponent {
     component =
       BorderLayoutPanel().apply {
-        check(inputOutputHandlers.isNotEmpty()) { "No input/output handler have been added" }
+        check(inputOutputHandlers.isNotEmpty())
 
-        activeInputOutputHandler = ValueProperty<InputOutputHandler>(inputOutputHandlers[0])
+        activeInputOutputHandler = ValueProperty(inputOutputHandlers[0])
 
-        //      if (inputOutputHandlers.size == 1) {
-        //        addToCenter(inputOutputHandlers.first().createComponent())
-        //      } else {
         val tabs =
           inputOutputHandlers.map { inputOutputHandler ->
             inputOutputHandler.title to
@@ -58,7 +59,6 @@ class ConversionSideHandler(
             }
           }
         )
-        //      }
       }
 
     conversionEnabled.afterChange(parentDisposable) { component.isEnabled = it }
@@ -70,6 +70,8 @@ class ConversionSideHandler(
     id: String,
     defaultText: String = "",
     exampleText: String? = null,
+    bytesToTextMode: BytesToTextMode = BytesToTextMode.BYTES_TO_CHARACTERS,
+    initialLanguage: Language = PlainTextLanguage.INSTANCE,
   ): TextInputOutputHandler {
     val textInputOutputHandler =
       TextInputOutputHandler(
@@ -86,6 +88,9 @@ class ConversionSideHandler(
         diffSupport = diffSupport,
         defaultText = defaultText,
         exampleText = exampleText,
+        inputOutputDirection = inputOutputDirection,
+        bytesToTextMode = bytesToTextMode,
+        initialLanguage = initialLanguage,
       )
     inputOutputHandlers.add(textInputOutputHandler)
     return textInputOutputHandler
@@ -99,6 +104,7 @@ class ConversionSideHandler(
         context = context,
         parentDisposable = parentDisposable,
         project = project,
+        inputOutputDirection = inputOutputDirection,
       )
     inputOutputHandlers.add(fileInputOutputHandler)
     return fileInputOutputHandler

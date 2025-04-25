@@ -7,7 +7,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.BottomGap
-import com.intellij.ui.dsl.builder.TopGap
+import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.concurrency.ThreadingAssertions.assertBackgroundThread
@@ -15,6 +15,7 @@ import com.intellij.util.text.DateFormatUtil
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool.Companion.DUMMY_DIALOG_VALIDATION_REQUESTOR
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.GeneralBundle
 import java.awt.dnd.DropTarget
@@ -27,20 +28,24 @@ import javax.swing.SwingConstants
 
 class FileHandling(
   val project: Project?,
-  val file: ValueProperty<String> = ValueProperty<String>(""),
+  val file: ValueProperty<String> = ValueProperty(""),
+  val writeFormat: ValueProperty<WriteFormat> = ValueProperty(WriteFormat.BINARY),
+  val supportsWrite: Boolean,
 ) {
   // -- Properties ---------------------------------------------------------- //
 
   private val lastWriteInformation =
-    ValueProperty<String>(GeneralBundle.message("file-handling.last-write.never"))
+    ValueProperty(GeneralBundle.message("file-handling.last-write.never"))
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
   fun crateComponent(errorHolder: ErrorHolder): JComponent = panel {
     row {
+        // Allow the selection of folders so that the user can manually extend the path with a file
+        // name, of the file does not exist yet.
         val fileChooserDescriptor =
-          FileChooserDescriptor(true, false, false, false, false, false)
+          FileChooserDescriptor(true, true, false, false, false, false)
             .withTitle(GeneralBundle.message("file-handling.file-chooser.title"))
         textFieldWithBrowseButton(fileChooserDescriptor, project)
           .bindText(file)
@@ -49,11 +54,7 @@ class FileHandling(
           .align(Align.FILL)
           .resizableColumn()
       }
-      .bottomGap(BottomGap.NONE)
-
-    row { label("").bindText(lastWriteInformation).resizableColumn() }
-      .topGap(TopGap.NONE)
-      .bottomGap(BottomGap.SMALL)
+      .bottomGap(if (supportsWrite) BottomGap.NONE else BottomGap.SMALL)
 
     row {
         cell(
@@ -73,6 +74,15 @@ class FileHandling(
           .resizableColumn()
       }
       .resizableRow()
+
+    if (supportsWrite) {
+      row {
+        label(GeneralBundle.message("file-handling.write-format.title")).gap(RightGap.SMALL)
+        segmentedButton(WriteFormat.entries) { text = it.title }.bind(writeFormat)
+      }
+
+      row { comment("").bindText(lastWriteInformation).resizableColumn() }
+    }
   }
 
   fun readFromFile(): ByteArray {
@@ -81,7 +91,10 @@ class FileHandling(
     val fileToUse = Paths.get(file.get())
 
     checkFile(fileToUse)
-    if (!Files.isReadable(fileToUse)) {
+
+    if (!Files.exists(fileToUse)) {
+      throw IllegalStateException(GeneralBundle.message("file-handling.error.file-not-exist"))
+    } else if (!Files.isReadable(fileToUse)) {
       throw IllegalStateException(GeneralBundle.message("file-handling.error.file-is-not-readable"))
     }
 
@@ -89,19 +102,26 @@ class FileHandling(
   }
 
   fun writeToFile(bytes: ByteArray) {
+    check(supportsWrite)
     assertBackgroundThread()
 
     val fileToUse = Paths.get(file.get())
 
     checkFile(fileToUse)
-    if (!Files.isWritable(fileToUse)) {
+    if (Files.exists(fileToUse) && !Files.isWritable(fileToUse)) {
       throw IllegalStateException(GeneralBundle.message("file-handling.error.file-is-not-writable"))
     }
+
+    val content =
+      when (writeFormat.get()) {
+        WriteFormat.BINARY -> bytes
+        WriteFormat.HEX -> bytes.toHexString().encodeToByteArray()
+      }
 
     try {
       Files.write(
         fileToUse,
-        bytes,
+        content,
         StandardOpenOption.WRITE,
         StandardOpenOption.CREATE,
         StandardOpenOption.TRUNCATE_EXISTING,
@@ -123,13 +143,18 @@ class FileHandling(
   private fun checkFile(file: Path?) {
     if (file == null || file.toString().isBlank()) {
       throw IllegalStateException(GeneralBundle.message("file-handling.error.no-file-selected"))
-    } else if (!Files.exists(file)) {
-      throw IllegalStateException(GeneralBundle.message("file-handling.error.file-not-exist"))
     } else if (Files.isDirectory(file)) {
       throw IllegalStateException(GeneralBundle.message("file-handling.error.file-is-directory"))
     }
   }
 
   // -- Inner Type ---------------------------------------------------------- //
+
+  enum class WriteFormat(val title: String) {
+
+    BINARY(GeneralBundle.message("file-handling.write-format.binary.title")),
+    HEX(GeneralBundle.message("file-handling.write-format.hex.title")),
+  }
+
   // -- Companion Object ---------------------------------------------------- //
 }

@@ -11,6 +11,7 @@ import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.selected
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.emptyByteArray
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
@@ -20,6 +21,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolde
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.RegexTextField
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.SelectRegexOptionsAction
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
 
 class TextFilterTransformer(
   context: DeveloperUiToolContext,
@@ -27,19 +30,15 @@ class TextFilterTransformer(
   parentDisposable: Disposable,
   project: Project?,
 ) :
-  TextTransformer(
-    textTransformerContext =
-      TextTransformerContext(
-        transformActionTitle = "Filter",
-        sourceTitle = "Unfiltered",
-        resultTitle = "Filtered",
-        initialSourceExampleText = EXAMPLE_INPUT,
-        diffSupport = DiffSupport(title = "Text Filter"),
-      ),
+  UndirectionalConverter(
     context = context,
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
+    title = "Text Filtering",
+    sourceTitle = "Unfiltered",
+    targetTitle = "Filtered",
+    toTargetTitle = "Filter",
   ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -67,7 +66,11 @@ class TextFilterTransformer(
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
-  override fun Panel.buildMiddleConfigurationUi() {
+  override fun ConversionSideHandler.addSourceTextInputOutputHandler() {
+    addTextInputOutputHandler(id = defaultSourceInputOutputHandlerId, exampleText = EXAMPLE_INPUT)
+  }
+
+  override fun Panel.buildSourceBottomConfigurationUi() {
     row { comboBox(TokenMode.entries).label("Filter:").bindItem(tokenMode) }
       .layout(RowLayout.PARENT_GRID)
       .topGap(TopGap.NONE)
@@ -123,7 +126,7 @@ class TextFilterTransformer(
     }
   }
 
-  override fun transform() {
+  override fun doConvertToTarget(source: ByteArray): ByteArray {
     val tokenFilter: (String) -> Boolean =
       when (filteringMode.get()) {
         FilteringMode.CONTAINING -> {
@@ -142,41 +145,39 @@ class TextFilterTransformer(
               Regex(filteringRegexModeText.get())
             } catch (e: Exception) {
               filteringRegexModeErrorHolder.add(e)
-              return
+              return emptyByteArray
             }
           filteringRegexModeTextValue::matches
         }
       }
 
-    val result =
-      when (tokenMode.get()) {
-        TokenMode.WORD -> {
-          with(StringBuilder()) {
-            var lastWasWord = false
-            for (match in WORDS_SPLIT_REGEX.findAll(sourceText.get())) {
-              val token = match.value
-              if (token.isBlank() && !token.contains("\n")) {
-                if (lastWasWord) {
-                  append(token)
-                }
-              } else if (token.contains("\n")) {
+    val sourceText = String(source)
+    return when (tokenMode.get()) {
+      TokenMode.WORD -> {
+        with(StringBuilder()) {
+          var lastWasWord = false
+          for (match in WORDS_SPLIT_REGEX.findAll(sourceText)) {
+            val token = match.value
+            if (token.isBlank() && !token.contains("\n")) {
+              if (lastWasWord) {
                 append(token)
-                lastWasWord = false
-              } else if (tokenFilter(token)) {
-                append(token)
-                lastWasWord = true
-              } else {
-                lastWasWord = false
               }
+            } else if (token.contains("\n")) {
+              append(token)
+              lastWasWord = false
+            } else if (tokenFilter(token)) {
+              append(token)
+              lastWasWord = true
+            } else {
+              lastWasWord = false
             }
-            toString().trim()
           }
+          toString().trim()
         }
-
-        TokenMode.LINE ->
-          sourceText.get().lines().filter(tokenFilter).joinToString(System.lineSeparator())
       }
-    resultText.set(result)
+
+      TokenMode.LINE -> sourceText.lines().filter(tokenFilter).joinToString(System.lineSeparator())
+    }.encodeToByteArray()
   }
 
   // -- Private Methods ----------------------------------------------------- //

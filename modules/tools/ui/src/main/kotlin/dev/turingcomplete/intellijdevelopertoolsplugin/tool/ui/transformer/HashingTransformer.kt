@@ -4,12 +4,14 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.toMessageDigest
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.TextInputOutputHandler.BytesToTextMode.BYTES_TO_HEX
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
 import java.security.Security
 
 class HashingTransformer(
@@ -18,17 +20,15 @@ class HashingTransformer(
   parentDisposable: Disposable,
   project: Project?,
 ) :
-  TextTransformer(
-    textTransformerContext =
-      TextTransformerContext(
-        transformActionTitle = "Hash",
-        sourceTitle = "Plain",
-        resultTitle = "Hashed",
-      ),
+  UndirectionalConverter(
     context = context,
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
+    title = "Hashing",
+    sourceTitle = "Plain",
+    targetTitle = "Hashed",
+    toTargetTitle = "Hash",
   ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -49,13 +49,17 @@ class HashingTransformer(
 
   // -- Exposed Methods ----------------------------------------------------- //
 
-  override fun transform() {
-    val hash =
-      selectedAlgorithm.get().toMessageDigest().digest(sourceText.get().encodeToByteArray())
-    resultText.set(hash.toHexString())
+  override fun ConversionSideHandler.addSourceTextInputOutputHandler() {
+    addTextInputOutputHandler(
+      id = defaultSourceInputOutputHandlerId,
+      bytesToTextMode = BYTES_TO_HEX,
+    )
   }
 
-  override fun Panel.buildTopConfigurationUi() {
+  override fun doConvertToTarget(source: ByteArray): ByteArray =
+    selectedAlgorithm.get().toMessageDigest().digest(source)
+
+  override fun Panel.buildSourceTopConfigurationUi() {
     row { comboBox(messageDigestAlgorithms).label("Algorithm:").bindItem(selectedAlgorithm) }
   }
 

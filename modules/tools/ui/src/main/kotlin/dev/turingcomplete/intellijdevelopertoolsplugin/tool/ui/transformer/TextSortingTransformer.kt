@@ -15,6 +15,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextSortingTransformer.WordsDelimiter.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextSortingTransformer.WordsDelimiter.LINE_BREAK
 
@@ -24,19 +26,15 @@ class TextSortingTransformer(
   parentDisposable: Disposable,
   project: Project?,
 ) :
-  TextTransformer(
-    textTransformerContext =
-      TextTransformerContext(
-        transformActionTitle = "Sort",
-        sourceTitle = "Unsorted",
-        resultTitle = "Sorted",
-        initialSourceExampleText = EXAMPLE_INPUT,
-        diffSupport = DiffSupport(title = "Text Sorting"),
-      ),
+  UndirectionalConverter(
     context = context,
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
+    title = "Text Sorting",
+    sourceTitle = "Unsorted",
+    targetTitle = "Sorted",
+    toTargetTitle = "Sort",
   ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -61,13 +59,20 @@ class TextSortingTransformer(
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
-  override fun transform() {
+  override fun ConversionSideHandler.addSourceTextInputOutputHandler() {
+    addTextInputOutputHandler(
+      id = defaultSourceInputOutputHandlerId,
+      exampleText = EXAMPLE_SOURCE_TEXT,
+    )
+  }
+
+  override fun doConvertToTarget(source: ByteArray): ByteArray {
     val unsortedSplitWordsDelimiterPattern: Regex =
       unsortedSplitWordsDelimiter.get().splitPattern
         ?: Regex("${Regex.escape(unsortedIndividualSplitWordsDelimiter.get())}+")
     val sortedJoinWordsDelimiter =
       sortedJoinWordsDelimiter.get().joinDelimiter ?: sortedIndividualJoinWordsDelimiter.get()
-    var unsortedWords = sourceText.get().split(unsortedSplitWordsDelimiterPattern)
+    var unsortedWords = String(source).split(unsortedSplitWordsDelimiterPattern)
 
     if (trimWords.get()) {
       unsortedWords = unsortedWords.map { it.trim() }
@@ -88,10 +93,10 @@ class TextSortingTransformer(
     }
     unsortedWords = unsortedWords.sortedWith(comparator)
 
-    resultText.set(unsortedWords.joinToString(sortedJoinWordsDelimiter))
+    return unsortedWords.joinToString(sortedJoinWordsDelimiter).encodeToByteArray()
   }
 
-  override fun Panel.buildMiddleConfigurationUi() {
+  override fun Panel.buildSourceBottomConfigurationUi() {
     row {
       buildSplitConfigurationUi(
         "Split unsorted words by:",
@@ -185,6 +190,6 @@ class TextSortingTransformer(
 
   companion object {
 
-    private const val EXAMPLE_INPUT = "b\nc\na"
+    private const val EXAMPLE_SOURCE_TEXT = "b\nc\na"
   }
 }

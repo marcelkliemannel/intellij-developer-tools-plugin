@@ -11,7 +11,7 @@ import com.intellij.ui.dsl.builder.actionButton
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.decodeBase64String
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.toHexString
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.emptyByteArray
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.SENSITIVE
@@ -24,6 +24,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.SimpleTogg
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.registerDynamicToolTip
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateNonEmpty
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE32
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE64
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.RAW
@@ -38,17 +39,15 @@ class HmacTransformer(
   parentDisposable: Disposable,
   project: Project?,
 ) :
-  TextTransformer(
-    textTransformerContext =
-      TextTransformerContext(
-        transformActionTitle = "Generate",
-        sourceTitle = "Data",
-        resultTitle = "Hash",
-      ),
+  UndirectionalConverter(
     context = context,
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
+    title = "HMAC",
+    sourceTitle = "Data",
+    targetTitle = "Hash",
+    toTargetTitle = "Generate",
   ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -64,18 +63,6 @@ class HmacTransformer(
   init {
     check(hmacAlgorithms.isNotEmpty())
 
-    secretKey.afterChange {
-      if (!isDisposed && liveTransformation.get()) {
-        transform()
-      }
-    }
-
-    secretKeyEncodingMode.afterChange {
-      if (!isDisposed && liveTransformation.get()) {
-        transform()
-      }
-    }
-
     // Validate if selected algorithm is still available
     val selectedAlgorithm = selectedAlgorithm.get()
     if (hmacAlgorithms.find { it.algorithm == selectedAlgorithm } == null) {
@@ -89,33 +76,25 @@ class HmacTransformer(
 
   // -- Exposed Methods ----------------------------------------------------- //
 
-  override fun transform() {
-    if (validate().isNotEmpty()) {
-      return
-    }
-
+  override fun doConvertToTarget(source: ByteArray): ByteArray {
     val secretKeyValue = secretKey.get()
     if (secretKeyValue.isEmpty()) {
-      resultText.set("")
-      return
+      return emptyByteArray
     }
 
-    val hmac: ByteArray =
-      Mac.getInstance(selectedAlgorithm.get()).run {
-        val secretKey =
-          when (secretKeyEncodingMode.get()) {
-            RAW -> secretKeyValue
-            BASE32 -> Base32().decode(secretKeyValue).decodeToString()
-            BASE64 -> secretKeyValue.decodeBase64String()
-          }
-        init(SecretKeySpec(secretKey.encodeToByteArray(), selectedAlgorithm.get()))
-        doFinal(sourceText.get().encodeToByteArray())
-      }
-    resultText.set(hmac.toHexString())
+    return Mac.getInstance(selectedAlgorithm.get()).run {
+      val secretKey =
+        when (secretKeyEncodingMode.get()) {
+          RAW -> secretKeyValue
+          BASE32 -> Base32().decode(secretKeyValue).decodeToString()
+          BASE64 -> secretKeyValue.decodeBase64String()
+        }
+      init(SecretKeySpec(secretKey.encodeToByteArray(), selectedAlgorithm.get()))
+      doFinal(source)
+    }
   }
 
-  @Suppress("UnstableApiUsage")
-  override fun Panel.buildTopConfigurationUi() {
+  override fun Panel.buildSourceTopConfigurationUi() {
     row {
       comboBox(hmacAlgorithms)
         .label("Algorithm:")
@@ -126,7 +105,7 @@ class HmacTransformer(
     }
   }
 
-  override fun Panel.buildMiddleConfigurationUi() {
+  override fun Panel.buildSourceBottomConfigurationUi() {
     row {
       expandableTextField()
         .label("Secret key:")

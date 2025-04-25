@@ -95,11 +95,14 @@ dependencies {
 
 intellijPlatform {
   pluginConfiguration {
+    id = providers.gradleProperty("pluginId")
     version = providers.gradleProperty("pluginVersion")
+
     ideaVersion {
       sinceBuild = properties("pluginSinceBuild")
       untilBuild = provider { null }
     }
+
     changeNotes.set(
       provider {
         changelog.renderItem(changelog.get(project.version as String), Changelog.OutputType.HTML)

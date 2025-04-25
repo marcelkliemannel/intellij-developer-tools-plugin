@@ -9,8 +9,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.BidirectionalConverter
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.Converter
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.lang.System.lineSeparator
 
@@ -20,7 +20,7 @@ class CliCommandConverter(
   context: DeveloperUiToolContext,
   project: Project?,
 ) :
-  Converter(
+  BidirectionalConverter(
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
@@ -47,17 +47,18 @@ class CliCommandConverter(
     }
   }
 
-  override fun ConversionSideHandler.initSourceConversionSide() {
-    addTextInputOutputHandler(id = "source", exampleText = EXAMPLE_SOURCE_TEXT)
-    addFileInputOutputHandler("source")
+  override fun ConversionSideHandler.addSourceTextInputOutputHandler() {
+    addTextInputOutputHandler(
+      id = defaultSourceInputOutputHandlerId,
+      exampleText = EXAMPLE_SOURCE_TEXT,
+    )
   }
 
-  override fun ConversionSideHandler.initTargetConversionSide() {
+  override fun ConversionSideHandler.addTargetTextInputOutputHandler() {
     addTextInputOutputHandler(
-      id = "target",
+      id = defaultTargetInputOutputHandlerId,
       exampleText = String(doConvertToTarget(EXAMPLE_SOURCE_TEXT.toByteArray())),
     )
-    addFileInputOutputHandler("target")
   }
 
   override fun doConvertToTarget(source: ByteArray): ByteArray {

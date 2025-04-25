@@ -9,8 +9,9 @@ import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.XCollection
 import com.intellij.util.xmlb.annotations.XCollection.Style.v2
 import com.jetbrains.rd.util.UUID
-import com.jetbrains.rd.util.firstOrNull
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.LocaleContainer
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.PluginInfo
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.PluginInfo.PluginVersion.Companion.toPluginVersion
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PersistentProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType
@@ -20,6 +21,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfigurationPropertyType.SimplePropertyType
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings.Companion.generalSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings.InstanceState
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettingsLegacy.applyConfigurationPropertyKeyLegacies
 import java.math.BigDecimal
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
@@ -80,6 +82,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
         .toList()
 
     return InstanceState(
+      pluginVersion = PluginInfo.pluginVersion.toString(),
       developerToolsConfigurations = stateDeveloperToolsConfigurations,
       lastSelectedContentNodeId = lastSelectedContentNodeId.get(),
       expandedGroupNodeIds = expandedGroupNodeIds?.toList(),
@@ -89,6 +92,8 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
   override fun loadState(state: InstanceState) {
     lastSelectedContentNodeId.set(state.lastSelectedContentNodeId)
     setExpandedGroupNodeIds(state.expandedGroupNodeIds?.toSet() ?: emptySet())
+
+    val statePluginVersion: PluginInfo.PluginVersion? = state.pluginVersion?.toPluginVersion()
 
     developerToolsConfigurations.clear()
     state.developerToolsConfigurations
@@ -107,7 +112,15 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
                 // removed from the `PropertyType` enum.
                 ?.filter { it.key != null && it.type != null && it.value != null }
                 ?.filter { shouldSavePropertyType(it.type!!) }
-                ?.map { it.key!! to PersistentProperty(it.key!!, it.value!!, it.type!!) }
+                ?.map {
+                  val propertyKey =
+                    applyConfigurationPropertyKeyLegacies(
+                      statePluginVersion = statePluginVersion,
+                      developerToolId = developerToolsConfigurationState.developerToolId!!,
+                      propertyKey = it.key!!,
+                    )
+                  propertyKey to PersistentProperty(propertyKey, it.value!!, it.type!!)
+                }
                 ?.toMap() ?: emptyMap(),
           )
 
@@ -162,6 +175,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
   // -- Inner Type ---------------------------------------------------------- //
 
   open class InstanceState(
+    @get:Attribute("pluginVersion") var pluginVersion: String? = null,
     @get:XCollection(style = v2, elementName = "developerToolsConfigurations")
     var developerToolsConfigurations: List<DeveloperToolConfigurationState>? = null,
     @get:Attribute("lastSelectedContentNodeId") var lastSelectedContentNodeId: String? = null,
@@ -224,7 +238,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
       return try {
         val valueAndType = value.split(PROPERTY_TYPE_VALUE_DELIMITER, limit = 2)
         check(valueAndType.size == 2) { "Malformed serialized value: $value" }
-        val valueType = applyPre320TypePackageLegacy(valueAndType[0])
+        val valueType = valueAndType[0]
         val actualValue = valueAndType[1]
         val configurationPropertyType =
           configurationPropertyTypesByNamesAndLegacyValueTypes[valueType]
@@ -239,13 +253,6 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
         null
       }
     }
-
-    private fun applyPre320TypePackageLegacy(type: String): String {
-      val legacyToApply =
-        pre320TypePackageLegacy.filter { type.startsWith(it.key) }.firstOrNull() ?: return type
-
-      return "${legacyToApply.value}${type.substring(legacyToApply.key.length)}"
-    }
   }
 
   // -- Companion Object ---------------------------------------------------- //
@@ -254,13 +261,6 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
 
     private val log = logger<DeveloperToolsInstanceSettings>()
 
-    private val pre320TypePackageLegacy =
-      mapOf(
-        "dev.turingcomplete.intellijdevelopertoolsplugins.tool." to
-          "dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.",
-        "dev.turingcomplete.intellijdevelopertoolsplugins.common." to
-          "dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.",
-      )
     private const val PROPERTY_TYPE_VALUE_DELIMITER = "|"
 
     fun <T : Any> assertPersistableType(type: KClass<T>): KClass<T> {

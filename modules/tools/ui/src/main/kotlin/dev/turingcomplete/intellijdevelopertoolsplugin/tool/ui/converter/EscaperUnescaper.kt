@@ -4,7 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.Converter
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.BidirectionalConverter
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 
 abstract class EscaperUnescaper(
@@ -14,7 +14,7 @@ abstract class EscaperUnescaper(
   context: DeveloperUiToolContext,
   project: Project?,
 ) :
-  Converter(
+  BidirectionalConverter(
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,

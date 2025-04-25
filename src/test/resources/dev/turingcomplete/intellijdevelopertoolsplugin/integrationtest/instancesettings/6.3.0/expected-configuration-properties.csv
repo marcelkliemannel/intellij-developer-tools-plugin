@@ -1,4 +1,4 @@
-developerToolId,propertyId,propertyType,propertyValueTypeName,propertyValue
+developerToolId,propertyKey,propertyType,propertyValueTypeName,propertyValue
 text-statistic,text-statistic-text-showWhitespaces,CONFIGURATION,kotlin.Boolean,true
 text-statistic,text-statistic-text-showSpecialCharacters,CONFIGURATION,kotlin.Boolean,true
 text-statistic,text,INPUT,kotlin.String,6D0itFvr3Cqe6SKJlnzl

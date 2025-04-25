@@ -9,6 +9,7 @@ abstract class InputOutputHandler(
   val errorHolder: ErrorHolder,
   val liveConversionSupported: Boolean,
   val textDiffSupported: Boolean,
+  val inputOutputDirection: InputOutputDirection,
 ) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //

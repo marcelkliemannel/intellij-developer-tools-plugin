@@ -15,8 +15,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.ObjectMapperServi
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.BidirectionalConverter
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.Converter
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.TextInputOutputHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 
@@ -26,7 +26,7 @@ class TextFormattingConverter(
   context: DeveloperUiToolContext,
   project: Project?,
 ) :
-  Converter(
+  BidirectionalConverter(
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
@@ -55,14 +55,12 @@ class TextFormattingConverter(
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
-  override fun ConversionSideHandler.initSourceConversionSide() {
-    sourceTextInputOutputHandler = addTextInputOutputHandler("source")
-    addFileInputOutputHandler("source")
+  override fun ConversionSideHandler.addSourceTextInputOutputHandler() {
+    sourceTextInputOutputHandler = addTextInputOutputHandler(defaultSourceInputOutputHandlerId)
   }
 
-  override fun ConversionSideHandler.initTargetConversionSide() {
-    targetTextInputOutputHandler = addTextInputOutputHandler("target")
-    addFileInputOutputHandler("target")
+  override fun ConversionSideHandler.addTargetTextInputOutputHandler() {
+    targetTextInputOutputHandler = addTextInputOutputHandler(defaultTargetInputOutputHandlerId)
   }
 
   override fun afterBuildUi() {

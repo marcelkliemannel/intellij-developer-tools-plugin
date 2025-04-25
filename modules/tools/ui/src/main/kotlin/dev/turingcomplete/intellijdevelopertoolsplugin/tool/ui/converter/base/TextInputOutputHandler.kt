@@ -3,15 +3,18 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool.Companion.DUMMY_DIALOG_VALIDATION_REQUESTOR
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor.EditorMode.INPUT_OUTPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor.EditorMode
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import javax.swing.JComponent
@@ -27,6 +30,9 @@ class TextInputOutputHandler(
   private val diffSupport: AdvancedEditor.DiffSupport? = null,
   defaultText: String = "",
   exampleText: String? = null,
+  inputOutputDirection: InputOutputDirection,
+  private val initialLanguage: Language = PlainTextLanguage.INSTANCE,
+  private val bytesToTextMode: BytesToTextMode = BytesToTextMode.BYTES_TO_CHARACTERS,
 ) :
   InputOutputHandler(
     id = id,
@@ -34,10 +40,14 @@ class TextInputOutputHandler(
     errorHolder = ErrorHolder(),
     liveConversionSupported = true,
     textDiffSupported = true,
+    inputOutputDirection = inputOutputDirection,
   ) {
   // -- Properties ---------------------------------------------------------- //
 
-  private var inputOutputText = configuration.register("${id}Text", defaultText, INPUT, exampleText)
+  private var inputOutputText =
+    if (inputOutputDirection.supportsRead)
+      configuration.register("${id}Text", defaultText, INPUT, exampleText)
+    else ValueProperty("")
 
   private lateinit var advancedEditor: AdvancedEditor
 
@@ -49,13 +59,19 @@ class TextInputOutputHandler(
       AdvancedEditor(
           id = id,
           title = null,
-          editorMode = INPUT_OUTPUT,
+          editorMode =
+            when (inputOutputDirection) {
+              InputOutputDirection.UNDIRECTIONAL_WRITE -> EditorMode.OUTPUT
+              InputOutputDirection.UNDIRECTIONAL_READ -> EditorMode.INPUT
+              InputOutputDirection.BIDIRECTIONAL -> EditorMode.INPUT_OUTPUT
+            },
           parentDisposable = parentDisposable,
           configuration = configuration,
           context = context,
           project = project,
           textProperty = inputOutputText,
           diffSupport = diffSupport,
+          initialLanguage = initialLanguage,
         )
         .apply {
           onFocusGained { focusGained(this@TextInputOutputHandler) }
@@ -75,10 +91,19 @@ class TextInputOutputHandler(
       .resizableRow()
   }
 
-  override fun read(): ByteArray = inputOutputText.get().toByteArray()
+  override fun read(): ByteArray {
+    check(inputOutputDirection.supportsRead)
+    return inputOutputText.get().toByteArray()
+  }
 
   override fun write(output: ByteArray) {
-    ApplicationManager.getApplication().invokeLater { inputOutputText.set(String(output)) }
+    check(inputOutputDirection.supportsWrite)
+    val text =
+      when (bytesToTextMode) {
+        BytesToTextMode.BYTES_TO_CHARACTERS -> String(output)
+        BytesToTextMode.BYTES_TO_HEX -> output.toHexString()
+      }
+    ApplicationManager.getApplication().invokeLater { inputOutputText.set(text) }
   }
 
   fun setLanguage(language: Language) {
@@ -87,5 +112,12 @@ class TextInputOutputHandler(
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //
+
+  enum class BytesToTextMode {
+
+    BYTES_TO_CHARACTERS,
+    BYTES_TO_HEX,
+  }
+
   // -- Companion Object ---------------------------------------------------- //
 }

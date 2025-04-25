@@ -455,7 +455,7 @@ class JwtEncoderDecoder(
 
   private fun createEncodedEditor(): AdvancedEditor =
     createEditor(
-      id = "jwt-encoder-decoder-encoded",
+      id = "encoded",
       changeOrigin = ENCODED,
       title = "Encoded",
       language = PlainTextLanguage.INSTANCE,
@@ -466,7 +466,7 @@ class JwtEncoderDecoder(
 
   private fun createHeaderEditor(): AdvancedEditor =
     createEditor(
-      id = "jwt-encoder-decoder-header",
+      id = "header",
       changeOrigin = HEADER_OR_PAYLOAD,
       title = "Header",
       language = JsonLanguage.INSTANCE,
@@ -477,7 +477,7 @@ class JwtEncoderDecoder(
 
   private fun createPayloadEditor(): AdvancedEditor =
     createEditor(
-      id = "jwt-encoder-decoder-payload",
+      id = "payload",
       changeOrigin = HEADER_OR_PAYLOAD,
       title = "Payload",
       language = JsonLanguage.INSTANCE,

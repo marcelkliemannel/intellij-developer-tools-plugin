@@ -4,28 +4,34 @@ import com.intellij.openapi.util.JDOMUtil
 import com.intellij.ui.JBColor
 import com.intellij.util.xmlb.XmlSerializer
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.LocaleContainer
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.PluginInfo
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.PluginInfo.PluginVersion.Companion.toPluginVersion
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.IdeaTest
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.testfixtures.PluginUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings.Companion.configurationPropertyTypesByNamesAndLegacyValueTypes
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings.DeveloperToolConfigurationState
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings.InstanceState
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings.StatePropertyValueConverter
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettingsLegacy
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.testfixtures.DeveloperUiToolUnderTest
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.testfixtures.DeveloperUiToolsInstances.createDeveloperUiToolsUnderTest
 import java.math.BigDecimal
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
 import java.util.Locale
+import java.util.SortedMap
 import kotlin.io.path.bufferedReader
 import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
+import kotlin.io.path.name
+import kotlin.io.path.writeText
 import kotlin.io.path.writer
 import kotlin.reflect.KClass
+import kotlin.streams.asSequence
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
@@ -176,14 +182,16 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
   @Test
   fun `Legacy settings import test data for current plugin version exists`() {
-    val legacyImportDirForPluginVersion = legacyImportDir.resolve(PluginUtils.getPluginVersion())
+    val legacyImportDirForPluginVersion =
+      instanceSettingsResourcesDir.resolve(PluginInfo.pluginVersion.toString())
     assertThat(legacyImportDirForPluginVersion).exists()
   }
 
   @Test
   @Disabled
-  fun `Create legacy settings import test data for current plugin version`() {
-    val legacyImportDirForPluginVersion = legacyImportDir.resolve(PluginUtils.getPluginVersion())
+  fun `Create settings import test data for current plugin version`() {
+    val legacyImportDirForPluginVersion =
+      instanceSettingsResourcesDir.resolve(PluginInfo.pluginVersion.toString())
     if (Files.notExists(legacyImportDirForPluginVersion)) {
       legacyImportDirForPluginVersion.createDirectories()
     }
@@ -208,24 +216,30 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
             expectedConfigurationPropertiesCsvFormat.builder().setSkipHeaderRecord(false).build(),
           )
           .use { printer ->
-            settings.getState().developerToolsConfigurations!!.forEach {
-              it.properties!!.forEach { property ->
-                val persistedValue =
-                  StatePropertyValueConverter().toString(property.value!!).split("|", limit = 2)
-                printer.printRecord(
-                  it.developerToolId,
-                  property.key!!,
-                  property.type!!.name,
-                  persistedValue[0],
-                  persistedValue[1],
-                )
+            settings
+              .getState()
+              .developerToolsConfigurations!!
+              .sortedBy { it.developerToolId }
+              .forEach {
+                it.properties!!
+                  .sortedBy { it.key }
+                  .forEach { property ->
+                    val persistedValue =
+                      StatePropertyValueConverter().toString(property.value!!).split("|", limit = 2)
+                    printer.printRecord(
+                      it.developerToolId,
+                      property.key!!,
+                      property.type!!.name,
+                      persistedValue[0],
+                      persistedValue[1],
+                    )
+                  }
               }
-            }
           }
       }
 
     legacyImportDirForPluginVersion
-      .resolve(PERSISTED_STATE_XML_FILENAME)
+      .resolve(INSTANCE_SETTINGS_PERSISTED_STATE_XML_FILENAME)
       .writer(options = arrayOf(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))
       .use { writer ->
         val element = XmlSerializer.serialize(settings.getState())
@@ -233,26 +247,143 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
       }
   }
 
-  @TestFactory
-  fun `Test legacy settings import`(): List<DynamicNode> {
-    val deletedProperties: List<(ExpectedConfigurationProperty) -> Boolean> =
-      listOf({ it.developerToolId == "line-breaks-encoder-decoder" })
+  @Test
+  @Disabled
+  fun `Collect changed configuration properties of current plugin version`() {
+    val pluginVersion =
+      walkInstanceSettingsResourcesDir().map { it.name.toPluginVersion() }.sorted().toList()
+    val previousPluginVersion = pluginVersion[pluginVersion.lastIndex - 1]
+    assertThat(previousPluginVersion).isLessThan(PluginInfo.pluginVersion)
 
-    val checkLegacyPersistedSettingsImport: (Path) -> DynamicContainer = { legacyImportVersionDir ->
-      val persistedStateXmlFile = legacyImportVersionDir.resolve(PERSISTED_STATE_XML_FILENAME)
-      val expectedConfigurationPropertiesCsvFile =
-        legacyImportVersionDir.resolve(EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME)
+    val instanceSettingsVersionDir =
+      walkInstanceSettingsResourcesDir()
+        .filter { it.name == previousPluginVersion.toString() }
+        .first()
 
-      DeveloperToolsApplicationSettings.Companion.generalSettings.saveConfigurations.set(true)
-      DeveloperToolsApplicationSettings.Companion.generalSettings.saveInputs.set(true)
-      DeveloperToolsApplicationSettings.Companion.generalSettings.saveSensitiveInputs.set(true)
+    val persistedStateXmlFile =
+      instanceSettingsVersionDir.resolve(INSTANCE_SETTINGS_PERSISTED_STATE_XML_FILENAME)
+    val expectedConfigurationPropertiesCsvFile =
+      instanceSettingsVersionDir.resolve(EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME)
 
-      val restoredSettings =
-        createDeveloperToolsInstanceSettings(
+    DeveloperToolsApplicationSettings.generalSettings.saveConfigurations.set(true)
+    DeveloperToolsApplicationSettings.generalSettings.saveInputs.set(true)
+    DeveloperToolsApplicationSettings.generalSettings.saveSensitiveInputs.set(true)
+
+    val restoredSettings =
+      createDeveloperToolsInstanceSettings(
+        instantState =
           XmlSerializer.deserialize(
             persistedStateXmlFile.toUri().toURL(),
             InstanceState::class.java,
           )
+      )
+
+    val developerUiToolsUnderTest: Map<String, DeveloperUiToolUnderTest<*>> =
+      createDeveloperUiToolsUnderTest(fixture.project, disposable, restoredSettings).associateBy {
+        it.id
+      }
+
+    data class RenamedConfigurationProperty(
+      val developerToolId: String,
+      val propertyKey: String,
+      val propertyKeyAfterLegacies: String,
+    )
+    data class RemovedConfigurationProperty(val developerToolId: String, val propertyKey: String)
+
+    val renamedConfigurationProperties = mutableListOf<RenamedConfigurationProperty>()
+    val removedConfigurationProperties = mutableListOf<RemovedConfigurationProperty>()
+
+    readExpectedConfigurationProperties(expectedConfigurationPropertiesCsvFile).forEach {
+      (developerToolId, propertyKey, _, _, _) ->
+      // If `actualConfiguration` is null, the whole developer tool was removed
+      val actualConfiguration = developerUiToolsUnderTest[developerToolId]?.configuration
+
+      if (actualConfiguration?.properties?.containsKey(propertyKey) == true) {
+        return@forEach
+      }
+
+      val propertyKeyAfterLegacies =
+        DeveloperToolsInstanceSettingsLegacy.applyConfigurationPropertyKeyLegacies(
+          null,
+          developerToolId,
+          propertyKey,
+        )
+
+      if (
+        propertyKeyAfterLegacies != propertyKey &&
+          actualConfiguration != null &&
+          actualConfiguration.properties.containsKey(propertyKeyAfterLegacies)
+      ) {
+        renamedConfigurationProperties.add(
+          RenamedConfigurationProperty(
+            developerToolId = developerToolId,
+            propertyKey = propertyKey,
+            propertyKeyAfterLegacies = propertyKeyAfterLegacies,
+          )
+        )
+      } else {
+        removedConfigurationProperties.add(
+          RemovedConfigurationProperty(developerToolId = developerToolId, propertyKey = propertyKey)
+        )
+      }
+    }
+
+    fun writePropertiesFile(
+      filename: String,
+      csvFormat: CSVFormat,
+      writeProperties: CSVPrinter.() -> Unit,
+    ) {
+      instanceSettingsResourcesDir
+        .resolve(PluginInfo.pluginVersion.toString())
+        .resolve(filename)
+        .apply { writeText("") }
+        .writer(options = arrayOf(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))
+        .use { writer ->
+          val csvPrinter =
+            CSVPrinter(writer, csvFormat.builder().setSkipHeaderRecord(false).build())
+          writeProperties(csvPrinter)
+        }
+    }
+
+    writePropertiesFile(
+      RENAMED_CONFIGURATION_PROPERTIES_CSV_FILENAME,
+      renamedConfigurationPropertiesCsvFormat,
+    ) {
+      renamedConfigurationProperties.forEach {
+        printRecord(it.developerToolId, it.propertyKey, it.propertyKeyAfterLegacies)
+      }
+    }
+
+    writePropertiesFile(
+      REMOVED_CONFIGURATION_PROPERTIES_CSV_FILENAME,
+      removedConfigurationPropertiesCsvFormat,
+    ) {
+      removedConfigurationProperties.forEach { printRecord(it.developerToolId, it.propertyKey) }
+    }
+  }
+
+  @TestFactory
+  fun `Test legacy settings import`(): List<DynamicNode> {
+    val renamedProperties = collectRenamedConfigurationProperties()
+    val removedProperties = collectRemovedConfigurationProperties()
+
+    val checkInstanceSettings: (Path) -> DynamicContainer = { instanceSettingsVersionDir ->
+      val persistedStateXmlFile =
+        instanceSettingsVersionDir.resolve(INSTANCE_SETTINGS_PERSISTED_STATE_XML_FILENAME)
+      val expectedConfigurationPropertiesCsvFile =
+        instanceSettingsVersionDir.resolve(EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME)
+
+      DeveloperToolsApplicationSettings.generalSettings.saveConfigurations.set(true)
+      DeveloperToolsApplicationSettings.generalSettings.saveInputs.set(true)
+      DeveloperToolsApplicationSettings.generalSettings.saveSensitiveInputs.set(true)
+
+      val restoredSettings =
+        createDeveloperToolsInstanceSettings(
+          instantState =
+            XmlSerializer.deserialize(
+              persistedStateXmlFile.toUri().toURL(),
+              InstanceState::class.java,
+            )
         )
 
       val developerUiToolsUnderTest: Map<String, DeveloperUiToolUnderTest<*>> =
@@ -260,51 +391,48 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
           it.id
         }
 
-      val expectedConfigurationProperties =
-        expectedConfigurationPropertiesCsvFile.bufferedReader(StandardCharsets.UTF_8).use { reader
-          ->
-          CSVParser(reader, expectedConfigurationPropertiesCsvFormat).records.map { record ->
-            ExpectedConfigurationProperty(
-              developerToolId = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_DEVELOPER_TOOL_ID],
-              propertyKey = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_ID],
-              propertyValueType =
-                record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE_TYPE_NAME],
-              propertyValue =
-                record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE].replace(
-                  "\r\n",
-                  System.lineSeparator(),
-                ),
-              propertyType = record[EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_TYPE],
-            )
-          }
-        }
+      val expectedProperties =
+        readExpectedConfigurationProperties(expectedConfigurationPropertiesCsvFile)
 
       val checkRestoredProperty: (ExpectedConfigurationProperty) -> DynamicTest =
-        { (developerToolId, propertyId, propertyValueTypeName, propertyValue, propertyType) ->
-          dynamicTest(propertyId) {
-            val actualConfiguration = developerUiToolsUnderTest[developerToolId]!!.configuration
+        {
+          (
+            developerToolId,
+            expectedPropertyKey,
+            expectedPropertyValueTypeName,
+            expectedPropertyValue,
+            expectedPropertyType) ->
+          dynamicTest(expectedPropertyKey) {
+            val actualConfiguration = developerUiToolsUnderTest[developerToolId]?.configuration
+
+            assertThat(actualConfiguration).isNotNull
 
             // Property was loaded from the persisted state
-            assertThat(actualConfiguration.persistentProperties).containsKey(propertyId)
+            val expectedPropertyKeyAfterRename =
+              applyRenamedConfigurationPropertyKeys(
+                renamedConfigurationProperties = renamedProperties,
+                developerToolId = developerToolId,
+                propertyKey = expectedPropertyKey,
+              )
+            assertThat(actualConfiguration!!.persistentProperties)
+              .containsKey(expectedPropertyKeyAfterRename)
 
             // Property was restored from persisted state during property registration
-            val actualProperties =
-              actualConfiguration.properties.values
-                .flatMap { listOf(it.key, it.legacyKey).map { key -> key to it } }
-                .toMap()
-            assertThat(actualProperties).containsKey(propertyId)
-            val actualProperty = actualProperties[propertyId]
+            assertThat(actualConfiguration.properties).containsKey(expectedPropertyKeyAfterRename)
+            val actualProperty = actualConfiguration.properties[expectedPropertyKeyAfterRename]
 
             // Property type is allowed
             assertThat(configurationPropertyTypesByNamesAndLegacyValueTypes)
-              .containsKey(propertyValueTypeName)
+              .containsKey(expectedPropertyValueTypeName)
 
             val propertyValueType =
-              configurationPropertyTypesByNamesAndLegacyValueTypes[propertyValueTypeName]
+              configurationPropertyTypesByNamesAndLegacyValueTypes[expectedPropertyValueTypeName]
 
-            val expectedValue = propertyValueType!!.fromPersistent(propertyValue)
+            val expectedValue = propertyValueType!!.fromPersistent(expectedPropertyValue)
             // Property value was correctly read from its persisted state
-            assertThat(actualConfiguration.persistentProperties[propertyId]!!.value)
+            assertThat(
+                actualConfiguration.persistentProperties[expectedPropertyKeyAfterRename]!!.value
+              )
               .isEqualTo(expectedValue)
             // Property value was correctly restored from its persisted state
             // This test may in some cases not really test the restore, because the
@@ -313,26 +441,63 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
             assertThat(actualProperty!!.reference.get()).isEqualTo(expectedValue)
 
             // Property type was correctly restored
-            assertThat(actualProperty.type.name).isEqualTo(propertyType)
+            assertThat(actualProperty.type.name).isEqualTo(expectedPropertyType)
           }
         }
 
       dynamicContainer(
-        legacyImportVersionDir.fileName.toString(),
-        expectedConfigurationProperties
-          .filter { expectedConfigurationProperty ->
-            deletedProperties.none { it(expectedConfigurationProperty) }
+        instanceSettingsVersionDir.fileName.toString(),
+        expectedProperties
+          .filter { expectedProperty ->
+            removedProperties.values.none {
+              it[expectedProperty.developerToolId]?.contains(expectedProperty.propertyKey) == true
+            }
           }
           .groupBy { it.developerToolId }
-          .map { dynamicContainer(it.key, it.value.map(checkRestoredProperty)) },
+          .map { expectedProperty ->
+            dynamicContainer(
+              expectedProperty.key,
+              expectedProperty.value.map(checkRestoredProperty),
+            )
+          },
       )
     }
 
-    return Files.walk(legacyImportDir, 1)
-      .filter { it != legacyImportDir }
-      .filter { it.isDirectory() }
-      .map(checkLegacyPersistedSettingsImport)
-      .toList()
+    return walkInstanceSettingsResourcesDir().map(checkInstanceSettings).toList()
+  }
+
+  private fun readExpectedConfigurationProperties(
+    expectedConfigurationPropertiesCsvFile: Path
+  ): List<ExpectedConfigurationProperty> =
+    expectedConfigurationPropertiesCsvFile.bufferedReader().use { reader ->
+      CSVParser(reader, expectedConfigurationPropertiesCsvFormat).records.map { record ->
+        val developerToolId = record[CSV_HEADER_DEVELOPER_TOOL_ID]
+        ExpectedConfigurationProperty(
+          developerToolId = developerToolId,
+          propertyKey = record[CSV_HEADER_PROPERTY_KEY],
+          propertyValueType = record[CSV_HEADER_PROPERTY_VALUE_TYPE_NAME],
+          propertyValue = record[CSV_HEADER_PROPERTY_VALUE].replace("\r\n", System.lineSeparator()),
+          propertyType = record[CSV_HEADER_PROPERTY_TYPE],
+        )
+      }
+    }
+
+  private fun applyRenamedConfigurationPropertyKeys(
+    renamedConfigurationProperties:
+      SortedMap<PluginInfo.PluginVersion, Map<String, Map<String, String>>>,
+    developerToolId: String,
+    propertyKey: String,
+  ): String {
+    var newPropertyName = propertyKey
+    for ((_, renamedProperties) in renamedConfigurationProperties) {
+      if (renamedProperties.containsKey(developerToolId)) {
+        val renamedPropertiesForDeveloperTool = renamedProperties[developerToolId]
+        if (renamedPropertiesForDeveloperTool?.containsKey(propertyKey) == true) {
+          newPropertyName = renamedPropertiesForDeveloperTool[propertyKey]!!
+        }
+      }
+    }
+    return newPropertyName
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -346,6 +511,63 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
         loadState(instantState)
       }
     }
+
+  private fun collectRenamedConfigurationProperties():
+    SortedMap<PluginInfo.PluginVersion, Map<String, Map<String, String>>> =
+    walkInstanceSettingsResourcesDir()
+      .mapNotNull { dir ->
+        val csvFile = dir.resolve(RENAMED_CONFIGURATION_PROPERTIES_CSV_FILENAME)
+        if (!csvFile.exists()) return@mapNotNull null
+
+        val properties =
+          csvFile.bufferedReader().use { reader ->
+            CSVParser(reader, renamedConfigurationPropertiesCsvFormat).records.map {
+              Triple(
+                it.get(CSV_HEADER_DEVELOPER_TOOL_ID),
+                it.get(CSV_HEADER_OLD_PROPERTY_KEY),
+                it.get(CSV_HEADER_NEW_PROPERTY_KEY),
+              )
+            }
+          }
+
+        dir.name.toPluginVersion() to properties
+      }
+      .associate { (pluginVersion, props) ->
+        pluginVersion to
+          props
+            .groupBy { it.first }
+            .mapValues { (_, group) -> group.associate { it.second to it.third } }
+      }
+      .toSortedMap()
+
+  private fun collectRemovedConfigurationProperties():
+    SortedMap<PluginInfo.PluginVersion, Map<String, List<String>>> =
+    Files.walk(instanceSettingsResourcesDir, 1)
+      .asSequence()
+      .filter { it != instanceSettingsResourcesDir && it.isDirectory() }
+      .mapNotNull { dir ->
+        val csvFile = dir.resolve(REMOVED_CONFIGURATION_PROPERTIES_CSV_FILENAME)
+        if (!csvFile.exists()) return@mapNotNull null
+
+        val properties =
+          csvFile.bufferedReader().use { reader ->
+            CSVParser(reader, removedConfigurationPropertiesCsvFormat).records.groupBy({
+              it.get(CSV_HEADER_DEVELOPER_TOOL_ID)
+            }) {
+              it.get(CSV_HEADER_PROPERTY_KEY)
+            }
+          }
+
+        dir.name.toPluginVersion() to properties
+      }
+      .toMap()
+      .toSortedMap()
+
+  private fun walkInstanceSettingsResourcesDir(): Sequence<Path> =
+    Files.walk(instanceSettingsResourcesDir, 1)
+      .filter { it != instanceSettingsResourcesDir }
+      .filter { it.isDirectory() }
+      .asSequence()
 
   // -- Inner Type ---------------------------------------------------------- //
 
@@ -363,28 +585,50 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
     private const val EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME =
       "expected-configuration-properties.csv"
-    private const val PERSISTED_STATE_XML_FILENAME = "persisted-state.xml"
-    private val legacyImportDir =
+    private const val RENAMED_CONFIGURATION_PROPERTIES_CSV_FILENAME =
+      "renamed-configuration-properties.csv"
+    private const val REMOVED_CONFIGURATION_PROPERTIES_CSV_FILENAME =
+      "removed-configuration-properties.csv"
+    private const val INSTANCE_SETTINGS_PERSISTED_STATE_XML_FILENAME =
+      "instance-settings-persisted-state.xml"
+    private val instanceSettingsResourcesDir =
       Paths.get(
-        "src/test/resources/dev/turingcomplete/intellijdevelopertoolsplugin/integrationtest/legacyimport"
+        "src/test/resources/dev/turingcomplete/intellijdevelopertoolsplugin/integrationtest/instancesettings"
       )
 
-    private const val EXPECTED_CONFIGURATION_PROPERTIES_HEADER_DEVELOPER_TOOL_ID = "developerToolId"
-    private const val EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_ID = "propertyId"
-    private const val EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_TYPE = "propertyType"
-    private const val EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE_TYPE_NAME =
-      "propertyValueTypeName"
-    private const val EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE = "propertyValue"
+    private const val CSV_HEADER_DEVELOPER_TOOL_ID = "developerToolId"
+    private const val CSV_HEADER_PROPERTY_KEY = "propertyKey"
+    private const val CSV_HEADER_OLD_PROPERTY_KEY = "oldPropertyKey"
+    private const val CSV_HEADER_NEW_PROPERTY_KEY = "newPropertyKey"
+    private const val CSV_HEADER_PROPERTY_TYPE = "propertyType"
+    private const val CSV_HEADER_PROPERTY_VALUE_TYPE_NAME = "propertyValueTypeName"
+    private const val CSV_HEADER_PROPERTY_VALUE = "propertyValue"
 
     private val expectedConfigurationPropertiesCsvFormat =
       CSVFormat.Builder.create()
         .setHeader(
-          EXPECTED_CONFIGURATION_PROPERTIES_HEADER_DEVELOPER_TOOL_ID,
-          EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_ID,
-          EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_TYPE,
-          EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE_TYPE_NAME,
-          EXPECTED_CONFIGURATION_PROPERTIES_HEADER_PROPERTY_VALUE,
+          CSV_HEADER_DEVELOPER_TOOL_ID,
+          CSV_HEADER_PROPERTY_KEY,
+          CSV_HEADER_PROPERTY_TYPE,
+          CSV_HEADER_PROPERTY_VALUE_TYPE_NAME,
+          CSV_HEADER_PROPERTY_VALUE,
         )
+        .setSkipHeaderRecord(true)
+        .build()
+
+    private val renamedConfigurationPropertiesCsvFormat =
+      CSVFormat.Builder.create()
+        .setHeader(
+          CSV_HEADER_DEVELOPER_TOOL_ID,
+          CSV_HEADER_OLD_PROPERTY_KEY,
+          CSV_HEADER_NEW_PROPERTY_KEY,
+        )
+        .setSkipHeaderRecord(true)
+        .build()
+
+    private val removedConfigurationPropertiesCsvFormat =
+      CSVFormat.Builder.create()
+        .setHeader(CSV_HEADER_DEVELOPER_TOOL_ID, CSV_HEADER_PROPERTY_KEY)
         .setSkipHeaderRecord(true)
         .build()
   }

@@ -16,6 +16,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateLongValue
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
 
 class SqlFormattingTransformer(
   context: DeveloperUiToolContext,
@@ -23,19 +25,15 @@ class SqlFormattingTransformer(
   parentDisposable: Disposable,
   project: Project?,
 ) :
-  TextTransformer(
-    textTransformerContext =
-      TextTransformerContext(
-        transformActionTitle = "Format",
-        sourceTitle = "Plain SQL",
-        resultTitle = "Formatted SQL",
-        initialSourceExampleText = EXAMPLE_SQL,
-        diffSupport = DiffSupport(title = "SQL Formatting"),
-      ),
+  UndirectionalConverter(
     context = context,
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
+    title = "SQL Formatting",
+    sourceTitle = "Plain SQL",
+    targetTitle = "Formatted SQL",
+    toTargetTitle = "Format",
   ),
   DeveloperToolConfiguration.ChangeListener {
   // -- Properties ---------------------------------------------------------- //
@@ -52,7 +50,14 @@ class SqlFormattingTransformer(
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
-  override fun Panel.buildMiddleConfigurationUi() {
+  override fun ConversionSideHandler.addSourceTextInputOutputHandler() {
+    addTextInputOutputHandler(
+      id = defaultSourceInputOutputHandlerId,
+      exampleText = EXAMPLE_SOURCE_TEXT,
+    )
+  }
+
+  override fun Panel.buildSourceTopConfigurationUi() {
     row { comboBox(Dialect.entries).label("Dialect:").bindItem(dialect) }
       .layout(RowLayout.PARENT_GRID)
 
@@ -89,9 +94,8 @@ class SqlFormattingTransformer(
     super.afterBuildUi()
   }
 
-  override fun transform() {
-    resultText.set(SqlFormatter.of(dialect.get()).format(sourceText.get(), formatConfig))
-  }
+  override fun doConvertToTarget(source: ByteArray): ByteArray =
+    SqlFormatter.of(dialect.get()).format(String(source), formatConfig).toByteArray()
 
   override fun configurationChanged(property: ValueProperty<out Any>) {
     updateFormatConfig()
@@ -130,7 +134,7 @@ class SqlFormattingTransformer(
 
   companion object {
 
-    private const val EXAMPLE_SQL =
+    private const val EXAMPLE_SOURCE_TEXT =
       "select c.id, c.name, o.address, o.orderedAt from customers c left join orders o ON (o.customerId = c.id) order by o.orderedAt"
 
     private val DEFAULT_DIALECT = Dialect.N1ql

@@ -13,6 +13,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bind
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.AUTOMATIC_DETECTION
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.FIXED_TEXT_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.INDIVIDUAL_DELIMITER
@@ -29,20 +31,15 @@ class TextCaseTransformer(
   parentDisposable: Disposable,
   project: Project?,
 ) :
-  TextTransformer(
-    textTransformerContext =
-      TextTransformerContext(
-        transformActionTitle = "Transform",
-        sourceTitle = "Original",
-        resultTitle = "Target",
-        initialSourceExampleText = EXAMPLE_INPUT_TEXT,
-        diffSupport = DiffSupport(title = "Text Case Transformer"),
-        supportsDebug = true,
-      ),
+  UndirectionalConverter(
     context = context,
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
+    title = "Text Case",
+    sourceTitle = "Original",
+    targetTitle = "Target",
+    toTargetTitle = "Transform",
   ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -55,13 +52,20 @@ class TextCaseTransformer(
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
-  override fun transform() {
-    resultText.set(
-      sourceText.get().toTextCase(outputTextCase.get().textCase, getInputWordsSplitter())
+  override fun ConversionSideHandler.addSourceTextInputOutputHandler() {
+    addTextInputOutputHandler(
+      id = defaultSourceInputOutputHandlerId,
+      exampleText = EXAMPLE_SOURCE_TEXT,
     )
   }
 
-  override fun Panel.buildMiddleConfigurationUi() {
+  override fun doConvertToTarget(source: ByteArray): ByteArray {
+    val sourceText = String(source)
+    val wordsSplitter = getInputWordsSplitter(sourceText)
+    return sourceText.toTextCase(outputTextCase.get().textCase, wordsSplitter).toByteArray()
+  }
+
+  override fun Panel.buildSourceBottomConfigurationUi() {
     buttonsGroup("Original:") {
       row { radioButton("Automatic detection").bind(originalParsingMode, AUTOMATIC_DETECTION) }
 
@@ -91,29 +95,29 @@ class TextCaseTransformer(
     row { comboBox(TextCase.entries).label("Target:").bindItem(outputTextCase) }
   }
 
-  override fun Panel.buildDebugComponent() {
-    group("Input Words") {
-      row {
-        val inputWords = getInputWordsSplitter().split(sourceText.get())
-        if (inputWords.isEmpty()) {
-          label("<html><i>None</i></html>")
-        } else {
-          val wordsList =
-            inputWords.joinToString(separator = "", prefix = "<ol>", postfix = "</ol>") {
-              "<li>$it</li>"
-            }
-          label("<html>$wordsList</html>")
-        }
-      }
-    }
-  }
+  //  override fun Panel.buildDebugComponent() {
+  //    group("Input Words") {
+  //      row {
+  //        val inputWords = getInputWordsSplitter().split(sourceText.get())
+  //        if (inputWords.isEmpty()) {
+  //          label("<html><i>None</i></html>")
+  //        } else {
+  //          val wordsList =
+  //            inputWords.joinToString(separator = "", prefix = "<ol>", postfix = "</ol>") {
+  //              "<li>$it</li>"
+  //            }
+  //          label("<html>$wordsList</html>")
+  //        }
+  //      }
+  //    }
+  //  }
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun getInputWordsSplitter() =
+  private fun getInputWordsSplitter(sourceText: String) =
     when (originalParsingMode.get()) {
       AUTOMATIC_DETECTION ->
-        TextCaseUtils.determineWordsSplitter(sourceText.get(), inputTextCase.get().textCase)
+        TextCaseUtils.determineWordsSplitter(sourceText, inputTextCase.get().textCase)
       FIXED_TEXT_CASE -> inputTextCase.get().textCase.wordsSplitter()
       INDIVIDUAL_DELIMITER -> individualDelimiter.get().toWordsSplitter()
     }
@@ -170,6 +174,6 @@ class TextCaseTransformer(
 
   companion object {
 
-    const val EXAMPLE_INPUT_TEXT = "thisIsAnExampleText"
+    const val EXAMPLE_SOURCE_TEXT = "thisIsAnExampleText"
   }
 }
