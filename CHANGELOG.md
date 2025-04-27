@@ -18,14 +18,9 @@
 
 ### Fixed
 
-- Fixed compatibility problems with IntelliJ 2025.1.
+- Fixed compatibility problems with 2025.1 releases.
 - The `hsl/hsla` CSS color value wasn't correctly calculated in the "Color Picker" tool.
-
-## 6.4.0 - 2025-03-18
-
-### Added
-
-- Compatibility with 2025.1 EAP releases
+- JSON input errors contained too much irrelevant metadata about the internal JSON processing.
 
 ## 6.3.0 - 2025-01-14
 

@@ -173,6 +173,10 @@ class EscapeSequencesEscaperUnescaper(
       DeveloperUiToolPresentation(
         menuTitle = UiToolsBundle.message("escape-sequences-escaper-unescaper.title"),
         contentTitle = UiToolsBundle.message("escape-sequences-escaper-unescaper.content-title"),
+        description =
+          DeveloperUiToolPresentation.contextHelp(
+            UiToolsBundle.message("escape-sequences-escaper-unescaper.context-help")
+          ),
       )
 
     override fun getDeveloperUiToolCreator(
