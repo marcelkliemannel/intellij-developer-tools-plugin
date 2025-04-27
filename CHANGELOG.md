@@ -4,6 +4,16 @@
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## 7.0.0 - 2025-04-27
+
+### Added
+
 - All encoding/decoding, escaping/unescaping and text transformation tools now also support reading from and writing to files.
 - New "Escape Sequence" tool for escaping/unescaping line breaks, tabs, backslashes, and single/double quotes.
 - Added a setting to control the number of decimal places in the "Color Picker" tool.
