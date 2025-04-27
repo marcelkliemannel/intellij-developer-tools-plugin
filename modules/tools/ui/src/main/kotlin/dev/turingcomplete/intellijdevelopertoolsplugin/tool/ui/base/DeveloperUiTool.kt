@@ -98,9 +98,12 @@ abstract class DeveloperUiTool(protected val parentDisposable: Disposable) :
     // Override if needed
   }
 
-  fun validate(): List<ValidationInfo> {
+  fun validate(onlyVisibleAndEnabled: Boolean = false): List<ValidationInfo> {
     val result =
-      findComponentsOfType(component, DialogPanel::class.java).flatMap { it.validateAll() }.toList()
+      findComponentsOfType(component, DialogPanel::class.java)
+        .filter { !onlyVisibleAndEnabled || (it.isVisible && it.isEnabled) }
+        .flatMap { it.validateAll() }
+        .toList()
     validationListeners.forEach { it(result) }
     return result
   }

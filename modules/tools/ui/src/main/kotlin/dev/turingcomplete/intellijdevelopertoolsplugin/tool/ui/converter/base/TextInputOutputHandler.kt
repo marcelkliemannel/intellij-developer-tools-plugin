@@ -36,7 +36,13 @@ class TextInputOutputHandler(
 ) :
   InputOutputHandler(
     id = id,
-    title = UiToolsBundle.message("converter.text-input-output-handler.title"),
+    title =
+      when (bytesToTextMode) {
+        BytesToTextMode.BYTES_TO_CHARACTERS ->
+          UiToolsBundle.message("converter.text-input-output-handler.simple-title")
+        BytesToTextMode.BYTES_TO_HEX ->
+          UiToolsBundle.message("converter.text-input-output-handler.hex-title")
+      },
     errorHolder = ErrorHolder(),
     liveConversionSupported = true,
     textDiffSupported = true,

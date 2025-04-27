@@ -49,9 +49,9 @@ class HashingTransformer(
 
   // -- Exposed Methods ----------------------------------------------------- //
 
-  override fun ConversionSideHandler.addSourceTextInputOutputHandler() {
+  override fun ConversionSideHandler.addTargetTextInputOutputHandler() {
     addTextInputOutputHandler(
-      id = defaultSourceInputOutputHandlerId,
+      id = defaultTargetInputOutputHandlerId,
       bytesToTextMode = BYTES_TO_HEX,
     )
   }

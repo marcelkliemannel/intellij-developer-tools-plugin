@@ -24,6 +24,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.SimpleTogg
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.registerDynamicToolTip
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateNonEmpty
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.TextInputOutputHandler.BytesToTextMode.BYTES_TO_HEX
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE32
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE64
@@ -75,6 +77,13 @@ class HmacTransformer(
   }
 
   // -- Exposed Methods ----------------------------------------------------- //
+
+  override fun ConversionSideHandler.addTargetTextInputOutputHandler() {
+    addTextInputOutputHandler(
+      id = defaultTargetInputOutputHandlerId,
+      bytesToTextMode = BYTES_TO_HEX,
+    )
+  }
 
   override fun doConvertToTarget(source: ByteArray): ByteArray {
     val secretKeyValue = secretKey.get()

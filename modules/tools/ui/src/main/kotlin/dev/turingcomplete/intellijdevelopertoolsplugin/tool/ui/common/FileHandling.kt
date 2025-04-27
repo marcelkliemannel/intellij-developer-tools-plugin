@@ -78,7 +78,14 @@ class FileHandling(
     if (supportsWrite) {
       row {
         label(GeneralBundle.message("file-handling.write-format.title")).gap(RightGap.SMALL)
-        segmentedButton(WriteFormat.entries) { text = it.title }.bind(writeFormat)
+        segmentedButton(WriteFormat.entries) { text = it.title }
+          .bind(writeFormat)
+          .gap(RightGap.SMALL)
+        contextHelp(
+          WriteFormat.entries.joinToString(separator = "", prefix = "<ul>", postfix = "</ul>") {
+            "<li><b>${it.title}</b>: ${it.description}</li>"
+          }
+        )
       }
 
       row { comment("").bindText(lastWriteInformation).resizableColumn() }
@@ -150,10 +157,15 @@ class FileHandling(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  enum class WriteFormat(val title: String) {
-
-    BINARY(GeneralBundle.message("file-handling.write-format.binary.title")),
-    HEX(GeneralBundle.message("file-handling.write-format.hex.title")),
+  enum class WriteFormat(val title: String, val description: String) {
+    BINARY(
+      GeneralBundle.message("file-handling.write-format.binary.title"),
+      GeneralBundle.message("file-handling.write-format.binary.description"),
+    ),
+    HEX(
+      GeneralBundle.message("file-handling.write-format.hex.title"),
+      GeneralBundle.message("file-handling.write-format.hex.description"),
+    ),
   }
 
   // -- Companion Object ---------------------------------------------------- //

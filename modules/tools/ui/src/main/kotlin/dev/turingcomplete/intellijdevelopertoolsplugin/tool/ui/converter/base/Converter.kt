@@ -66,7 +66,9 @@ abstract class Converter(
     convert(
       heavyConversionTitle = toTargetTitle,
       doConvert = { source, target ->
-        if (validate().isNotEmpty()) {
+        // Only check visible/enabled components, because there might be
+        // validation errors in non-active `InputOutputHandler`s.
+        if (validate(onlyVisibleAndEnabled = true).isNotEmpty()) {
           return@convert
         }
 
