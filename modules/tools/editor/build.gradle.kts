@@ -1,5 +1,3 @@
-apply(plugin = "org.jetbrains.intellij.platform.module")
-
 dependencies {
   implementation(project(":common"))
   // This is required for the `OpenDeveloperToolService` mechanism. However, a

@@ -1,6 +1,5 @@
 plugins {
   `java-test-fixtures`
-  id("org.jetbrains.intellij.platform.module")
 }
 
 dependencies {

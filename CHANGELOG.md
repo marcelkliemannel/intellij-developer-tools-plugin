@@ -18,6 +18,7 @@
 
 ### Fixed
 
+- Fixed compatibility problems with IntelliJ 2025.1.
 - The `hsl/hsla` CSS color value wasn't correctly calculated in the "Color Picker" tool.
 
 ## 6.4.0 - 2025-03-18

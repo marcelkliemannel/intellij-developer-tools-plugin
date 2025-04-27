@@ -1,4 +1,3 @@
-
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
@@ -18,6 +17,7 @@ plugins {
   alias(libs.plugins.intellij.platform)
   alias(libs.plugins.changelog)
   alias(libs.plugins.spotless)
+  alias(libs.plugins.version.catalog.update)
 }
 
 subprojects { apply(plugin = "org.jetbrains.intellij.platform.module") }
@@ -190,5 +190,17 @@ tasks {
       // https://kotlin.github.io/analysis-api/testing-in-k2-locally.html
       listOf("-Didea.kotlin.plugin.use.k2=true")
     }
+  }
+}
+
+versionCatalogUpdate {
+  pin {
+    versions.set(
+      listOf(
+        // Must be updated in conjunction with the minimum platform version
+        // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
+        "kotlin"
+      )
+    )
   }
 }

@@ -1,7 +1,3 @@
-plugins {
-  id("org.jetbrains.intellij.platform.module")
-}
-
 repositories {
   mavenLocal()
   mavenCentral()

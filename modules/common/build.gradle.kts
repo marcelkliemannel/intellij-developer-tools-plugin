@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.utils.extendsFrom
 
 plugins {
   `java-test-fixtures`
-  id("org.jetbrains.intellij.platform.module")
 }
 
 dependencies {

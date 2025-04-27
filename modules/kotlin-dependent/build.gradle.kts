@@ -1,5 +1,3 @@
-apply(plugin = "org.jetbrains.intellij.platform.module")
-
 dependencies {
   intellijPlatform {
     bundledPlugins("org.jetbrains.kotlin")

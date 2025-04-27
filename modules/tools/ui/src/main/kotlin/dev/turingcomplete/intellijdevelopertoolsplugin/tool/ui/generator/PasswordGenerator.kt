@@ -97,7 +97,7 @@ class PasswordGenerator(
     return RandomStringGenerator.Builder()
       .usingRandom { SECURE_RANDOM.nextInt(it) }
       .selectFrom(*characters)
-      .build()
+      .get()
       .generate(length, length)
   }
 
