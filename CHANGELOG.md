@@ -16,6 +16,7 @@
 
 - All encoding/decoding, escaping/unescaping and text transformation tools now also support reading from and writing to files.
 - New "Escape Sequence" tool for escaping/unescaping line breaks, tabs, backslashes, and single/double quotes.
+- New "JSON Handling" settings that allow very fine-grained control over the features for reading and writing JSON in all tools. This makes it possible to handle certain non-standard JSON features, such as comments.
 - Added a setting to control the number of decimal places in the "Color Picker" tool.
 
 ### Changed

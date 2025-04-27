@@ -14,6 +14,7 @@ object PluginInfo {
   val pluginVersion: PluginVersion by lazy {
     pluginProperties.getProperty("pluginVersion").toPluginVersion()
   }
+  val pluginName: String by lazy { pluginProperties.getProperty("pluginName") }
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //

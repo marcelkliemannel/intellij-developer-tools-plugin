@@ -1,5 +1,8 @@
+import org.jetbrains.changelog.Changelog
+
 plugins {
   `java-test-fixtures`
+  alias(libs.plugins.changelog)
 }
 
 dependencies {
@@ -40,4 +43,33 @@ dependencies {
 
   testFixturesApi(project(":common"))
   testFixturesApi(project(":settings"))
+}
+
+changelog {
+  path.set(rootProject.file("CHANGELOG.md").path)
+}
+
+val writeChangelogToFileTask =
+  tasks.register("writeChangelogToFile") {
+    val generatedResourcesDir = layout.buildDirectory.dir("generated-resources/changelog").get()
+    outputs.dir(generatedResourcesDir)
+
+    doLast {
+      val renderResult =
+        changelog.instance.get().releasedItems.joinToString("\n") {
+          changelog.renderItem(it, Changelog.OutputType.HTML)
+        }
+      val baseDir = generatedResourcesDir.dir("dev/turingcomplete/intellijdevelopertoolsplugin")
+      file(baseDir).mkdirs()
+      file(baseDir.file("changelog.html")).writeText(renderResult)
+    }
+  }
+
+sourceSets { main { resources { srcDir(writeChangelogToFileTask.map { it.outputs.files }) } } }
+
+tasks.withType(org.jetbrains.changelog.tasks.InitializeChangelogTask::class).configureEach {
+  enabled = false
+}
+tasks.withType(org.jetbrains.changelog.tasks.PatchChangelogTask::class).configureEach {
+  enabled = false
 }

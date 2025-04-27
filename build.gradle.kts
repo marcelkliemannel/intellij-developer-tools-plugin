@@ -158,24 +158,6 @@ changelog {
   groups.set(listOf("Added", "Changed", "Removed", "Fixed"))
 }
 
-val writeChangelogToFileTask =
-  tasks.register("writeChangelogToFile") {
-    val generatedResourcesDir = layout.buildDirectory.dir("generated-resources/changelog").get()
-    outputs.dir(generatedResourcesDir)
-
-    doLast {
-      val renderResult =
-        changelog.instance.get().releasedItems.joinToString("\n") {
-          changelog.renderItem(it, Changelog.OutputType.HTML)
-        }
-      val baseDir = generatedResourcesDir.dir("dev/turingcomplete/intellijdevelopertoolsplugin")
-      file(baseDir).mkdirs()
-      file(baseDir.file("changelog.html")).writeText(renderResult)
-    }
-  }
-
-sourceSets { main { resources { srcDir(writeChangelogToFileTask) } } }
-
 tasks {
   named("publishPlugin") {
     dependsOn("check")

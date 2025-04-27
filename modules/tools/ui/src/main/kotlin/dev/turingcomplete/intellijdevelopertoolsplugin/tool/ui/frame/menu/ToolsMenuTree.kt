@@ -33,7 +33,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactoryEp
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolGroup
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.ChangelogDialog
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.AboutPluginDialog
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.OpenSettingsAction
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -195,14 +195,14 @@ class ToolsMenuTree(
     }
 
   private fun createWhatsNewLink(parentComponent: JComponent) =
-    HyperlinkLabel("What's new").apply {
+    HyperlinkLabel("About").apply {
       icon = AllIcons.Actions.IntentionBulbGrey
       addHyperlinkListener(
         object : HyperlinkAdapter() {
 
           override fun hyperlinkActivated(e: HyperlinkEvent) {
             ApplicationManager.getApplication().invokeLater {
-              ChangelogDialog(project, parentComponent).show()
+              AboutPluginDialog(project, parentComponent).show()
             }
           }
         }

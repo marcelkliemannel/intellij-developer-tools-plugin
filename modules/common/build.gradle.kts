@@ -34,6 +34,7 @@ val generatePluginProperties by
         """
             pluginId=${project.property("pluginId")}
             pluginVersion=${project.property("pluginVersion")}
+            pluginName=${project.property("pluginName")}
             """
           .trimIndent()
       )
