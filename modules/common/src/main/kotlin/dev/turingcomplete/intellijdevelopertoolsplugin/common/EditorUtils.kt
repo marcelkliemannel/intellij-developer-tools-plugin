@@ -9,9 +9,9 @@ import com.intellij.openapi.editor.SelectionModel
 import com.intellij.openapi.util.TextRange
 
 object EditorUtils {
-  // -- Variables --------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Variables ----------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun Editor.getSelectedText(): Pair<String, TextRange>? {
     val selectionModel = this.selectionModel
@@ -21,25 +21,27 @@ object EditorUtils {
   }
 
   fun Editor.executeWriteCommand(actionName: String, action: (Editor) -> Unit) {
-    CommandProcessor.getInstance().executeCommand(this.project, {
-      runWriteAction {
-        action(this)
-      }
-    }, actionName, null, this.document)
+    CommandProcessor.getInstance()
+      .executeCommand(
+        this.project,
+        { runWriteAction { action(this) } },
+        actionName,
+        null,
+        this.document,
+      )
   }
 
   fun AnActionEvent.getEditor(): Editor =
     this.getData(CommonDataKeys.EDITOR) ?: error("Editor not found")
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
 
   private fun SelectionModel.getTextRangeIfSelection(): TextRange? =
     if (selectionStart < selectionEnd) {
       TextRange(selectionStart, selectionEnd)
-    }
-    else {
+    } else {
       null
     }
 
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 }

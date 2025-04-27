@@ -10,10 +10,10 @@ import com.intellij.psi.PsiJavaToken
 import com.intellij.psi.util.elementType
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedText
 
-internal object PsiJavaUtils {
-  // -- Variables --------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+object PsiJavaUtils {
+  // -- Variables ----------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun getPsiElementAtCaret(e: AnActionEvent): PsiElement? {
     val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return null
@@ -29,8 +29,7 @@ internal object PsiJavaUtils {
     return getTextIfStringValue(psiElement)
       ?: if (psiElement is PsiIdentifier) {
         psiElement.text to psiElement.textRange
-      }
-      else {
+      } else {
         null
       }
   }
@@ -42,15 +41,13 @@ internal object PsiJavaUtils {
       val newEnd = psiElement.textRange.endOffset - 1
       if (newStart > newEnd) {
         null
-      }
-      else {
+      } else {
         psiElement.text.substring(1, psiElement.text.length - 1) to TextRange(newStart, newEnd)
       }
-    }
-    else {
+    } else {
       null
     }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 }

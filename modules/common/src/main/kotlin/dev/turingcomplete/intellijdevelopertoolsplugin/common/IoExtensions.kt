@@ -1,11 +1,13 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.common
 
+import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.Properties
 
-// -- Properties ---------------------------------------------------------------------------------------------------- //
-// -- Initialization ------------------------------------------------------------------------------------------------ //
-// -- Exported Methods ---------------------------------------------------------------------------------------------- //
+// -- Properties ---------------------------------------------------------- //
+// -- Initialization ------------------------------------------------------ //
+// -- Exported Methods ---------------------------------------------------- //
 
 fun Path.clearDirectory() {
   if (!Files.exists(this) || !Files.isDirectory(this)) {
@@ -23,9 +25,11 @@ fun Path.clearDirectory() {
   }
 }
 
-fun Path.nameWithoutExtension() = fileName.toString().substringBeforeLast('.')
+fun Path.nameWithoutExtension(): String = fileName.toString().substringBeforeLast('.')
 
-fun Path.extension() = fileName.toString().substringAfterLast('.')
+fun Path.extension(): String = fileName.toString().substringAfterLast('.')
 
-// -- Private Methods ----------------------------------------------------------------------------------------------- //
-// -- Inner Type ---------------------------------------------------------------------------------------------------- //
+fun InputStream.readProperties(): Properties = this.use { Properties().apply { load(it) } }
+
+// -- Private Methods  ---------------------------------------------------- //
+// -- Inner Type ---------------------------------------------------------- //

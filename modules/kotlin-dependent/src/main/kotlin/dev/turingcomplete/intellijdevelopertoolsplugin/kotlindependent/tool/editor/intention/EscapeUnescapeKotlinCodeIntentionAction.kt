@@ -3,13 +3,13 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.kotlindependent.tool.edi
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.tool.editor.intention.EncodeDecodeIntentionAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.kotlindependent.PsiKotlinUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.EncodeDecodeIntentionAction
 
-internal class EscapeUnescapeKotlinCodeIntentionAction : EncodeDecodeIntentionAction() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+class EscapeUnescapeKotlinCodeIntentionAction : EncodeDecodeIntentionAction() {
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getFamilyName(): String = "Escape or unescape Kotlin string"
 
@@ -20,7 +20,7 @@ internal class EscapeUnescapeKotlinCodeIntentionAction : EncodeDecodeIntentionAc
     return PsiKotlinUtils.getTextFromStringValue(psiElement)?.let { it to psiElement.textRange }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

@@ -30,3 +30,9 @@ gradle-app.setting
 
 # Mac
 .DS_Store
+
+# Kotlin
+.kotlin/
+
+# Java
+.java-version

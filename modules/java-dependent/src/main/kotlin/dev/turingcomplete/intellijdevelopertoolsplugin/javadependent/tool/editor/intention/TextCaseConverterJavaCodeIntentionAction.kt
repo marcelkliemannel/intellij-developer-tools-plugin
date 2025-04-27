@@ -3,13 +3,13 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.edito
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.tool.editor.intention.TextCaseConverterIntentionAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.PsiJavaUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.TextCaseConverterIntentionAction
 
-internal class TextCaseConverterJavaCodeIntentionAction : TextCaseConverterIntentionAction() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+class TextCaseConverterJavaCodeIntentionAction : TextCaseConverterIntentionAction() {
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getFamilyName(): String = "Convert text case of Java string or identifier"
 
@@ -20,7 +20,7 @@ internal class TextCaseConverterJavaCodeIntentionAction : TextCaseConverterInten
     return PsiJavaUtils.getTextIfStringValueOrIdentifier(psiElement)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

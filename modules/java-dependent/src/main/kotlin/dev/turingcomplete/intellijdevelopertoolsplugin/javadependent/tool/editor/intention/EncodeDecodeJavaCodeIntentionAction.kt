@@ -3,13 +3,13 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.tool.edito
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.tool.editor.intention.EncodeDecodeIntentionAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.javadependent.PsiJavaUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.EncodeDecodeIntentionAction
 
-internal class EncodeDecodeJavaCodeIntentionAction : EncodeDecodeIntentionAction() {
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+class EncodeDecodeJavaCodeIntentionAction : EncodeDecodeIntentionAction() {
+  // -- Properties ---------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   override fun getFamilyName(): String = "Encode or decode Java string or identifier"
 
@@ -20,7 +20,7 @@ internal class EncodeDecodeJavaCodeIntentionAction : EncodeDecodeIntentionAction
     return PsiJavaUtils.getTextIfStringValueOrIdentifier(psiElement)
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
+  // -- Companion Object ---------------------------------------------------- //
 }

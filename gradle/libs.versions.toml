@@ -1,76 +1,98 @@
 [versions]
-jackson = "2.17.0"
-junit = "5.10.2"
-zxing = "3.5.3"
-text-case-converter = "2.0.0"
-uuid-generator = "5.0.0"
-jsonpath = "2.9.0"
-json-schema-validator = "1.4.0"
-commons-text = "1.10.0"
-commons-codec = "1.15"
-commons-io = "2.15.1"
-commons-compress = "1.26.0"
-ulid-creator = "5.2.3"
+assertj = "3.27.3"
+changelog = "2.2.1"
+commons-codec = "1.18.0"
+commons-compress = "1.27.1"
+commons-csv = "1.14.0"
+commons-io = "2.19.0"
+commons-text = "1.13.1"
 csscolor4j = "1.0.0"
-okhttp = "4.12.0"
+intellij-platform = "2.5.0"
+jackson = "2.19.0"
 jfiglet = "0.0.9"
 jnanoid = "2.0.0"
 jose4j = "0.9.6"
-named-regexp = "1.0.0"
-sql-formatter = "2.0.4"
-assertj = "3.25.3"
+json-schema-validator = "1.5.6"
+jsonpath = "2.9.0"
+junit4 = "4.13.2"
+junit5 = "5.12.2"
 # See bundled version: https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-kotlin = "2.1.10"
-intellij-platform = "2.3.0"
-changelog = "2.2.0"
+kotlin = "2.0.21"
+named-regexp = "1.0.0"
+okhttp = "4.12.0"
+spotless = "7.0.3"
+version-catalog-update = "1.0.0"
+sql-formatter = "2.0.5"
+text-case-converter = "2.0.0"
+ulid-creator = "5.2.3"
+uuid-generator = "5.1.0"
+zxing = "3.5.3"
 
 [libraries]
-jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson" }
-jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
-jackson-dataformat-yaml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-yaml", version.ref = "jackson" }
-jackson-dataformat-xml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-xml", version.ref = "jackson" }
-jackson-dataformat-properties = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-properties", version.ref = "jackson" }
-jackson-dataformat-toml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-toml", version.ref = "jackson" }
-
-uuid-generator = { group = "com.fasterxml.uuid", name = "java-uuid-generator", version.ref = "uuid-generator" }
-jsonpath = { group = "com.jayway.jsonpath", name = "json-path", version.ref = "jsonpath" }
-json-schema-validator = { group = "com.networknt", name = "json-schema-validator", version.ref = "json-schema-validator" }
-commons-text = { group = "org.apache.commons", name = "commons-text", version.ref = "commons-text" }
-commons-codec = { group = "commons-codec", name = "commons-codec", version.ref = "commons-codec" }
-commons-io = { group = "commons-io", name = "commons-io", version.ref = "commons-io" }
-commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }
-ulid-creator = { group = "com.github.f4b6a3", name = "ulid-creator", version.ref = "ulid-creator" }
-csscolor4j = { group = "org.silentsoft", name = "csscolor4j", version.ref = "csscolor4j" }
-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
-jfiglet = { group = "com.github.lalyos", name = "jfiglet", version.ref = "jfiglet" }
-jnanoid = { group = "com.aventrix.jnanoid", name = "jnanoid", version.ref = "jnanoid" }
-jose4j = { group = "org.bitbucket.b_c", name = "jose4j", version.ref = "jose4j" }
-named-regexp = { group = "com.github.tony19", name = "named-regexp", version.ref = "named-regexp" }
-sql-formatter = { group = "com.github.vertical-blank", name = "sql-formatter", version.ref = "sql-formatter" }
-
-zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
-zxing-javase = { group = "com.google.zxing", name = "javase", version.ref = "zxing" }
-
-text-case-converter = { group = "dev.turingcomplete", name = "text-case-converter", version.ref = "text-case-converter" }
-text-case-converter-kotlin-extension = { group = "dev.turingcomplete", name = "text-case-converter-kotlin-extension", version.ref = "text-case-converter" }
-
-assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj" }
-
-junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
-junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit" }
-junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
-junit4 = { group = "junit", name = "junit", version = "4.13.2" }
-
-kotlin-compiler = { group = "org.jetbrains.kotlin", name = "kotlin-compiler", version.ref = "kotlin" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
+commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons-compress" }
+commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commons-csv" }
+commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
+commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
+csscolor4j = { module = "org.silentsoft:csscolor4j", version.ref = "csscolor4j" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-dataformat-properties = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-properties", version.ref = "jackson" }
+jackson-dataformat-toml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-toml", version.ref = "jackson" }
+jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
+jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
+jfiglet = { module = "com.github.lalyos:jfiglet", version.ref = "jfiglet" }
+jnanoid = { module = "com.aventrix.jnanoid:jnanoid", version.ref = "jnanoid" }
+jose4j = { module = "org.bitbucket.b_c:jose4j", version.ref = "jose4j" }
+json-schema-validator = { module = "com.networknt:json-schema-validator", version.ref = "json-schema-validator" }
+jsonpath = { module = "com.jayway.jsonpath:json-path", version.ref = "jsonpath" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit5" }
+# See: https://docs.gradle.org/8.12/userguide/upgrading_version_8.html#manually_declaring_dependencies
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+junit4 = { module = "junit:junit", version.ref = "junit4" }
+named-regexp = { module = "com.github.tony19:named-regexp", version.ref = "named-regexp" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+sql-formatter = { module = "com.github.vertical-blank:sql-formatter", version.ref = "sql-formatter" }
+text-case-converter = { module = "dev.turingcomplete:text-case-converter", version.ref = "text-case-converter" }
+text-case-converter-kotlin-extension = { module = "dev.turingcomplete:text-case-converter-kotlin-extension", version.ref = "text-case-converter" }
+ulid-creator = { module = "com.github.f4b6a3:ulid-creator", version.ref = "ulid-creator" }
+uuid-generator = { module = "com.fasterxml.uuid:java-uuid-generator", version.ref = "uuid-generator" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
+zxing-javase = { module = "com.google.zxing:javase", version.ref = "zxing" }
 
 [bundles]
-zxing = ["zxing-core", "zxing-javase"]
-jackson = ["jackson-core", "jackson-databind", "jackson-dataformat-yaml", "jackson-dataformat-xml", "jackson-dataformat-properties", "jackson-dataformat-toml"]
-junit-implementation = ["junit-jupiter-api", "junit-jupiter-params"]
-junit-runtime = ["junit-jupiter-engine", "junit4"]
-text-case-converter = ["text-case-converter", "text-case-converter-kotlin-extension"]
+jackson = [
+    "jackson-core",
+    "jackson-databind",
+    "jackson-dataformat-properties",
+    "jackson-dataformat-toml",
+    "jackson-dataformat-xml",
+    "jackson-dataformat-yaml",
+]
+junit-implementation = [
+    "junit-jupiter-api",
+    "junit-jupiter-params",
+]
+junit-runtime = [
+    "junit-jupiter-engine",
+    "junit-platform-launcher",
+    "junit4",
+]
+text-case-converter = [
+    "text-case-converter",
+    "text-case-converter-kotlin-extension",
+]
+zxing = [
+    "zxing-core",
+    "zxing-javase",
+]
 
 [plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
+intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }

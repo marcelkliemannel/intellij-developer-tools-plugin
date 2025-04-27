@@ -10,11 +10,28 @@
 
 ### Fixed
 
-## 6.4.0 - 2025-03-18
+## 7.0.0 - 2025-04-27
 
 ### Added
 
-- Compatibility with 2025.1 EAP releases
+- All encoding/decoding, escaping/unescaping and text transformation tools now also support reading from and writing to files.
+- New "Escape Sequence" tool for escaping/unescaping line breaks, tabs, backslashes, and single/double quotes.
+- New "JSON Handling" settings that allow very fine-grained control over the features for reading and writing JSON in all tools. This makes it possible to handle certain non-standard JSON features, such as comments.
+- Added a setting to control the number of decimal places in the "Color Picker" tool.
+
+### Changed
+
+- Setting "Dialog is modal" was reset to its default value (false), due to overhaul of the internal settings handling.
+
+### Removed
+
+- The "Line Breaks Encoding" tool has been replaced by the new "Escape Sequence" tool.
+
+### Fixed
+
+- Fixed compatibility problems with 2025.1 releases.
+- The `hsl/hsla` CSS color value wasn't correctly calculated in the "Color Picker" tool.
+- JSON input errors contained too much irrelevant metadata about the internal JSON processing.
 
 ## 6.3.0 - 2025-01-14
 
@@ -143,7 +160,7 @@
 
 ### Added
 
-- Add automatic input text case detection to the text case converter 
+- Add automatic input text case detection to the text case converter
 - Add escape/unescape as editor actions and code intentions
 - Add new tool: Text Statistic
 - Add support for the "Dot Text Case"

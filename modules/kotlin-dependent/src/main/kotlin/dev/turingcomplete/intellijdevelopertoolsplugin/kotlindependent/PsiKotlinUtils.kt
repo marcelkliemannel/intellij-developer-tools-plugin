@@ -8,13 +8,13 @@ import com.intellij.psi.util.elementType
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedText
 import org.jetbrains.kotlin.lexer.KtTokens
 
-internal object PsiKotlinUtils {
-  // -- Variables --------------------------------------------------------------------------------------------------- //
+object PsiKotlinUtils {
+  // -- Variables ----------------------------------------------------------- //
 
   private val textElementKtTokens = setOf(KtTokens.REGULAR_STRING_PART, KtTokens.IDENTIFIER)
 
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exported Methods -------------------------------------------------------------------------------------------- //
+  // -- Initialization ------------------------------------------------------ //
+  // -- Exported Methods ---------------------------------------------------- //
 
   fun getTextFromStringValueOrIdentifier(e: AnActionEvent): Pair<String, TextRange>? {
     val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return null
@@ -30,8 +30,7 @@ internal object PsiKotlinUtils {
   fun getTextFromStringValueOrIdentifier(psiElement: PsiElement): String? {
     return if (textElementKtTokens.contains(psiElement.elementType)) {
       psiElement.text
-    }
-    else {
+    } else {
       null
     }
   }
@@ -50,12 +49,11 @@ internal object PsiKotlinUtils {
   fun getTextFromStringValue(psiElement: PsiElement): String? {
     return if (psiElement.elementType == KtTokens.REGULAR_STRING_PART) {
       psiElement.text
-    }
-    else {
+    } else {
       null
     }
   }
 
-  // -- Private Methods --------------------------------------------------------------------------------------------- //
-  // -- Inner Type -------------------------------------------------------------------------------------------------- //
+  // -- Private Methods ----------------------------------------------------- //
+  // -- Inner Type ---------------------------------------------------------- //
 }

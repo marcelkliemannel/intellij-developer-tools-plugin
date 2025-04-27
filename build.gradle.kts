@@ -1,4 +1,3 @@
-
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
@@ -17,17 +16,18 @@ plugins {
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.intellij.platform)
   alias(libs.plugins.changelog)
+  alias(libs.plugins.spotless)
+  alias(libs.plugins.version.catalog.update)
 }
 
-subprojects {
-  apply(plugin = "org.jetbrains.intellij.platform.module")
-}
+subprojects { apply(plugin = "org.jetbrains.intellij.platform.module") }
 
 val platform = properties("platform")
 
 allprojects {
   apply(plugin = "java")
   apply(plugin = "kotlin")
+  apply(plugin = "com.diffplug.spotless")
 
   group = properties("pluginGroup")
   version = properties("pluginVersion")
@@ -36,9 +36,7 @@ allprojects {
     mavenLocal()
     mavenCentral()
 
-    intellijPlatform {
-      defaultRepositories()
-    }
+    intellijPlatform { defaultRepositories() }
   }
 
   dependencies {
@@ -51,16 +49,14 @@ allprojects {
     }
   }
 
-  java {
-    toolchain {
-      languageVersion.set(JavaLanguageVersion.of(21))
-    }
-  }
+  spotless { kotlin { ktfmt().googleStyle() } }
+
+  java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
 
   tasks {
     withType<KotlinCompile> {
       compilerOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
+        freeCompilerArgs = listOf("-Xjsr305=strict", "-opt-in=kotlin.ExperimentalStdlibApi")
         jvmTarget.set(JvmTarget.JVM_21)
       }
     }
@@ -69,6 +65,8 @@ allprojects {
       useJUnitPlatform()
       systemProperty("java.awt.headless", "false")
     }
+
+    named("check") { dependsOn("spotlessCheck") }
   }
 }
 
@@ -77,80 +75,69 @@ dependencies {
     pluginVerifier()
     zipSigner()
 
-    pluginModule(project(":common"))
+    pluginModule(implementation(project(":common")))
+    pluginModule(implementation(project(":settings")))
+    pluginModule(implementation(project(":tools-editor")))
+    pluginModule(implementation(project(":tools-ui")))
     if (platform == "IC") {
-      pluginModule(project(":java-dependent"))
-      pluginModule(project(":kotlin-dependent"))
+      pluginModule(implementation(project(":java-dependent")))
+      pluginModule(implementation(project(":kotlin-dependent")))
     }
   }
-
-  implementation(libs.bundles.jackson)
-  implementation(libs.uuid.generator) {
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
-  implementation(libs.jsonpath) {
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
-  implementation(libs.json.schema.validator) {
-    exclude("org.apache.commons", "commons-lang3")
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
-  implementation(libs.commons.text)
-  implementation(libs.commons.codec)
-  implementation(libs.commons.io)
-  implementation(libs.commons.compress)
-  implementation(libs.ulid.creator)
-  implementation(libs.csscolor4j)
-  implementation(libs.okhttp)
-  implementation(libs.jfiglet)
-  implementation(libs.jnanoid)
-  implementation(libs.jose4j) {
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
-  implementation(libs.named.regexp)
-  implementation(libs.sql.formatter)
-  implementation(libs.bundles.zxing)
-  implementation(libs.bundles.text.case.converter)
 
   testImplementation(libs.assertj.core)
   testImplementation(libs.bundles.junit.implementation)
   testRuntimeOnly(libs.bundles.junit.runtime)
-  // Required for the PSI Kotlin structure in tests. It needs to be compile-only
-  // as some parts are clashing with the IntelliJ platform dependency and
-  // causing the tests initialisation to fail.
-  testCompileOnly(libs.kotlin.compiler)
+  testImplementation(libs.commons.csv)
   testImplementation(testFixtures(project(":common")))
+  testImplementation(testFixtures(project(":tools-ui")))
 }
 
 intellijPlatform {
   pluginConfiguration {
+    id = providers.gradleProperty("pluginId")
     version = providers.gradleProperty("pluginVersion")
+
     ideaVersion {
       sinceBuild = properties("pluginSinceBuild")
       untilBuild = provider { null }
     }
-    changeNotes.set(provider { changelog.renderItem(changelog.get(project.version as String), Changelog.OutputType.HTML) })
+
+    changeNotes.set(
+      provider {
+        changelog.renderItem(changelog.get(project.version as String), Changelog.OutputType.HTML)
+      }
+    )
   }
 
   signing {
     val jetbrainsDir = File(System.getProperty("user.home"), ".jetbrains")
-    certificateChain.set(project.provider { File(jetbrainsDir, "plugin-sign-chain.crt").readText() })
-    privateKey.set(project.provider { File(jetbrainsDir, "plugin-sign-private-key.pem").readText() })
+    certificateChain.set(
+      project.provider { File(jetbrainsDir, "plugin-sign-chain.crt").readText() }
+    )
+    privateKey.set(
+      project.provider { File(jetbrainsDir, "plugin-sign-private-key.pem").readText() }
+    )
     password.set(project.provider { properties("jetbrains.sign-plugin.password") })
   }
 
   publishing {
     token.set(project.provider { properties("jetbrains.marketplace.token") })
-    channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+    channels.set(
+      listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first())
+    )
   }
 
   pluginVerification {
     failureLevel.set(
       listOf(
-        COMPATIBILITY_PROBLEMS, INTERNAL_API_USAGES, NON_EXTENDABLE_API_USAGES,
-        OVERRIDE_ONLY_API_USAGES, INVALID_PLUGIN,
+        COMPATIBILITY_PROBLEMS,
+        INTERNAL_API_USAGES,
+        NON_EXTENDABLE_API_USAGES,
+        OVERRIDE_ONLY_API_USAGES,
+        INVALID_PLUGIN,
         // Will fail for non-IC IDEs
-        //MISSING_DEPENDENCIES
+        // MISSING_DEPENDENCIES
       )
     )
 
@@ -158,7 +145,7 @@ intellijPlatform {
       recommended()
 
       properties("pluginVerificationAdditionalIdes").split(",").forEach { ide ->
-//        ide(ide, properties("platformVersion"))
+        ide(ide, properties("platformVersion"))
       }
     }
   }
@@ -171,43 +158,31 @@ changelog {
   groups.set(listOf("Added", "Changed", "Removed", "Fixed"))
 }
 
-val writeChangelogToFileTask = tasks.create("writeChangelogToFile") {
-  val generatedResourcesDir = layout.buildDirectory.dir("generated-resources/changelog").get()
-  outputs.dir(generatedResourcesDir)
-
-  doLast {
-    val renderResult = changelog.instance.get().releasedItems.joinToString("\n") { changelog.renderItem(it, Changelog.OutputType.HTML) }
-    val baseDir = generatedResourcesDir.dir("dev/turingcomplete/intellijdevelopertoolsplugin")
-    file(baseDir).mkdirs()
-    file(baseDir.file("changelog.html")).writeText(renderResult)
-  }
-}
-
-sourceSets {
-  main {
-    resources {
-      srcDir(writeChangelogToFileTask)
-    }
-  }
-}
-
 tasks {
   named("publishPlugin") {
     dependsOn("check")
 
-    doFirst {
-      check(platform == "IC") { "Expected platform 'IC', but was: '$platform'" }
-    }
+    doFirst { check(platform == "IC") { "Expected platform 'IC', but was: '$platform'" } }
   }
 
-  named("buildSearchableOptions") {
-    enabled = false
-  }
+  named("buildSearchableOptions") { enabled = false }
 
   named<RunIdeTask>("runIde") {
     jvmArgumentProviders += CommandLineArgumentProvider {
       // https://kotlin.github.io/analysis-api/testing-in-k2-locally.html
       listOf("-Didea.kotlin.plugin.use.k2=true")
     }
+  }
+}
+
+versionCatalogUpdate {
+  pin {
+    versions.set(
+      listOf(
+        // Must be updated in conjunction with the minimum platform version
+        // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
+        "kotlin"
+      )
+    )
   }
 }
