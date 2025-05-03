@@ -53,6 +53,13 @@ allprojects {
 
   java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
 
+  configurations.all {
+    exclude(group = "org.slf4j", module = "slf4j-api")
+    exclude(group = "org.slf4j", module = "slf4j-simple")
+    exclude(group = "org.slf4j", module = "slf4j-log4j12")
+    exclude(group = "org.slf4j", module = "slf4j-jdk14")
+  }
+
   tasks {
     withType<KotlinCompile> {
       compilerOptions {

@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.libs
+
 dependencies {
   implementation(project(":common"))
   // This is required for the `OpenDeveloperToolService` mechanism. However, a
@@ -9,9 +11,7 @@ dependencies {
   implementation(libs.bundles.text.case.converter)
   implementation(libs.ulid.creator)
   implementation(libs.jnanoid)
-  implementation(libs.uuid.generator) {
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
+  implementation(libs.uuid.generator)
 
   testImplementation(libs.assertj.core)
   testImplementation(libs.bundles.junit.implementation)

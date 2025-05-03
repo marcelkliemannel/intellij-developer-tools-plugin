@@ -1,3 +1,8 @@
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
+import org.gradle.kotlin.dsl.changelog
+import org.gradle.kotlin.dsl.`java-test-fixtures`
+import org.gradle.kotlin.dsl.libs
+import org.gradle.kotlin.dsl.sourceSets
 import org.jetbrains.changelog.Changelog
 
 plugins {
@@ -13,28 +18,21 @@ dependencies {
   implementation(libs.commons.codec)
   implementation(libs.commons.io)
   implementation(libs.commons.compress)
-  implementation(libs.jose4j) {
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
+  implementation(libs.jose4j)
   implementation(libs.bundles.jackson)
   implementation(libs.named.regexp)
   implementation(libs.bundles.zxing)
   implementation(libs.sql.formatter)
   implementation(libs.csscolor4j)
   implementation(libs.jfiglet)
-  implementation(libs.jsonpath) {
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
+  implementation(libs.jsonpath)
   implementation(libs.json.schema.validator) {
     exclude("org.apache.commons", "commons-lang3")
-    exclude(group = "org.slf4j", module = "slf4j-api")
   }
   implementation(libs.bundles.text.case.converter)
   implementation(libs.ulid.creator)
   implementation(libs.jnanoid)
-  implementation(libs.uuid.generator) {
-    exclude(group = "org.slf4j", module = "slf4j-api")
-  }
+  implementation(libs.uuid.generator)
 
   testImplementation(libs.assertj.core)
   testImplementation(libs.bundles.junit.implementation)
