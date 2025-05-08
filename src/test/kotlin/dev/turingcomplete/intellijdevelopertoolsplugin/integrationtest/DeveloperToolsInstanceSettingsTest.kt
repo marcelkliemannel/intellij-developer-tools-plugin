@@ -44,6 +44,8 @@ import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class DeveloperToolsInstanceSettingsTest : IdeaTest() {
   // -- Properties ---------------------------------------------------------- //
@@ -245,6 +247,23 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
         val element = XmlSerializer.serialize(settings.getState())
         writer.write(JDOMUtil.write(element))
       }
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings =
+      [
+        EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME,
+        RENAMED_CONFIGURATION_PROPERTIES_CSV_FILENAME,
+        REMOVED_CONFIGURATION_PROPERTIES_CSV_FILENAME,
+      ]
+  )
+  fun `Changed configuration properties test data for current plugin version exists`(
+    fileName: String
+  ) {
+    val changedConfigurationPropertiesFile =
+      instanceSettingsResourcesDir.resolve(PluginInfo.pluginVersion.toString()).resolve(fileName)
+    assertThat(changedConfigurationPropertiesFile).exists()
   }
 
   @Test
