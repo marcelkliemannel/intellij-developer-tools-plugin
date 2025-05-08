@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolReference
@@ -75,6 +76,9 @@ open class ContentPanelHandler(
     if (old != new) {
       if (old is DeveloperToolNode) {
         cachedDeveloperToolsPanels[old]?.deselected()
+        if (!DeveloperToolsApplicationSettings.generalSettings.toolWindowUiCacheUi.get()) {
+          cachedDeveloperToolsPanels.remove(old)
+        }
       }
 
       if (new == null) {

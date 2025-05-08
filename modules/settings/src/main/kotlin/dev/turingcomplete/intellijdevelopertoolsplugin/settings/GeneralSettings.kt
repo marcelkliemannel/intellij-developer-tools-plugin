@@ -139,6 +139,15 @@ interface GeneralSettings : Settings {
   @BooleanValue(defaultValue = false)
   val dialogIsModal: BooleanSettingProperty
 
+  @Setting(
+    titleBundleKey = "general-settings.tool-window-cache-ui.title",
+    descriptionBundleKey = "general-settings.tool-window-cache-ui.description",
+    groupId = ADVANCED_GROUP_ID,
+    order = 13,
+  )
+  @BooleanValue(defaultValue = false)
+  val toolWindowUiCacheUi: BooleanSettingProperty
+
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
   // -- Private Methods ----------------------------------------------------- //
@@ -167,6 +176,7 @@ interface GeneralSettings : Settings {
 
     private const val DEFAULT_EDITOR_SETTINGS_GROUP_ID = "defaultEditorSettings"
     private const val ADVANCED_GROUP_ID = "advanced"
+    private const val EXPERIMENTAL_GROUP_ID = "experimental"
     const val ACTION_HANDLING_GROUP_ID = "actionHandling"
 
     fun GeneralSettings.createSensitiveInputsHandlingToolTipText(): String? =
