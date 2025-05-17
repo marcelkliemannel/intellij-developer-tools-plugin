@@ -1,6 +1,5 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter
 
-import ai.grazie.utils.capitalize
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.intellij.icons.AllIcons
@@ -43,6 +42,7 @@ import com.intellij.util.Alarm
 import com.intellij.util.ExceptionUtil
 import com.intellij.util.text.DateFormatUtil
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.capitalize
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.decodeBase64String
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.CONFIGURATION

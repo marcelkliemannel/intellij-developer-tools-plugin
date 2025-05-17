@@ -38,7 +38,7 @@ class DeveloperToolConfiguration(
     defaultValue: T,
     propertyType: PropertyType = PropertyType.CONFIGURATION,
     example: T? = null,
-  ): ValueProperty<T> =
+  ): ConfigurationProperty<T> =
     properties[key]?.let { reuseExistingProperty(it) }
       ?: createNewProperty(defaultValue, propertyType, key, createExampleProvider(example))
 
@@ -47,7 +47,7 @@ class DeveloperToolConfiguration(
     defaultValue: T,
     propertyType: PropertyType = PropertyType.CONFIGURATION,
     example: (() -> T)? = null,
-  ): ValueProperty<T> =
+  ): ConfigurationProperty<T> =
     properties[key]?.let { reuseExistingProperty(it) }
       ?: createNewProperty(defaultValue, propertyType, key, example)
 
@@ -161,7 +161,7 @@ class DeveloperToolConfiguration(
 
     fun reset(loadExamples: Boolean) {
       val value = if (example != null && loadExamples) example.invoke() else defaultValue
-      reference.setWithUncheckedCast(value, ValueProperty.RESET_CHANGE_ID)
+      reference.setWithUncheckedCast(value, RESET_CHANGE_ID)
     }
 
     fun valueWasChanged(): Boolean {
@@ -208,4 +208,11 @@ class DeveloperToolConfiguration(
   data class PersistentProperty(val key: String, val value: Any, val type: PropertyType)
 
   // -- Companion Object ---------------------------------------------------- //
+
+  companion object {
+
+    const val RESET_CHANGE_ID = "reset"
+  }
 }
+
+typealias ConfigurationProperty<T> = ValueProperty<T>

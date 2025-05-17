@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.util.Disposer
+import java.time.Duration
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,7 @@ class AsyncTaskExecutor(
 ) : Disposable {
   // -- Properties ---------------------------------------------------------- //
 
-  private val taskQueue = ConcurrentLinkedQueue<Pair<Runnable, Long>>()
+  private val taskQueue = ConcurrentLinkedQueue<Pair<() -> Unit, Long>>()
   private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
   var isDisposed: Boolean = false
     private set
@@ -37,12 +38,25 @@ class AsyncTaskExecutor(
     cancelAll()
   }
 
-  fun enqueueTask(runnable: Runnable, delayMillis: Long = 0) {
-    taskQueue.add(runnable to delayMillis)
+  fun replaceTasks(delayMillis: Duration = Duration.ZERO, task: () -> Unit) {
+    cancelAll()
+    enqueueTask(delayMillis, task)
+  }
+
+  private fun enqueueTask(delayMillis: Duration = Duration.ZERO, task: () -> Unit) {
+    if (isDisposed) {
+      return
+    }
+
+    taskQueue.add(task to delayMillis.toMillis())
     processQueue()
   }
 
   fun cancelAll() {
+    if (isDisposed) {
+      return
+    }
+
     coroutineScope.coroutineContext.cancelChildren()
     taskQueue.clear()
   }
@@ -80,6 +94,8 @@ class AsyncTaskExecutor(
   // -- Companion Object ---------------------------------------------------- //
 
   companion object {
+
+    val defaultUiInputDelay: Duration = Duration.ofMillis(50)
 
     fun onEdt(parentDisposable: Disposable) =
       AsyncTaskExecutor(parentDisposable, ExecutionThread.EDT)

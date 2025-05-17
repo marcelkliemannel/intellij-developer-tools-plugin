@@ -1,23 +1,19 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.settings.message
 
 import com.intellij.DynamicBundle
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.message.SettingsBundle.ID
 import org.jetbrains.annotations.PropertyKey
 
-object SettingsBundle {
+object SettingsBundle : DynamicBundle(SettingsBundle::class.java, ID) {
   // -- Properties ---------------------------------------------------------- //
 
-  const val SETTINGS_BUNDLE_ID = "message.SettingsBundle"
-
-  private val instance: DynamicBundle =
-    DynamicBundle(SettingsBundle::class.java, SETTINGS_BUNDLE_ID)
+  const val ID = "message.SettingsBundle"
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
-  fun message(
-    @PropertyKey(resourceBundle = SETTINGS_BUNDLE_ID) key: String,
-    vararg params: Any,
-  ): String = instance.getMessage(key, *params)
+  fun message(@PropertyKey(resourceBundle = ID) key: String, vararg params: Any): String =
+    getMessage(key, *params)
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //

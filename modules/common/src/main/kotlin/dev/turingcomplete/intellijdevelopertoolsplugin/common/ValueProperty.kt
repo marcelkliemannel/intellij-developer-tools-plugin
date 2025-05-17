@@ -9,7 +9,7 @@ open class ValueProperty<T>(initialValue: T) : ObservableMutableProperty<T> {
   // -- Properties ---------------------------------------------------------- //
 
   private val value = AtomicReference(initialValue)
-  private val changeDispatcher = SingleEventDispatcher.create<ChangeEvent<T>>()
+  private val changeDispatcher = SingleEventDispatcher.Companion.create<ChangeEvent<T>>()
   var modificationsCounter: Int = 0
     private set
 
@@ -55,9 +55,4 @@ open class ValueProperty<T>(initialValue: T) : ObservableMutableProperty<T> {
   }
 
   // -- Companion Object ---------------------------------------------------- //
-
-  companion object {
-
-    const val RESET_CHANGE_ID = "reset"
-  }
 }

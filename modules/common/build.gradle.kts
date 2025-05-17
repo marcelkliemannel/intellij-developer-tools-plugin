@@ -12,8 +12,10 @@ dependencies {
   testImplementation(libs.bundles.junit.implementation)
   testRuntimeOnly(libs.bundles.junit.runtime)
 
-  intellijPlatform { testBundledPlugins("org.jetbrains.kotlin") }
-  configurations.testFixturesApi.extendsFrom(configurations.intellijPlatformTestBundledPlugins)
+  if (project.property("platform") == "IC") {
+    intellijPlatform { testBundledPlugins("org.jetbrains.kotlin") }
+    configurations.testFixturesApi.extendsFrom(configurations.intellijPlatformTestBundledPlugins)
+  }
 
   testFixturesImplementation(libs.assertj.core)
   testFixturesImplementation(libs.bundles.junit.implementation)

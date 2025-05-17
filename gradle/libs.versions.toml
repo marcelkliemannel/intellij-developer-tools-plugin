@@ -6,6 +6,7 @@ commons-compress = "1.27.1"
 commons-csv = "1.14.0"
 commons-io = "2.19.0"
 commons-text = "1.13.1"
+cronutils = "9.2.0"
 csscolor4j = "1.0.0"
 intellij-platform = "2.5.0"
 jackson = "2.19.0"
@@ -35,6 +36,7 @@ commons-compress = { module = "org.apache.commons:commons-compress", version.ref
 commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commons-csv" }
 commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
 commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
+cronutils = { module = "com.cronutils:cron-utils", version.ref = "cronutils" }
 csscolor4j = { module = "org.silentsoft:csscolor4j", version.ref = "csscolor4j" }
 jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }

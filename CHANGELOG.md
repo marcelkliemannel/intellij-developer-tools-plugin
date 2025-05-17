@@ -4,6 +4,8 @@
 
 ### Added
 
+- New "Cron Expression" tool
+
 ### Changed
 
 - By default, the UI of the tools in the tool window will no longer be cached and will instead be rebuilt on demand to reduce memory usage. This behavior can be changed in the settings to prioritize responsiveness.

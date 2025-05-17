@@ -7,9 +7,9 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.BottomGap
+import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindText
-import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.concurrency.ThreadingAssertions.assertBackgroundThread
 import com.intellij.util.text.DateFormatUtil
 import com.intellij.util.ui.UIUtil
@@ -23,7 +23,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
-import javax.swing.JComponent
 import javax.swing.SwingConstants
 
 class FileHandling(
@@ -40,7 +39,7 @@ class FileHandling(
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
-  fun crateComponent(errorHolder: ErrorHolder): JComponent = panel {
+  fun Panel.buildUi(errorHolder: ErrorHolder) {
     row {
         // Allow the selection of folders so that the user can manually extend the path with a file
         // name, of the file does not exist yet.

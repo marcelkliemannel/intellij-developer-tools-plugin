@@ -20,6 +20,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AsyncTaskExecutor
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AsyncTaskExecutor.Companion.defaultUiInputDelay
 
 abstract class Converter(
   private val configuration: DeveloperToolConfiguration,
@@ -307,15 +308,9 @@ abstract class Converter(
       sourceInputOutputHandler.liveConversionSupported &&
         targetInputOutputHandler.liveConversionSupported
     ) {
-      if (!liveConversionExecutor.isDisposed) {
-        liveConversionExecutor.cancelAll()
-        liveConversionExecutor.enqueueTask(
-          {
-            doConvert(sourceInputOutputHandler, targetInputOutputHandler)
-            doValidate()
-          },
-          100,
-        )
+      liveConversionExecutor.replaceTasks(defaultUiInputDelay) {
+        doConvert(sourceInputOutputHandler, targetInputOutputHandler)
+        doValidate()
       }
       return
     }

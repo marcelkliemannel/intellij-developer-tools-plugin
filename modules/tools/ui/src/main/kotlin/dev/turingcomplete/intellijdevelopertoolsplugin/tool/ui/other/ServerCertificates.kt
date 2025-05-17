@@ -1,6 +1,5 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other
 
-import ai.grazie.utils.capitalize
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -34,6 +33,7 @@ import com.intellij.util.text.DateFormatUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.OkHttpClientUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.OkHttpClientUtils.applyIntelliJProxySettings
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.capitalize
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.CONFIGURATION
@@ -45,7 +45,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor.EditorMode.OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AnActionOptionButton
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.createPopup
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.Popup.createPopup
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.awt.datatransfer.StringSelection

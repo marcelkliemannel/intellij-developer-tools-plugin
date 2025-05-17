@@ -18,6 +18,8 @@ import com.intellij.openapi.ui.popup.util.PopupUtil
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.JBColor
 import com.intellij.ui.ScrollPaneFactory
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.popup.PopupState
 import com.intellij.util.ui.ColumnInfo
 import com.intellij.util.ui.UIUtil
@@ -148,21 +150,30 @@ object UiUtils {
       override fun getComparator(): Comparator<T> = compareBy { sortValue(it) }
     }
 
-  fun createPopup(content: JComponent, width: Int = 600, height: Int = 450): Balloon =
-    JBPopupFactory.getInstance()
-      .createBalloonBuilder(
-        ScrollPaneFactory.createScrollPane(content, true).apply {
-          preferredSize = Dimension(width, height)
-        }
-      )
-      .setDialogMode(true)
-      .setFillColor(UIUtil.getPanelBackground())
-      .setBorderColor(JBColor.border())
-      .setBlockClicksThroughBalloon(true)
-      .setRequestFocus(true)
-      .createBalloon()
-      .apply { setAnimationEnabled(false) }
-
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //
+
+  object Popup {
+
+    fun createTextPopup(text: String, preferredSize: Dimension? = Dimension(600, 450)): Balloon =
+      createPopup(
+        panel { row { text(text).align(Align.FILL).resizableColumn() }.resizableRow() },
+        preferredSize = preferredSize,
+      )
+
+    fun createPopup(content: JComponent, preferredSize: Dimension? = Dimension(600, 450)): Balloon =
+      JBPopupFactory.getInstance()
+        .createBalloonBuilder(
+          ScrollPaneFactory.createScrollPane(content, true).apply {
+            preferredSize?.let { this.preferredSize = it }
+          }
+        )
+        .setDialogMode(true)
+        .setFillColor(UIUtil.getPanelBackground())
+        .setBorderColor(JBColor.border())
+        .setBlockClicksThroughBalloon(true)
+        .setRequestFocus(true)
+        .createBalloon()
+        .apply { setAnimationEnabled(false) }
+  }
 }
