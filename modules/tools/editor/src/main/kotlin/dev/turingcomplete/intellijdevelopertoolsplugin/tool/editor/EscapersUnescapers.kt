@@ -27,7 +27,7 @@ object EscapersUnescapers {
       Unescaper("Java String", { StringEscapeUtils.unescapeJava(it) }),
       Unescaper("HTML Entities", { StringEscapeUtils.escapeHtml4(it) }),
       Unescaper("JSON Value", { StringEscapeUtils.unescapeJson(it) }),
-      Unescaper("XML Value", { StringEscapeUtils.unescapeCsv(it) }),
+      Unescaper("XML Value", { StringEscapeUtils.unescapeXml(it) }),
       Unescaper("CSV Value", { StringEscapeUtils.unescapeCsv(it) }),
     )
 
