@@ -2,6 +2,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
+import com.intellij.ui.dsl.builder.Panel
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
@@ -10,7 +11,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolde
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.FileHandling
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.FileHandling.WriteFormat
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
-import javax.swing.JComponent
 
 class FileInputOutputHandler(
   id: String,
@@ -35,7 +35,7 @@ class FileInputOutputHandler(
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
-  override fun createComponent(): JComponent {
+  override fun Panel.buildUi() {
     fileHandling =
       FileHandling(
         project = project,
@@ -44,7 +44,7 @@ class FileInputOutputHandler(
           configuration.register("${id}FileWriteFormat", WriteFormat.BINARY, CONFIGURATION),
         supportsWrite = inputOutputDirection.supportsWrite,
       )
-    return fileHandling.crateComponent(errorHolder)
+    with(fileHandling) { buildUi(errorHolder) }
   }
 
   override fun read(): ByteArray {

@@ -6,6 +6,7 @@ import java.math.BigDecimal
 import java.security.MessageDigest
 import java.util.Base64
 import java.util.HexFormat
+import java.util.Locale.getDefault
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
@@ -124,6 +125,10 @@ inline fun <T> Collection<T>.random(except: (T) -> Boolean): T =
   this.filter { !except(it) }.random()
 
 inline fun <T> Array<T>.random(except: (T) -> Boolean): T = this.filter { !except(it) }.random()
+
+fun String.capitalize() = replaceFirstChar {
+  if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString()
+}
 
 // -- Private Methods  ---------------------------------------------------- //
 // -- Inner Type ---------------------------------------------------------- //

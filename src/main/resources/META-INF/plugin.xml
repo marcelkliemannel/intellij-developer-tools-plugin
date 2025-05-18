@@ -272,6 +272,9 @@
                 id="date-time-converter"
                 implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.DatetimeConverter$Factory"/>
         <developerUiTool
+                id="cron-expression"
+                implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.CronExpression$Factory"/>
+        <developerUiTool
                 id="json-path"
                 implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.JsonPathTransformer$Factory"/>
         <developerUiTool
@@ -420,6 +423,9 @@
         <developerToolConfigurationEnumPropertyType
                 id="FileHandling-WriteFormat"
                 type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.FileHandling$WriteFormat"/>
+        <developerToolConfigurationEnumPropertyType
+                id="CronExpression-CronType"
+                type="com.cronutils.model.CronType"/>
     </extensions>
 
     <actions>

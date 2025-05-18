@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.getUserData
 import com.intellij.openapi.ui.putUserData
 import com.intellij.openapi.util.Key
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
@@ -48,9 +49,8 @@ class ConversionSideHandler(
         val tabs =
           inputOutputHandlers.map { inputOutputHandler ->
             inputOutputHandler.title to
-              inputOutputHandler.createComponent().apply {
-                putUserData(inputOutputHandlerUserObjectKey, inputOutputHandler)
-              }
+              panel { with(inputOutputHandler) { buildUi() } }
+                .apply { putUserData(inputOutputHandlerUserObjectKey, inputOutputHandler) }
           }
         addToCenter(
           TitledTabbedPane(title, tabs).apply {

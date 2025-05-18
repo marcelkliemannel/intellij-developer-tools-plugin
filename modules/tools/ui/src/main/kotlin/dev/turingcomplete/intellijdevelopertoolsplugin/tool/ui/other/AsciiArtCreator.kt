@@ -29,6 +29,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AsyncTaskExecutor
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AsyncTaskExecutor.Companion.defaultUiInputDelay
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.hyperLink
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
@@ -184,12 +185,10 @@ class AsciiArtCreator(
   }
 
   private fun createAsciiArt() {
-    if (isDisposed || createAsciiArtAlarm.isDisposed) {
+    if (isDisposed) {
       return
     }
-    createAsciiArtAlarm.cancelAll()
-
-    val request = {
+    createAsciiArtAlarm.replaceTasks(defaultUiInputDelay) {
       asciiArtOutputErrorHolder.clear()
 
       try {
@@ -204,7 +203,6 @@ class AsciiArtCreator(
         asciiArtOutputErrorHolder.add(e)
       }
     }
-    createAsciiArtAlarm.enqueueTask(request, 50)
   }
 
   private fun createAsciiArt(fontResource: InputStream, text: String): String =
@@ -220,9 +218,7 @@ class AsciiArtCreator(
     if (isDisposed || syncFontsAlarm.isDisposed) {
       return
     }
-    syncFontsAlarm.cancelAll()
-
-    val request = {
+    syncFontsAlarm.replaceTasks {
       val fontResources = mutableMapOf<String, () -> InputStream>()
 
       builtInFonts.forEach {
@@ -251,7 +247,6 @@ class AsciiArtCreator(
 
       createAsciiArt()
     }
-    syncFontsAlarm.enqueueTask(request, 0)
   }
 
   private fun getBuiltInFontResource(fontFileName: String): InputStream? =

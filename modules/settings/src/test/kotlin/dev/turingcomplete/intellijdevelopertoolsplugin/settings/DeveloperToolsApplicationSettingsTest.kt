@@ -215,6 +215,7 @@ class DeveloperToolsApplicationSettingsTest {
             "showInternalTools",
             "hideWorkbenchTabsOnSingleTab",
             "dialogIsModal",
+            "toolWindowUiCacheUi",
           ),
         ),
         arguments(

@@ -1,0 +1,714 @@
+<InstanceState pluginVersion="7.1.0">
+  <developerToolsConfigurations>
+    <developerToolConfiguration developerToolId="text-statistic" id="24f033ad-ea69-4001-9f42-82dcdade87fc" name="Workbench">
+      <properties>
+        <property key="text-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="text-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="text-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="text" type="INPUT" value="kotlin.String|XzHvrOaAHXhAPzUGVHAw" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="notes" id="c4428052-62fd-47a5-a74b-495108594561" name="Workbench">
+      <properties>
+        <property key="test" type="INPUT" value="kotlin.String|UrMvpTC3FcZ0fUs5FusA" />
+        <property key="content-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="content-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="content-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="password-generator" id="94bb9360-3aa6-4153-a657-838da008803d" name="Workbench">
+      <properties>
+        <property key="bulk-generation-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="addDigits" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="bulk-generation-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="bulk-generation-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="lettersMode" type="CONFIGURATION" value="PasswordGenerator-LettersMode|ASCII_ALPHABET_ONLY_LOWERCASE" />
+        <property key="length" type="CONFIGURATION" value="kotlin.Int|31" />
+        <property key="addSymbols" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="symbols" type="CONFIGURATION" value="kotlin.String|nrKmbSZPtQgWUFHtF6rO" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="text-diff" id="c6e1e5fa-3303-472d-9936-7299e0812754" name="Workbench">
+      <properties>
+        <property key="firstText" type="INPUT" value="kotlin.String|Q62iAKq6QTTc1MPiiCbK" />
+        <property key="secondText" type="INPUT" value="kotlin.String|bwVzJLXJCiIULb5gOT81" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="json-schema-validator" id="7912927a-5779-4737-b4e8-92d9f544c146" name="Workbench">
+      <properties>
+        <property key="liveValidation" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="data-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="data-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="dataText" type="INPUT" value="kotlin.String|0vVSpsNxiRj5Qp1GWZOb" />
+        <property key="schema-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="schema-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="schemaText" type="INPUT" value="kotlin.String|3qc1ROzIJpw0Rsu4YB6Z" />
+        <property key="data-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="schema-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="cron-expression" id="a8a137c9-b969-40b3-a082-85fa7008ded9" name="Workbench">
+      <properties>
+        <property key="cronExpression-SPRING53" type="INPUT" value="kotlin.String|nCRK1ljizl1MI68Brrpy" />
+        <property key="cronExpression-SPRING" type="INPUT" value="kotlin.String|IMsBEX52gskpOUM5gPNG" />
+        <property key="cronExpression-QUARTZ" type="INPUT" value="kotlin.String|yGeToZZ3zYODeomDrQeX" />
+        <property key="selectedCronType" type="CONFIGURATION" value="CronExpression-CronType|SPRING" />
+        <property key="cronExpression-CRON4J" type="INPUT" value="kotlin.String|plStO2xEKje37sHuWdci" />
+        <property key="cronExpression-UNIX" type="INPUT" value="kotlin.String|6s9Glk3H1hzWWX94DTDE" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="date-time-converter" id="36fe9184-2663-4f03-b531-bcca672de4e0" name="Workbench">
+      <properties>
+        <property key="formattedLocale" type="CONFIGURATION" value="dev.turingcomplete.intellijdevelopertoolsplugin.common.LocaleContainer|sbp" />
+        <property key="formattedIndividual" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="formattedIndividualFormat" type="CONFIGURATION" value="kotlin.String|t9RGEDaH86ZiJ6gb8Jq0" />
+        <property key="timeZoneId" type="CONFIGURATION" value="kotlin.String|America/Pangnirtung" />
+        <property key="formattedStandardFormatAddTimeZone" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="formattedStandardFormat" type="CONFIGURATION" value="DatetimeConverter-StandardFormat|ISO_8601_DATE" />
+        <property key="formattedStandardFormatAddOffset" type="CONFIGURATION" value="kotlin.Boolean|false" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="base64-encoder-decoder" id="1dafda3e-7e0a-4ea4-a4a9-8dbb790a90a2" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|bmBY9egexZT5jtFYRwV9" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|rYqSqqtS1hrAYv2ceD23" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|FiQ4wQ0XxTgEUzyL3UPM" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|Ym1CWTllZ2V4WlQ1anRGWVJ3Vjk=" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="json-text-escape" id="8d57d4c3-1773-4a76-8aef-78b991dae738" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|uIKQjeuZRrJNVIr8N2sG" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|0U6iJfjk0Td1bdxFdgkf" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|UMkiVplhuDKQNdCKJNKG" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|uIKQjeuZRrJNVIr8N2sG" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="ascii-art" id="28614be9-60e2-4f31-842c-72af39c3d13a" name="Workbench">
+      <properties>
+        <property key="asciiArtOutput-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="textInput" type="INPUT" value="kotlin.String|fQuIIS9WA1PI5y2h3Y6r" />
+        <property key="selectedFontFileName" type="CONFIGURATION" value="kotlin.String|slant.flf" />
+        <property key="asciiArtOutput-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="asciiArtOutput-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="url-encoding-encoder-decoder" id="bf6aa930-8fef-4a0c-8134-cdb4fe96c78c" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|KMdoQYAlq05OGyM075hU" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|gKmaaSTh7LFBNAdpluQz" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|VuPPekydskzs8tltgrJi" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|KMdoQYAlq05OGyM075hU" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="cli-command-converter" id="f6fd2789-9a7a-4866-a251-1ba59f29cc5c" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|kFRL5WRFceeJumfC0PUc" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="lineBreakDelimiter" type="CONFIGURATION" value="kotlin.String|1ND5yLLq57rp9i0ekAlm" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|qeVVfFg45DkA6NRzZxkM" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|79pMA2yfvD0GHi1kmCxh" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|kFRL5WRFceeJumfC0PUc" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="ascii-encoder-decoder" id="0e89edc3-7df9-4dc2-af52-21dbfd2a9949" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|4Gg8Ll1vLs6VRtNr3aAE" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|uzERt1udPst0e07lSI6t" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|V3c1zYuj5y2UVlbJKl8G" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|4Gg8Ll1vLs6VRtNr3aAE" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="html-entities-escape" id="93d980c0-fd8a-4589-afb9-55ec1365baa8" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|TfqD8baLl4Ll9g0eZzPA" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|j1pDx24nYV2zN0yOEvHV" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|g4ipFxCP0fPNe6fT3Sy2" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|TfqD8baLl4Ll9g0eZzPA" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="java-text-escape" id="9a2b381b-669a-43c2-9869-2d41ee540802" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|8VmnBdmzn5sI5cexcOmQ" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|O7KoC9h8yVughe5L8SgN" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|ZJlcY5A63r09s1shJ5es" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|8VmnBdmzn5sI5cexcOmQ" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="jwt-encoder-decoder" id="f148d32d-6ef5-435f-b41a-d822176a1d9d" name="Workbench">
+      <properties>
+        <property key="encoded-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="headerText" type="INPUT" value="kotlin.String|{&#10;  &quot;alg&quot;: &quot;HS512&quot;,&#10;  &quot;typ&quot;: &quot;JWT&quot;&#10;}" />
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="secretKeyEncodingMode" type="CONFIGURATION" value="JwtEncoderDecoder-SecretKeyEncodingMode|BASE32" />
+        <property key="payloadText" type="INPUT" value="kotlin.String|{&#10;  &quot;sub&quot;: &quot;1234567890&quot;,&#10;  &quot;name&quot;: &quot;John Doe&quot;,&#10;  &quot;admin&quot;: true,&#10;  &quot;iat&quot;: 1516239022&#10;}" />
+        <property key="payload-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="secret" type="SENSITIVE" value="kotlin.String|KKaI16NMdoBTf3JBrg6H" />
+        <property key="encodedText" type="INPUT" value="kotlin.String|eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.ANCf_8p1AE4ZQs7QuqGAyyfTEgYrKSjKWkhBk5cIn1_2QVr2jEjmM-1tu7EgnyOf_fAsvdFXva8Sv05iTGzETg" />
+        <property key="privateKey" type="SENSITIVE" value="kotlin.String|hDd9Xnh2CbmFpJCsMl7B" />
+        <property key="header-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="header-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="encoded-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="signingKeyValidation" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="payload-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="payload-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="header-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="encoded-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="algorithm" type="CONFIGURATION" value="JwtEncoderDecoder-SignatureAlgorithm|HMAC512" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="hmac-transformer" id="f6194952-f7b2-46b5-8ed9-0aa2d491d685" name="Workbench">
+      <properties>
+        <property key="secretKey" type="SENSITIVE" value="kotlin.String|3nMqPwBTVJlcsb7H76VI" />
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="secretKeyEncodingMode" type="CONFIGURATION" value="HmacTransformer-SecretKeyEncodingMode|BASE32" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|vJnz1eqzDKDR6zk6hVrp" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|d5kJWYvfMNYlaG3IymPj" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|OIHN7qiIK7i6Trwo7OwB" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="algorithm" type="CONFIGURATION" value="kotlin.String|HMACSHA1" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="json-path" id="b10d721d-b7b1-4306-a2f2-8fde07c5ee2e" name="Workbench">
+      <properties>
+        <property key="formatResult" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="result-output-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="liveTransformation" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|bWJwjpZQm19QoKBZqYHE" />
+        <property key="contentText" type="INPUT" value="kotlin.String|e0mMXbwtNFyHfB6ogJ1X" />
+        <property key="result-output-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="source-input-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-input-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="source-input-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="result-output-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="code-style-formatting" id="a008c6a2-bf48-4ac8-93ff-95ceab9a9340" name="Workbench">
+      <properties>
+        <property key="result-output-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="liveTransformation" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|&lt;foo&gt;&lt;bar&gt;&lt;/bar&gt;&lt;/foo&gt;" />
+        <property key="languageId" type="CONFIGURATION" value="kotlin.String|XML" />
+        <property key="result-output-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="source-input-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-input-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="source-input-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="result-output-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="units-converter" id="3c01a0a1-ee19-4b1e-af4f-7bfbdc762666" name="Workbench">
+      <properties>
+        <property key="lastSelectedUnitConverterIndex" type="CONFIGURATION" value="kotlin.Int|1" />
+        <property key="dataSizeConverter_precision" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="dataSizeConverter_bitDataSizeValue" type="INPUT" value="java.math.BigDecimal|1" />
+        <property key="baseConverter_baseTwoInput" type="INPUT" value="kotlin.String|1101000" />
+        <property key="transferRateConverter_parsingLocale" type="CONFIGURATION" value="dev.turingcomplete.intellijdevelopertoolsplugin.common.LocaleContainer|en-GI" />
+        <property key="baseConverter_showOnlyCommonBases" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="timeConverter_precision" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="dataSizeConverter_roundingMode" type="CONFIGURATION" value="MathContextUnitConverter-RoundingMode|HALF_DOWN" />
+        <property key="transferRateConverter_precision" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="transferRateConverter_showLargeDataUnits" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="timeConverter_parsingLocale" type="CONFIGURATION" value="dev.turingcomplete.intellijdevelopertoolsplugin.common.LocaleContainer|fr-BE" />
+        <property key="dataSizeConverter_decimalPlaces" type="CONFIGURATION" value="kotlin.Int|6" />
+        <property key="timeConverter_decimalPlaces" type="CONFIGURATION" value="kotlin.Int|6" />
+        <property key="transferRateConverter_timeDimension" type="CONFIGURATION" value="TransferRateConverter-TransferRateTimeDimension|MINUTES" />
+        <property key="timeConverter_roundingMode" type="CONFIGURATION" value="MathContextUnitConverter-RoundingMode|HALF_DOWN" />
+        <property key="timeConverter_timeNanoseconds" type="INPUT" value="java.math.BigDecimal|1" />
+        <property key="transferRateConverter_bitTransferRateValue" type="INPUT" value="java.math.BigDecimal|1" />
+        <property key="dataSizeConverter_parsingLocale" type="CONFIGURATION" value="dev.turingcomplete.intellijdevelopertoolsplugin.common.LocaleContainer|sn-Latn-ZW" />
+        <property key="transferRateConverter_roundingMode" type="CONFIGURATION" value="MathContextUnitConverter-RoundingMode|HALF_DOWN" />
+        <property key="transferRateConverter_useCombinedAbbreviationNotation" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="dataSizeConverter_showLargeDataUnits" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="transferRateConverter_decimalPlaces" type="CONFIGURATION" value="kotlin.Int|6" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="text-filter" id="3b257381-5dca-455c-8b78-fb47773a519d" name="Workbench">
+      <properties>
+        <property key="filteringMode" type="CONFIGURATION" value="TextFilterTransformer-FilteringMode|NOT_CONTAINING" />
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|sbYf4bLx85OQHiZAGeOq" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|wkUCQmxl2cEYGF8B08wD" />
+        <property key="tokenSelectionMode" type="CONFIGURATION" value="TextFilterTransformer-TokenMode|WORD" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="filteringRegexModeOptions" type="CONFIGURATION" value="kotlin.Int|1" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="filteringNotContainingModeText" type="INPUT" value="kotlin.String|I6hqXN7NfCgnyYsnevky" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|7qkU539QDlzZB8A9jFSX" />
+        <property key="filteringRegexModeText" type="INPUT" value="kotlin.String|okZesiB6YVVCIq2cBMAU" />
+        <property key="filteringContainingModeText" type="INPUT" value="kotlin.String|XvxVjU6GncFREKMMeiU8" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="ulid-generator" id="72ae64f9-736b-41a0-9ad0-fb24a5065405" name="Workbench">
+      <properties>
+        <property key="generateMonotonicUlid" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="bulk-generation-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="bulk-generation-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="bulk-generation-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="individualTime" type="CONFIGURATION" value="kotlin.Long|1747566048792" />
+        <property key="ulidFormat" type="CONFIGURATION" value="UlidGenerator-UlidFormat|TO_LOWERCASE" />
+        <property key="useIndividualTime" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="unarchiver" id="c42411ea-745c-4654-aca8-b98ae550d747" name="Workbench">
+      <properties>
+        <property key="lastSelectedTargetDirectoryPath" type="CONFIGURATION" value="kotlin.String|FW3YP8jP4PE1kc4Wsv8h" />
+        <property key="archiveTreeSortingMode" type="CONFIGURATION" value="Unarchiver-SortingMode|FILENAME_DESC" />
+        <property key="showArchiveNodeTotalNumberOfChildren" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="createParentDirectories" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="clearTargetDirectory" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="openFileInEditorOnDoubleClick" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="preserveFileAttributes" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="openTargetDirectoryAfterExtraction" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="lastSelectedOpenedDirectoryPath" type="CONFIGURATION" value="kotlin.String|9n5b4he0F78ZfB5TrYv3" />
+        <property key="preserveDirectoryStructure" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="createArchiveFilenameSubDirectory" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="showArchiveNodeUncompressedSize" type="CONFIGURATION" value="kotlin.Boolean|false" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="base32-encoder-decoder" id="b27afcba-6072-41ca-8c1b-96ce5833275b" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|Kn3ssQOzg25tEdBXcFII" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|JEIDT2HM3U3bdPUXHLdU" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|0dPgXPsK0GAERKmRmGMt" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|JNXDG43TKFHXUZZSGV2EKZCCLBRUMSKJ" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="text-format-converter" id="3e6d1d5c-48a6-4649-93ce-2f40a9b64757" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|feKF5vv3tDNWBKNOLiSC" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="secondLanguage" type="CONFIGURATION" value="CodeFormattingConverter-Language|XML" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|AfV2rYaESIMdTRmOzvDx" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|LDetLFiNDjekZFuZZFjL" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="firstLanguage" type="CONFIGURATION" value="CodeFormattingConverter-Language|YAML" />
+        <property key="targetText" type="INPUT" value="kotlin.String|&lt;TextNode&gt;feKF5vv3tDNWBKNOLiSC&lt;/TextNode&gt;" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="qr-code-generator" id="431a108a-2946-4010-9c35-6fc014020fb0" name="Workbench">
+      <properties>
+        <property key="PDF_417-minRows" type="CONFIGURATION" value="kotlin.Int|2" />
+        <property key="CODE_39-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="content-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="CODE_128-margin" type="CONFIGURATION" value="kotlin.Int|11" />
+        <property key="contentText" type="INPUT" value="kotlin.String|WKdHR1Z5tKPPcyjGTXAI" />
+        <property key="QR_CODE-margin" type="CONFIGURATION" value="kotlin.Int|1" />
+        <property key="PDF_417-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="UPC_EAN_EXTENSION-margin" type="CONFIGURATION" value="kotlin.Int|2" />
+        <property key="PDF_417-compactionModeType" type="CONFIGURATION" value="QrCode-Compaction|TEXT" />
+        <property key="ITF-height" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="PDF_417-insertEcis" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="CODE_93-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="ITF-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="CODE_39-height" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="EAN_13-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="AZTEC-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="PDF_417-compactMode" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="CODABAR-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="UPC_A-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="PDF_417-maxColumns" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="QR_CODE-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="DATA_MATRIX-margin" type="CONFIGURATION" value="kotlin.Int|2" />
+        <property key="PDF_417-height" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="QR_CODE-maskPattern" type="CONFIGURATION" value="kotlin.Int|0" />
+        <property key="format" type="CONFIGURATION" value="BarcodeGenerator-Format|DATA_MATRIX" />
+        <property key="foregroundColor" type="CONFIGURATION" value="com.intellij.ui.JBColor|-16777071" />
+        <property key="DATA_MATRIX-height" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="EAN_8-margin" type="CONFIGURATION" value="kotlin.Int|11" />
+        <property key="CODE_39-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="CODE_93-height" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="CODE_128-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="QR_CODE-width" type="CONFIGURATION" value="kotlin.Int|201" />
+        <property key="CODABAR-height" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="AZTEC-layers" type="CONFIGURATION" value="kotlin.Int|1" />
+        <property key="EAN_13-margin" type="CONFIGURATION" value="kotlin.Int|11" />
+        <property key="CODABAR-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="ITF-margin" type="CONFIGURATION" value="kotlin.Int|11" />
+        <property key="AZTEC-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="CODABAR-margin" type="CONFIGURATION" value="kotlin.Int|11" />
+        <property key="CODE_93-margin" type="CONFIGURATION" value="kotlin.Int|11" />
+        <property key="UPC_EAN_EXTENSION-height" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="QR_CODE-compactMode" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="UPC_E-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="CODE_128-height" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="DATA_MATRIX-gs1" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="PDF_417-setDimensions" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="UPC_EAN_EXTENSION-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="UPC_E-margin" type="CONFIGURATION" value="kotlin.Int|2" />
+        <property key="QR_CODE-height" type="CONFIGURATION" value="kotlin.Int|201" />
+        <property key="EAN_8-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="liveGeneration" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="DATA_MATRIX-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="UPC_A-margin" type="CONFIGURATION" value="kotlin.Int|2" />
+        <property key="DATA_MATRIX-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="CODE_128-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="UPC_A-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="AZTEC-margin" type="CONFIGURATION" value="kotlin.Int|2" />
+        <property key="EAN_8-height" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="backgroundColor" type="CONFIGURATION" value="com.intellij.ui.JBColor|-16776990" />
+        <property key="DATA_MATRIX-forceC40" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="EAN_13-height" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="UPC_A-height" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="content-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="DATA_MATRIX-symbolShape" type="CONFIGURATION" value="QrCode-SymbolShapeHint|FORCE_SQUARE" />
+        <property key="content-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="QR_CODE-gs1" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="QR_CODE-version" type="CONFIGURATION" value="kotlin.Int|1" />
+        <property key="CODE_93-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="EAN_13-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="UPC_EAN_EXTENSION-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="UPC_E-height" type="CONFIGURATION" value="kotlin.Int|51" />
+        <property key="PDF_417-margin" type="CONFIGURATION" value="kotlin.Int|6" />
+        <property key="UPC_E-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="AZTEC-height" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="PDF_417-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="CODE_39-margin" type="CONFIGURATION" value="kotlin.Int|11" />
+        <property key="PDF_417-minColumns" type="CONFIGURATION" value="kotlin.Int|2" />
+        <property key="EAN_8-width" type="CONFIGURATION" value="kotlin.Int|251" />
+        <property key="ITF-errorCorrection" type="CONFIGURATION" value="BarcodeGenerator-ErrorCorrection|L" />
+        <property key="DATA_MATRIX-compactMode" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="nano-id-generator" id="b708e8c7-566b-4ee2-a477-31f43d75d96c" name="Workbench">
+      <properties>
+        <property key="bulk-generation-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="bulk-generation-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="bulk-generation-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="mime-base64-encoder-decoder" id="6b68d748-d3ba-434c-81c4-972ddca9db0d" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|pGuG1odlJKNSyj6EzGZv" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|zhmdcxh3RHIZ6K63fgru" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|7UGRmmRceyRW2iHpg93j" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|cEd1RzFvZGxKS05TeWo2RXpHWnY=" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="escape-sequence-escaper-unescaper" id="310ca265-bcd4-4df5-b118-214ac2608ea7" name="Workbench">
+      <properties>
+        <property key="doubleQuotesEncodingEnabled" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|kg7uM7TimDzrMOn4cF2Z" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|c0XgfQhZxA6SthPCHvHx" />
+        <property key="singleQuotesEncodingEnabled" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="lineBreaksEscapeSequence" type="CONFIGURATION" value="EscapeSequencesEncoderDecoder-LineBreak|LF" />
+        <property key="backslashsEncodingEnabled" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|Cxt5z1G448mSWIJF7C99" />
+        <property key="tabsEncodingEnabled" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="lineBreaksEncodingEnabled" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|kg7uM7TimDzrMOn4cF2Z" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="regular-expression-matcher" id="dae94b3c-8ded-4cf2-a86a-69e7e408ef60" name="Workbench">
+      <properties>
+        <property key="input-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="substitutionPattern" type="INPUT" value="kotlin.String|Nua28MSn20iEEzeT6MW5" />
+        <property key="extractionPattern" type="INPUT" value="kotlin.String|NmOicb4J4AKTp9ILOe9D" />
+        <property key="substitution-result-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="inputText" type="INPUT" value="kotlin.String|t2oEnjjjApOGn2qjThip" />
+        <property key="substitution-result-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="extraction-result-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="extraction-result-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="input-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="input-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="regexOption" type="CONFIGURATION" value="kotlin.Int|1" />
+        <property key="extraction-result-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="regexText" type="INPUT" value="kotlin.String|4hhOSyTkLFuVu3BTUurO" />
+        <property key="substitution-result-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="color-picker" id="9f3b26b1-6193-4275-82dd-e66036aab120" name="Workbench">
+      <properties>
+        <property key="decimalPlaces" type="CONFIGURATION" value="kotlin.Int|3" />
+        <property key="selectedColor" type="INPUT" value="com.intellij.ui.JBColor|-16777196" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="uuid-generator" id="6089fce5-f4aa-4338-972d-c6c573fb5563" name="Workbench">
+      <properties>
+        <property key="UUIDv1IndividualMacAddress" type="CONFIGURATION" value="kotlin.String|A28dxwYw6MibWAmuLU9E" />
+        <property key="UUIDv5Name" type="CONFIGURATION" value="kotlin.String|I8oJnMluAuRidYdZajig" />
+        <property key="bulk-generation-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="UUIDv6MacAddressGenerationMode" type="CONFIGURATION" value="MacAddressBasedUuidGenerator-MacAddressGenerationMode|INDIVIDUAL" />
+        <property key="bulk-generation-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="UUIDv6IndividualMacAddress" type="CONFIGURATION" value="kotlin.String|WSBz0UKhYoMu1Jf8BdZe" />
+        <property key="UUIDv5IndividualNamespace" type="CONFIGURATION" value="kotlin.String|POxMhIO319Nmvjaajb4s" />
+        <property key="UUIDv5PredefinedNamespace" type="CONFIGURATION" value="NamespaceAndNameBasedUuidGenerator-PredefinedNamespace|URL" />
+        <property key="UUIDv3Name" type="CONFIGURATION" value="kotlin.String|pKXexOo6i5AupbkNxO6X" />
+        <property key="UUIDv1LocalInterface" type="CONFIGURATION" value="kotlin.String|b86xjVBLLImKixKA246v" />
+        <property key="version" type="CONFIGURATION" value="UuidVersion|V5" />
+        <property key="UUIDv3PredefinedNamespace" type="CONFIGURATION" value="NamespaceAndNameBasedUuidGenerator-PredefinedNamespace|URL" />
+        <property key="UUIDv5NamespaceMode" type="CONFIGURATION" value="NamespaceAndNameBasedUuidGenerator-NamespaceMode|INDIVIDUAL" />
+        <property key="bulk-generation-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="UUIDv3IndividualNamespace" type="CONFIGURATION" value="kotlin.String|949j2g5S5PVUQVkVg55n" />
+        <property key="UUIDv6LocalInterface" type="CONFIGURATION" value="kotlin.String|JezwAz8YC7eeUauPQrQh" />
+        <property key="UUIDv1MacAddressGenerationMode" type="CONFIGURATION" value="MacAddressBasedUuidGenerator-MacAddressGenerationMode|INDIVIDUAL" />
+        <property key="UUIDv3NamespaceMode" type="CONFIGURATION" value="NamespaceAndNameBasedUuidGenerator-NamespaceMode|INDIVIDUAL" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="text-case-transformer" id="7cc5aad6-9d7b-4af4-973e-5cc1d3be39a0" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|47Ow4p4QzziCY9rxVYfl" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|X6w593Z6HdNSiPMxR1xu" />
+        <property key="individualDelimiter" type="CONFIGURATION" value="kotlin.String|wYQl206FaZAYLvD5H2Mw" />
+        <property key="outputTextCase" type="CONFIGURATION" value="TextCaseTransformer-TextCase|PASCAL_SNAKE_CASE" />
+        <property key="inputTextCase" type="CONFIGURATION" value="TextCaseTransformer-TextCase|PASCAL_CASE" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="originalParsingMode" type="CONFIGURATION" value="TextCaseTransformer-OriginalParsingMode|FIXED_TEXT_CASE" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|KQp8tuojtY06NBmhm5Po" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="lorem-ipsum-generator" id="2babcd23-62ca-487d-9268-7ce0ddf6e5c1" name="Workbench">
+      <properties>
+        <property key="startWithLoremIpsum" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="maxWordsInBullet" type="CONFIGURATION" value="kotlin.Int|31" />
+        <property key="generated-text-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="numberOfValues" type="CONFIGURATION" value="kotlin.Int|10" />
+        <property key="minWordsInParagraph" type="CONFIGURATION" value="kotlin.Int|21" />
+        <property key="generated-text-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="maxWordsInParagraph" type="CONFIGURATION" value="kotlin.Int|101" />
+        <property key="generated-text-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="minWordsInBullet" type="CONFIGURATION" value="kotlin.Int|11" />
+        <property key="generatedTextKind" type="CONFIGURATION" value="LoremIpsumGenerator-TextMode|WORDS" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="url-base64-encoder-decoder" id="04100f3d-d72c-463d-8097-071e59982951" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|QImmk7zBO0ShqQ7CuZQK" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|KIu59judupwRMxKQSwhq" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|tKHusZmgBEbIuUaXwgNd" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|UUltbWs3ekJPMFNocVE3Q3VaUUs=" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="csv-text-escape" id="3c71864d-5c16-4c72-b7c9-649b44219a52" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|kHNzld7kpkdiL5y4mFV3" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|Hw5cFzAHIy6uNmAiTfVs" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|4bccysMSjYKwrJMrJFp1" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|kHNzld7kpkdiL5y4mFV3" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="sql-formatting" id="7069f3cd-38e7-4acf-8761-156c23f98c84" name="Workbench">
+      <properties>
+        <property key="uppercase" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="dialect" type="CONFIGURATION" value="SqlFormatter-Dialect|PlSql" />
+        <property key="linesBetweenQueries" type="CONFIGURATION" value="kotlin.Int|2" />
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="indentSpaces" type="CONFIGURATION" value="kotlin.Int|3" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|qIIK2MZRrZkyBLOQsBzz" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="maxColumnLength" type="CONFIGURATION" value="kotlin.Int|31" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|Yzs1DbLNYS1jK45ODEMJ" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|XbxaIUgphZy6UVBr37xF" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="hashing-transformer" id="57e0e639-41a6-4171-9013-9948eb9968bc" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|iDZpF6RuNyEVCOVpDcHY" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|8dzuFAZNqrZKrWJxsjU2" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|rRPXurvdYgpNRHoP81Re" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="algorithm" type="CONFIGURATION" value="kotlin.String|TUPLEHASH256-512" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="xml-text-escape" id="43bf66c3-996c-40a0-ae5f-40f841b0f099" name="Workbench">
+      <properties>
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|eXBUGFChl1ZJ925jAsaF" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|oA7uCsFt3h2xg3w7mtcj" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|HcIOhFjBJzh19DJ3zEER" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="targetText" type="INPUT" value="kotlin.String|eXBUGFChl1ZJ925jAsaF" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="text-sorting-transformer" id="1d7e8b61-7be3-4214-ac0a-e1281ac11b88" name="Workbench">
+      <properties>
+        <property key="sortingOrder" type="CONFIGURATION" value="TextSortingTransformer-SortingOrder|WORD_LENGTH" />
+        <property key="liveConversion" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sortedIndividualJoinWordsDelimiter" type="CONFIGURATION" value="kotlin.String|j6sNv8FHptaP8sfPL2hd" />
+        <property key="reverseOrder" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sourceText" type="INPUT" value="kotlin.String|oHLHM4EXygGhVfUKS8GJ" />
+        <property key="source-editor-softWraps" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="sortedJoinWordsDelimiter" type="CONFIGURATION" value="TextSortingTransformer-WordsDelimiter|SPACE" />
+        <property key="targetFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="sourceFile" type="INPUT" value="kotlin.String|eJiWGRzqnH7y1i0pAgH5" />
+        <property key="removeDuplicates" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="trimWords" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="source-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="source-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="unsortedIndividualSplitWordsDelimiter" type="CONFIGURATION" value="kotlin.String|a9hS1roTxRY7UouXIfMA" />
+        <property key="sourceFileWriteFormat" type="CONFIGURATION" value="FileHandling-WriteFormat|HEX" />
+        <property key="targetFile" type="INPUT" value="kotlin.String|W7bomnfo9doAmitRiXdh" />
+        <property key="unsortedPredefinedDelimiter" type="CONFIGURATION" value="TextSortingTransformer-WordsDelimiter|SPACE" />
+        <property key="caseInsensitive" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="removeBlankWords" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="target-editor-showWhitespaces" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="target-editor-showSpecialCharacters" type="CONFIGURATION" value="kotlin.Boolean|true" />
+      </properties>
+    </developerToolConfiguration>
+    <developerToolConfiguration developerToolId="certificates-download" id="1c309498-eafd-4121-a29b-fd5c61101039" name="Workbench">
+      <properties>
+        <property key="followRedirects" type="CONFIGURATION" value="kotlin.Boolean|false" />
+        <property key="allowInsecureConnection" type="CONFIGURATION" value="kotlin.Boolean|true" />
+        <property key="url" type="INPUT" value="kotlin.String|TZuwMI2IK0l9vn4ZBZQO" />
+      </properties>
+    </developerToolConfiguration>
+  </developerToolsConfigurations>
+  <expandedGroupNodeIds />
+</InstanceState>

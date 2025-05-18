@@ -10,6 +10,16 @@
 
 ### Fixed
 
+## 7.1.0 - 2025-05-18
+
+### Added
+
+- New "Cron Expression" tool
+
+### Changed
+
+- By default, the UI of the tools in the tool window will no longer be cached and will instead be rebuilt on demand to reduce memory usage. This behavior can be changed in the settings to prioritize responsiveness.
+
 ## 7.0.0 - 2025-04-27
 
 ### Added

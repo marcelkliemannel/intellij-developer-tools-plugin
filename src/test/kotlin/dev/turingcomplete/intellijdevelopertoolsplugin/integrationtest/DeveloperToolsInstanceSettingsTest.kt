@@ -44,6 +44,8 @@ import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class DeveloperToolsInstanceSettingsTest : IdeaTest() {
   // -- Properties ---------------------------------------------------------- //
@@ -213,7 +215,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
       .use { writer ->
         CSVPrinter(
             writer,
-            expectedConfigurationPropertiesCsvFormat.builder().setSkipHeaderRecord(false).build(),
+            expectedConfigurationPropertiesCsvFormat.builder().setSkipHeaderRecord(false).get(),
           )
           .use { printer ->
             settings
@@ -245,6 +247,23 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
         val element = XmlSerializer.serialize(settings.getState())
         writer.write(JDOMUtil.write(element))
       }
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings =
+      [
+        EXPECTED_CONFIGURATION_PROPERTIES_CSV_FILENAME,
+        RENAMED_CONFIGURATION_PROPERTIES_CSV_FILENAME,
+        REMOVED_CONFIGURATION_PROPERTIES_CSV_FILENAME,
+      ]
+  )
+  fun `Changed configuration properties test data for current plugin version exists`(
+    fileName: String
+  ) {
+    val changedConfigurationPropertiesFile =
+      instanceSettingsResourcesDir.resolve(PluginInfo.pluginVersion.toString()).resolve(fileName)
+    assertThat(changedConfigurationPropertiesFile).exists()
   }
 
   @Test
@@ -339,8 +358,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
         .apply { writeText("") }
         .writer(options = arrayOf(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))
         .use { writer ->
-          val csvPrinter =
-            CSVPrinter(writer, csvFormat.builder().setSkipHeaderRecord(false).build())
+          val csvPrinter = CSVPrinter(writer, csvFormat.builder().setSkipHeaderRecord(false).get())
           writeProperties(csvPrinter)
         }
     }
@@ -470,16 +488,22 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     expectedConfigurationPropertiesCsvFile: Path
   ): List<ExpectedConfigurationProperty> =
     expectedConfigurationPropertiesCsvFile.bufferedReader().use { reader ->
-      CSVParser(reader, expectedConfigurationPropertiesCsvFormat).records.map { record ->
-        val developerToolId = record[CSV_HEADER_DEVELOPER_TOOL_ID]
-        ExpectedConfigurationProperty(
-          developerToolId = developerToolId,
-          propertyKey = record[CSV_HEADER_PROPERTY_KEY],
-          propertyValueType = record[CSV_HEADER_PROPERTY_VALUE_TYPE_NAME],
-          propertyValue = record[CSV_HEADER_PROPERTY_VALUE].replace("\r\n", System.lineSeparator()),
-          propertyType = record[CSV_HEADER_PROPERTY_TYPE],
-        )
-      }
+      CSVParser.builder()
+        .setReader(reader)
+        .setFormat(expectedConfigurationPropertiesCsvFormat)
+        .get()
+        .records
+        .map { record ->
+          val developerToolId = record[CSV_HEADER_DEVELOPER_TOOL_ID]
+          ExpectedConfigurationProperty(
+            developerToolId = developerToolId,
+            propertyKey = record[CSV_HEADER_PROPERTY_KEY],
+            propertyValueType = record[CSV_HEADER_PROPERTY_VALUE_TYPE_NAME],
+            propertyValue =
+              record[CSV_HEADER_PROPERTY_VALUE].replace("\r\n", System.lineSeparator()),
+            propertyType = record[CSV_HEADER_PROPERTY_TYPE],
+          )
+        }
     }
 
   private fun applyRenamedConfigurationPropertyKeys(
@@ -521,13 +545,18 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
         val properties =
           csvFile.bufferedReader().use { reader ->
-            CSVParser(reader, renamedConfigurationPropertiesCsvFormat).records.map {
-              Triple(
-                it.get(CSV_HEADER_DEVELOPER_TOOL_ID),
-                it.get(CSV_HEADER_OLD_PROPERTY_KEY),
-                it.get(CSV_HEADER_NEW_PROPERTY_KEY),
-              )
-            }
+            CSVParser.builder()
+              .setReader(reader)
+              .setFormat(renamedConfigurationPropertiesCsvFormat)
+              .get()
+              .records
+              .map {
+                Triple(
+                  it.get(CSV_HEADER_DEVELOPER_TOOL_ID),
+                  it.get(CSV_HEADER_OLD_PROPERTY_KEY),
+                  it.get(CSV_HEADER_NEW_PROPERTY_KEY),
+                )
+              }
           }
 
         dir.name.toPluginVersion() to properties
@@ -551,11 +580,12 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
 
         val properties =
           csvFile.bufferedReader().use { reader ->
-            CSVParser(reader, removedConfigurationPropertiesCsvFormat).records.groupBy({
-              it.get(CSV_HEADER_DEVELOPER_TOOL_ID)
-            }) {
-              it.get(CSV_HEADER_PROPERTY_KEY)
-            }
+            CSVParser.builder()
+              .setReader(reader)
+              .setFormat(removedConfigurationPropertiesCsvFormat)
+              .get()
+              .records
+              .groupBy({ it.get(CSV_HEADER_DEVELOPER_TOOL_ID) }) { it.get(CSV_HEADER_PROPERTY_KEY) }
           }
 
         dir.name.toPluginVersion() to properties
@@ -614,7 +644,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
           CSV_HEADER_PROPERTY_VALUE,
         )
         .setSkipHeaderRecord(true)
-        .build()
+        .get()
 
     private val renamedConfigurationPropertiesCsvFormat =
       CSVFormat.Builder.create()
@@ -624,12 +654,12 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
           CSV_HEADER_NEW_PROPERTY_KEY,
         )
         .setSkipHeaderRecord(true)
-        .build()
+        .get()
 
     private val removedConfigurationPropertiesCsvFormat =
       CSVFormat.Builder.create()
         .setHeader(CSV_HEADER_DEVELOPER_TOOL_ID, CSV_HEADER_PROPERTY_KEY)
         .setSkipHeaderRecord(true)
-        .build()
+        .get()
   }
 }

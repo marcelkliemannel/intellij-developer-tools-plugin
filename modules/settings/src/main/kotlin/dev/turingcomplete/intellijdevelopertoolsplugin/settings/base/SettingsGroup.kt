@@ -1,6 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.settings.base
 
-import dev.turingcomplete.intellijdevelopertoolsplugin.settings.message.SettingsBundle.SETTINGS_BUNDLE_ID
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.message.SettingsBundle.ID
 import org.jetbrains.annotations.PropertyKey
 
 @Target(AnnotationTarget.CLASS)
@@ -8,8 +8,8 @@ import org.jetbrains.annotations.PropertyKey
 @Repeatable
 annotation class SettingsGroup(
   val id: String,
-  @PropertyKey(resourceBundle = SETTINGS_BUNDLE_ID) val titleBundleKey: String,
-  @PropertyKey(resourceBundle = SETTINGS_BUNDLE_ID) val descriptionBundleKey: String = "",
+  @PropertyKey(resourceBundle = ID) val titleBundleKey: String,
+  @PropertyKey(resourceBundle = ID) val descriptionBundleKey: String = "",
   val order: Int,
 ) {
 

@@ -1,7 +1,7 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base
 
+import com.intellij.ui.dsl.builder.Panel
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
-import javax.swing.JComponent
 
 abstract class InputOutputHandler(
   val id: String,
@@ -15,7 +15,7 @@ abstract class InputOutputHandler(
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
-  abstract fun createComponent(): JComponent
+  abstract fun Panel.buildUi()
 
   abstract fun read(): ByteArray
 
