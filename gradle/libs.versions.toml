@@ -1,5 +1,6 @@
 [versions]
 assertj = "3.27.7"
+bcrypt = "0.10.2"
 changelog = "2.5.0"
 commons-codec = "1.22.0"
 commons-compress = "1.28.0"
@@ -31,6 +32,7 @@ zxing = "3.5.4"
 
 [libraries]
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+bcrypt = { module = "at.favre.lib:bcrypt", version.ref = "bcrypt" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
 commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons-compress" }
 commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commons-csv" }

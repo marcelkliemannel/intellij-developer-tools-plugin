@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added a "BCrypt" tool to hash passwords with a configurable cost factor.
+
 ### Changed
 
 ### Removed

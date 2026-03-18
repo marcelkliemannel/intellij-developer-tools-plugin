@@ -50,6 +50,14 @@ abstract class Converter(
   protected open val defaultSourceInputOutputHandlerId: String = "source"
   protected open val defaultTargetInputOutputHandlerId: String = "target"
 
+  /**
+   * If a conversion is too expensive to be executed on every input change (e.g., a deliberately
+   * slow key derivation function), a subclass can set this to `false`. The live conversion checkbox
+   * will then be hidden, the conversion button stays always enabled and the conversion will be
+   * executed as a background task instead of on the live conversion executor.
+   */
+  protected open val liveConversionPossible: Boolean = true
+
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
@@ -293,7 +301,8 @@ abstract class Converter(
 
   private fun syncLiveConversionSupported() {
     liveConversionSupported.set(
-      sourceConversionSideHandler.activeInputOutputHandler.get().liveConversionSupported &&
+      liveConversionPossible &&
+        sourceConversionSideHandler.activeInputOutputHandler.get().liveConversionSupported &&
         targetConversionSideHandler.activeInputOutputHandler.get().liveConversionSupported
     )
   }
@@ -318,7 +327,8 @@ abstract class Converter(
     targetInputOutputHandler.errorHolder.clear()
 
     if (
-      sourceInputOutputHandler.liveConversionSupported &&
+      liveConversionPossible &&
+        sourceInputOutputHandler.liveConversionSupported &&
         targetInputOutputHandler.liveConversionSupported
     ) {
       liveConversionExecutor.replaceTasks(defaultUiInputDelay) {
