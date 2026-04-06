@@ -69,8 +69,10 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEnco
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SecretKeyEncodingMode.BASE64
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SecretKeyEncodingMode.RAW
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithm.HMAC256
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithm.NONE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.ECDSA
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.HMAC
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.NONE as NONE_KIND
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder.SignatureAlgorithmKind.RSA
 import java.security.Key
 import java.security.KeyFactory
@@ -272,7 +274,7 @@ class JwtEncoderDecoder(
               )
             )
           }
-          .visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind?.keyFactory == null })
+          .visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind == HMAC })
           .layout(RowLayout.PARENT_GRID)
 
         row {
@@ -297,6 +299,7 @@ class JwtEncoderDecoder(
             "The RFC 7518 for the JSON Web Algorithms (JWA) specifies some restrictions that a key or secret should fulfill for the computation of a signature (e.g., a minimum length). This option can be used to enforce these restrictions."
           )
         }
+          .visibleIf(ComboBoxPredicate(signatureAlgorithmComboBox) { it?.kind != NONE_KIND })
       }
       .apply { expanded = false }
       .topGap(TopGap.NONE)
@@ -619,6 +622,7 @@ class JwtEncoderDecoder(
 
   enum class SignatureAlgorithmKind(val keyFactory: KeyFactory?) {
 
+    NONE(null),
     HMAC(null),
     RSA(KeyFactory.getInstance("RSA")),
     ECDSA(KeyFactory.getInstance("EC")),
@@ -633,6 +637,7 @@ class JwtEncoderDecoder(
     val algorithmIdentifiers: String,
   ) {
 
+    NONE("none", NONE_KIND, "none"),
     HMAC256("HS256", HMAC, HMAC_SHA256),
     HMAC384("HS384", HMAC, HMAC_SHA384),
     HMAC512("HS512", HMAC, HMAC_SHA512),
@@ -643,7 +648,12 @@ class JwtEncoderDecoder(
     ECDSA384("ES384", ECDSA, ECDSA_USING_P384_CURVE_AND_SHA384),
     ECDSA512("ES512", ECDSA, ECDSA_USING_P521_CURVE_AND_SHA512);
 
-    override fun toString(): String = "$name ($jwtHeaderValue)"
+    override fun toString(): String =
+      if (this == NONE) {
+        "None"
+      } else {
+        "$name ($jwtHeaderValue)"
+      }
 
     companion object {
 
@@ -672,7 +682,7 @@ class JwtEncoderDecoder(
     fun decodeJwt() {
       clearErrorHolders()
 
-      val jwtParts = encoded.get().split(".")
+      val jwtParts = encoded.get().split('.', limit = 3)
       val numOfJwtParts = jwtParts.size
 
       // Header
@@ -703,17 +713,23 @@ class JwtEncoderDecoder(
       }
 
       // Signature
-      if (numOfJwtParts >= 3 && headerErrorHolder.isNotSet()) {
-        signature.compute(jwtParts[0], jwtParts[1])?.let { expectedSignature ->
-          val actualSignature = jwtParts[2]
-          if (expectedSignature != actualSignature) {
-            signatureErrorHolder.add(
-              "Invalid signature. Check the configuration in the 'Signature Algorithm Configuration' section."
-            )
+      if (headerErrorHolder.isNotSet()) {
+        val actualSignature = jwtParts.getOrElse(2) { "" }
+        if (signature.algorithm.get() == NONE) {
+          if (actualSignature.isNotEmpty()) {
+            signatureErrorHolder.add("JWT with algorithm 'none' must not contain a signature")
           }
+        } else if (numOfJwtParts >= 3) {
+          signature.compute(jwtParts[0], jwtParts[1])?.let { expectedSignature ->
+            if (expectedSignature != actualSignature) {
+              signatureErrorHolder.add(
+                "Invalid signature. Check the configuration in the 'Signature Algorithm Configuration' section."
+              )
+            }
+          }
+        } else {
+          signatureErrorHolder.add("Encoded JWT does not have a signature part")
         }
-      } else {
-        signatureErrorHolder.add("Encoded JWT does not have a signature part")
       }
     }
 
@@ -843,6 +859,9 @@ class JwtEncoderDecoder(
       privateKeyErrorHolder.clear()
 
       return try {
+        if (algorithm.get() == NONE) {
+          return ""
+        }
         val signingKey = createSigningKey() ?: return null
         ExtendedJsonWebSignature()
           .apply {
@@ -863,6 +882,7 @@ class JwtEncoderDecoder(
     private fun createSigningKey(): Key? {
       val signatureAlgorithm = algorithm.get()
       return when (signatureAlgorithm.kind) {
+        NONE_KIND -> null
         HMAC ->
           HmacKey(
             when (secretEncodingMode.get()) {
@@ -903,6 +923,7 @@ class JwtEncoderDecoder(
     private fun loadExampleSecrets() {
       val privateKeyValue = privateKey.get()
       when (algorithm.get().kind) {
+        NONE_KIND -> {}
         HMAC -> {
           if (secret.get().isBlank()) {
             secret.set(EXAMPLE_SECRET)

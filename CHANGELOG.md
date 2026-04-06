@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add support for "algo=none" to the JWT decoding/encoding tool
+
 ### Added
 
 ### Changed
