@@ -14,13 +14,13 @@ class TitledTabbedPane(title: String, tabs: List<Pair<String, JComponent>>) : JB
   // -- Initialization ------------------------------------------------------ //
 
   init {
-    tabComponentInsets = JBUI.insetsTop(8)
+    tabComponentInsets = JBUI.emptyInsets()
 
     addTab("", JPanel())
     setTabComponentAt(0, JBLabel(title).apply { font = font?.deriveFont(Font.BOLD) })
     setEnabledAt(0, false)
 
-    tabs.forEach { addTab(it.first, it.second) }
+    tabs.forEach { addTab(it.first, it.second.wrapTabbedPaneContent()) }
 
     selectedIndex = 1
     setUI(TitleTabAwareTabbedPaneUi())

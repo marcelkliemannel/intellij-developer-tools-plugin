@@ -11,7 +11,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactoryEp
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.jwtencoderdecoder.SignatureAlgorithm
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer
 import java.math.BigDecimal
 import java.security.Security
@@ -85,8 +85,7 @@ open class DeveloperUiToolUnderTest<T : DeveloperUiTool>(
       id == "date-time-converter" && property.key == "timeZoneId" ->
         ZoneId.getAvailableZoneIds().random { it == property.defaultValue }
 
-      id == "jwt-encoder-decoder" && property.key == "algorithm" ->
-        JwtEncoderDecoder.SignatureAlgorithm.HMAC512
+      id == "jwt-encoder-decoder" && property.key == "algorithm" -> SignatureAlgorithm.HMAC512
       id == "jwt-encoder-decoder" && property.key == "encodedText" ->
         "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.ANCf_8p1AE4ZQs7QuqGAyyfTEgYrKSjKWkhBk5cIn1_2QVr2jEjmM-1tu7EgnyOf_fAsvdFXva8Sv05iTGzETg"
       id == "jwt-encoder-decoder" && property.key == "headerText" ->

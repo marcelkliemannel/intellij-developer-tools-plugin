@@ -145,7 +145,7 @@
         <developerUiTool
                 id="jwt-encoder-decoder"
                 groupId="encoder-decoder"
-                implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder$Factory"/>
+                implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.jwtencoderdecoder.JwtEncoderDecoder$Factory"/>
         <developerUiTool
                 id="base32-encoder-decoder"
                 groupId="encoder-decoder"
@@ -322,11 +322,11 @@
                 legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter$StandardFormat"/>
         <developerToolConfigurationEnumPropertyType
                 id="JwtEncoderDecoder-SecretKeyEncodingMode"
-                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder$SecretKeyEncodingMode"
+                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.jwtencoderdecoder.SecretKeyEncodingMode"
                 legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder$SecretKeyEncodingMode"/>
         <developerToolConfigurationEnumPropertyType
                 id="JwtEncoderDecoder-SignatureAlgorithm"
-                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder$SignatureAlgorithm"
+                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.jwtencoderdecoder.SignatureAlgorithm"
                 legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder$SignatureAlgorithm"/>
         <developerToolConfigurationEnumPropertyType
                 id="HmacTransformer-SecretKeyEncodingMode"

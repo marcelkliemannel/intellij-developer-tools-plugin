@@ -2,9 +2,12 @@
 
 ## Unreleased
 
-- Add support for "algo=none" to the JWT decoding/encoding tool
-
 ### Added
+
+- Added support for algo=none to the JWT tool.
+- Added support for validating JWTs via public keys and JWKS.
+- Overhauled the JWT tool UI.
+
 
 ### Changed
 
