@@ -52,6 +52,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEd
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.PropertyComponentPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.SimpleToggleAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.applyDefaultTabComponentInsets
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.onSelectionChanged
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.registerDynamicToolTip
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.setValidationResultBorder

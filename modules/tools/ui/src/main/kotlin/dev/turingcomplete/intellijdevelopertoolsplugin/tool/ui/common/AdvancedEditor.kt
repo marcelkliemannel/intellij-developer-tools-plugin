@@ -12,11 +12,14 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.Separator
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ex.ClipboardUtil
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
@@ -168,6 +171,27 @@ class AdvancedEditor(
   fun onTextChangeFromUi(changeListener: ((String) -> Unit)): AdvancedEditor {
     onTextChangeFromUi.add(changeListener)
     return this
+  }
+
+  fun appendText(value: String) {
+    if (value.isEmpty()) {
+      return
+    }
+
+    updateDocument {
+      val document = editor.document
+      document.insertString(document.textLength, value)
+      editor.caretModel.moveToOffset(document.textLength)
+      editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
+    }
+  }
+
+  fun clearText() {
+    updateDocument {
+      editor.document.setText("")
+      editor.caretModel.moveToOffset(0)
+      editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
+    }
   }
 
   fun onFocusGained(changeListener: () -> Unit): AdvancedEditor {
@@ -403,6 +427,23 @@ class AdvancedEditor(
         additionalLinesCount = 0
         project?.let { setTabSize(CodeStyle.getIndentOptions(it, document).TAB_SIZE) }
       }
+    }
+  }
+
+  private fun updateDocument(update: () -> Unit) {
+    val application = ApplicationManager.getApplication()
+    val action = Runnable {
+      if (editor.isDisposed) {
+        return@Runnable
+      }
+
+      CommandProcessor.getInstance().runUndoTransparentAction { runWriteAction(update) }
+    }
+
+    if (application.isDispatchThread) {
+      action.run()
+    } else {
+      application.invokeLater(action)
     }
   }
 

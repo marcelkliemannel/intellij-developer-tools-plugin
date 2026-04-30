@@ -4,10 +4,10 @@
 
 ### Added
 
+- Added new tool "HTTP Server" to start and manage an easily configurable local HTTP server.
 - Added support for algo=none to the JWT tool.
 - Added support for validating JWTs via public keys and JWKS.
 - Overhauled the JWT tool UI.
-
 
 ### Changed
 

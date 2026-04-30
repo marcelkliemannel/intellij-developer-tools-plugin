@@ -10,7 +10,9 @@ import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBEmptyBorder
+import com.intellij.util.ui.JBUI
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.PluginInfo
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.applyDefaultTabComponentInsets
 import java.awt.Dimension
 import javax.swing.Action
 import javax.swing.JComponent
@@ -36,6 +38,8 @@ class AboutPluginDialog(project: Project?, parentComponent: JComponent) :
 
         cell(
             JBTabbedPane().apply {
+              applyDefaultTabComponentInsets()
+
               tabs.forEach { (title, component) ->
                 // Create scroll panes with specific preferred size
                 val scrollPane = ScrollPaneFactory.createScrollPane(component, true)

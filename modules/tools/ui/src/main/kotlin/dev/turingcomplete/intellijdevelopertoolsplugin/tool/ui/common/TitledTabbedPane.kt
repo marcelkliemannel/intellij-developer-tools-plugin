@@ -14,7 +14,7 @@ class TitledTabbedPane(title: String, tabs: List<Pair<String, JComponent>>) : JB
   // -- Initialization ------------------------------------------------------ //
 
   init {
-    tabComponentInsets = JBUI.emptyInsets()
+    applyDefaultTabComponentInsets()
 
     addTab("", JPanel())
     setTabComponentAt(0, JBLabel(title).apply { font = font?.deriveFont(Font.BOLD) })

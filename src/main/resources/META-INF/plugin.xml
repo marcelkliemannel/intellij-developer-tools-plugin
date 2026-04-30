@@ -305,6 +305,9 @@
                 id="ascii-art"
                 implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.AsciiArtCreator$Factory"/>
         <developerUiTool
+                id="http-server"
+                implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.HttpServer$Factory"/>
+        <developerUiTool
                 id="rubber-duck"
                 implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.RubberDuck$Factory"/>
         <developerUiTool
@@ -336,6 +339,12 @@
                 id="MathContextUnitConverter-RoundingMode"
                 type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.MathContextUnitConverter$RoundingMode"
                 legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.MathContextUnitConverter$RoundingMode"/>
+        <developerToolConfigurationEnumPropertyType
+                id="HttpServer-ServerMode"
+                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.HttpServer$ServerMode"/>
+        <developerToolConfigurationEnumPropertyType
+                id="HttpServer-JavaExecutableMode"
+                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.HttpServer$JavaExecutableMode"/>
         <developerToolConfigurationEnumPropertyType
                 id="TransferRateConverter-TransferRateTimeDimension"
                 type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.TransferRateConverter$TransferRateTimeDimension"

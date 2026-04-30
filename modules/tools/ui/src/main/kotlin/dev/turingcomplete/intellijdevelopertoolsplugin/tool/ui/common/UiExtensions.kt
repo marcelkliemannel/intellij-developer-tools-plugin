@@ -311,6 +311,10 @@ fun JBTabbedPane.onSelectionChanged(onSelectionChanged: (JComponent) -> Unit): J
   return this
 }
 
+fun JBTabbedPane.applyDefaultTabComponentInsets() {
+  tabComponentInsets = JBUI.insetsTop(5)
+}
+
 // -- Private Methods  ---------------------------------------------------- //
 // -- Inner Type ---------------------------------------------------------- //
 
