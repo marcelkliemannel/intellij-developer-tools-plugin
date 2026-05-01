@@ -2,7 +2,7 @@
 
 <img src="src/main/resources/META-INF/pluginIcon.svg" alt="Plugin Logo" width="120px"/>
 
-Developer Tools brings a broad collection of everyday development utilities directly into IntelliJ-based IDEs. Encode and decode data, transform text, validate JSON, generate identifiers, inspect archives, format code and SQL, and run other common tasks without leaving the IDE.
+Developer Tools brings a practical toolbox of everyday development utilities directly into IntelliJ-based IDEs. It keeps common tasks such as encoding data, transforming text, validating JSON, generating identifiers, inspecting archives, formatting code and SQL, and checking certificates inside the IDE, so you do not need to switch to separate web tools or command-line snippets.
 
 Main toolbar window:
 
@@ -16,14 +16,16 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 
 ## Key Features
 
-- Encoding and decoding: JWT (JSON Web Tokens), Base32, Base64, URL Base64, MIME Base64, URL encoding, ASCII, and line breaks
+- JWT Encoder/Decoder
+- Base32, Base64, URL Base64, MIME Base64, URL, and ASCII Encoder/Decoder
+- Text escaping and unescaping for HTML entities, Java strings, JSON, CSV, XML, and escape sequences
 - Regular Expression Matcher
-- UUID, ULID, Nano ID, and password generators
+- UUID, ULID, Nano ID, password, QR code/barcode, Lorem Ipsum, and ASCII art generators
 - Text Sorting
 - Text Case Transformation
 - Text Diff Viewer
 - Text Format Conversion
-- Text escaping and unescaping: HTML entities, Java strings, JSON, CSV, XML, and escape sequences
+- Text Statistic
 - Text Filter
 - JSON Path Parser
 - JSON Schema Validator
@@ -34,21 +36,20 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 - Unit converters for time, data size, and transfer rate
 - Code Style Formatting
 - SQL Formatting
+- CLI Command Conversion
 - Color Picker
 - Fetching, analyzing, and exporting server certificates
-- QR Code/Barcode Generator
-- Lorem Ipsum Generator
-- ASCII Art
+- Notes
 
 ## Integration
 
-The main tools are available in a standalone dialog and in a tool window. Some tools are also available from the editor menu or as code intentions. Editor actions may require selected text or a caret placed on a Java/Kotlin string or identifier.
+The full toolbox is available in both a persistent tool window and a standalone dialog. Tools can have multiple named workbenches, so you can keep separate inputs and configurations for different tasks. Frequently used text operations are also available from the editor popup menu and as intentions; depending on the action, they work on selected text or on the Java/Kotlin string or identifier at the caret.
 
 Plugin settings are available in IntelliJ IDEA's settings/preferences under **Tools | Developer Tools**.
 
 ### Tool Window
 
-The tool window is available through **View | Tool Windows | Developer Tools**. Inputs and tool configuration are stored per project.
+The tool window is available through **View | Tool Windows | Developer Tools**. Inputs, selected tools, expanded menu groups, and tool configuration are stored per project.
 
 ### Dialog
 
@@ -56,7 +57,7 @@ The dialog is available from IntelliJ IDEA's main menu under **Tools | Developer
 
 To add the "Open Dialog" action to the main toolbar, enable it in IntelliJ IDEA's settings/preferences under **Tools | Developer Tools**, or add it manually via **Customize Toolbar... | Add Actions... | Developer Tools**.
 
-Dialog inputs and tool configuration are stored at the application level.
+Dialog inputs, selected tools, expanded menu groups, and tool configuration are stored at the application level.
 
 ## Development
 
