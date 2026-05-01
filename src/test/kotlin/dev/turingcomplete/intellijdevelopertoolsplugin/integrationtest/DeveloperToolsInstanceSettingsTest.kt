@@ -16,22 +16,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsIn
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettingsLegacy
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.testfixtures.DeveloperUiToolUnderTest
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.testfixtures.DeveloperUiToolsInstances.createDeveloperUiToolsUnderTest
-import java.math.BigDecimal
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardOpenOption
-import java.util.Locale
-import java.util.SortedMap
-import kotlin.io.path.bufferedReader
-import kotlin.io.path.createDirectories
-import kotlin.io.path.exists
-import kotlin.io.path.isDirectory
-import kotlin.io.path.name
-import kotlin.io.path.writeText
-import kotlin.io.path.writer
-import kotlin.reflect.KClass
-import kotlin.streams.asSequence
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
@@ -46,6 +30,21 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import java.math.BigDecimal
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
+import java.util.*
+import kotlin.io.path.bufferedReader
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
+import kotlin.io.path.name
+import kotlin.io.path.writeText
+import kotlin.io.path.writer
+import kotlin.reflect.KClass
+import kotlin.streams.asSequence
 
 class DeveloperToolsInstanceSettingsTest : IdeaTest() {
   // -- Properties ---------------------------------------------------------- //
@@ -112,7 +111,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     testNodes.add(
       dynamicTest("No persisted properties after they have been reset") {
         // Load all example values
-        DeveloperToolsApplicationSettings.Companion.generalSettings.loadExamples.set(true)
+        DeveloperToolsApplicationSettings.generalSettings.loadExamples.set(true)
         developerUiToolsUnderTest.forEach { it.resetConfiguration(loadExamples = true) }
 
         // Expect: No configurations have persisted because there are no property changes
