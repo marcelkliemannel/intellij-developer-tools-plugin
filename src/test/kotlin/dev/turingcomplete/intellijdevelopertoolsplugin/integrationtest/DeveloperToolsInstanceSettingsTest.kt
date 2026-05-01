@@ -21,8 +21,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
-import java.util.Locale
-import java.util.SortedMap
+import java.util.*
 import kotlin.io.path.bufferedReader
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
@@ -112,7 +111,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     testNodes.add(
       dynamicTest("No persisted properties after they have been reset") {
         // Load all example values
-        DeveloperToolsApplicationSettings.Companion.generalSettings.loadExamples.set(true)
+        DeveloperToolsApplicationSettings.generalSettings.loadExamples.set(true)
         developerUiToolsUnderTest.forEach { it.resetConfiguration(loadExamples = true) }
 
         // Expect: No configurations have persisted because there are no property changes

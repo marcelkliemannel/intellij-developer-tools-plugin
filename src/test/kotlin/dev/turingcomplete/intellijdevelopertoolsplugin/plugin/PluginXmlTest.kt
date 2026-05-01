@@ -1,6 +1,8 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.plugin
 
 import com.intellij.openapi.util.JDOMUtil
+import java.nio.file.Files
+import java.nio.file.Path
 import org.assertj.core.api.Assertions.assertThat
 import org.jdom.Element
 import org.junit.jupiter.api.BeforeAll
@@ -102,8 +104,9 @@ class PluginXmlTest {
     @BeforeAll
     @JvmStatic
     fun beforeAll() {
-      pluginXml =
-        JDOMUtil.load(PluginXmlTest::class.java.getResourceAsStream("/META-INF/plugin.xml"))
+      Files.newInputStream(Path.of("src/main/resources/META-INF/plugin.xml")).use {
+        pluginXml = JDOMUtil.load(it)
+      }
     }
   }
 }

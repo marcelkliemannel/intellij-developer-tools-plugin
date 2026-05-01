@@ -1,6 +1,6 @@
+
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
-import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.COMPATIBILITY_PROBLEMS
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INTERNAL_API_USAGES
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INVALID_PLUGIN
@@ -20,38 +20,47 @@ plugins {
   alias(libs.plugins.version.catalog.update)
 }
 
-subprojects { apply(plugin = "org.jetbrains.intellij.platform.module") }
-
 val platform = properties("platform")
 
 allprojects {
-  apply(plugin = "java")
-  apply(plugin = "kotlin")
-  apply(plugin = "com.diffplug.spotless")
-
   group = properties("pluginGroup")
   version = properties("pluginVersion")
 
   repositories {
     mavenLocal()
     mavenCentral()
-
-    intellijPlatform { defaultRepositories() }
   }
 
-  dependencies {
-    intellijPlatform {
-      create(platform, properties("platformVersion"), false)
-      bundledPlugins(properties("platformGlobalBundledPlugins").split(','))
-
-      testFramework(TestFrameworkType.Platform)
-      testFramework(TestFrameworkType.JUnit5)
+  pluginManager.withPlugin("org.jetbrains.intellij.platform.base") {
+    repositories {
+      intellijPlatform { defaultRepositories() }
     }
   }
 
-  spotless { kotlin { ktfmt().googleStyle() } }
+  pluginManager.withPlugin("org.jetbrains.intellij.platform.base") {
+    dependencies {
+      intellijPlatform {
+        if (platform == "idea") {
+          intellijIdea(properties("platformVersion")) { useInstaller = false }
+        } else {
+          create(platform, properties("platformVersion")) { useInstaller = false }
+        }
+        bundledPlugins(properties("platformGlobalBundledPlugins").split(','))
 
-  java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
+        testFramework(TestFrameworkType.Platform)
+        testFramework(TestFrameworkType.JUnit5)
+      }
+    }
+  }
+
+  pluginManager.withPlugin("com.diffplug.spotless") {
+    spotless { kotlin { ktfmt().googleStyle() } }
+  }
+
+  pluginManager.withPlugin("java") {
+    java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
+    tasks.named("check") { dependsOn("spotlessCheck") }
+  }
 
   configurations.all {
     exclude(group = "org.slf4j", module = "slf4j-api")
@@ -72,8 +81,6 @@ allprojects {
       useJUnitPlatform()
       systemProperty("java.awt.headless", "false")
     }
-
-    named("check") { dependsOn("spotlessCheck") }
   }
 }
 
@@ -86,7 +93,7 @@ dependencies {
     pluginModule(implementation(project(":settings")))
     pluginModule(implementation(project(":tools-editor")))
     pluginModule(implementation(project(":tools-ui")))
-    if (platform == "IC") {
+    if (platform == "idea") {
       pluginModule(implementation(project(":java-dependent")))
       pluginModule(implementation(project(":kotlin-dependent")))
     }
@@ -152,7 +159,7 @@ intellijPlatform {
       recommended()
 
       properties("pluginVerificationAdditionalIdes").split(",").forEach { ide ->
-        ide(ide, properties("platformVersion"))
+        create(ide, properties("platformVersion"))
       }
     }
   }
@@ -169,17 +176,10 @@ tasks {
   named("publishPlugin") {
     dependsOn("check")
 
-    doFirst { check(platform == "IC") { "Expected platform 'IC', but was: '$platform'" } }
+    doFirst { check(platform == "idea") { "Expected platform 'idea', but was: '$platform'" } }
   }
 
   named("buildSearchableOptions") { enabled = false }
-
-  named<RunIdeTask>("runIde") {
-    jvmArgumentProviders += CommandLineArgumentProvider {
-      // https://kotlin.github.io/analysis-api/testing-in-k2-locally.html
-      listOf("-Didea.kotlin.plugin.use.k2=true")
-    }
-  }
 }
 
 versionCatalogUpdate {

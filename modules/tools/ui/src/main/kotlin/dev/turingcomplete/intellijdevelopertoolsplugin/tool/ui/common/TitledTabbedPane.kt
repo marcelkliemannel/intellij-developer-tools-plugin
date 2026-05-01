@@ -3,7 +3,6 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common
 import com.intellij.ide.ui.laf.darcula.ui.DarculaTabbedPaneUI
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTabbedPane
-import com.intellij.util.ui.JBUI
 import java.awt.Font
 import java.awt.Graphics
 import javax.swing.JComponent
@@ -14,13 +13,13 @@ class TitledTabbedPane(title: String, tabs: List<Pair<String, JComponent>>) : JB
   // -- Initialization ------------------------------------------------------ //
 
   init {
-    tabComponentInsets = JBUI.insetsTop(8)
+    applyDefaultTabComponentInsets()
 
     addTab("", JPanel())
     setTabComponentAt(0, JBLabel(title).apply { font = font?.deriveFont(Font.BOLD) })
     setEnabledAt(0, false)
 
-    tabs.forEach { addTab(it.first, it.second) }
+    tabs.forEach { addTab(it.first, it.second.wrapTabbedPaneContent()) }
 
     selectedIndex = 1
     setUI(TitleTabAwareTabbedPaneUi())

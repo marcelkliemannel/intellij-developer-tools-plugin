@@ -37,12 +37,12 @@ class CliCommandConverterTest {
     assertThat(actual)
       .isEqualTo(
         """
-app \
-  -foo \
-  --baz \
-  ---baz \
-  -foo-bar "foo -baz" '-foo-bar'
-    """
+        app \
+          -foo \
+          --baz \
+          ---baz \
+          -foo-bar "foo -baz" '-foo-bar'
+        """
           .trimIndent()
       )
   }
@@ -59,12 +59,12 @@ app \
     val actual =
       cliCommandConverter.doConvertToSource(
         """
-app \
-  -foo \
-  --baz \
-  ---baz \
-  -foo-bar "foo -baz" '-foo-bar'
-    """
+        app \
+          -foo \
+          --baz \
+          ---baz \
+          -foo-bar "foo -baz" '-foo-bar'
+        """
           .trimIndent()
           .toByteArray()
       )

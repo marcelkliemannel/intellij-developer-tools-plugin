@@ -268,7 +268,7 @@ class JsonPathTransformer(
               <tr><td><code>${'$'}..movie[-1:].director</code></td><td>Selects the director of the last movie in all sub-objects of the root.</td></tr>
           </table>
           </html>
-        """
+          """
             .trimIndent()
         )
         .copyable()

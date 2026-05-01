@@ -43,6 +43,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.applyDefaultTabComponentInsets
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.RegexTextField
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.SelectRegexOptionsAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.setContextMenu
@@ -152,6 +153,8 @@ class RegularExpressionMatcher(
     row {
         cell(
             JBTabbedPane().apply {
+              applyDefaultTabComponentInsets()
+
               addTab(
                 UiToolsBundle.message("regular-expression-matcher.matches-title"),
                 createMatchesTableComponent(),

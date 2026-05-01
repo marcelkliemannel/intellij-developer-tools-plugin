@@ -1,5 +1,12 @@
 import org.gradle.kotlin.dsl.libs
 
+plugins {
+  java
+  alias(libs.plugins.kotlin.jvm)
+  id("org.jetbrains.intellij.platform.module")
+  alias(libs.plugins.spotless)
+}
+
 dependencies {
   implementation(project(":common"))
   // This is required for the `OpenDeveloperToolService` mechanism. However, a

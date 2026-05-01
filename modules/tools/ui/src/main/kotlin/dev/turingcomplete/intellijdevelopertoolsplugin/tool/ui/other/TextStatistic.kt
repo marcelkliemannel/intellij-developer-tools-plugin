@@ -20,6 +20,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEd
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor.EditorMode
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.SimpleTable
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.simpleColumnInfo
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.applyDefaultTabComponentInsets
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolReference
@@ -106,6 +107,8 @@ class TextStatistic(
     row {
         cell(
             JBTabbedPane().apply {
+              applyDefaultTabComponentInsets()
+
               metricsTable = createMetricsTable()
               addTab("Metrics", ScrollPaneFactory.createScrollPane(metricsTable, false))
 
@@ -259,12 +262,12 @@ class TextStatistic(
 
     private val TEXT_EXAMPLE =
       """
-Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
+      Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
 
-Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.
+      Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.
 
-A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
-    """
+      A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
+      """
         .trimIndent()
 
     val openTextStatisticReference =

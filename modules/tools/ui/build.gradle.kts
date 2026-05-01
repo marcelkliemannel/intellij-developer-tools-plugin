@@ -2,6 +2,10 @@
 import org.jetbrains.changelog.Changelog
 
 plugins {
+  java
+  alias(libs.plugins.kotlin.jvm)
+  id("org.jetbrains.intellij.platform.module")
+  alias(libs.plugins.spotless)
   `java-test-fixtures`
   alias(libs.plugins.changelog)
 }

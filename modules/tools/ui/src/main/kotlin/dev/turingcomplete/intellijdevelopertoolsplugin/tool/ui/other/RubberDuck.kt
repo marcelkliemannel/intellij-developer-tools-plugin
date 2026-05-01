@@ -26,12 +26,14 @@ class RubberDuck(parentDisposable: Disposable) : DeveloperUiTool(parentDisposabl
     row {
       cell(
         JBLabel(
-          """<html>
-             Rubber duck debugging is a problem-solving technique where a programmer explains their code line by 
-             line to a rubber duck or any other inanimate object. The act of explaining the code helps 
-             the programmer to identify errors and logic mistakes in their code. This technique is widely 
-             used in software development to improve code quality and debugging efficiency.
-            </html>"""
+          """
+          |<html>
+          |             Rubber duck debugging is a problem-solving technique where a programmer explains their code line by 
+          |             line to a rubber duck or any other inanimate object. The act of explaining the code helps 
+          |             the programmer to identify errors and logic mistakes in their code. This technique is widely 
+          |             used in software development to improve code quality and debugging efficiency.
+          |            </html>
+          """
             .trimMargin()
         )
       )

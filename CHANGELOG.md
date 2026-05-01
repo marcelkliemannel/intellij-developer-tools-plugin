@@ -10,6 +10,19 @@
 
 ### Fixed
 
+## 8.0.0 - 2026-05-01
+
+### Added
+
+- Added a new HTTP Server tool for starting and managing a configurable local HTTP server based on WireMock.
+- Added support for alg=none in the JWT tool.
+- Added support for validating JWTs using public keys and JWKS.
+- Overhauled the JWT tool UI.
+
+### Changed
+
+- Raise minimum IntelliJ version to 2026.1
+
 ## 7.1.0 - 2025-05-18
 
 ### Added

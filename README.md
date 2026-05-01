@@ -2,7 +2,7 @@
 
 <img src="src/main/resources/META-INF/pluginIcon.svg" alt="Plugin Logo" width="120px"/>
 
-This plugin is a powerful and versatile set of tools designed to enhance the development experience for software engineers. With its extensive collection of features, developers can increase their productivity and simplify complex operations without leaving their coding environment.
+Developer Tools brings a practical toolbox of everyday development utilities directly into IntelliJ-based IDEs. It keeps common tasks such as encoding data, transforming text, validating JSON, generating identifiers, inspecting archives, formatting code and SQL, and checking certificates inside the IDE, so you do not need to switch to separate web tools or command-line snippets.
 
 Main toolbar window:
 
@@ -16,49 +16,51 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 
 ## Key Features
 
-- Encoding and Decoding: JWT (JSON Web Tokens), Base32, Base64, URL Base64, MIME Base64, URL encoding and line breaks
+- JWT Encoder/Decoder
+- Base32, Base64, URL Base64, MIME Base64, URL, and ASCII Encoder/Decoder
+- Text escaping and unescaping for HTML entities, Java strings, JSON, CSV, XML, and escape sequences
 - Regular Expression Matcher
-- UUID, ULID, Nano ID and Password Generator
+- UUID, ULID, Nano ID, password, QR code/barcode, Lorem Ipsum, and ASCII art generators
 - Text Sorting
 - Text Case Transformation
 - Text Diff Viewer
 - Text Format Conversion
-- Text Escape: HTML entities, Java Strings, JSON, CSV, and XML
+- Text Statistic
 - Text Filter
 - JSON Path Parser
 - JSON Schema Validator
-- Hashing
-- Archive (ZIP, TAR, JAR, 7z, ...) viewer and extractor
-- Date Time Handling (Unix Timestamp, Formatting, ...)
-- Units converters for time, data size and transfer rate
+- Hashing and HMAC
+- HTTP Server (WireMock)
+- Archive viewer and extractor for ZIP, TAR, JAR, 7z, and other formats
+- Date and time tools for Unix timestamps, formatting, and parsing
+- Unit converters for time, data size, and transfer rate
 - Code Style Formatting
 - SQL Formatting
+- CLI Command Conversion
 - Color Picker
-- Server certificates fetching, analyse and export
-- QR Code/Barcode Generator
-- Lorem Ipsum Generator
-- ASCII Art
+- Fetching, analyzing, and exporting server certificates
+- Notes
 
 ## Integration
 
-The main tools are currently available as a standalone dialog or tool window. Additionally, some tools are also available via the editor menu or code intentions. Some of these tools are only available if a text is selected, or the current caret position is on a Java/Kotlin string or identifier.
+The full toolbox is available in both a persistent tool window and a standalone dialog. Tools can have multiple named workbenches, so you can keep separate inputs and configurations for different tasks. Frequently used text operations are also available from the editor popup menu and as intentions; depending on the action, they work on selected text or on the Java/Kotlin string or identifier at the caret.
 
-The plugin settings can be found in IntelliJ's settings/preferences under **Tools | Developer Tools**.
+Plugin settings are available in IntelliJ IDEA's settings/preferences under **Tools | Developer Tools**.
 
 ### Tool Window
 
-The tool window is available through **View | Tool Windows | Tools**. All inputs and configurations of a tool window will be stored on the project level.
+The tool window is available through **View | Tool Windows | Developer Tools**. Inputs, selected tools, expanded menu groups, and tool configuration are stored per project.
 
 ### Dialog
 
-The action to access the dialog is available through IntelliJ's main menu under **Tools | Developer Tools**.
+The dialog is available from IntelliJ IDEA's main menu under **Tools | Developer Tools**.
 
-To add the "Open Dialog" action to the main toolbar, we can either enable it in IntelliJ's settings/preferences under **Tools | Developer Tools**, or manually add the action via **Customize Toolbar... | Add Actions... | Developer Tools**.
+To add the "Open Dialog" action to the main toolbar, enable it in IntelliJ IDEA's settings/preferences under **Tools | Developer Tools**, or add it manually via **Customize Toolbar... | Add Actions... | Developer Tools**.
 
-All inputs and configurations of the dialog will be stored on the application level.
+Dialog inputs, selected tools, expanded menu groups, and tool configuration are stored at the application level.
 
 ## Development
 
-This plugin is not seen as a library. Therefore, code changes do not necessarily adhere to the semantics version rules.
+This plugin is not treated as a library, so code changes do not necessarily follow semantic versioning rules.
 
-If you want to contribute something, please follow the code style in the `.editorconfig` and sign your commits.
+If you want to contribute, please follow the code style defined in `.editorconfig` and sign your commits.

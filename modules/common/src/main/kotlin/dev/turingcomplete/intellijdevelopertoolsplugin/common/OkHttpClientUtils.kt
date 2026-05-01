@@ -29,6 +29,7 @@ object OkHttpClientUtils {
       Protocol.HTTP_1_0 -> "HTTP/1.0"
       Protocol.HTTP_1_1 -> "HTTP/1.1"
       Protocol.HTTP_2 -> "HTTP/2"
+      Protocol.HTTP_3 -> "HTTP/3"
       Protocol.H2_PRIOR_KNOWLEDGE -> "HTTP/2 (Prior Knowledge)"
       Protocol.QUIC -> "QUIC"
       Protocol.SPDY_3 -> "SPDY/3.1"

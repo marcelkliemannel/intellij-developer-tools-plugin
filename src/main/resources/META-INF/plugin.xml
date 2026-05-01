@@ -6,53 +6,55 @@
     </vendor>
 
     <description><![CDATA[
-<p>This plugin is a powerful and versatile set of tools designed to enhance the development experience for software engineers. With its extensive collection of features, developers can increase their productivity and simplify complex operations without leaving their coding environment.</p>
+<p>Developer Tools brings a practical toolbox of everyday development utilities directly into IntelliJ-based IDEs. It keeps common tasks such as encoding data, transforming text, validating JSON, generating identifiers, inspecting archives, formatting code and SQL, and checking certificates inside the IDE, so you do not need to switch to separate web tools or command-line snippets.</p>
 
 <p>Plugin icon by <a href="https://www.svgrepo.com/svg/489187/toolbox">Gabriele Malaspina</a>.</p>
 
 <h2>Key Features</h2>
 <ul>
-    <li>Encoding and Decoding: JWT (JSON Web Tokens), Base32, Base64, URL Base64, MIME Base64, URL encoding, line breaks</li>
+    <li>JWT Encoder/Decoder</li>
+    <li>Base32, Base64, URL Base64, MIME Base64, URL, and ASCII Encoder/Decoder</li>
+    <li>Text escaping and unescaping for HTML entities, Java strings, JSON, CSV, XML, and escape sequences</li>
     <li>Regular Expression Matcher</li>
-    <li>UUID, ULID, Nano ID and Password Generator</li>
+    <li>UUID, ULID, Nano ID, password, QR code/barcode, Lorem Ipsum, and ASCII art generators</li>
     <li>Text Sorting</li>
     <li>Text Case Transformation</li>
     <li>Text Diff Viewer</li>
     <li>Text Format Conversion</li>
-    <li>Text Escape:</b> HTML entities, Java Strings, JSON, CSV, and XML</li>
+    <li>Text Statistic</li>
     <li>Text Filter</li>
     <li>JSON Path Parser</li>
     <li>JSON Schema Validator</li>
-    <li>Hashing</li>
-    <li>Archive (ZIP, TAR, JAR, 7z, ...) viewer and extractor</li>
-    <li>Date Time Handling (Unix Timestamp, Formatting, ...)</li>
-    <li>Units converters for time, data size and transfer rate</li>
+    <li>Hashing and HMAC</li>
+    <li>HTTP Server (WireMock)</li>
+    <li>Archive viewer and extractor for ZIP, TAR, JAR, 7z, and other formats</li>
+    <li>Date and time tools for Unix timestamps, formatting, and parsing</li>
+    <li>Unit converters for time, data size, and transfer rate</li>
     <li>Code Style Formatting</li>
     <li>SQL Formatting</li>
+    <li>CLI Command Conversion</li>
     <li>Color Picker</li>
-    <li>Server certificates fetching, analyse and export</li>
-    <li>QR Code/Barcode Generator</li>
-    <li>Lorem Ipsum Generator</li>
-    <li>ASCII Art</li>
+    <li>Fetching, analyzing, and exporting server certificates</li>
+    <li>Notes</li>
 </ul>
 
 <h2>Integration</h2>
 
-<p>The main tools are currently available as a standalone dialog or tool window. Additionally, some tools are also available via the editor menu or code intentions. Some of these tools are only available if a text is selected, or the current caret position is on a Java/Kotlin string or identifier.</p>
+<p>The full toolbox is available in both a persistent tool window and a standalone dialog. Tools can have multiple named workbenches, so you can keep separate inputs and configurations for different tasks. Frequently used text operations are also available from the editor popup menu and as intentions; depending on the action, they work on selected text or on the Java/Kotlin string or identifier at the caret.</p>
 
-<p>The plugin settings can be found in IntelliJ's settings/preferences under <b>Tools | Developer Tools</b>.</p>
+<p>Plugin settings are available in IntelliJ IDEA's settings/preferences under <b>Tools | Developer Tools</b>.</p>
 
 <h3>Tool Window</h3>
 
-<p>The tool window is available under <b>View | Tool Windows | Tools</b>. All inputs and configurations will be stored in the project.</p>
+<p>The tool window is available under <b>View | Tool Windows | Developer Tools</b>. Inputs, selected tools, expanded menu groups, and tool configuration are stored per project.</p>
 
-<h2>Dialog</h3>
+<h3>Dialog</h3>
 
-<p>The action to access the dialog is available through IntelliJ's main menu under <b>Tools | Developer Tools</b>.</p>
+<p>The dialog is available from IntelliJ IDEA's main menu under <b>Tools | Developer Tools</b>.</p>
 
-<p>To add the "Open Dialog" action to the main toolbar, we can either enable it in IntelliJ's settings/preferences under <b>Tools | Developer Tools</b>, or manually add the action via <b>Customize Toolbar... | Add Actions... | Developer Tools</b>.</p>
+<p>To add the "Open Dialog" action to the main toolbar, enable it in IntelliJ IDEA's settings/preferences under <b>Tools | Developer Tools</b>, or add it manually via <b>Customize Toolbar... | Add Actions... | Developer Tools</b>.</p>
 
-<p>All inputs and configurations of the dialog will be stored on the application level.</p>
+<p>Dialog inputs, selected tools, expanded menu groups, and tool configuration are stored at the application level.</p>
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
@@ -145,7 +147,7 @@
         <developerUiTool
                 id="jwt-encoder-decoder"
                 groupId="encoder-decoder"
-                implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder$Factory"/>
+                implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.jwtencoderdecoder.JwtEncoderDecoder$Factory"/>
         <developerUiTool
                 id="base32-encoder-decoder"
                 groupId="encoder-decoder"
@@ -305,6 +307,9 @@
                 id="ascii-art"
                 implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.AsciiArtCreator$Factory"/>
         <developerUiTool
+                id="http-server"
+                implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.HttpServer$Factory"/>
+        <developerUiTool
                 id="rubber-duck"
                 implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.RubberDuck$Factory"/>
         <developerUiTool
@@ -322,11 +327,11 @@
                 legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.DatetimeConverter$StandardFormat"/>
         <developerToolConfigurationEnumPropertyType
                 id="JwtEncoderDecoder-SecretKeyEncodingMode"
-                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder$SecretKeyEncodingMode"
+                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.jwtencoderdecoder.SecretKeyEncodingMode"
                 legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder$SecretKeyEncodingMode"/>
         <developerToolConfigurationEnumPropertyType
                 id="JwtEncoderDecoder-SignatureAlgorithm"
-                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.JwtEncoderDecoder$SignatureAlgorithm"
+                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.jwtencoderdecoder.SignatureAlgorithm"
                 legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.JwtEncoderDecoder$SignatureAlgorithm"/>
         <developerToolConfigurationEnumPropertyType
                 id="HmacTransformer-SecretKeyEncodingMode"
@@ -336,6 +341,12 @@
                 id="MathContextUnitConverter-RoundingMode"
                 type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.MathContextUnitConverter$RoundingMode"
                 legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.unitconverter.MathContextUnitConverter$RoundingMode"/>
+        <developerToolConfigurationEnumPropertyType
+                id="HttpServer-ServerMode"
+                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.HttpServer$ServerMode"/>
+        <developerToolConfigurationEnumPropertyType
+                id="HttpServer-JavaExecutableMode"
+                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.HttpServer$JavaExecutableMode"/>
         <developerToolConfigurationEnumPropertyType
                 id="TransferRateConverter-TransferRateTimeDimension"
                 type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.TransferRateConverter$TransferRateTimeDimension"

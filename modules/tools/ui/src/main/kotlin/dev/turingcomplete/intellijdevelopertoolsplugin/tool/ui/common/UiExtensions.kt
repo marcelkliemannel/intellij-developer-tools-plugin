@@ -9,6 +9,9 @@ import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.openapi.ui.getUserData
+import com.intellij.openapi.ui.putUserData
+import com.intellij.openapi.util.Key
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.JBColor
 import com.intellij.ui.UIBundle
@@ -24,6 +27,7 @@ import com.intellij.ui.tabs.TabInfo
 import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
+import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Color
 import java.awt.Font
@@ -214,6 +218,16 @@ fun JComponent.wrapWithToolBar(
   }
 }
 
+fun JComponent.wrapTabbedPaneContent(topInset: Int = 8): JComponent {
+  return BorderLayoutPanel().apply {
+    isOpaque = true
+    background = UIUtil.getPanelBackground()
+    border = JBUI.Borders.emptyTop(topInset)
+    putUserData(wrappedTabbedPaneContentKey, this@wrapTabbedPaneContent)
+    addToCenter(this@wrapTabbedPaneContent)
+  }
+}
+
 fun JComponent.withNoRightBorderInset(): JComponent {
   val insets = border?.getBorderInsets(this) ?: JBUI.emptyInsets()
   border = JBUI.Borders.empty(insets.top, insets.left, insets.bottom, 0)
@@ -287,9 +301,18 @@ fun Cell<JComponent>.registerDynamicToolTip(toolTipText: () -> String?) {
 }
 
 fun JBTabbedPane.onSelectionChanged(onSelectionChanged: (JComponent) -> Unit): JBTabbedPane {
-  addChangeListener { onSelectionChanged(selectedComponent as JComponent) }
+  addChangeListener {
+    val selectedComponent = selectedComponent as? JComponent ?: return@addChangeListener
+    onSelectionChanged(
+      selectedComponent.getUserData(wrappedTabbedPaneContentKey) ?: selectedComponent
+    )
+  }
 
   return this
+}
+
+fun JBTabbedPane.applyDefaultTabComponentInsets() {
+  tabComponentInsets = JBUI.insetsTop(5)
 }
 
 // -- Private Methods  ---------------------------------------------------- //
@@ -308,3 +331,5 @@ enum class ToolBarPlace(val horizontal: Boolean) {
   RIGHT(false),
   APPEND(true),
 }
+
+private val wrappedTabbedPaneContentKey = Key.create<JComponent>("wrappedTabbedPaneContent")

@@ -10,7 +10,7 @@ val modules = mutableSetOf(
   Module("tools-editor", Paths.get("modules/tools/editor")),
   Module("tools-ui", Paths.get("modules/tools/ui"))
 )
-if (platform == "IC") {
+if (platform == "idea") {
   modules.add(Module("java-dependent"))
   modules.add(Module("kotlin-dependent"))
 }

@@ -1,6 +1,10 @@
 import org.jetbrains.kotlin.gradle.utils.extendsFrom
 
 plugins {
+  java
+  alias(libs.plugins.kotlin.jvm)
+  id("org.jetbrains.intellij.platform.module")
+  alias(libs.plugins.spotless)
   `java-test-fixtures`
 }
 
@@ -12,7 +16,7 @@ dependencies {
   testImplementation(libs.bundles.junit.implementation)
   testRuntimeOnly(libs.bundles.junit.runtime)
 
-  if (project.property("platform") == "IC") {
+  if (project.property("platform") == "idea") {
     intellijPlatform { testBundledPlugins("org.jetbrains.kotlin") }
     configurations.testFixturesApi.extendsFrom(configurations.intellijPlatformTestBundledPlugins)
   }
