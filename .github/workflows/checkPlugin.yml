@@ -4,9 +4,12 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
 
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -16,27 +19,31 @@ permissions:
 jobs:
   verifyPlugin:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
         with:
-          distribution: 'adopt'
+          distribution: 'temurin'
           java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@v6
 
       - name: Run Checks
         uses: coactions/setup-xvfb@v1
         with:
           run: ./gradlew check --stacktrace
 
+      - name: Verify Plugin
+        run: ./gradlew verifyPlugin --stacktrace
+
       - name: Test Report
-        uses: dorny/test-reporter@v1
-        if: success() || failure()
+        uses: dorny/test-reporter@v3
+        if: ${{ !cancelled() }}
+        continue-on-error: true
         with:
           name: JUnit Tests
           path: '**/build/test-results/test/TEST-*.xml'
           reporter: java-junit
-
-      - name: Verify Plugin
-        run: ./gradlew verifyPlugin --stacktrace
-
