@@ -16,20 +16,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsIn
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsInstanceSettingsLegacy
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.testfixtures.DeveloperUiToolUnderTest
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.testfixtures.DeveloperUiToolsInstances.createDeveloperUiToolsUnderTest
-import org.apache.commons.csv.CSVFormat
-import org.apache.commons.csv.CSVParser
-import org.apache.commons.csv.CSVPrinter
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.DynamicContainer
-import org.junit.jupiter.api.DynamicContainer.dynamicContainer
-import org.junit.jupiter.api.DynamicNode
-import org.junit.jupiter.api.DynamicTest
-import org.junit.jupiter.api.DynamicTest.dynamicTest
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestFactory
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import java.math.BigDecimal
 import java.nio.file.Files
 import java.nio.file.Path
@@ -45,6 +31,20 @@ import kotlin.io.path.writeText
 import kotlin.io.path.writer
 import kotlin.reflect.KClass
 import kotlin.streams.asSequence
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVParser
+import org.apache.commons.csv.CSVPrinter
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.DynamicContainer
+import org.junit.jupiter.api.DynamicContainer.dynamicContainer
+import org.junit.jupiter.api.DynamicNode
+import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.DynamicTest.dynamicTest
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class DeveloperToolsInstanceSettingsTest : IdeaTest() {
   // -- Properties ---------------------------------------------------------- //
