@@ -9,7 +9,6 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.Alarm
-import com.intellij.util.ui.JBUI
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextStatisticUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
@@ -263,12 +262,12 @@ class TextStatistic(
 
     private val TEXT_EXAMPLE =
       """
-Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
+      Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
 
-Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.
+      Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.
 
-A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
-    """
+      A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
+      """
         .trimIndent()
 
     val openTextStatisticReference =

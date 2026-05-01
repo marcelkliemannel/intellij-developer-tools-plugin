@@ -24,6 +24,7 @@
     <li>JSON Path Parser</li>
     <li>JSON Schema Validator</li>
     <li>Hashing</li>
+    <li>HTTP Server (WireMock)</li>
     <li>Archive (ZIP, TAR, JAR, 7z, ...) viewer and extractor</li>
     <li>Date Time Handling (Unix Timestamp, Formatting, ...)</li>
     <li>Units converters for time, data size and transfer rate</li>

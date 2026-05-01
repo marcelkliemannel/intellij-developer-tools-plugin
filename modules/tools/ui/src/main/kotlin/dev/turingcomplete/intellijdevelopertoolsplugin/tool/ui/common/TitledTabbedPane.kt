@@ -3,7 +3,6 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common
 import com.intellij.ide.ui.laf.darcula.ui.DarculaTabbedPaneUI
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTabbedPane
-import com.intellij.util.ui.JBUI
 import java.awt.Font
 import java.awt.Graphics
 import javax.swing.JComponent

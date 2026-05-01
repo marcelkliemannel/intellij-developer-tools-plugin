@@ -10,7 +10,6 @@ import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBEmptyBorder
-import com.intellij.util.ui.JBUI
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.PluginInfo
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.applyDefaultTabComponentInsets
 import java.awt.Dimension

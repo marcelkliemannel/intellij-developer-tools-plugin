@@ -130,7 +130,7 @@ private constructor(
       lateinit var backgroundColorButton: JButton
       backgroundColorButton =
         button("Change") {
-            ColorChooserService.instance
+            ColorChooserService.getInstance()
               .showDialog(
                 project,
                 backgroundColorButton,
@@ -149,7 +149,7 @@ private constructor(
       lateinit var foregroundColorButton: JButton
       foregroundColorButton =
         button("Change") {
-            ColorChooserService.instance
+            ColorChooserService.getInstance()
               .showDialog(
                 project,
                 foregroundColorButton,

@@ -1,3 +1,10 @@
+plugins {
+  java
+  alias(libs.plugins.kotlin.jvm)
+  id("org.jetbrains.intellij.platform.module")
+  alias(libs.plugins.spotless)
+}
+
 repositories {
   mavenLocal()
   mavenCentral()

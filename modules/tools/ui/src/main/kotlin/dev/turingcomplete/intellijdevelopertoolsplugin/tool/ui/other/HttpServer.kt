@@ -2,8 +2,8 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.KillableProcessHandler
-import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessListener
 import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
 import com.intellij.json.JsonLanguage
@@ -50,8 +50,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.awt.Dimension
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
@@ -63,6 +61,8 @@ import java.time.format.DateTimeFormatter
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.event.HyperlinkEvent
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 class HttpServer(
   private val configuration: DeveloperToolConfiguration,
@@ -103,19 +103,19 @@ class HttpServer(
       "",
       CONFIGURATION,
       """
-        {
-          "request": {
-            "method": "GET",
-            "urlPattern": "/"
+      {
+        "request": {
+          "method": "GET",
+          "urlPattern": "/"
+        },
+        "response": {
+          "status": 200,
+          "headers": {
+            "Content-Type": "text/plain"
           },
-          "response": {
-            "status": 200,
-            "headers": {
-              "Content-Type": "text/plain"
-            },
-            "body": "Hello World!"
-          }
+          "body": "Hello World!"
         }
+      }
       """
         .trimIndent(),
     )
@@ -725,7 +725,7 @@ class HttpServer(
     processOutput: StringBuilder,
   ) {
     processHandler.addProcessListener(
-      object : ProcessAdapter() {
+      object : ProcessListener {
 
         override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
           val outputChunk = event.text
@@ -743,7 +743,7 @@ class HttpServer(
 
   private fun watchWireMockProcess(processHandler: KillableProcessHandler) {
     processHandler.addProcessListener(
-      object : ProcessAdapter() {
+      object : ProcessListener {
 
         override fun processTerminated(event: ProcessEvent) {
           unregisterWireMockProcess(processHandler)
@@ -947,7 +947,7 @@ class HttpServer(
                   .bind(selectedJavaExecutableMode, JavaExecutableMode.PATH)
                   .gap(RightGap.SMALL)
                 textFieldWithBrowseButton(
-                    FileChooserDescriptorFactory.createSingleFileDescriptor()
+                    FileChooserDescriptorFactory.singleFile()
                       .withTitle(
                         UiToolsBundle.message(
                           "http-server.advanced-config.java-executable.path.title"

@@ -233,7 +233,7 @@ class TextFilterTransformer(
       """
       [info] Application started
       [error] Error occurred while processing request
-    """
+      """
         .trimIndent()
   }
 }

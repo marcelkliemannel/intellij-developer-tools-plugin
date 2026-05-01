@@ -10,10 +10,10 @@ import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.observable.properties.AtomicProperty
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.getUserData
-import com.intellij.openapi.ui.putUserData
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.Splitter
+import com.intellij.openapi.ui.getUserData
+import com.intellij.openapi.ui.putUserData
 import com.intellij.ui.JBSplitter
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.dsl.builder.Align
@@ -52,7 +52,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEd
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.PropertyComponentPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.SimpleToggleAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.applyDefaultTabComponentInsets
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.onSelectionChanged
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.registerDynamicToolTip
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.setValidationResultBorder
@@ -179,9 +178,7 @@ class JwtEncoderDecoder(
           .resizableColumn()
       }
       .topGap(TopGap.NONE)
-    row {
-        cell(createEncodingDecodingComponent()).align(Align.FILL).resizableColumn()
-      }
+    row { cell(createEncodingDecodingComponent()).align(Align.FILL).resizableColumn() }
       .resizableRow()
       .topGap(TopGap.NONE)
   }
@@ -203,9 +200,7 @@ class JwtEncoderDecoder(
           .resizableColumn()
       }
       .topGap(TopGap.NONE)
-    row {
-        cell(createValidationComponent()).align(Align.FILL).resizableColumn()
-      }
+    row { cell(createValidationComponent()).align(Align.FILL).resizableColumn() }
       .resizableRow()
       .topGap(TopGap.NONE)
   }
@@ -629,8 +624,7 @@ class JwtEncoderDecoder(
 
   private fun sharedEncodedEditorLabel(jwtTab: JwtTab): String =
     when (jwtTab) {
-      JwtTab.DECODE_ENCODE ->
-        UiToolsBundle.message("jwt-encoder-decoder.editor.jwt-input-output")
+      JwtTab.DECODE_ENCODE -> UiToolsBundle.message("jwt-encoder-decoder.editor.jwt-input-output")
       JwtTab.VALIDATE -> UiToolsBundle.message("jwt-encoder-decoder.editor.jwt-input")
     }
 
@@ -677,58 +671,58 @@ class JwtEncoderDecoder(
     internal const val EXAMPLE_SECRET = "s3cre!"
     internal val exampleHeader =
       """
-          {
-            "typ":"JWT",
-            "alg":"HS256"
-          }
-          """
+      {
+        "typ":"JWT",
+        "alg":"HS256"
+      }
+      """
         .trimIndent()
     internal val examplePayload =
       """
-          {
-            "jti":"96492d59-0ad5-4c00-892d-590ad5ac00f3",
-            "sub":"0123456789",
-            "name":"John Doe",
-            "iat":1681040515
-          }
-          """
+      {
+        "jti":"96492d59-0ad5-4c00-892d-590ad5ac00f3",
+        "sub":"0123456789",
+        "name":"John Doe",
+        "iat":1681040515
+      }
+      """
         .trimIndent()
 
     internal val exampleRsaPrivateKey =
       """
------BEGIN RSA PRIVATE KEY-----
-MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDdadLFj3DqaYtpZ1ik6ejpIIAU
-2KhFqygTvR6SSS9RmcFQu/vojHWzQUhm8aqrGYVkDXCHvEcyBPcZUlWBczcDwQ5YF8VktRpMxfAI
-K/OZRmfrhK9jAZsxOPCCXMOY+JoCbEqEOpsClbHKbgNBgw4AfsISzuWODa47KucIQad202lUZMQ5
-iBQ9CRcSfSis6HyvCMTY5li/9a+O78FfqIGUE4FHeJpsiay2z2AMEzwBPoURkTaSjjOT25e+GY7k
-ntilnVne1ORdOPMnOcd28COex55Z+C4QlOr2UIDaAinTAG/0ozwWxd8OaVJJy3mj3dd3AeD2vBMm
-ycnhrM+sccqHAgMBAAECggEARelztZDg2QuhixMoUM5RDkeGWc69d14fZfgpzowQRmZTvZ/V32x2
-f7bl2yeEucjxrxF1Tk67dkZOFa9DM4BDR0qusk8zM2Th3IsFizcBkIzEJIA9dvgbXjP58VfEJSme
-S5SRBOaSaoME5APPwGBWy/46XoD4x912/dTCpX9Blwl81i7EO8o3NnYhsCWeVoUJTWBzN95OchZF
-ozV4pFgv0tZqTNa7VhJtWHHiKkCpdK7gA9SeVEqEeL1TADAa2ngy3BIRfTgdAct6/4N+ZlVsaIXB
-1Gnw2RaOoUbHy1PCA6ygtH5lz65p0JdWGcO5l+JNeYmOIeOdJ3QWbVI+CikPGQKBgQDv/JrTewDt
-BK5KBpotFsrJeDFKOkC6A8aNeGliAEgJYvCk7zb8RtKCx7ViaYGYWJYj30oYejYEE+vFT7sgzXfE
-JPAEiMw4uKeIrbX8QEIP+R25S8iRr657DkTxOvyhO2oQcC7UkZagvrVyQ17VgjtjxGWbc5bRBk5v
-u1ZV9VMZuQKBgQDsL/PsLCX3YRBB5+0rpWoTKKrmFtGh31oue+d37Nd7oxBzb2uyF4Q29+zoy1on
-EnHNamjjdR95NZoOjEsIIKDTV1C/bsS7be53m0mwKQfecKIXJ+7VN4UsYZXjCajHCr3NFHiIU8ct
-pcKGtg7ga5cERIBtrPAi9Qzi7/o1MxUmPwKBgFuSaMWPZuAJ7DNE56mSy9gqa6xmI/KWpDmxG40Q
-jGxAe5CD0thacdMDPzwJBDFMhCW1+wDyCRBvRYSpkr7GiA+pBIjGZh6ynwKxPgK9xjdwGB5vQ14L
-yikcXcQqfOFM2YDiPYxQ7Ufy3St3d4VCx0SfWSIC7iZeIKnTsvLjxEzJAoGBAKcLFzou0z9N3+Cs
-9pnK6OXZ+ly3QNZ6kF6V9VRlJtXjs0vhPsr7ROBXoq/WutEtg11j6AEPIg5o8adeY+bApN40QADU
-h8GD84eWRZyYuF8DTDCSZqFYHhEQh6DGgR8dIrX7x2+ryRAozxbVhloE3g7/n9Fx4Xjn1ZBfZ5fe
-pBOjAoGAcw2M22BK3NWOHhJ8EC4p6aUIR96lNcCWE/ij+MWCcRdotLDSDuT1q13C+UTxDZ5PsmDs
-N/bhCDRZYZoLYo0/h6v4zKBDaX05nVUTCYux0Fo2HGrj5S0bjmgyRcr8+enA3CTzCHZPWZ7ZeADb
-0Mbtt/Q4JyOCgwORgXJVQBHxxIQ=
------END RSA PRIVATE KEY-----
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDdadLFj3DqaYtpZ1ik6ejpIIAU
+      2KhFqygTvR6SSS9RmcFQu/vojHWzQUhm8aqrGYVkDXCHvEcyBPcZUlWBczcDwQ5YF8VktRpMxfAI
+      K/OZRmfrhK9jAZsxOPCCXMOY+JoCbEqEOpsClbHKbgNBgw4AfsISzuWODa47KucIQad202lUZMQ5
+      iBQ9CRcSfSis6HyvCMTY5li/9a+O78FfqIGUE4FHeJpsiay2z2AMEzwBPoURkTaSjjOT25e+GY7k
+      ntilnVne1ORdOPMnOcd28COex55Z+C4QlOr2UIDaAinTAG/0ozwWxd8OaVJJy3mj3dd3AeD2vBMm
+      ycnhrM+sccqHAgMBAAECggEARelztZDg2QuhixMoUM5RDkeGWc69d14fZfgpzowQRmZTvZ/V32x2
+      f7bl2yeEucjxrxF1Tk67dkZOFa9DM4BDR0qusk8zM2Th3IsFizcBkIzEJIA9dvgbXjP58VfEJSme
+      S5SRBOaSaoME5APPwGBWy/46XoD4x912/dTCpX9Blwl81i7EO8o3NnYhsCWeVoUJTWBzN95OchZF
+      ozV4pFgv0tZqTNa7VhJtWHHiKkCpdK7gA9SeVEqEeL1TADAa2ngy3BIRfTgdAct6/4N+ZlVsaIXB
+      1Gnw2RaOoUbHy1PCA6ygtH5lz65p0JdWGcO5l+JNeYmOIeOdJ3QWbVI+CikPGQKBgQDv/JrTewDt
+      BK5KBpotFsrJeDFKOkC6A8aNeGliAEgJYvCk7zb8RtKCx7ViaYGYWJYj30oYejYEE+vFT7sgzXfE
+      JPAEiMw4uKeIrbX8QEIP+R25S8iRr657DkTxOvyhO2oQcC7UkZagvrVyQ17VgjtjxGWbc5bRBk5v
+      u1ZV9VMZuQKBgQDsL/PsLCX3YRBB5+0rpWoTKKrmFtGh31oue+d37Nd7oxBzb2uyF4Q29+zoy1on
+      EnHNamjjdR95NZoOjEsIIKDTV1C/bsS7be53m0mwKQfecKIXJ+7VN4UsYZXjCajHCr3NFHiIU8ct
+      pcKGtg7ga5cERIBtrPAi9Qzi7/o1MxUmPwKBgFuSaMWPZuAJ7DNE56mSy9gqa6xmI/KWpDmxG40Q
+      jGxAe5CD0thacdMDPzwJBDFMhCW1+wDyCRBvRYSpkr7GiA+pBIjGZh6ynwKxPgK9xjdwGB5vQ14L
+      yikcXcQqfOFM2YDiPYxQ7Ufy3St3d4VCx0SfWSIC7iZeIKnTsvLjxEzJAoGBAKcLFzou0z9N3+Cs
+      9pnK6OXZ+ly3QNZ6kF6V9VRlJtXjs0vhPsr7ROBXoq/WutEtg11j6AEPIg5o8adeY+bApN40QADU
+      h8GD84eWRZyYuF8DTDCSZqFYHhEQh6DGgR8dIrX7x2+ryRAozxbVhloE3g7/n9Fx4Xjn1ZBfZ5fe
+      pBOjAoGAcw2M22BK3NWOHhJ8EC4p6aUIR96lNcCWE/ij+MWCcRdotLDSDuT1q13C+UTxDZ5PsmDs
+      N/bhCDRZYZoLYo0/h6v4zKBDaX05nVUTCYux0Fo2HGrj5S0bjmgyRcr8+enA3CTzCHZPWZ7ZeADb
+      0Mbtt/Q4JyOCgwORgXJVQBHxxIQ=
+      -----END RSA PRIVATE KEY-----
       """
         .trimIndent()
 
     internal val exampleEcPrivateKey =
       """
------BEGIN EC PRIVATE KEY-----
-MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCDQ+B6qEzr/M2sql4X+09X9YlYt8BKA
-HX8Q7/6s4KC3qQ==
------END RSA PRIVATE KEY-----
+      -----BEGIN EC PRIVATE KEY-----
+      MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCDQ+B6qEzr/M2sql4X+09X9YlYt8BKA
+      HX8Q7/6s4KC3qQ==
+      -----END RSA PRIVATE KEY-----
       """
         .trimIndent()
   }

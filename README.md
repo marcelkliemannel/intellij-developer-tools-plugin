@@ -28,6 +28,7 @@ Plugin icon by [Gabriele Malaspina](https://www.svgrepo.com/svg/489187/toolbox).
 - JSON Path Parser
 - JSON Schema Validator
 - Hashing
+- HTTP Server (WireMock)
 - Archive (ZIP, TAR, JAR, 7z, ...) viewer and extractor
 - Date Time Handling (Unix Timestamp, Formatting, ...)
 - Units converters for time, data size and transfer rate

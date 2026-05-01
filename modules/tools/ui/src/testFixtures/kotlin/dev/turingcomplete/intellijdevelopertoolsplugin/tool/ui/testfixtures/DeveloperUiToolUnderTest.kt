@@ -90,20 +90,20 @@ open class DeveloperUiToolUnderTest<T : DeveloperUiTool>(
         "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.ANCf_8p1AE4ZQs7QuqGAyyfTEgYrKSjKWkhBk5cIn1_2QVr2jEjmM-1tu7EgnyOf_fAsvdFXva8Sv05iTGzETg"
       id == "jwt-encoder-decoder" && property.key == "headerText" ->
         """
-          {
-            "alg": "HS512",
-            "typ": "JWT"
-          }
+        {
+          "alg": "HS512",
+          "typ": "JWT"
+        }
         """
           .trimIndent()
       id == "jwt-encoder-decoder" && property.key == "payloadText" ->
         """
-          {
-            "sub": "1234567890",
-            "name": "John Doe",
-            "admin": true,
-            "iat": 1516239022
-          }
+        {
+          "sub": "1234567890",
+          "name": "John Doe",
+          "admin": true,
+          "iat": 1516239022
+        }
         """
           .trimIndent()
 

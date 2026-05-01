@@ -1,3 +1,10 @@
+plugins {
+  java
+  alias(libs.plugins.kotlin.jvm)
+  id("org.jetbrains.intellij.platform.module")
+  alias(libs.plugins.spotless)
+}
+
 dependencies {
   intellijPlatform {
     bundledPlugins("org.jetbrains.kotlin")

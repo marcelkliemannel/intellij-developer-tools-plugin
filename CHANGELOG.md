@@ -11,6 +11,8 @@
 
 ### Changed
 
+- Raise minimum IntelliJ version to 2026.1
+
 ### Removed
 
 ### Fixed
