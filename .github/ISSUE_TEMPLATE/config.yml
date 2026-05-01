@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions or support
+    url: https://github.com/marcelkliemannel/intellij-developer-tools-plugin/discussions
+    about: Please use Discussions for questions, support requests, and general ideas.
