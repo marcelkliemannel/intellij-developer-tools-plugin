@@ -36,6 +36,9 @@ jobs:
         with:
           run: ./gradlew check --stacktrace
 
+      - name: Build and Verify Plugin Structure
+        run: ./gradlew buildPlugin verifyPluginProjectConfiguration verifyPluginStructure --stacktrace
+
       - name: Verify Plugin
         run: ./gradlew verifyPlugin --stacktrace
 
