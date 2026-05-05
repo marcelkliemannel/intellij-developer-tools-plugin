@@ -89,13 +89,13 @@ dependencies {
     pluginVerifier()
     zipSigner()
 
-    pluginModule(implementation(project(":common")))
-    pluginModule(implementation(project(":settings")))
-    pluginModule(implementation(project(":tools-editor")))
-    pluginModule(implementation(project(":tools-ui")))
+    pluginComposedModule(implementation(project(":common")))
+    pluginComposedModule(implementation(project(":settings")))
+    pluginComposedModule(implementation(project(":tools-editor")))
+    pluginComposedModule(implementation(project(":tools-ui")))
     if (platform == "idea") {
-      pluginModule(implementation(project(":java-dependent")))
-      pluginModule(implementation(project(":kotlin-dependent")))
+      pluginComposedModule(implementation(project(":java-dependent")))
+      pluginComposedModule(implementation(project(":kotlin-dependent")))
     }
   }
 
