@@ -6,6 +6,7 @@ import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.util.Disposer
 import java.time.Duration
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -22,6 +23,7 @@ class AsyncTaskExecutor(
 
   private val taskQueue = ConcurrentLinkedQueue<Pair<() -> Unit, Long>>()
   private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+  private val processing = AtomicBoolean(false)
   var isDisposed: Boolean = false
     private set
 
@@ -34,8 +36,8 @@ class AsyncTaskExecutor(
   // -- Exported Methods ---------------------------------------------------- //
 
   override fun dispose() {
-    isDisposed = true
     cancelAll()
+    isDisposed = true
   }
 
   fun replaceTasks(delayMillis: Duration = Duration.ZERO, task: () -> Unit) {
@@ -53,23 +55,33 @@ class AsyncTaskExecutor(
   }
 
   fun cancelAll() {
-    if (isDisposed) {
-      return
-    }
-
     coroutineScope.coroutineContext.cancelChildren()
     taskQueue.clear()
+    processing.set(false)
   }
 
   private fun processQueue() {
+    if (!processing.compareAndSet(false, true)) {
+      return
+    }
+
     coroutineScope.launch {
-      while (true) {
-        val item = taskQueue.poll() ?: break
-        val (task, delayMillis) = item
-        if (delayMillis > 0) {
-          delay(delayMillis)
+      try {
+        while (!isDisposed) {
+          val item = taskQueue.poll() ?: break
+          val (task, delayMillis) = item
+          if (delayMillis > 0) {
+            delay(delayMillis)
+          }
+          if (!isDisposed) {
+            executeTask(task)
+          }
         }
-        executeTask(task)
+      } finally {
+        processing.set(false)
+        if (!isDisposed && taskQueue.isNotEmpty()) {
+          processQueue()
+        }
       }
     }
   }
@@ -80,7 +92,13 @@ class AsyncTaskExecutor(
     when (executionThread) {
       ExecutionThread.POOLED -> withContext(Dispatchers.IO) { task.run() }
       ExecutionThread.EDT ->
-        withContext(Dispatchers.Main) { invokeLater(ModalityState.any()) { task.run() } }
+        withContext(Dispatchers.Main) {
+          invokeLater(ModalityState.any()) {
+            if (!isDisposed) {
+              task.run()
+            }
+          }
+        }
     }
   }
 
