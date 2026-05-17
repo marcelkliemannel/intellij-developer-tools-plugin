@@ -18,6 +18,8 @@
   during extraction.
 - Fixed parsing of advanced HTTP Server command line options so option lines with values are
   correctly tokenized before starting WireMock.
+- Increased the HTTP Server startup grace period to reduce false startup failures on slower
+  environments.
 
 ## 8.0.0 - 2026-05-01
 
