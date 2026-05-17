@@ -185,11 +185,7 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
     try {
       val aClass = IntelliJInternals::class.java.classLoader.loadClass(className)
       val classFilePath =
-        aClass
-          .getResource('/' + aClass.getName().replace('.', '/') + ".class")
-          ?.toURI()
-          ?.path
-          ?.toString()
+        aClass.getResource('/' + aClass.getName().replace('.', '/') + ".class")?.toURI()?.path
       if (classFilePath != null) {
         Messages.showInfoMessage(project, "Class file path: ${classFilePath}.", messageDialogTitle)
       } else {

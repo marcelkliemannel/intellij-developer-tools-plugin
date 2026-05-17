@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.JavaTokenType
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiJavaToken
 import com.intellij.psi.util.elementType
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedText
@@ -23,15 +22,6 @@ object PsiJavaUtils {
     }
 
     return psiFile.findElementAt(editor.caretModel.offset)
-  }
-
-  fun getTextIfStringValueOrIdentifier(psiElement: PsiElement): Pair<String, TextRange>? {
-    return getTextIfStringValue(psiElement)
-      ?: if (psiElement is PsiIdentifier) {
-        psiElement.text to psiElement.textRange
-      } else {
-        null
-      }
   }
 
   fun getTextIfStringValue(psiElement: PsiElement): Pair<String, TextRange>? =

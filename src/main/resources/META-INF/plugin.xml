@@ -93,6 +93,22 @@
             <bundleName>messages.LangBundle</bundleName>
             <categoryKey>intention.category.other</categoryKey>
         </intentionAction>
+        <!--suppress PluginXmlExtensionRegistration (not depending on any language) -->
+        <intentionAction>
+            <className>
+                dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.TextCaseConverterCodeIntentionAction
+            </className>
+            <bundleName>messages.LangBundle</bundleName>
+            <categoryKey>intention.category.other</categoryKey>
+        </intentionAction>
+        <!--suppress PluginXmlExtensionRegistration (not depending on any language) -->
+        <intentionAction>
+            <className>
+                dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.EncodeDecodeCodeIntentionAction
+            </className>
+            <bundleName>messages.LangBundle</bundleName>
+            <categoryKey>intention.category.other</categoryKey>
+        </intentionAction>
 
         <keymapExtension
                 implementation="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.ShowDeveloperUiToolKeymapExtension"/>

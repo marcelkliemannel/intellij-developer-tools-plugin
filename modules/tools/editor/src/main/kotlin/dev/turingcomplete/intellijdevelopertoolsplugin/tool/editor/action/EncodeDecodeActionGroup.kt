@@ -7,7 +7,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.TextRange
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedText
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EditorSourceText.getSelectedTextOrTextAtCaret
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecoders
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecoders.Encoder
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecoders.executeDecodingInEditor
@@ -53,7 +53,7 @@ open class EncodeDecodeActionGroup : DefaultActionGroup("Encoder/Decoder", false
 
   open fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? {
     val editor = e.getData(EDITOR) ?: return null
-    return editor.getSelectedText()
+    return editor.getSelectedTextOrTextAtCaret()
   }
 
   // -- Private Methods ----------------------------------------------------- //
