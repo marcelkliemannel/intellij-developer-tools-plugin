@@ -27,8 +27,13 @@ dependencies {
 
 val generatePluginProperties by
   tasks.registering {
-    inputs.property("pluginId", project.property("pluginId"))
-    inputs.property("pluginVersion", project.property("pluginVersion"))
+    val pluginId = providers.gradleProperty("pluginId")
+    val pluginVersion = providers.gradleProperty("pluginVersion")
+    val pluginName = providers.gradleProperty("pluginName")
+
+    inputs.property("pluginId", pluginId)
+    inputs.property("pluginVersion", pluginVersion)
+    inputs.property("pluginName", pluginName)
 
     val outputDir = layout.buildDirectory.dir("generated-resources")
     outputs.dir(outputDir)
@@ -38,9 +43,9 @@ val generatePluginProperties by
       file.parentFile.mkdirs()
       file.writeText(
         """
-            pluginId=${project.property("pluginId")}
-            pluginVersion=${project.property("pluginVersion")}
-            pluginName=${project.property("pluginName")}
+            pluginId=${pluginId.get()}
+            pluginVersion=${pluginVersion.get()}
+            pluginName=${pluginName.get()}
             """
           .trimIndent()
       )

@@ -3,7 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.action
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedText
@@ -23,7 +23,10 @@ class EditorTextStatisticAction : DumbAwareAction("Show Text Statistic of Docume
   override fun actionPerformed(e: AnActionEvent) {
     val project = e.getData(CommonDataKeys.PROJECT) ?: return
     val editor = e.getData(CommonDataKeys.EDITOR) ?: return
-    val text = runReadAction { editor.getSelectedText()?.first ?: editor.document.text }
+    val text =
+      ReadAction.computeBlocking<String, RuntimeException> {
+        editor.getSelectedText()?.first ?: editor.document.text
+      }
     project
       .service<OpenDeveloperToolService>()
       .openTool(
