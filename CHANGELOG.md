@@ -13,6 +13,7 @@
 
 ### Fixed
 
+- Fixed the "Text Statistic" tool freezing the UI while recalculating statistics for large text.
 - Fixed opening and saving shared editor content from files blocking the UI or failing without a
   clear error message.
 - Fixed live conversions in converter tools blocking the UI while processing text input.
