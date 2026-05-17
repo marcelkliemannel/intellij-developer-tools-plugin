@@ -1,6 +1,7 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Splitter
 import com.intellij.ui.ScrollPaneFactory
@@ -10,6 +11,7 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.Alarm
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextStatisticUtils
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextStatisticUtils.TextStatistic as GatheredTextStatistic
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
@@ -26,6 +28,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.ha
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.TextStatistic.OpenTextStatisticContext
+import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.SortOrder
 import org.apache.commons.text.StringEscapeUtils
 
@@ -61,6 +64,7 @@ class TextStatistic(
   private val uniqueWords = mutableListOf<Pair<String, Int>>()
 
   private val counterAlarm by lazy { Alarm(parentDisposable) }
+  private val counterUpdateId = AtomicInteger()
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
@@ -201,7 +205,20 @@ class TextStatistic(
   }
 
   private fun updateCounter() {
-    with(TextStatisticUtils.gatherStatistic(text.get())) {
+    val updateId = counterUpdateId.incrementAndGet()
+    val textToAnalyze = text.get()
+    ApplicationManager.getApplication().executeOnPooledThread {
+      val statistic = TextStatisticUtils.gatherStatistic(textToAnalyze)
+      ApplicationManager.getApplication().invokeLater {
+        if (updateId == counterUpdateId.get() && !isDisposed) {
+          applyCounterUpdate(statistic)
+        }
+      }
+    }
+  }
+
+  private fun applyCounterUpdate(statistic: GatheredTextStatistic) {
+    with(statistic) {
       charactersCounter.value = charactersCount.toString()
       wordsCounter.value = wordsCount.toString()
       uniqueWordsCounter.value = uniqueWords.size.toString()
@@ -221,6 +238,7 @@ class TextStatistic(
       this@TextStatistic.uniqueCharacters.clear()
       this@TextStatistic.uniqueCharacters.addAll(uniqueCharacters.toList())
     }
+
     metricsTable.reload()
     uniqueWordsTable.reload()
     uniqueCharactersTable.reload()
