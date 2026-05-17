@@ -13,6 +13,8 @@
 
 ### Fixed
 
+- Fixed opening and saving shared editor content from files blocking the UI or failing without a
+  clear error message.
 - Fixed live conversions in converter tools blocking the UI while processing text input.
 - Fixed large editor encode/decode and escape/unescape actions blocking the UI while processing
   selected text.
