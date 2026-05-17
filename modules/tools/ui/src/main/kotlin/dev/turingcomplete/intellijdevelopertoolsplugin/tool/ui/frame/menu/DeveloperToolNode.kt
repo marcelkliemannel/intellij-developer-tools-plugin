@@ -51,6 +51,7 @@ class DeveloperToolNode(
           developerToolId = developerToolId,
           developerToolConfiguration = it.configuration,
         )
+        _developerTools.remove(it)
         Disposer.dispose(developerUiTool)
       }
   }
