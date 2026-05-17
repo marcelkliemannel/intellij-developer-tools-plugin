@@ -6,6 +6,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Splitter
+import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.Panel
@@ -21,6 +22,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AsyncTaskExecutor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AsyncTaskExecutor.Companion.defaultUiInputDelay
+import java.util.concurrent.atomic.AtomicReference
 
 abstract class Converter(
   private val configuration: DeveloperToolConfiguration,
@@ -43,7 +45,7 @@ abstract class Converter(
   protected lateinit var sourceConversionSideHandler: ConversionSideHandler
   protected lateinit var targetConversionSideHandler: ConversionSideHandler
 
-  private val liveConversionExecutor by lazy { AsyncTaskExecutor.onEdt(parentDisposable) }
+  private val liveConversionExecutor by lazy { AsyncTaskExecutor.onPooled(parentDisposable) }
 
   protected open val defaultSourceInputOutputHandlerId: String = "source"
   protected open val defaultTargetInputOutputHandlerId: String = "target"
@@ -69,7 +71,7 @@ abstract class Converter(
       doConvert = { source, target ->
         // Only check visible/enabled components, because there might be
         // validation errors in non-active `InputOutputHandler`s.
-        if (validate(onlyVisibleAndEnabled = true).isNotEmpty()) {
+        if (validateOnEdt(onlyVisibleAndEnabled = true).isNotEmpty()) {
           return@convert
         }
 
@@ -258,6 +260,17 @@ abstract class Converter(
       // make use of its text field error UI to display the `errorHolder`.
       validate()
     }
+  }
+
+  private fun validateOnEdt(onlyVisibleAndEnabled: Boolean): List<ValidationInfo> {
+    val application = ApplicationManager.getApplication()
+    if (application.isDispatchThread) {
+      return validate(onlyVisibleAndEnabled)
+    }
+
+    val result = AtomicReference<List<ValidationInfo>>()
+    application.invokeAndWait { result.set(validate(onlyVisibleAndEnabled)) }
+    return result.get()
   }
 
   protected fun createConversionSideHandler(
