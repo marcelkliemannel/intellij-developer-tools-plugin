@@ -19,6 +19,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Key
+import com.intellij.util.execution.ParametersListUtil
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTabbedPane
@@ -983,6 +984,7 @@ class HttpServer(
       .lineSequence()
       .map { it.trim() }
       .filter { it.isNotEmpty() }
+      .flatMap { ParametersListUtil.parse(it).asSequence() }
       .toList()
 
   private fun currentServerUrl(): String = "http://localhost:${serverPort.get()}"

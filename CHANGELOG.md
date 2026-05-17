@@ -16,6 +16,8 @@
 - Improved archive extraction safety in the "Unarchiver" tool by blocking archive entries that
   escape the selected target directory and by correctly handling duplicate archive entry names
   during extraction.
+- Fixed parsing of advanced HTTP Server command line options so option lines with values are
+  correctly tokenized before starting WireMock.
 
 ## 8.0.0 - 2026-05-01
 
