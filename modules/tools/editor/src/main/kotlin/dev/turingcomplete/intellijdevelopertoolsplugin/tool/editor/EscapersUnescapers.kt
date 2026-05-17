@@ -46,7 +46,7 @@ object EscapersUnescapers {
       ),
       Unescaper(
         EditorToolsBundle.message("escape-unescape.title.html-entities"),
-        { StringEscapeUtils.escapeHtml4(it) },
+        { StringEscapeUtils.unescapeHtml4(it) },
       ),
       Unescaper(
         EditorToolsBundle.message("escape-unescape.title.json-value"),
