@@ -97,19 +97,25 @@ object EncodersDecoders {
     encoder: Encoder,
     editor: Editor,
   ) {
-    try {
-      val result = encoder.encode(text)
-      editor.executeWriteCommand(encoder.actionName) {
-        it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
-      }
-    } catch (e: Exception) {
-      log.warn("Encoding failed", e)
-      ApplicationManager.getApplication().invokeLater {
-        Messages.showErrorDialog(
-          editor.project,
-          EditorToolsBundle.message("encode-decode.error.encoding-failed", e.message ?: ""),
-          encoder.actionName,
-        )
+    ApplicationManager.getApplication().executeOnPooledThread {
+      try {
+        val result = encoder.encode(text)
+        ApplicationManager.getApplication().invokeLater {
+          if (!editor.isDisposed && editor.document.isWritable) {
+            editor.executeWriteCommand(encoder.actionName) {
+              it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+            }
+          }
+        }
+      } catch (e: Exception) {
+        log.warn("Encoding failed", e)
+        ApplicationManager.getApplication().invokeLater {
+          Messages.showErrorDialog(
+            editor.project,
+            EditorToolsBundle.message("encode-decode.error.encoding-failed", e.message ?: ""),
+            encoder.actionName,
+          )
+        }
       }
     }
   }
@@ -120,19 +126,25 @@ object EncodersDecoders {
     decoder: Decoder,
     editor: Editor,
   ) {
-    try {
-      val result = decoder.decode(text)
-      editor.executeWriteCommand(decoder.actionName) {
-        it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
-      }
-    } catch (e: Exception) {
-      log.warn("Decoding failed", e)
-      ApplicationManager.getApplication().invokeLater {
-        Messages.showErrorDialog(
-          editor.project,
-          EditorToolsBundle.message("encode-decode.error.decoding-failed", e.message ?: ""),
-          decoder.actionName,
-        )
+    ApplicationManager.getApplication().executeOnPooledThread {
+      try {
+        val result = decoder.decode(text)
+        ApplicationManager.getApplication().invokeLater {
+          if (!editor.isDisposed && editor.document.isWritable) {
+            editor.executeWriteCommand(decoder.actionName) {
+              it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+            }
+          }
+        }
+      } catch (e: Exception) {
+        log.warn("Decoding failed", e)
+        ApplicationManager.getApplication().invokeLater {
+          Messages.showErrorDialog(
+            editor.project,
+            EditorToolsBundle.message("encode-decode.error.decoding-failed", e.message ?: ""),
+            decoder.actionName,
+          )
+        }
       }
     }
   }
