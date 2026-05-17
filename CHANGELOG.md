@@ -13,6 +13,8 @@
 
 ### Fixed
 
+- Fixed large editor encode/decode and escape/unescape actions blocking the UI while processing
+  selected text.
 - Fixed closed tool workbenches being restored as disposed tabs after the tool UI was rebuilt.
 - Fixed HTML entity unescaping in editor actions and intentions so escaped values are decoded
   instead of escaped again.

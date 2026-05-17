@@ -66,19 +66,25 @@ object EscapersUnescapers {
   // -- Exported Methods ---------------------------------------------------- //
 
   fun executeEscapeInEditor(text: String, textRange: TextRange, escaper: Escaper, editor: Editor) {
-    try {
-      val result = escaper.escape(text)
-      editor.executeWriteCommand(escaper.actionName) {
-        it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
-      }
-    } catch (e: Exception) {
-      log.warn("Escape failed", e)
-      ApplicationManager.getApplication().invokeLater {
-        Messages.showErrorDialog(
-          editor.project,
-          EditorToolsBundle.message("escape-unescape.error.escape-failed", e.message ?: ""),
-          escaper.actionName,
-        )
+    ApplicationManager.getApplication().executeOnPooledThread {
+      try {
+        val result = escaper.escape(text)
+        ApplicationManager.getApplication().invokeLater {
+          if (!editor.isDisposed && editor.document.isWritable) {
+            editor.executeWriteCommand(escaper.actionName) {
+              it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+            }
+          }
+        }
+      } catch (e: Exception) {
+        log.warn("Escape failed", e)
+        ApplicationManager.getApplication().invokeLater {
+          Messages.showErrorDialog(
+            editor.project,
+            EditorToolsBundle.message("escape-unescape.error.escape-failed", e.message ?: ""),
+            escaper.actionName,
+          )
+        }
       }
     }
   }
@@ -89,19 +95,25 @@ object EscapersUnescapers {
     unescaper: Unescaper,
     editor: Editor,
   ) {
-    try {
-      val result = unescaper.unescape(text)
-      editor.executeWriteCommand(unescaper.actionName) {
-        it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
-      }
-    } catch (e: Exception) {
-      log.warn("Unescape failed", e)
-      ApplicationManager.getApplication().invokeLater {
-        Messages.showErrorDialog(
-          editor.project,
-          EditorToolsBundle.message("escape-unescape.error.unescape-failed", e.message ?: ""),
-          unescaper.actionName,
-        )
+    ApplicationManager.getApplication().executeOnPooledThread {
+      try {
+        val result = unescaper.unescape(text)
+        ApplicationManager.getApplication().invokeLater {
+          if (!editor.isDisposed && editor.document.isWritable) {
+            editor.executeWriteCommand(unescaper.actionName) {
+              it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+            }
+          }
+        }
+      } catch (e: Exception) {
+        log.warn("Unescape failed", e)
+        ApplicationManager.getApplication().invokeLater {
+          Messages.showErrorDialog(
+            editor.project,
+            EditorToolsBundle.message("escape-unescape.error.unescape-failed", e.message ?: ""),
+            unescaper.actionName,
+          )
+        }
       }
     }
   }
