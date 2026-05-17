@@ -13,6 +13,8 @@
 
 ### Fixed
 
+- Fixed the HTTP Server tool potentially freezing during disposal and retaining unbounded process
+  output.
 - Fixed the "Text Statistic" tool freezing the UI while recalculating statistics for large text.
 - Fixed opening and saving shared editor content from files blocking the UI or failing without a
   clear error message.

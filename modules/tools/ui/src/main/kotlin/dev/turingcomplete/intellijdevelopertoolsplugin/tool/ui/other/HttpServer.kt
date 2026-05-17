@@ -736,10 +736,16 @@ class HttpServer(
               processOutput.delete(0, processOutput.length - MAX_STARTUP_PROCESS_OUTPUT_LENGTH)
             }
           }
-          outputEditor.appendText(outputChunk)
+          appendProcessOutput(outputChunk)
         }
       }
     )
+  }
+
+  private fun appendProcessOutput(outputChunk: String) {
+    synchronized(outputEditor) {
+      outputEditor.text = (outputEditor.text + outputChunk).takeLast(MAX_PROCESS_OUTPUT_LENGTH)
+    }
   }
 
   private fun watchWireMockProcess(processHandler: KillableProcessHandler) {
@@ -1007,8 +1013,10 @@ class HttpServer(
 
   override fun doDispose() {
     currentWireMockProcess()?.let { process ->
-      runCatching { stopWireMockProcess(process) }
-        .onFailure { error -> log.warn("Failed to dispose running WireMock process", error) }
+      ApplicationManager.getApplication().executeOnPooledThread {
+        runCatching { stopWireMockProcess(process) }
+          .onFailure { error -> log.warn("Failed to dispose running WireMock process", error) }
+      }
     }
   }
 
@@ -1064,6 +1072,7 @@ class HttpServer(
     private const val STARTUP_TIMEOUT_MILLISECONDS = 10_000L
     private const val STOP_TIMEOUT_MILLISECONDS = 5_000L
     private const val MAX_STARTUP_PROCESS_OUTPUT_LENGTH = 8_000
+    private const val MAX_PROCESS_OUTPUT_LENGTH = 100_000
     private const val DEFAULT_ADVANCED_COMMAND_LINE_OPTIONS = "--disable-banner"
     private val processEventTimestampFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
     internal val httpServerToolRootPath: Path =
