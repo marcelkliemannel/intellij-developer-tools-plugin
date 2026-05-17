@@ -19,6 +19,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 
 class TextDiffViewer(
   configuration: DeveloperToolConfiguration,
@@ -83,7 +84,10 @@ class TextDiffViewer(
   class Factory : DeveloperUiToolFactory<TextDiffViewer> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Text Diff", contentTitle = "Text Diff Viewer")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("text-diff-viewer.menu-title"),
+        contentTitle = UiToolsBundle.message("text-diff-viewer.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

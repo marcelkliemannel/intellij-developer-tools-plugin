@@ -11,6 +11,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 
 class Notes(
   private val context: DeveloperUiToolContext,
@@ -51,7 +52,10 @@ class Notes(
   class Factory : DeveloperUiToolFactory<Notes> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Notes", contentTitle = "Notes")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("notes.menu-title"),
+        contentTitle = UiToolsBundle.message("notes.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

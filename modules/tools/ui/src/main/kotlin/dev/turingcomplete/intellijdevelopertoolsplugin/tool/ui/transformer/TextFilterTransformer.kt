@@ -23,6 +23,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.Rege
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex.SelectRegexOptionsAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 
 class TextFilterTransformer(
   context: DeveloperUiToolContext,
@@ -35,10 +36,10 @@ class TextFilterTransformer(
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
-    title = "Text Filtering",
-    sourceTitle = "Unfiltered",
-    targetTitle = "Filtered",
-    toTargetTitle = "Filter",
+    title = UiToolsBundle.message("text-filter-transformer.title"),
+    sourceTitle = UiToolsBundle.message("text-filter-transformer.source-title"),
+    targetTitle = UiToolsBundle.message("text-filter-transformer.target-title"),
+    toTargetTitle = UiToolsBundle.message("text-filter-transformer.filter"),
   ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -71,7 +72,11 @@ class TextFilterTransformer(
   }
 
   override fun Panel.buildSourceBottomConfigurationUi() {
-    row { comboBox(TokenMode.entries).label("Filter:").bindItem(tokenMode) }
+    row {
+        comboBox(TokenMode.entries)
+          .label(UiToolsBundle.message("text-filter-transformer.filter-label"))
+          .bindItem(tokenMode)
+      }
       .layout(RowLayout.PARENT_GRID)
       .topGap(TopGap.NONE)
       .bottomGap(BottomGap.NONE)
@@ -80,7 +85,7 @@ class TextFilterTransformer(
       row {
           cell()
           val containingFilteringModeRadioButton =
-            radioButton("Containing:")
+            radioButton(UiToolsBundle.message("text-filter-transformer.containing"))
               .bind(filteringMode, FilteringMode.CONTAINING)
               .gap(RightGap.SMALL)
           expandableTextField()
@@ -95,7 +100,7 @@ class TextFilterTransformer(
       row {
           cell()
           val containingFilteringModeRadioButton =
-            radioButton("Not containing:")
+            radioButton(UiToolsBundle.message("text-filter-transformer.not-containing"))
               .bind(filteringMode, FilteringMode.NOT_CONTAINING)
               .gap(RightGap.SMALL)
           expandableTextField()
@@ -110,7 +115,7 @@ class TextFilterTransformer(
 
       row {
           cell()
-          radioButton("Matching regular expression:")
+          radioButton(UiToolsBundle.message("text-filter-transformer.matching-regular-expression"))
             .bind(filteringMode, FilteringMode.REGEX)
             .gap(RightGap.SMALL)
           cell(RegexTextField(project, parentDisposable, filteringRegexModeText))
@@ -185,8 +190,8 @@ class TextFilterTransformer(
 
   private enum class TokenMode(val pluralTitle: String) {
 
-    WORD("Words"),
-    LINE("Lines");
+    WORD(UiToolsBundle.message("text-filter-transformer.token-mode.words")),
+    LINE(UiToolsBundle.message("text-filter-transformer.token-mode.lines"));
 
     override fun toString(): String = pluralTitle
   }
@@ -205,7 +210,10 @@ class TextFilterTransformer(
   class Factory : DeveloperUiToolFactory<TextFilterTransformer> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Text Filter", contentTitle = "Text Filter")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("text-filter-transformer.menu-title"),
+        contentTitle = UiToolsBundle.message("text-filter-transformer.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

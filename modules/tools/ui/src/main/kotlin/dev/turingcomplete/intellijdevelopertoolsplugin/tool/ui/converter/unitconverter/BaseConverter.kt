@@ -16,6 +16,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.not
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.CONFIGURATION
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.math.BigInteger
 
 class BaseConverter(configuration: DeveloperToolConfiguration, parentDisposable: Disposable) :
@@ -67,8 +68,11 @@ class BaseConverter(configuration: DeveloperToolConfiguration, parentDisposable:
   }
 
   override fun Panel.buildSettingsUi() {
-    collapsibleGroup("Settings") {
-        row { checkBox("Show only common bases").bindSelected(showOnlyCommonBases) }
+    collapsibleGroup(UiToolsBundle.message("units-converter.settings")) {
+        row {
+          checkBox(UiToolsBundle.message("units-converter.show-only-common-bases"))
+            .bindSelected(showOnlyCommonBases)
+        }
       }
       .topGap(TopGap.NONE)
   }
@@ -102,10 +106,10 @@ class BaseConverter(configuration: DeveloperToolConfiguration, parentDisposable:
         }
         try {
           this@validate.component.text.parse(base)
-            ?: return@validationInfo error("Please enter a number")
+            ?: return@validationInfo error(UiToolsBundle.message("units-converter.enter-number"))
           return@validationInfo null
         } catch (_: Exception) {
-          return@validationInfo error("Please enter a valid number")
+          return@validationInfo error(UiToolsBundle.message("units-converter.enter-valid-number"))
         }
       }
     }

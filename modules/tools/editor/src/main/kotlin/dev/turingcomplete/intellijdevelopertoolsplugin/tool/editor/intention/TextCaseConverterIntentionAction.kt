@@ -13,6 +13,7 @@ import com.intellij.psi.PsiFile
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.executeWriteCommand
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils.allTextCases
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 import dev.turingcomplete.textcaseconverter.TextCase
 
 abstract class TextCaseConverterIntentionAction : IntentionAction, LowPriorityAction {
@@ -51,14 +52,23 @@ abstract class TextCaseConverterIntentionAction : IntentionAction, LowPriorityAc
     private val editor: Editor,
     private val text: String,
     private val textRange: TextRange,
-  ) : BaseListPopupStep<TextCase>("Select Target Text Case", allTextCases) {
+  ) :
+    BaseListPopupStep<TextCase>(
+      EditorToolsBundle.message("text-case-converter.popup.select-target-text-case"),
+      allTextCases,
+    ) {
 
     override fun getTextFor(textCase: TextCase): String = textCase.example()
 
     override fun onChosen(textCase: TextCase, finalChoice: Boolean): PopupStep<*>? {
       val wordsSplitter = TextCaseUtils.determineWordsSplitter(text, textCase)
       val result = textCase.convert(text, wordsSplitter)
-      editor.executeWriteCommand("Convert text case to ${textCase.title().lowercase()}") {
+      editor.executeWriteCommand(
+        EditorToolsBundle.message(
+          "text-case-converter.action.convert-to",
+          textCase.title().lowercase(),
+        )
+      ) {
         it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
       }
 

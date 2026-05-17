@@ -12,9 +12,11 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.execut
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils.allTextCases
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils.determineWordsSplitter
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EditorSourceText.getSelectedTextOrTextAtCaret
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 import dev.turingcomplete.textcaseconverter.TextCase
 
-open class TextCaseConverterActionGroup : DefaultActionGroup("Convert Text Case To", true) {
+open class TextCaseConverterActionGroup :
+  DefaultActionGroup(EditorToolsBundle.message("text-case-converter-action-group.title"), true) {
   // -- Properties ---------------------------------------------------------- //
 
   private val textCasesAction: Array<AnAction> =
@@ -60,7 +62,12 @@ open class TextCaseConverterActionGroup : DefaultActionGroup("Convert Text Case 
     ) {
       val wordsSplitter = determineWordsSplitter(text, textCase)
       val result = textCase.convert(text, wordsSplitter)
-      editor.executeWriteCommand("Convert text case to ${textCase.title().lowercase()}") {
+      editor.executeWriteCommand(
+        EditorToolsBundle.message(
+          "text-case-converter.action.convert-to",
+          textCase.title().lowercase(),
+        )
+      ) {
         it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
       }
     }

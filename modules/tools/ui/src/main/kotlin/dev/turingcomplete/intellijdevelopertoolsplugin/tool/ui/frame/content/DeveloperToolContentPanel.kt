@@ -30,6 +30,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.ha
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.DeveloperToolNode
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.DeveloperToolNode.DeveloperToolContainer
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.GeneralBundle
 import javax.swing.Icon
 import javax.swing.JComponent
 import kotlin.reflect.cast
@@ -92,7 +93,7 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
 
             val actions =
               mutableListOf(
-                dumbAwareAction("Reset") {
+                dumbAwareAction(GeneralBundle.message("developer-tool-content-panel.reset")) {
                   selectedDeveloperToolInstance.get().apply {
                     configuration.reset()
                     instance.reset()
@@ -102,7 +103,11 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
               )
             developerToolNode.developerUiToolPresentation.description?.let { description ->
               actions.add(
-                dumbAwareAction("Show Tool Description") { description.show(titleComponent) }
+                dumbAwareAction(
+                  GeneralBundle.message("developer-tool-content-panel.show-tool-description")
+                ) {
+                  description.show(titleComponent)
+                }
               )
             }
             actionsButton(actions = actions.toTypedArray(), icon = AllIcons.General.GearPlain)
@@ -170,7 +175,12 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
   }
 
   private fun createRenameWorkbenchAction() =
-    object : DumbAwareAction("Rename", null, AllIcons.Actions.Edit) {
+    object :
+      DumbAwareAction(
+        GeneralBundle.message("developer-tool-content-panel.rename"),
+        null,
+        AllIcons.Actions.Edit,
+      ) {
 
       override fun actionPerformed(e: AnActionEvent) {
         val (_, developerToolConfiguration) = selectedDeveloperToolInstance.get()
@@ -178,8 +188,8 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
         val inputDialog =
           InputDialog(
             developerToolNode.project,
-            "New name:",
-            "Rename",
+            GeneralBundle.message("developer-tool-content-panel.new-name"),
+            GeneralBundle.message("developer-tool-content-panel.rename"),
             null,
             developerToolConfiguration.name,
             NotBlankInputValidator(),
@@ -205,7 +215,12 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
     )
 
   private fun createNewWorkbenchAction() =
-    object : DumbAwareAction("New Workbench", null, AllIcons.General.Add) {
+    object :
+      DumbAwareAction(
+        GeneralBundle.message("developer-tool-content-panel.new-workbench"),
+        null,
+        AllIcons.General.Add,
+      ) {
 
       override fun actionPerformed(e: AnActionEvent) {
         addWorkbench(developerToolNode.createNewDeveloperToolInstance())
@@ -220,7 +235,7 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
   private class DestroyWorkbenchAction(
     private val removeTab: () -> Unit,
     private val visible: () -> Boolean,
-  ) : DumbAwareAction("Close Workbench") {
+  ) : DumbAwareAction(GeneralBundle.message("developer-tool-content-panel.close-workbench")) {
 
     override fun update(e: AnActionEvent) {
       e.presentation.apply {

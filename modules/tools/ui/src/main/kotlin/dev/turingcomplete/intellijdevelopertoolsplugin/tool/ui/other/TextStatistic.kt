@@ -24,6 +24,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.applyDefau
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolReference
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.TextStatistic.OpenTextStatisticContext
 import javax.swing.SortOrder
 import org.apache.commons.text.StringEscapeUtils
@@ -95,7 +96,7 @@ class TextStatistic(
         context = context,
         configuration = configuration,
         project = project,
-        title = "Text",
+        title = UiToolsBundle.message("text-statistic.text"),
         editorMode = EditorMode.INPUT,
         parentDisposable = parentDisposable,
         textProperty = text,
@@ -238,7 +239,10 @@ class TextStatistic(
   class Factory : DeveloperUiToolFactory<TextStatistic> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Text Statistic", contentTitle = "Text Statistic")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("text-statistic.menu-title"),
+        contentTitle = UiToolsBundle.message("text-statistic.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

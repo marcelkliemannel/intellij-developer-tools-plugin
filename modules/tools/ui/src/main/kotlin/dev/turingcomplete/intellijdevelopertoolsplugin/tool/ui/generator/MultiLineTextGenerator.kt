@@ -9,6 +9,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.GeneralBundle
 
 abstract class MultiLineTextGenerator(
   private val generatedTextTitle: String,
@@ -27,7 +28,7 @@ abstract class MultiLineTextGenerator(
   final override fun Panel.buildUi() {
     buildConfigurationUi()
 
-    row { button("Regenerate") { doGenerate() } }
+    row { button(GeneralBundle.message("generator.regenerate")) { doGenerate() } }
 
     row { cell(generatedTextEditor.component).align(Align.FILL) }.resizableRow()
   }

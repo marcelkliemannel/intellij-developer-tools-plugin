@@ -28,6 +28,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.BooleanCom
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.CopyAction.Companion.CONTENT_DATA_KEY
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.monospaceFont
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.GeneralBundle
 import java.awt.Font
 
 abstract class OneLineTextGenerator(
@@ -111,7 +112,7 @@ abstract class OneLineTextGenerator(
   }
 
   private fun Panel.buildBulkGenerationUi() {
-    collapsibleGroup("Bulk Generation", false) {
+    collapsibleGroup(GeneralBundle.message("one-line-text-generator.bulk-generation"), false) {
         val resultEditor =
           AdvancedEditor(
             id = "bulk-generation",
@@ -124,7 +125,8 @@ abstract class OneLineTextGenerator(
           )
 
         row {
-          label("Number of values:").gap(RightGap.SMALL)
+          label(GeneralBundle.message("one-line-text-generator.number-of-values"))
+            .gap(RightGap.SMALL)
 
           val numberOfValuesTextField =
             intTextField(IntRange(1, 99999))
@@ -132,7 +134,7 @@ abstract class OneLineTextGenerator(
               .applyToComponent { text = DEFAULT_NUMBER_OF_VALUES }
               .gap(RightGap.SMALL)
 
-          button("Generate") {
+          button(GeneralBundle.message("one-line-text-generator.generate")) {
             configuration
             if (validate().isEmpty()) {
               resultEditor.text =
@@ -164,7 +166,7 @@ abstract class OneLineTextGenerator(
       .visibleIf(invalidConfiguration.not())
     row {
         icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
-        label("Invalid configuration").bold()
+        label(GeneralBundle.message("one-line-text-generator.invalid-configuration")).bold()
       }
       .visibleIf(invalidConfiguration)
   }
@@ -172,7 +174,7 @@ abstract class OneLineTextGenerator(
   // -- Inner Type ---------------------------------------------------------- //
 
   private class RegenerateAction(private val generateContent: () -> Unit) :
-    DumbAwareAction("Regenerate", null, AllIcons.Actions.Refresh) {
+    DumbAwareAction(GeneralBundle.message("generator.regenerate"), null, AllIcons.Actions.Refresh) {
 
     override fun actionPerformed(e: AnActionEvent) {
       generateContent()

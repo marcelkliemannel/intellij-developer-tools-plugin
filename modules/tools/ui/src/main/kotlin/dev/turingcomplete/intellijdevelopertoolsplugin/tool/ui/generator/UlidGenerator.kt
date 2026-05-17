@@ -27,6 +27,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.CopyAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindLongTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateLongValue
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.time.format.DateTimeFormatter
 
 class UlidGenerator(
@@ -65,18 +66,27 @@ class UlidGenerator(
   // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildConfigurationUi() {
-    row { comboBox(UlidFormat.entries).label("Format:").bindItem(ulidFormat) }
     row {
-      checkBox("Monotonic").bindSelected(generateMonotonicUlid).gap(RightGap.SMALL)
-      contextHelp(
-        "If selected, the random component is incremented for each new ULID generated in the same millisecond. Otherwise, the random component is reset for each new ULID generated."
-      )
+      comboBox(UlidFormat.entries)
+        .label(UiToolsBundle.message("ulid-generator.format"))
+        .bindItem(ulidFormat)
+    }
+    row {
+      checkBox(UiToolsBundle.message("ulid-generator.monotonic"))
+        .bindSelected(generateMonotonicUlid)
+        .gap(RightGap.SMALL)
+      contextHelp(UiToolsBundle.message("ulid-generator.monotonic-help"))
     }
 
     buttonsGroup {
-      row { radioButton("Use current Unix timestamp").bindSelected(useIndividualTime.not()) }
       row {
-        radioButton("Use individual timestamp:").bindSelected(useIndividualTime).gap(RightGap.SMALL)
+        radioButton(UiToolsBundle.message("ulid-generator.use-current-unix-timestamp"))
+          .bindSelected(useIndividualTime.not())
+      }
+      row {
+        radioButton(UiToolsBundle.message("ulid-generator.use-individual-timestamp"))
+          .bindSelected(useIndividualTime)
+          .gap(RightGap.SMALL)
         textField()
           .validateLongValue(LongRange(0, Long.MAX_VALUE))
           .gap(RightGap.SMALL)
@@ -88,22 +98,27 @@ class UlidGenerator(
   }
 
   override fun Panel.buildAdditionalUi() {
-    group("Parse ULID") {
+    group(UiToolsBundle.message("ulid-generator.parse.title")) {
       row {
         expandableTextField()
           .bindText(parseUlidInput)
           .validationOnInput {
-            if (!Ulid.isValid(it.text)) ValidationInfo("Invalid ULID") else null
+            if (!Ulid.isValid(it.text)) {
+              ValidationInfo(UiToolsBundle.message("ulid-generator.parse.invalid"))
+            } else null
           }
           .align(Align.FILL)
       }
       row {
-        label("").label("Timestamp:").bindText(parsedUlIdTimestamp).gap(RightGap.SMALL)
+        label("")
+          .label(UiToolsBundle.message("ulid-generator.parse.timestamp"))
+          .bindText(parsedUlIdTimestamp)
+          .gap(RightGap.SMALL)
         actionButton(CopyAction(parsedUlIdTimestampDataKey), UlidGenerator::class.java.name)
       }
       row {
           comboBox(UlidFormat.entries.filter { it != UlidFormat.NONE })
-            .label("Transform to:")
+            .label(UiToolsBundle.message("ulid-generator.parse.transform-to"))
             .bindItem(parseUlidTransformFormat)
         }
         .bottomGap(BottomGap.NONE)
@@ -163,10 +178,13 @@ class UlidGenerator(
 
   private enum class UlidFormat(val title: String, val format: (Ulid) -> String) {
 
-    NONE("None", { it.toString() }),
-    TO_LOWERCASE("Lowercase", { it.toLowerCase() }),
-    UUID("UUID", { it.toUuid().toString() }),
-    RFC_4122_UUID("RFC-4122 UUIDv4", { it.toRfc4122().toUuid().toString() });
+    NONE(UiToolsBundle.message("ulid-generator.format.none"), { it.toString() }),
+    TO_LOWERCASE(UiToolsBundle.message("ulid-generator.format.lowercase"), { it.toLowerCase() }),
+    UUID(UiToolsBundle.message("ulid-generator.format.uuid"), { it.toUuid().toString() }),
+    RFC_4122_UUID(
+      UiToolsBundle.message("ulid-generator.format.rfc-4122-uuid-v4"),
+      { it.toRfc4122().toUuid().toString() },
+    );
 
     override fun toString(): String = title
   }
@@ -176,7 +194,10 @@ class UlidGenerator(
   class Factory : DeveloperUiToolFactory<UlidGenerator> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "ULID", contentTitle = "ULID Generator")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("ulid-generator.menu-title"),
+        contentTitle = UiToolsBundle.message("ulid-generator.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

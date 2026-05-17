@@ -44,6 +44,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.copyable
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import javax.swing.JComponent
 import org.intellij.lang.annotations.Language
 
@@ -56,9 +57,9 @@ class JsonPathTransformer(
   TextTransformer(
     textTransformerContext =
       TextTransformerContext(
-        transformActionTitle = "Execute Query",
-        sourceTitle = "Original",
-        resultTitle = "Result",
+        transformActionTitle = UiToolsBundle.message("json-path-transformer.execute-query"),
+        sourceTitle = UiToolsBundle.message("json-path-transformer.source-title"),
+        resultTitle = UiToolsBundle.message("json-path-transformer.result-title"),
         initialSourceExampleText = EXAMPLE_SOURCE,
         inputInitialLanguage = JsonLanguage.INSTANCE,
         outputInitialLanguage = JsonLanguage.INSTANCE,
@@ -81,7 +82,7 @@ class JsonPathTransformer(
     row {
       expandableTextField()
         .bindText(queryText)
-        .label("JSON path:", LabelPosition.TOP)
+        .label(UiToolsBundle.message("json-path-transformer.json-path"), LabelPosition.TOP)
         .validationOnApply(errorHolder.asValidation())
         .validationRequestor(DUMMY_DIALOG_VALIDATION_REQUESTOR)
         .align(Align.FILL)
@@ -94,9 +95,9 @@ class JsonPathTransformer(
   }
 
   override fun Row.buildAdditionalActionsUi() {
-    checkBox("Format result").bindSelected(formatResult).whenStateChangedFromUi {
-      configurationChanged(queryText)
-    }
+    checkBox(UiToolsBundle.message("json-path-transformer.format-result"))
+      .bindSelected(formatResult)
+      .whenStateChangedFromUi { configurationChanged(queryText) }
   }
 
   override fun transform() {
@@ -144,7 +145,10 @@ class JsonPathTransformer(
   class Factory : DeveloperUiToolFactory<JsonPathTransformer> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "JSON Path", contentTitle = "JSON Path Transformer")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("json-path-transformer.menu-title"),
+        contentTitle = UiToolsBundle.message("json-path-transformer.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
@@ -164,7 +168,12 @@ class JsonPathTransformer(
   // -- Inner Type ---------------------------------------------------------- //
 
   private class ShowOperatorsHelpPopup(val helpButton: () -> JComponent) :
-    DumbAwareAction("Operators Help", null, AllIcons.General.ContextHelp), PopupAction {
+    DumbAwareAction(
+      UiToolsBundle.message("json-path-transformer.operators-help"),
+      null,
+      AllIcons.General.ContextHelp,
+    ),
+    PopupAction {
 
     override fun actionPerformed(e: AnActionEvent) {
       JBPopupFactory.getInstance()

@@ -29,6 +29,7 @@ import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.GeneralBundle
 import java.awt.Color
 import java.awt.Font
 import java.awt.event.InputEvent
@@ -176,11 +177,15 @@ fun <T : JTextField> Cell<T>.validateMinMaxValueRelation(
       it.text?.toIntOrNull()?.let { thisValue ->
         when {
           side == ValidateMinIntValueSide.MIN && thisValue > getOppositeValue() -> {
-            ValidationInfo("Minimum must be smaller than or equal to maximum")
+            ValidationInfo(
+              GeneralBundle.message("validation.minimum-must-be-smaller-than-or-equal-to-maximum")
+            )
           }
 
           side == ValidateMinIntValueSide.MAX && thisValue < getOppositeValue() ->
-            ValidationInfo("Maximum must be larger than or equal to minimum")
+            ValidationInfo(
+              GeneralBundle.message("validation.maximum-must-be-larger-than-or-equal-to-minimum")
+            )
 
           else -> null
         }

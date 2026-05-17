@@ -12,6 +12,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.awt.Image.SCALE_SMOOTH
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
@@ -23,21 +24,7 @@ class RubberDuck(parentDisposable: Disposable) : DeveloperUiTool(parentDisposabl
   // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildUi() {
-    row {
-      cell(
-        JBLabel(
-          """
-          |<html>
-          |             Rubber duck debugging is a problem-solving technique where a programmer explains their code line by 
-          |             line to a rubber duck or any other inanimate object. The act of explaining the code helps 
-          |             the programmer to identify errors and logic mistakes in their code. This technique is widely 
-          |             used in software development to improve code quality and debugging efficiency.
-          |            </html>
-          """
-            .trimMargin()
-        )
-      )
-    }
+    row { cell(JBLabel(UiToolsBundle.message("rubber-duck.description"))) }
 
     row {
         cell(
@@ -60,11 +47,7 @@ class RubberDuck(parentDisposable: Disposable) : DeveloperUiTool(parentDisposabl
       .resizableRow()
 
     row {
-      comment(
-        "Image by <a href='https://www.pexels.com/photo/yellow-duck-toy-beside-green-duck-toy-132464/'>Anthony</a>"
-      ) {
-        BrowserUtil.browse(it.url)
-      }
+      comment(UiToolsBundle.message("rubber-duck.image-attribution")) { BrowserUtil.browse(it.url) }
     }
   }
 
@@ -74,7 +57,10 @@ class RubberDuck(parentDisposable: Disposable) : DeveloperUiTool(parentDisposabl
   class Factory : DeveloperUiToolFactory<RubberDuck> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Rubber Duck", contentTitle = "Rubber Duck Debugging")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("rubber-duck.menu-title"),
+        contentTitle = UiToolsBundle.message("rubber-duck.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

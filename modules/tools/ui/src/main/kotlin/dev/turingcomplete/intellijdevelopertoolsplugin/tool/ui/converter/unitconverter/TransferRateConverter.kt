@@ -21,6 +21,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitcon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.NumberSystem
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.bitDataUnit
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.dataUnits
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.math.BigDecimal
 import java.math.BigDecimal.ONE
 import java.math.BigDecimal.ZERO
@@ -115,12 +116,12 @@ class TransferRateConverter(
   @Suppress("UnstableApiUsage")
   override fun Panel.buildAdditionalSettingsUi() {
     row {
-      checkBox("Show large data units").bindSelected(showLargeDataUnits).whenStateChangedFromUi {
-        sync()
-      }
+      checkBox(UiToolsBundle.message("units-converter.show-large-data-units"))
+        .bindSelected(showLargeDataUnits)
+        .whenStateChangedFromUi { sync() }
     }
     row {
-      checkBox("Use combined abbreviation notation")
+      checkBox(UiToolsBundle.message("units-converter.use-combined-abbreviation-notation"))
         .bindSelected(useCombinedAbbreviationNotation)
         .whenStateChangedFromUi { sync() }
     }
@@ -203,10 +204,30 @@ class TransferRateConverter(
     val seconds: BigDecimal,
   ) {
 
-    SECONDS("Seconds", "sec.", "s", ONE),
-    MINUTES("Minutes", "min.", "m", TimeUnit.MINUTES.toSeconds(1).toBigDecimal()),
-    HOURS("Hours", "hours", "h", TimeUnit.HOURS.toSeconds(1).toBigDecimal()),
-    DAYS("Days", "days", "d", TimeUnit.DAYS.toSeconds(1).toBigDecimal()),
+    SECONDS(
+      UiToolsBundle.message("units-converter.time-dimension.seconds"),
+      UiToolsBundle.message("units-converter.time-dimension.seconds.short"),
+      "s",
+      ONE,
+    ),
+    MINUTES(
+      UiToolsBundle.message("units-converter.time-dimension.minutes"),
+      UiToolsBundle.message("units-converter.time-dimension.minutes.short"),
+      "m",
+      TimeUnit.MINUTES.toSeconds(1).toBigDecimal(),
+    ),
+    HOURS(
+      UiToolsBundle.message("units-converter.time-dimension.hours"),
+      UiToolsBundle.message("units-converter.time-dimension.hours.short"),
+      "h",
+      TimeUnit.HOURS.toSeconds(1).toBigDecimal(),
+    ),
+    DAYS(
+      UiToolsBundle.message("units-converter.time-dimension.days"),
+      UiToolsBundle.message("units-converter.time-dimension.days.short"),
+      "d",
+      TimeUnit.DAYS.toSeconds(1).toBigDecimal(),
+    ),
   }
 
   // -- Inner Type ---------------------------------------------------------- //

@@ -1,5 +1,6 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.regex
 
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.GeneralBundle
 import java.util.regex.Pattern
 
 enum class RegexOption(val patternFlag: Int, val title: String, val description: String? = null) {
@@ -7,43 +8,43 @@ enum class RegexOption(val patternFlag: Int, val title: String, val description:
 
   CASE_INSENSITIVE(
     Pattern.CASE_INSENSITIVE,
-    "Case-insensitive",
-    "Case-insensitive matching will use characters for the US-ASCII charset for matching.",
+    GeneralBundle.message("regex-options.case-insensitive.title"),
+    GeneralBundle.message("regex-options.case-insensitive.description"),
   ),
   UNICODE_CASE(
     Pattern.UNICODE_CASE,
-    "Unicode-aware",
-    "The <code>case insensitive</code> option will use the Unicode standard.",
+    GeneralBundle.message("regex-options.unicode-case.title"),
+    GeneralBundle.message("regex-options.unicode-case.description"),
   ),
   MULTILINE(
     Pattern.MULTILINE,
-    "Multiline",
-    "The expressions <code>^</code> and <code>\$</code> match just after or just before, respectively, a line terminator or the end of the input sequence.",
+    GeneralBundle.message("regex-options.multiline.title"),
+    GeneralBundle.message("regex-options.multiline.description"),
   ),
   DOTALL(
     Pattern.DOTALL,
-    "Dotall",
-    "The expression <code>.</code> will also match line terminators.",
+    GeneralBundle.message("regex-options.dotall.title"),
+    GeneralBundle.message("regex-options.dotall.description"),
   ),
   CANON_EQ(
     Pattern.CANON_EQ,
-    "Canonical equivalence",
-    "Two characters will be considered to match if, and only if, their full canonical decompositions match.",
+    GeneralBundle.message("regex-options.canon-eq.title"),
+    GeneralBundle.message("regex-options.canon-eq.description"),
   ),
   UNIX_LINES(
     Pattern.UNIX_LINES,
-    "Unix line endings",
-    "Only the <code>\\n</code> line terminator is recognized in the behavior of <code>.</code>, <code>^</code>, and <code>\$</code>.",
+    GeneralBundle.message("regex-options.unix-lines.title"),
+    GeneralBundle.message("regex-options.unix-lines.description"),
   ),
   LITERAL(
     Pattern.LITERAL,
-    "Literal parsing of the pattern",
-    "The input string that specifies the pattern will be treated as a sequence of literal characters.",
+    GeneralBundle.message("regex-options.literal.title"),
+    GeneralBundle.message("regex-options.literal.description"),
   ),
   COMMENTS(
     Pattern.COMMENTS,
-    "Permit whitespace and comments in pattern",
-    "Whitespace will be ignored, and embedded comments starting with <code>#</code> are ignored until the end of a line.",
+    GeneralBundle.message("regex-options.comments.title"),
+    GeneralBundle.message("regex-options.comments.description"),
   );
 
   // -- Properties ---------------------------------------------------------- //

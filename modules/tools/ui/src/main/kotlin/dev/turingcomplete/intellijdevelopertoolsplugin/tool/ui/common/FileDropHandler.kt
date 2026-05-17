@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.EditorDropHandler
 import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.GeneralBundle
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.DropTargetDragEvent
@@ -75,7 +76,11 @@ class FileDropHandler(private val project: Project?, private val openFile: (Path
           return true
         }
     } catch (e: Exception) {
-      Messages.showErrorDialog(project, "Failed to handle dropped file: ${e.message}.", "Open File")
+      Messages.showErrorDialog(
+        project,
+        GeneralBundle.message("file-drop-handler.failed-to-handle-dropped-file", e.message ?: ""),
+        GeneralBundle.message("file-drop-handler.open-file"),
+      )
     }
     return false
   }

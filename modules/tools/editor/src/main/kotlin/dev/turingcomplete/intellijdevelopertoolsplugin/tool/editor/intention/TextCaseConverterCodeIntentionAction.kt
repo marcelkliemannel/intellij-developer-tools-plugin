@@ -4,15 +4,17 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EditorSourceText.getSelectedTextOrTextAtCaret
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 
 class TextCaseConverterCodeIntentionAction : TextCaseConverterIntentionAction() {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
-  override fun getFamilyName(): String = "Convert text case of selected text or identifier"
+  override fun getFamilyName(): String =
+    EditorToolsBundle.message("intention.text-case-converter.family-name")
 
-  override fun getText(): String = "Convert text case"
+  override fun getText(): String = EditorToolsBundle.message("intention.text-case-converter.text")
 
   override fun getSourceText(editor: Editor, file: PsiFile): Pair<String, TextRange>? =
     editor.getSelectedTextOrTextAtCaret()

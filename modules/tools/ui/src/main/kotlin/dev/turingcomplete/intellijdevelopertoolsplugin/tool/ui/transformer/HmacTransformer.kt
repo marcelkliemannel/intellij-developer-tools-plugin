@@ -27,6 +27,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateNo
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.TextInputOutputHandler.BytesToTextMode.BYTES_TO_HEX
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE32
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.BASE64
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer.SecretKeyEncodingMode.RAW
@@ -46,10 +47,10 @@ class HmacTransformer(
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
-    title = "HMAC",
-    sourceTitle = "Data",
-    targetTitle = "Hash",
-    toTargetTitle = "Generate",
+    title = UiToolsBundle.message("hmac-transformer.title"),
+    sourceTitle = UiToolsBundle.message("hmac-transformer.source-title"),
+    targetTitle = UiToolsBundle.message("hmac-transformer.target-title"),
+    toTargetTitle = UiToolsBundle.message("hmac-transformer.generate"),
   ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -106,7 +107,7 @@ class HmacTransformer(
   override fun Panel.buildSourceTopConfigurationUi() {
     row {
       comboBox(hmacAlgorithms)
-        .label("Algorithm:")
+        .label(UiToolsBundle.message("hmac-transformer.algorithm"))
         .applyToComponent {
           selectedItem = hmacAlgorithms.find { it.algorithm == selectedAlgorithm.get() }
         }
@@ -117,10 +118,10 @@ class HmacTransformer(
   override fun Panel.buildSourceBottomConfigurationUi() {
     row {
       expandableTextField()
-        .label("Secret key:")
+        .label(UiToolsBundle.message("hmac-transformer.secret-key"))
         .align(AlignX.FILL)
         .bindText(secretKey)
-        .validateNonEmpty("A secret key must be provided")
+        .validateNonEmpty(UiToolsBundle.message("hmac-transformer.secret-key-required"))
         .gap(RightGap.SMALL)
         .resizableColumn()
         .registerDynamicToolTip { generalSettings.createSensitiveInputsHandlingToolTipText() }
@@ -140,7 +141,7 @@ class HmacTransformer(
         }
       actionButton(
         UiUtils.actionsPopup(
-          title = "Encoding",
+          title = UiToolsBundle.message("hmac-transformer.encoding"),
           icon = AllIcons.General.Settings,
           actions = encodingActions,
         )
@@ -160,9 +161,9 @@ class HmacTransformer(
 
   enum class SecretKeyEncodingMode(val title: String) {
 
-    RAW("Raw"),
-    BASE32("Base32 Encoded"),
-    BASE64("Base64 Encoded"),
+    RAW(UiToolsBundle.message("hmac-transformer.secret-key-encoding-mode.raw")),
+    BASE32(UiToolsBundle.message("hmac-transformer.secret-key-encoding-mode.base32")),
+    BASE64(UiToolsBundle.message("hmac-transformer.secret-key-encoding-mode.base64")),
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -170,7 +171,10 @@ class HmacTransformer(
   class Factory : DeveloperUiToolFactory<HmacTransformer> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "HMAC", contentTitle = "HMAC Transformer")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("hmac-transformer.menu-title"),
+        contentTitle = UiToolsBundle.message("hmac-transformer.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

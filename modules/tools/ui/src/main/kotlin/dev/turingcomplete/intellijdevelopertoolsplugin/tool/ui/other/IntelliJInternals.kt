@@ -43,6 +43,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.simpleColumnInfo
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.setContextMenu
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.awt.Dimension
 import java.net.URLClassLoader
 import java.nio.file.Files
@@ -61,7 +62,7 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
   // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildUi() {
-    group("Plugins") {
+    group(UiToolsBundle.message("intellij-internals.plugins")) {
       row {
           val pluginOverviewTableModel =
             ListTableModel<IdeaPluginDescriptor>(*pluginOverviewTableColumns).apply {
@@ -85,7 +86,7 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
                   OpenPluginDescriptor(),
                 ),
               )
-              setEmptyState("No plugins")
+              setEmptyState(UiToolsBundle.message("intellij-internals.no-plugins"))
               TableSpeedSearch.installOn(this)
             }
           cell(ScrollPaneFactory.createScrollPane(pluginOverviewTable, false))
@@ -94,18 +95,29 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
             .align(Align.FILL)
         }
         .bottomGap(BottomGap.NONE)
-      row { button("Refresh") { populatePluginOverviewTableModel() } }.topGap(TopGap.NONE)
+      row {
+          button(UiToolsBundle.message("intellij-internals.refresh")) {
+            populatePluginOverviewTableModel()
+          }
+        }
+        .topGap(TopGap.NONE)
 
-      group("Find Plugin by Class Name") {
+      group(UiToolsBundle.message("intellij-internals.find-plugin-by-class-name")) {
         row {
           val classNameTextField =
-            textField().label("Class name:").resizableColumn().align(Align.FILL).component
-          button("Find") { findPluginByClassName(classNameTextField.text.trim()) }
+            textField()
+              .label(UiToolsBundle.message("intellij-internals.class-name"))
+              .resizableColumn()
+              .align(Align.FILL)
+              .component
+          button(UiToolsBundle.message("intellij-internals.find")) {
+            findPluginByClassName(classNameTextField.text.trim())
+          }
         }
       }
     }
 
-    group("Plugin Class Loaders") {
+    group(UiToolsBundle.message("intellij-internals.plugin-class-loaders")) {
       row {
           cell(
               ScrollPaneFactory.createScrollPane(
@@ -118,11 +130,17 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
         }
         .resizableRow()
 
-      group("Find Class File Path by Class Name") {
+      group(UiToolsBundle.message("intellij-internals.find-class-file-path-by-class-name")) {
         row {
           val classNameTextField =
-            textField().label("Class name:").resizableColumn().align(Align.FILL).component
-          button("Find") { findClassPathByClassName(classNameTextField.text.trim()) }
+            textField()
+              .label(UiToolsBundle.message("intellij-internals.class-name"))
+              .resizableColumn()
+              .align(Align.FILL)
+              .component
+          button(UiToolsBundle.message("intellij-internals.find")) {
+            findClassPathByClassName(classNameTextField.text.trim())
+          }
         }
       }
     }
@@ -154,19 +172,23 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
   }
 
   private fun findPluginByClassName(className: String) {
-    val messageDialogTitle = "Find Plugin by Class Name"
+    val messageDialogTitle = UiToolsBundle.message("intellij-internals.find-plugin-by-class-name")
     try {
       val plugin = PluginManager.getPluginByClass(Class.forName(className))
       if (plugin != null) {
         Messages.showInfoMessage(
           project,
-          "Class belongs to plugin: ${plugin.name} (ID: ${plugin.pluginId.idString}).",
+          UiToolsBundle.message(
+            "intellij-internals.class-belongs-to-plugin",
+            plugin.name,
+            plugin.pluginId.idString,
+          ),
           messageDialogTitle,
         )
       } else {
         Messages.showErrorDialog(
           project,
-          "No plugin found for the given class name.",
+          UiToolsBundle.message("intellij-internals.no-plugin-found-for-class-name"),
           messageDialogTitle,
         )
       }
@@ -174,24 +196,33 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
       log.warn("Failed to find plugin", e)
       Messages.showErrorDialog(
         project,
-        "${e.message}: ${e::class.qualifiedName}",
+        UiToolsBundle.message(
+          "intellij-internals.failed-with-message",
+          e.message ?: UiToolsBundle.message("intellij-internals.unknown-error"),
+          e::class.qualifiedName ?: UiToolsBundle.message("intellij-internals.unknown-error"),
+        ),
         messageDialogTitle,
       )
     }
   }
 
   private fun findClassPathByClassName(className: String) {
-    val messageDialogTitle = "Find Class File Path by Class Name"
+    val messageDialogTitle =
+      UiToolsBundle.message("intellij-internals.find-class-file-path-by-class-name")
     try {
       val aClass = IntelliJInternals::class.java.classLoader.loadClass(className)
       val classFilePath =
         aClass.getResource('/' + aClass.getName().replace('.', '/') + ".class")?.toURI()?.path
       if (classFilePath != null) {
-        Messages.showInfoMessage(project, "Class file path: ${classFilePath}.", messageDialogTitle)
+        Messages.showInfoMessage(
+          project,
+          UiToolsBundle.message("intellij-internals.class-file-path", classFilePath),
+          messageDialogTitle,
+        )
       } else {
         Messages.showErrorDialog(
           project,
-          "Unable to resolve the path of the class file for the given class name.",
+          UiToolsBundle.message("intellij-internals.unable-to-resolve-class-file-path"),
           messageDialogTitle,
         )
       }
@@ -199,7 +230,11 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
       log.warn("Failed to find class file", e)
       Messages.showErrorDialog(
         project,
-        "${e.message}: ${e::class.qualifiedName}",
+        UiToolsBundle.message(
+          "intellij-internals.failed-with-message",
+          e.message ?: UiToolsBundle.message("intellij-internals.unknown-error"),
+          e::class.qualifiedName ?: UiToolsBundle.message("intellij-internals.unknown-error"),
+        ),
         messageDialogTitle,
       )
     }
@@ -230,7 +265,8 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class OpenPluginDirectory : DumbAwareAction("Open Plugin Directory") {
+  private class OpenPluginDirectory :
+    DumbAwareAction(UiToolsBundle.message("intellij-internals.open-plugin-directory")) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val values: List<Any> =
@@ -246,7 +282,8 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class OpenPluginDescriptor : DumbAwareAction("Open Plugin Descriptor") {
+  private class OpenPluginDescriptor :
+    DumbAwareAction(UiToolsBundle.message("intellij-internals.open-plugin-descriptor")) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val project =
@@ -297,8 +334,8 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
         if (pluginDescriptorFiles.isEmpty()) {
           Messages.showErrorDialog(
             project,
-            "Unable to find plugin descriptor.",
-            "Open Plugin Descriptor",
+            UiToolsBundle.message("intellij-internals.unable-to-find-plugin-descriptor"),
+            UiToolsBundle.message("intellij-internals.open-plugin-descriptor"),
           )
         }
 
@@ -308,8 +345,8 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
           if (openEditor.isEmpty()) {
             Messages.showErrorDialog(
               project,
-              "Unable to open file '${it.name}' in editor.",
-              "Open Plugin Descriptor",
+              UiToolsBundle.message("intellij-internals.unable-to-open-file-in-editor", it.name),
+              UiToolsBundle.message("intellij-internals.open-plugin-descriptor"),
             )
           }
         }
@@ -323,8 +360,8 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "IntelliJ Internals",
-        contentTitle = "IntelliJ Internals",
+        menuTitle = UiToolsBundle.message("intellij-internals.menu-title"),
+        contentTitle = UiToolsBundle.message("intellij-internals.content-title"),
       )
 
     override fun getDeveloperUiToolCreator(

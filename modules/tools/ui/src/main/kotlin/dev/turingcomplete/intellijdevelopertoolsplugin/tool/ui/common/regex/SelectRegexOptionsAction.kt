@@ -17,12 +17,18 @@ import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.whenStateChangedFromUi
 import com.intellij.util.ui.UIUtil
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.GeneralBundle
 import javax.swing.JComponent
 
 class SelectRegexOptionsAction(
   private val parentComponent: () -> JComponent,
   private val selectedRegexOptionFlag: ObservableMutableProperty<Int>,
-) : DumbAwareAction("Regular Expression Options", null, AllIcons.General.GearPlain) {
+) :
+  DumbAwareAction(
+    GeneralBundle.message("regex-options.action-title"),
+    null,
+    AllIcons.General.GearPlain,
+  ) {
   // -- Properties ---------------------------------------------------------- //
 
   private var currentDialog: Balloon? = null

@@ -12,6 +12,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.TextInputOutputHandler.BytesToTextMode.BYTES_TO_HEX
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.security.Security
 
 class HashingTransformer(
@@ -25,10 +26,10 @@ class HashingTransformer(
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
-    title = "Hashing",
-    sourceTitle = "Plain",
-    targetTitle = "Hashed",
-    toTargetTitle = "Hash",
+    title = UiToolsBundle.message("hashing-transformer.title"),
+    sourceTitle = UiToolsBundle.message("hashing-transformer.source-title"),
+    targetTitle = UiToolsBundle.message("hashing-transformer.target-title"),
+    toTargetTitle = UiToolsBundle.message("hashing-transformer.hash"),
   ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -60,7 +61,11 @@ class HashingTransformer(
     selectedAlgorithm.get().toMessageDigest().digest(source)
 
   override fun Panel.buildSourceTopConfigurationUi() {
-    row { comboBox(messageDigestAlgorithms).label("Algorithm:").bindItem(selectedAlgorithm) }
+    row {
+      comboBox(messageDigestAlgorithms)
+        .label(UiToolsBundle.message("hashing-transformer.algorithm"))
+        .bindItem(selectedAlgorithm)
+    }
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -69,7 +74,10 @@ class HashingTransformer(
   class Factory : DeveloperUiToolFactory<HashingTransformer> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Hashing", contentTitle = "Hashing Transformer")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("hashing-transformer.menu-title"),
+        contentTitle = UiToolsBundle.message("hashing-transformer.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

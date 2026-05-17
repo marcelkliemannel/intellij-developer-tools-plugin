@@ -52,6 +52,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.Datetim
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.DatetimeConverter.ConversionOrigin.UNIX_TIMESTAMP_MILLIS
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.DatetimeConverter.ConversionOrigin.UNIX_TIMESTAMP_SECONDS
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.DatetimeConverter.ConversionOrigin.YEAR
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.awt.Font
 import java.time.Duration
 import java.time.Instant
@@ -92,7 +93,7 @@ class DatetimeConverter(
     configuration.register("formattedIndividualFormat", DEFAULT_INDIVIDUAL_FORMAT)
 
   private var formattedStandardFormatPattern = ValueProperty("")
-  private var formattedText = ValueProperty("No result")
+  private var formattedText = ValueProperty(UiToolsBundle.message("datetime-converter.no-result"))
   private var dateDetails = ValueProperty("")
 
   private val currentUnixTimestampUpdateAlarm by lazy { Alarm(parentDisposable) }
@@ -127,18 +128,18 @@ class DatetimeConverter(
   // -- Exposed Methods ----------------------------------------------------- //
 
   override fun Panel.buildUi() {
-    group("Current Unix Timestamp") {
+    group(UiToolsBundle.message("datetime-converter.current-unix-timestamp")) {
       if (context.prioritizeVerticalLayout) {
         row {
           buildTimestampLabelUi(
-            "Seconds:",
+            UiToolsBundle.message("datetime-converter.seconds"),
             currentUnixTimestampSeconds,
             TIMESTAMP_SECONDS_CONTENT_DATA_KEY,
           )
         }
         row {
           buildTimestampLabelUi(
-            "Milliseconds:",
+            UiToolsBundle.message("datetime-converter.milliseconds"),
             currentUnixTimestampMillis,
             TIMESTAMP_MILLIS_CONTENT_DATA_KEY,
           )
@@ -146,12 +147,12 @@ class DatetimeConverter(
       } else {
         row {
           buildTimestampLabelUi(
-            "Seconds:",
+            UiToolsBundle.message("datetime-converter.seconds"),
             currentUnixTimestampSeconds,
             TIMESTAMP_SECONDS_CONTENT_DATA_KEY,
           )
           buildTimestampLabelUi(
-            "Milliseconds:",
+            UiToolsBundle.message("datetime-converter.milliseconds"),
             currentUnixTimestampMillis,
             TIMESTAMP_MILLIS_CONTENT_DATA_KEY,
           )
@@ -159,11 +160,11 @@ class DatetimeConverter(
       }
     }
 
-    group("Convert") {
+    group(UiToolsBundle.message("datetime-converter.convert")) {
       val initialInstant = Instant.ofEpochMilli(System.currentTimeMillis())
       val initialLocalDateTime = LocalDateTime.ofInstant(initialInstant, selectedTimeZoneId())
 
-      group("Unix Timestamp") {
+      group(UiToolsBundle.message("datetime-converter.unix-timestamp")) {
           if (context.prioritizeVerticalLayout) {
             row { buildUnixTimeStampSecondsTextFieldUi(initialInstant) }
               .topGap(TopGap.NONE)
@@ -185,10 +186,10 @@ class DatetimeConverter(
         .topGap(TopGap.NONE)
         .bottomGap(BottomGap.NONE)
 
-      group("Date and Time") {
+      group(UiToolsBundle.message("datetime-converter.date-and-time")) {
           row {
             comboBox(ZoneId.getAvailableZoneIds().sorted())
-              .label("Time zone:")
+              .label(UiToolsBundle.message("datetime-converter.time-zone"))
               .bindItem(selectedTimeZoneId)
               .whenItemSelectedFromUi { convert(TIME_ZONE) }
               .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, TIME_ZONE) }
@@ -203,21 +204,21 @@ class DatetimeConverter(
           row {
               listOf(
                   DateField(
-                    "Year",
+                    UiToolsBundle.message("datetime-converter.year"),
                     initialLocalDateTime.year,
                     convertYear,
                     LongRange(1970, 9999),
                     YEAR,
                   ),
                   DateField(
-                    "Month",
+                    UiToolsBundle.message("datetime-converter.month"),
                     initialLocalDateTime.monthValue,
                     convertMonth,
                     LongRange(1, 12),
                     MONTH,
                   ),
                   DateField(
-                    "Day",
+                    UiToolsBundle.message("datetime-converter.day"),
                     initialLocalDateTime.dayOfMonth,
                     convertDay,
                     LongRange(1, 31),
@@ -226,7 +227,7 @@ class DatetimeConverter(
                 )
                 .forEach { (title, initialValue, valueProperty, range, changeOrigin) ->
                   textField()
-                    .label("$title:")
+                    .label(UiToolsBundle.message("datetime-converter.label", title))
                     .text(initialValue.toString())
                     .bindIntTextImproved(valueProperty)
                     .columns(5)
@@ -238,16 +239,22 @@ class DatetimeConverter(
             .layout(RowLayout.PARENT_GRID)
           row {
               listOf(
-                  DateField("Hour", initialLocalDateTime.hour, convertHour, LongRange(0, 23), HOUR),
                   DateField(
-                    "Minute",
+                    UiToolsBundle.message("datetime-converter.hour"),
+                    initialLocalDateTime.hour,
+                    convertHour,
+                    LongRange(0, 23),
+                    HOUR,
+                  ),
+                  DateField(
+                    UiToolsBundle.message("datetime-converter.minute"),
                     initialLocalDateTime.minute,
                     convertMinute,
                     LongRange(0, 59),
                     MINUTE,
                   ),
                   DateField(
-                    "Second",
+                    UiToolsBundle.message("datetime-converter.second"),
                     initialLocalDateTime.second,
                     convertSecond,
                     LongRange(0, 59),
@@ -256,7 +263,7 @@ class DatetimeConverter(
                 )
                 .forEach { (title, initialValue, valueProperty, range, changeOrigin) ->
                   textField()
-                    .label("$title:")
+                    .label(UiToolsBundle.message("datetime-converter.label", title))
                     .text(initialValue.toString())
                     .bindIntTextImproved(valueProperty)
                     .columns(5)
@@ -272,11 +279,11 @@ class DatetimeConverter(
         .topGap(TopGap.NONE)
         .bottomGap(BottomGap.NONE)
 
-      group("Formatted") {
+      group(UiToolsBundle.message("datetime-converter.formatted")) {
           buttonsGroup {
             lateinit var formattedStandardFormatComboBox: ComboBox<StandardFormat>
             row {
-                radioButton("Standard format:")
+                radioButton(UiToolsBundle.message("datetime-converter.standard-format"))
                   .bindSelected(formattedIndividual.not())
                   .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
                   .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
@@ -317,7 +324,7 @@ class DatetimeConverter(
               .layout(RowLayout.PARENT_GRID)
 
             row {
-                radioButton("Individual format:")
+                radioButton(UiToolsBundle.message("datetime-converter.individual-format"))
                   .bindSelected(formattedIndividual)
                   .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
                   .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
@@ -334,7 +341,10 @@ class DatetimeConverter(
                       }
                       return@validationInfo null
                     } catch (_: Exception) {
-                      return@validationInfo ValidationInfo("Invalid individual format", it)
+                      return@validationInfo ValidationInfo(
+                        UiToolsBundle.message("datetime-converter.invalid-individual-format"),
+                        it,
+                      )
                     }
                   }
                   .enabledIf(formattedIndividual)
@@ -344,7 +354,7 @@ class DatetimeConverter(
 
           row {
               comboBox(ALL_AVAILABLE_LOCALES)
-                .label("Locale:")
+                .label(UiToolsBundle.message("datetime-converter.locale"))
                 .bindItem(formattedLocale)
                 .columns(COLUMNS_MEDIUM)
                 .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
@@ -394,7 +404,7 @@ class DatetimeConverter(
   // -- Private Methods ----------------------------------------------------- //
 
   private fun Row.buildSetToNowButtonUi() {
-    button("Set to Now") {
+    button(UiToolsBundle.message("datetime-converter.set-to-now")) {
       convertUnixTimeStampMillis.set(System.currentTimeMillis())
       convert(UNIX_TIMESTAMP_MILLIS, 0)
     }
@@ -404,7 +414,7 @@ class DatetimeConverter(
     textField()
       .validateLongValue(LongRange(0, Long.MAX_VALUE))
       .bindLongTextImproved(convertUnixTimeStampMillis)
-      .label("Milliseconds:")
+      .label(UiToolsBundle.message("datetime-converter.milliseconds"))
       .text(initialInstant.toEpochMilli().toString())
       .columns(12)
       .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
@@ -415,7 +425,7 @@ class DatetimeConverter(
     textField()
       .validateLongValue(LongRange(0, Long.MAX_VALUE))
       .bindLongTextImproved(convertUnixTimeStampSeconds)
-      .label("Seconds:")
+      .label(UiToolsBundle.message("datetime-converter.seconds"))
       .text(initialInstant.epochSecond.toString())
       .columns(12)
       .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_SECONDS) }
@@ -425,7 +435,7 @@ class DatetimeConverter(
   private fun Row.buildStandardFormatConfigurationUi(
     formattedStandardFormatComboBox: ComboBox<StandardFormat>
   ) {
-    checkBox("Add offset")
+    checkBox(UiToolsBundle.message("datetime-converter.add-offset"))
       .bindSelected(formattedStandardFormatAddOffset)
       .whenStateChangedFromUi {
         syncFormattedStandardFormatPattern()
@@ -435,7 +445,7 @@ class DatetimeConverter(
       .enabledIf(formattedIndividual.not())
       .visibleIf(ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsOffset == true })
       .gap(RightGap.SMALL)
-    checkBox("Add time zone")
+    checkBox(UiToolsBundle.message("datetime-converter.add-time-zone"))
       .bindSelected(formattedStandardFormatAddTimeZone)
       .whenStateChangedFromUi {
         syncFormattedStandardFormatPattern()
@@ -634,8 +644,8 @@ class DatetimeConverter(
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "Date and Time",
-        contentTitle = "Date and Time Converter",
+        menuTitle = UiToolsBundle.message("datetime-converter.menu-title"),
+        contentTitle = UiToolsBundle.message("datetime-converter.content-title"),
       )
 
     override fun getDeveloperUiToolCreator(
@@ -682,19 +692,37 @@ class DatetimeConverter(
     val fixedTimeZone: ZoneId? = null,
   ) {
 
-    ISO_8601("ISO-8601 date time", "yyyy-MM-dd'T'HH:mm:ss.SSS"),
+    ISO_8601(
+      UiToolsBundle.message("datetime-converter.standard-format.iso-8601"),
+      "yyyy-MM-dd'T'HH:mm:ss.SSS",
+    ),
     ISO_8601_UTC(
-      title = "ISO-8601 date time at UTC",
+      title = UiToolsBundle.message("datetime-converter.standard-format.iso-8601-utc"),
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
       supportsOffset = false,
       supportsTimeZone = false,
       fixedTimeZone = ZoneOffset.UTC,
     ),
-    ISO_8601_DATE("ISO-8601 date", "yyyy-MM-dd"),
-    ISO_8601_TIME_WITH("ISO-8601 time", "HH:mm:ss"),
-    ISO_8601_ORDINAL_DATE("ISO-8601 ordinal date", "yyyy-DDD"),
-    ISO_8601_WEEK_DATE("ISO-8601 week date", "YYYY-'W'ww-e"),
-    RFC_1123_DATE_TIME("RFC-1123 date time", "EEE, dd MMM yyyy HH:mm:ss");
+    ISO_8601_DATE(
+      UiToolsBundle.message("datetime-converter.standard-format.iso-8601-date"),
+      "yyyy-MM-dd",
+    ),
+    ISO_8601_TIME_WITH(
+      UiToolsBundle.message("datetime-converter.standard-format.iso-8601-time"),
+      "HH:mm:ss",
+    ),
+    ISO_8601_ORDINAL_DATE(
+      UiToolsBundle.message("datetime-converter.standard-format.iso-8601-ordinal-date"),
+      "yyyy-DDD",
+    ),
+    ISO_8601_WEEK_DATE(
+      UiToolsBundle.message("datetime-converter.standard-format.iso-8601-week-date"),
+      "YYYY-'W'ww-e",
+    ),
+    RFC_1123_DATE_TIME(
+      UiToolsBundle.message("datetime-converter.standard-format.rfc-1123-date-time"),
+      "EEE, dd MMM yyyy HH:mm:ss",
+    );
 
     fun buildPattern(offset: Boolean, timeZone: Boolean): String {
       val patternBuilder = StringBuilder(pattern)

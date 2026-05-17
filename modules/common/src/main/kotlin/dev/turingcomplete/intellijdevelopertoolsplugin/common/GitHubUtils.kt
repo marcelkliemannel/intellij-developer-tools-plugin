@@ -7,6 +7,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.OkHttpClientUtils.applyIntelliJProxySettings
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.message.CommonBundle
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -32,7 +33,8 @@ object GitHubUtils {
     onThrowable: (Throwable) -> Unit,
     onFinished: () -> Unit,
   ) =
-    object : Task.Backgroundable(project, "Downloading files from GitHub") {
+    object :
+      Task.Backgroundable(project, CommonBundle.message("github.download-files.task-title")) {
 
       override fun run(indicator: ProgressIndicator) {
         onStart()
@@ -51,7 +53,7 @@ object GitHubUtils {
             return@forEach
           }
 
-          indicator.text = "Downloading $fileName"
+          indicator.text = CommonBundle.message("github.download-files.downloading", fileName)
           indicator.fraction = index.toDouble() / fileNamesToDownloadUrls.size
 
           val targetPath = destinationPath.resolve(fileName)
@@ -59,7 +61,7 @@ object GitHubUtils {
           if (!success) {
             errors++
           } else {
-            indicator.text = "Analyzing $fileName"
+            indicator.text = CommonBundle.message("github.download-files.analyzing", fileName)
             val keepFile = afterDownloadFilter(targetPath)
             if (!keepFile) {
               try {
@@ -72,9 +74,15 @@ object GitHubUtils {
           index++
         }
         if (errors > 0) {
-          throw Exception("Failed to download $errors of ${fileNamesToDownloadUrls.size} files")
+          throw Exception(
+            CommonBundle.message(
+              "github.download-files.failed-to-download-files",
+              errors,
+              fileNamesToDownloadUrls.size,
+            )
+          )
         }
-        indicator.text = "All files downloaded"
+        indicator.text = CommonBundle.message("github.download-files.all-files-downloaded")
       }
 
       override fun onThrowable(error: Throwable) {
@@ -105,7 +113,13 @@ object GitHubUtils {
           .associate { it["name"].asText() to it["download_url"].asText() }
       }
     } else {
-      throw Exception("Failed to fetch file list from $apiUrl: HTTP ${response.code}")
+      throw Exception(
+        CommonBundle.message(
+          "github.download-files.failed-to-fetch-file-list",
+          apiUrl,
+          response.code,
+        )
+      )
     }
   }
 

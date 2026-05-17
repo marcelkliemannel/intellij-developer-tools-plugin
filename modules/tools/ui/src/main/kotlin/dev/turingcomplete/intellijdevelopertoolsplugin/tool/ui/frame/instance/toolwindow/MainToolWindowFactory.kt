@@ -27,6 +27,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.content.Dev
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.toolwindow.MainToolWindowService.Companion.toolWindowContentPanelHandlerKey
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.ContentNode
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.DeveloperToolNode
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.awt.Dimension
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -40,7 +41,7 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
     assert(toolWindow.id == ID)
 
     toolWindow.component.putClientProperty(ToolWindowContentUi.HIDE_ID_LABEL, "false")
-    toolWindow.stripeTitle = "Developer Tools"
+    toolWindow.stripeTitle = UiToolsBundle.message("main-frame.title")
   }
 
   override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
@@ -92,7 +93,12 @@ class MainToolWindowFactory : ToolWindowFactory, DumbAware {
           )
       lateinit var toggleMenuActionLink: JComponent
       val toggleMenuAction: DumbAwareAction =
-        object : DumbAwareAction("Show Developer Tool", null, menuIcon) {
+        object :
+          DumbAwareAction(
+            UiToolsBundle.message("main-tool-window.show-developer-tool"),
+            null,
+            menuIcon,
+          ) {
 
           override fun actionPerformed(e: AnActionEvent) {
             toggleMenu(toggleMenuActionLink)
