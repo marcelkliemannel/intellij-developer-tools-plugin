@@ -553,10 +553,10 @@ class AdvancedEditor(
       val defaultFilename = "$timeStamp.txt"
       FileChooserFactory.getInstance()
         .createSaveFileDialog(fileSaverDescriptor, e.project)
-          .save(defaultFilename)
-          ?.file
-          ?.toPath()
-          ?.let {
+        .save(defaultFilename)
+        ?.file
+        ?.toPath()
+        ?.let {
           val targetFile = it
           object :
               Task.Backgroundable(
