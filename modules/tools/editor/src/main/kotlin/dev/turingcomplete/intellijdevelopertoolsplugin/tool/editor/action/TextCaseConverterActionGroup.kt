@@ -9,9 +9,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.TextRange
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.executeWriteCommand
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedText
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils.allTextCases
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils.determineWordsSplitter
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EditorSourceText.getSelectedTextOrTextAtCaret
 import dev.turingcomplete.textcaseconverter.TextCase
 
 open class TextCaseConverterActionGroup : DefaultActionGroup("Convert Text Case To", true) {
@@ -35,7 +35,7 @@ open class TextCaseConverterActionGroup : DefaultActionGroup("Convert Text Case 
 
   open fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? {
     val editor = e.getData(CommonDataKeys.EDITOR) ?: return null
-    return editor.getSelectedText()
+    return editor.getSelectedTextOrTextAtCaret()
   }
 
   // -- Private Methods ----------------------------------------------------- //

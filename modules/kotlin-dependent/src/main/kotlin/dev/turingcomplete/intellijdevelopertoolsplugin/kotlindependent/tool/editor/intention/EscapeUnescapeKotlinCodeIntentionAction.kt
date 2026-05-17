@@ -4,9 +4,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 import dev.turingcomplete.intellijdevelopertoolsplugin.kotlindependent.PsiKotlinUtils
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.EncodeDecodeIntentionAction
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.intention.EscapeUnescapeIntentionAction
 
-class EscapeUnescapeKotlinCodeIntentionAction : EncodeDecodeIntentionAction() {
+class EscapeUnescapeKotlinCodeIntentionAction : EscapeUnescapeIntentionAction() {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //

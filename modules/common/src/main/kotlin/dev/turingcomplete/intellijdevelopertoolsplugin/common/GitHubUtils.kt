@@ -98,7 +98,7 @@ object GitHubUtils {
 
     val response = httpClient.newCall(request).execute()
     if (response.code == 200) {
-      response.body?.byteStream()?.use { inputStream ->
+      response.body.byteStream()?.use { inputStream ->
         val rootNode: JsonNode = ObjectMapper().readTree(inputStream)
         return rootNode
           .filter { it["type"].asText() == "file" }
