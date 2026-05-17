@@ -181,8 +181,12 @@ Common commands:
 ./gradlew test
 ./gradlew check
 ./gradlew verifyPlugin
-./gradlew spotlessApply
+
+# For changes to the `plugin.xml`
+./gradlew verifyPluginStructur
 ```
+
+Do NOT run any Spotless code style checks. Code style is automatically checked and enforced during the CI.
 
 CI runs:
 
