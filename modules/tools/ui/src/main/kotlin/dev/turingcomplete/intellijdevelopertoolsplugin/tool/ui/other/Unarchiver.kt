@@ -86,6 +86,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.ha
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolReference
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolService
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.Unarchiver.OpenUnarchiverContext
 import java.awt.datatransfer.StringSelection
 import java.awt.dnd.DropTarget
@@ -279,8 +280,11 @@ class Unarchiver(
           replaceContent(noArchiveFilePanel)
           Messages.showErrorDialog(
             project,
-            "Reading archive failed: ${e.message}",
-            "Reading Archive Failed",
+            UiToolsBundle.message(
+              "unarchiver.reading-archive-failed-message",
+              e.message ?: UiToolsBundle.message("unarchiver.unknown"),
+            ),
+            UiToolsBundle.message("unarchiver.reading-archive-failed"),
           )
         }
       }
@@ -454,7 +458,8 @@ class Unarchiver(
     }
 
   private fun createReloadAction(archiveFilePath: Path): AnAction =
-    object : DumbAwareAction("Reload", null, AllIcons.Actions.Refresh) {
+    object :
+      DumbAwareAction(UiToolsBundle.message("unarchiver.reload"), null, AllIcons.Actions.Refresh) {
 
       override fun actionPerformed(e: AnActionEvent) {
         openArchiveFile().invoke(archiveFilePath)
@@ -469,7 +474,7 @@ class Unarchiver(
     }
 
   private fun createCloseArchiveFileAction(): AnAction =
-    object : DumbAwareAction("Close Archive File") {
+    object : DumbAwareAction(UiToolsBundle.message("unarchiver.close-archive-file")) {
 
       override fun actionPerformed(e: AnActionEvent) {
         closeArchiveFile()
@@ -634,9 +639,10 @@ class Unarchiver(
     }
 
     private fun createCopyContentToClipboardAction() =
-      ArchiveNodeAction("Copy Content to Clipboard", { it is FileNode && it.isTextFile() }) {
-        archiveNode,
-        _ ->
+      ArchiveNodeAction(
+        UiToolsBundle.message("unarchiver.copy-content-to-clipboard"),
+        { it is FileNode && it.isTextFile() },
+      ) { archiveNode, _ ->
         ApplicationManager.getApplication().executeOnPooledThread {
           try {
             val content = rootNode.readEntry(archiveNode.archiveEntry!!)
@@ -647,8 +653,11 @@ class Unarchiver(
             ApplicationManager.getApplication().invokeLater {
               Messages.showErrorDialog(
                 project,
-                "Failed to read archive entry: ${e.message}",
-                "Copy Content to Clipboard Failed",
+                UiToolsBundle.message(
+                  "unarchiver.failed-to-read-archive-entry",
+                  e.message ?: UiToolsBundle.message("unarchiver.unknown"),
+                ),
+                UiToolsBundle.message("unarchiver.copy-content-to-clipboard-failed"),
               )
             }
           }
@@ -667,7 +676,9 @@ class Unarchiver(
     override fun getText(archiveNode: ArchiveNode?): String? = archiveNode?.fileName
 
     private fun createExtractAction() =
-      ArchiveNodesAction("Extract...", { true }) { archiveNodes, _ ->
+      ArchiveNodesAction(UiToolsBundle.message("unarchiver.extract-ellipsis"), { true }) {
+        archiveNodes,
+        _ ->
         ApplicationManager.getApplication().executeOnPooledThread {
           val archiveNodesToExtract = determineArchiveNodesToExtract(archiveNodes)
           if (archiveNodesToExtract.archiveNodes.isEmpty()) {
@@ -687,9 +698,9 @@ class Unarchiver(
 
     private fun createFactExtractAction() =
       ArchiveNodesAction(
-        "Fast Extract",
+        UiToolsBundle.message("unarchiver.fast-extract"),
         { true },
-        "Extracts the selected entry into a temporary directory.",
+        UiToolsBundle.message("unarchiver.fast-extract-description"),
       ) { archiveNodes, _ ->
         ApplicationManager.getApplication().executeOnPooledThread {
           val archiveNodesToExtract = determineArchiveNodesToExtract(archiveNodes)
@@ -721,12 +732,17 @@ class Unarchiver(
       }
 
     private fun createOpenEnclosingDirectoryAction() =
-      ArchiveNodeAction("Open Enclosing Directory...", { it is RootNode }) { rootNode, _ ->
+      ArchiveNodeAction(
+        UiToolsBundle.message("unarchiver.open-enclosing-directory"),
+        { it is RootNode },
+      ) { rootNode, _ ->
         BrowserUtil.browse((rootNode as RootNode).archiveFilePath.parent)
       }
 
     private fun createOpenInEditorAction() =
-      ArchiveNodesAction("Open in Editor...", { it is FileNode }) { archiveNodes, e ->
+      ArchiveNodesAction(UiToolsBundle.message("unarchiver.open-in-editor"), { it is FileNode }) {
+        archiveNodes,
+        e ->
         val project =
           e.dataContext.getData(CommonDataKeys.PROJECT)
             ?: throw IllegalStateException("snh: Data missing")
@@ -751,8 +767,8 @@ class Unarchiver(
             if (openEditor.isEmpty() && notifyOnError) {
               Messages.showErrorDialog(
                 project,
-                "Unable to open file '${it.name}' in editor.",
-                "Open in Editor Failed",
+                UiToolsBundle.message("unarchiver.unable-to-open-file-in-editor", it.name),
+                UiToolsBundle.message("unarchiver.open-in-editor-failed"),
               )
             }
           }
@@ -761,12 +777,15 @@ class Unarchiver(
     }
 
     private fun createOpenWithDefaultApplicationAction() =
-      ArchiveNodeAction("Open With Default Application...", { it is RootNode }) { rootNode, _ ->
+      ArchiveNodeAction(
+        UiToolsBundle.message("unarchiver.open-with-default-application"),
+        { it is RootNode },
+      ) { rootNode, _ ->
         BrowserUtil.browse((rootNode as RootNode).archiveFilePath)
       }
 
     private fun createShowSelectedElementDetailsAction(contextMenuMouseEvent: MouseEvent) =
-      object : DumbAwareAction("Show Details...") {
+      object : DumbAwareAction(UiToolsBundle.message("unarchiver.show-details")) {
 
         override fun update(e: AnActionEvent) {
           val selectedValues =
@@ -794,7 +813,13 @@ class Unarchiver(
                 archiveNode.archiveFilePath.fileName.toString() to
                   createArchiveFileDetails(archiveNode)
               else ->
-                "${archiveNode.fileName} (${if (archiveNode is DirectoryNode) "directory" else "file"})" to
+                "${archiveNode.fileName} (${
+                  if (archiveNode is DirectoryNode) {
+                    UiToolsBundle.message("unarchiver.directory")
+                  } else {
+                    UiToolsBundle.message("unarchiver.file")
+                  }
+                })" to
                   createArchiveEntryDetails(archiveNode)
             }
           JBPopupFactory.getInstance()
@@ -818,12 +843,12 @@ class Unarchiver(
 
           if (archiveNode is DirectoryNode) {
             row {
-                label("Number of direct entries:")
+                label(UiToolsBundle.message("unarchiver.number-of-direct-entries"))
                 label(archiveNode.children.size.toString())
               }
               .layout(RowLayout.PARENT_GRID)
             row {
-                label("Number of all entries:")
+                label(UiToolsBundle.message("unarchiver.number-of-all-entries"))
                 label(archiveNode.totalChildren.toString())
               }
               .layout(RowLayout.PARENT_GRID)
@@ -831,32 +856,32 @@ class Unarchiver(
 
           row {
               label(
-                "Uncompressed size${if (archiveNode is DirectoryNode) " of all entries" else ""}:"
+                if (archiveNode is DirectoryNode) {
+                  UiToolsBundle.message("unarchiver.uncompressed-size-of-all-entries")
+                } else {
+                  UiToolsBundle.message("unarchiver.uncompressed-size")
+                }
               )
               label(StringUtil.formatFileSize(archiveNode.totalUncompressedSize() ?: 0))
             }
             .layout(RowLayout.PARENT_GRID)
             .bottomGap(BottomGap.NONE)
           if (archiveNode.inaccurateTotalUncompressedSize) {
-            row {
-                label(
-                  "The uncompressed size may be inaccurate because some entries do not provide size information."
-                )
-              }
+            row { label(UiToolsBundle.message("unarchiver.uncompressed-size-may-be-inaccurate")) }
               .topGap(TopGap.NONE)
           }
 
           if (archiveEntry is ZipArchiveEntry) {
             if (archiveNode is FileNode) {
               row {
-                  label("Compressed size:")
+                  label(UiToolsBundle.message("unarchiver.compressed-size"))
                   label(StringUtil.formatFileSize(archiveEntry.compressedSize))
                 }
                 .layout(RowLayout.PARENT_GRID)
             }
 
             row {
-                label("Method:")
+                label(UiToolsBundle.message("unarchiver.method"))
                 val method = ZipMethod.getMethodByCode(archiveEntry.method)
                 label(method.name.split("_").joinToString(" "))
               }
@@ -865,36 +890,36 @@ class Unarchiver(
 
           val fileTimes = FileTimes.fromArchiveEntry(archiveEntry)
           row {
-              label("Creation time:")
+              label(UiToolsBundle.message("unarchiver.creation-time"))
               label(
                 if (fileTimes.creationTime != null)
                   DateFormatUtil.formatDateTime(fileTimes.creationTime.toMillis())
-                else "Unknown"
+                else UiToolsBundle.message("unarchiver.unknown")
               )
             }
             .layout(RowLayout.PARENT_GRID)
           row {
-              label("Last modified time:")
+              label(UiToolsBundle.message("unarchiver.last-modified-time"))
               label(
                 if (fileTimes.lastModifiedTime != null)
                   DateFormatUtil.formatDateTime(fileTimes.lastModifiedTime.toMillis())
-                else "Unknown"
+                else UiToolsBundle.message("unarchiver.unknown")
               )
             }
             .layout(RowLayout.PARENT_GRID)
           row {
-              label("Last access time:")
+              label(UiToolsBundle.message("unarchiver.last-access-time"))
               label(
                 if (fileTimes.lastAccessTime != null)
                   DateFormatUtil.formatDateTime(fileTimes.lastAccessTime.toMillis())
-                else "Unknown"
+                else UiToolsBundle.message("unarchiver.unknown")
               )
             }
             .layout(RowLayout.PARENT_GRID)
 
           if (archiveEntry is ZipEntry) {
             row {
-                label("Comment:")
+                label(UiToolsBundle.message("unarchiver.comment"))
                 label(archiveEntry.comment)
               }
               .layout(RowLayout.PARENT_GRID)
@@ -902,7 +927,7 @@ class Unarchiver(
 
           if (archiveEntry is ZipEntry && archiveEntry.extra != null) {
             row {
-                label("Extra data size:")
+                label(UiToolsBundle.message("unarchiver.extra-data-size"))
                 label(StringUtil.formatFileSize(archiveEntry.extra.size.toLong()))
               }
               .layout(RowLayout.PARENT_GRID)
@@ -916,44 +941,44 @@ class Unarchiver(
       try {
         panel {
           row {
-              label("Number of direct entries:")
+              label(UiToolsBundle.message("unarchiver.number-of-direct-entries"))
               label(rootNode.children.size.toString())
             }
             .layout(RowLayout.PARENT_GRID)
           row {
-              label("Number of all entries:")
+              label(UiToolsBundle.message("unarchiver.number-of-all-entries"))
               label(rootNode.totalChildren.toString())
             }
             .layout(RowLayout.PARENT_GRID)
           val zipFileAttributes =
             Files.readAttributes(rootNode.archiveFilePath, BasicFileAttributes::class.java)
           row {
-              label("Actual size on disk:")
+              label(UiToolsBundle.message("unarchiver.actual-size-on-disk"))
               label(FileUtils.byteCountToDisplaySize(zipFileAttributes.size()))
             }
             .layout(RowLayout.PARENT_GRID)
           row {
-              label("Uncompressed size of all entries:")
+              label(UiToolsBundle.message("unarchiver.uncompressed-size-of-all-entries"))
               label(StringUtil.formatFileSize(rootNode.totalUncompressedSize() ?: 0))
             }
             .layout(RowLayout.PARENT_GRID)
           row {
-              label("Creation time:")
+              label(UiToolsBundle.message("unarchiver.creation-time"))
               label(DateFormatUtil.formatDateTime(zipFileAttributes.creationTime().toMillis()))
             }
             .layout(RowLayout.PARENT_GRID)
           row {
-              label("Last modified time:")
+              label(UiToolsBundle.message("unarchiver.last-modified-time"))
               label(DateFormatUtil.formatDateTime(zipFileAttributes.lastModifiedTime().toMillis()))
             }
             .layout(RowLayout.PARENT_GRID)
           row {
-              label("Last access time:")
+              label(UiToolsBundle.message("unarchiver.last-access-time"))
               label(DateFormatUtil.formatDateTime(zipFileAttributes.lastAccessTime().toMillis()))
             }
             .layout(RowLayout.PARENT_GRID)
           row {
-              label("Owner:")
+              label(UiToolsBundle.message("unarchiver.owner"))
               label(Files.getOwner(rootNode.archiveFilePath).name)
             }
             .layout(RowLayout.PARENT_GRID)
@@ -961,12 +986,28 @@ class Unarchiver(
             val writable = Files.isWritable(rootNode.archiveFilePath)
             icon(if (writable) AllIcons.Ide.Readwrite else AllIcons.Ide.Readonly)
               .gap(RightGap.SMALL)
-            label(if (writable) "File is writeable" else "File is readonly")
+            label(
+              if (writable) {
+                UiToolsBundle.message("unarchiver.file-is-writeable")
+              } else {
+                UiToolsBundle.message("unarchiver.file-is-readonly")
+              }
+            )
           }
         }
       } catch (e: IOException) {
         log.warn("Failed to read parameters of file: ${rootNode.archiveFilePath}", e)
-        panel { row { label("Failed to read file attributes: ${e.message}").bold() } }
+        panel {
+          row {
+            label(
+                UiToolsBundle.message(
+                  "unarchiver.failed-to-read-file-attributes",
+                  e.message ?: UiToolsBundle.message("unarchiver.unknown"),
+                )
+              )
+              .bold()
+          }
+        }
       }
 
     fun getSelectedArchiveNodes(): List<ArchiveNode> =
@@ -987,10 +1028,10 @@ class Unarchiver(
       object : DialogWrapper(project, tree, false, IdeModalityType.IDE) {
 
           init {
-            title = "Extract"
+            title = UiToolsBundle.message("unarchiver.extract")
             setSize(600, 400)
             isModal = true
-            setOKButtonText("Extract")
+            setOKButtonText(UiToolsBundle.message("unarchiver.extract"))
             init()
           }
 
@@ -1020,45 +1061,50 @@ class Unarchiver(
             row {
               textFieldWithBrowseButton(
                   FileChooserDescriptorFactory.createSingleFolderDescriptor()
-                    .withTitle("Select Target Directory"),
+                    .withTitle(UiToolsBundle.message("unarchiver.select-target-directory")),
                   project,
                 )
-                .label("Target directory:")
+                .label(UiToolsBundle.message("unarchiver.target-directory"))
                 .bindText(lastSelectedTargetDirectoryPath)
                 .resizableColumn()
                 .align(Align.FILL)
             }
             row {
               checkBox(
-                  "Create a sub-directory with the archive name '${rootNode.archiveFilePath.nameWithoutExtension()}'"
+                  UiToolsBundle.message(
+                    "unarchiver.create-sub-directory-with-archive-name",
+                    rootNode.archiveFilePath.nameWithoutExtension(),
+                  )
                 )
                 .bindSelected(createArchiveFilenameSubDirectory)
             }
-            row { checkBox("Clear target directory").bindSelected(clearTargetDirectory) }
+            row {
+                checkBox(UiToolsBundle.message("unarchiver.clear-target-directory"))
+                  .bindSelected(clearTargetDirectory)
+              }
               .bottomGap(BottomGap.SMALL)
 
             row {
-              checkBox("Preserve directory structure")
+              checkBox(UiToolsBundle.message("unarchiver.preserve-directory-structure"))
                 .bindSelected(preserveDirectoryStructure)
                 .gap(RightGap.SMALL)
-              contextHelp(
-                "If unselected, all files will be extracted as a flat list, ignoring the directory structure."
-              )
+              contextHelp(UiToolsBundle.message("unarchiver.preserve-directory-structure-help"))
             }
             row {
-              checkBox("Create parent directories")
+              checkBox(UiToolsBundle.message("unarchiver.create-parent-directories"))
                 .bindSelected(createParentDirectories)
                 .enabledIf(preserveDirectoryStructure)
                 .gap(RightGap.SMALL)
-              contextHelp(
-                "<html>For example, if selected, for the path <code>first/second/third/</code> both parent directories <code>first/second/</code> will be created, otherwise only the directory <code>third/</code>.</html>"
-              )
+              contextHelp(UiToolsBundle.message("unarchiver.create-parent-directories-help"))
             }
-            row { checkBox("Preserve file attributes").bindSelected(preserveFileAttributes) }
+            row {
+                checkBox(UiToolsBundle.message("unarchiver.preserve-file-attributes"))
+                  .bindSelected(preserveFileAttributes)
+              }
               .bottomGap(BottomGap.SMALL)
 
             row {
-                checkBox("Open target directory after extraction")
+                checkBox(UiToolsBundle.message("unarchiver.open-target-directory-after-extraction"))
                   .bindSelected(openTargetDirectoryAfterExtraction)
               }
               .bottomGap(BottomGap.SMALL)
@@ -1073,27 +1119,30 @@ class Unarchiver(
                             displayPath,
                             if (totalUncompressedSize != null)
                               StringUtil.formatFileSize(totalUncompressedSize)
-                            else "Unknown",
+                            else UiToolsBundle.message("unarchiver.unknown"),
                           )
                         }
                         .toTypedArray(),
-                      arrayOf("Path", "Uncompressed Size"),
+                      arrayOf(
+                        UiToolsBundle.message("unarchiver.path"),
+                        UiToolsBundle.message("unarchiver.uncompressed-size-column"),
+                      ),
                     )
                   )
                 cell(ScrollPaneFactory.createScrollPane(entriesToExtractTable))
                   .resizableColumn()
                   .align(Align.FILL)
-                  .label("Entries to extract:", LabelPosition.TOP)
+                  .label(UiToolsBundle.message("unarchiver.entries-to-extract"), LabelPosition.TOP)
               }
               .resizableRow()
               .bottomGap(BottomGap.NONE)
             row {
                 comment(
-                  "Expected size on disk: ${if (archiveNodesToExtract.inaccurateTotalUncompressedSize) "+" else ""}${
-                StringUtil.formatFileSize(
-                  archiveNodesToExtract.totalUncompressedSize
-                )
-              }"
+                  UiToolsBundle.message(
+                    "unarchiver.expected-size-on-disk",
+                    if (archiveNodesToExtract.inaccurateTotalUncompressedSize) "+" else "",
+                    StringUtil.formatFileSize(archiveNodesToExtract.totalUncompressedSize),
+                  )
                 )
               }
               .topGap(TopGap.SMALL)
@@ -1559,7 +1608,12 @@ class Unarchiver(
     private val tree: Tree?,
     private val lastSelectedOpenedDirectoryPath: ValueProperty<String>,
     private val openArchiveCallback: (Path) -> Unit,
-  ) : DumbAwareAction("Open Archive File", null, AllIcons.Actions.MenuOpen) {
+  ) :
+    DumbAwareAction(
+      UiToolsBundle.message("unarchiver.open-archive-file"),
+      null,
+      AllIcons.Actions.MenuOpen,
+    ) {
 
     override fun actionPerformed(e: AnActionEvent) {
       openArchiveDialog()
@@ -1580,8 +1634,11 @@ class Unarchiver(
         ApplicationManager.getApplication().invokeLater {
           val descriptor =
             FileChooserDescriptorFactory.singleFile()
-              .withTitle("Open Archive File")
-              .withExtensionFilter("Archive files", *supportedArchiveExtensions)
+              .withTitle(UiToolsBundle.message("unarchiver.open-archive-file"))
+              .withExtensionFilter(
+                UiToolsBundle.message("unarchiver.archive-files"),
+                *supportedArchiveExtensions,
+              )
           val fileToOpen = FileChooser.chooseFile(descriptor, project, startPath)
           if (fileToOpen != null) {
             openArchiveCallback(fileToOpen.toNioPath())
@@ -1602,7 +1659,11 @@ class Unarchiver(
   // -- Inner Type ---------------------------------------------------------- //
 
   class OpenArchiveFileInUnarchiverAction :
-    DumbAwareAction("Unarchiver", "Open archive file in the developer tool 'Unarchiver'.", null) {
+    DumbAwareAction(
+      UiToolsBundle.message("unarchiver.menu-title"),
+      UiToolsBundle.message("unarchiver.open-archive-file-in-unarchiver-description"),
+      null,
+    ) {
 
     private val supportedArchiveExtensions = Companion.supportedArchiveExtensions.toSet()
 
@@ -1644,15 +1705,21 @@ class Unarchiver(
   private enum class SortingMode(val title: String, val comparator: Comparator<ArchiveNode>) {
 
     UNCOMPRESSED_SIZE_ASC(
-      "Uncompressed size (ascending)",
+      UiToolsBundle.message("unarchiver.sorting.uncompressed-size-ascending"),
       { a, b -> compareValues(a.totalUncompressedSize(), b.totalUncompressedSize()) },
     ),
     UNCOMPRESSED_SIZE_DESC(
-      "Uncompressed size (descending)",
+      UiToolsBundle.message("unarchiver.sorting.uncompressed-size-descending"),
       { a, b -> compareValues(b.totalUncompressedSize(), a.totalUncompressedSize()) },
     ),
-    FILENAME_ASC("Filename (ascending)", { a, b -> a.fileName.compareTo(b.fileName) }),
-    FILENAME_DESC("Filename (descending)", { a, b -> b.fileName.compareTo(a.fileName) }),
+    FILENAME_ASC(
+      UiToolsBundle.message("unarchiver.sorting.filename-ascending"),
+      { a, b -> a.fileName.compareTo(b.fileName) },
+    ),
+    FILENAME_DESC(
+      UiToolsBundle.message("unarchiver.sorting.filename-descending"),
+      { a, b -> b.fileName.compareTo(a.fileName) },
+    ),
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -1727,21 +1794,24 @@ class Unarchiver(
   private class ExtractTask(project: Project?, private val extractionContext: ExtractionContext) :
     Task.ConditionalModal(
       project,
-      "Extracting ${extractionContext.rootNode.fileName}",
+      UiToolsBundle.message("unarchiver.extracting-archive", extractionContext.rootNode.fileName),
       true,
       DEAF,
     ) {
 
     override fun run(progressIndicator: ProgressIndicator) {
       progressIndicator.checkCanceled()
-      progressIndicator.text = "Preparing directory structure..."
+      progressIndicator.text = UiToolsBundle.message("unarchiver.preparing-directory-structure")
 
       if (!Files.exists(extractionContext.targetDirectoryPath)) {
         Files.createDirectories(extractionContext.targetDirectoryPath)
       } else {
         if (!Files.isDirectory(extractionContext.targetDirectoryPath)) {
           throw IllegalArgumentException(
-            "The target path '${extractionContext.targetDirectoryPath}' already exists but it is not a directory"
+            UiToolsBundle.message(
+              "unarchiver.target-path-exists-but-is-not-directory",
+              extractionContext.targetDirectoryPath,
+            )
           )
         } else if (extractionContext.clearTargetDirectory) {
           FileUtils.cleanDirectory(extractionContext.targetDirectoryPath.toFile())
@@ -1784,7 +1854,11 @@ class Unarchiver(
         if (archiveEntryToTargetFilePathToCopy.containsKey(archiveEntry.name)) {
           progressIndicator.checkCanceled()
           progressIndicator.text =
-            "Extracting $numOfFileNodesToExtract file${if (numOfFileNodesToExtract == 1) "s" else ""} (${archiveEntryToTargetFilePathToCopy.size} remaining)..."
+            UiToolsBundle.message(
+              "unarchiver.extracting-files",
+              numOfFileNodesToExtract,
+              archiveEntryToTargetFilePathToCopy.size,
+            )
           progressIndicator.text2 = archiveEntry.name
           progressIndicator.fraction =
             (numOfFileNodesToExtract - archiveEntryToTargetFilePathToCopy.size.toDouble()) /
@@ -1804,7 +1878,10 @@ class Unarchiver(
       }
       if (archiveEntryToTargetFilePathToCopy.isNotEmpty()) {
         throw IllegalStateException(
-          "Unable to find archive entries: ${archiveEntryToTargetFilePathToCopy.map { it.key }.joinToString(", ")}"
+          UiToolsBundle.message(
+            "unarchiver.unable-to-find-archive-entries",
+            archiveEntryToTargetFilePathToCopy.map { it.key }.joinToString(", "),
+          )
         )
       }
     }
@@ -1812,7 +1889,11 @@ class Unarchiver(
     override fun onThrowable(error: Throwable) {
       log.warn("Extraction failed", error)
       ApplicationManager.getApplication().invokeLater {
-        Messages.showErrorDialog(project, error.message, "Extraction Failed")
+        Messages.showErrorDialog(
+          project,
+          error.message ?: UiToolsBundle.message("unarchiver.unknown"),
+          UiToolsBundle.message("unarchiver.extraction-failed"),
+        )
       }
     }
 
@@ -1896,10 +1977,14 @@ class Unarchiver(
       val numOfExtractedEntries = extractionContext.archiveNodes.size
       NotificationUtils.notifyOnToolWindow(
         message =
-          "$numOfExtractedEntries ${if (numOfExtractedEntries == 1) "entry" else "entries"} have been extracted to: ${extractionContext.targetDirectoryPath}",
+          UiToolsBundle.message(
+            "unarchiver.entries-extracted",
+            numOfExtractedEntries,
+            extractionContext.targetDirectoryPath,
+          ),
         project = project,
         notificationType = NotificationType.INFORMATION,
-        object : DumbAwareAction("Open Target Directory") {
+        object : DumbAwareAction(UiToolsBundle.message("unarchiver.open-target-directory")) {
 
           override fun actionPerformed(e: AnActionEvent) {
             BrowserUtil.browse(extractionContext.targetDirectoryPath)
@@ -1918,7 +2003,10 @@ class Unarchiver(
   class Factory : DeveloperUiToolFactory<Unarchiver> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Unarchiver", contentTitle = CONTENT_TITLE)
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("unarchiver.menu-title"),
+        contentTitle = UiToolsBundle.message("unarchiver.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
@@ -1935,7 +2023,6 @@ class Unarchiver(
   companion object {
 
     private const val ID = "unarchiver"
-    private const val CONTENT_TITLE = "Unarchiver"
 
     private val DEFAULT_SORTING_MODE = SortingMode.FILENAME_ASC
     private const val DEFAULT_SHOW_ARCHIVE_NODE_SIZE = true

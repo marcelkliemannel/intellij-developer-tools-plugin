@@ -16,6 +16,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnesc
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnescapers.commonUnescaper
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnescapers.executeEscapeInEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnescapers.executeUnescapeInEditor
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 
 abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityAction {
   // -- Properties ---------------------------------------------------------- //
@@ -86,7 +87,8 @@ abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityActio
     private val editor: Editor,
   ) : BaseListPopupStep<Escaper>(null, commonEscaper), EscaperUnescaperListPopupStep<Escaper> {
 
-    override val actionName: String = "Escape"
+    override val actionName: String =
+      EditorToolsBundle.message("escape-unescape-action-group.escape")
 
     override fun getTextFor(escaper: Escaper): String = escaper.title
 
@@ -105,7 +107,8 @@ abstract class EscapeUnescapeIntentionAction : IntentionAction, LowPriorityActio
   ) :
     BaseListPopupStep<Unescaper>(null, commonUnescaper), EscaperUnescaperListPopupStep<Unescaper> {
 
-    override val actionName: String = "Unescape"
+    override val actionName: String =
+      EditorToolsBundle.message("escape-unescape-action-group.unescape")
 
     override fun getTextFor(unescaper: Unescaper): String = unescaper.title
 

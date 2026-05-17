@@ -5,6 +5,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitcon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.NumberSystem.BASIC
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.NumberSystem.BINARY
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.NumberSystem.DECIMAL
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.math.BigDecimal
 import java.math.MathContext
 
@@ -163,9 +164,9 @@ object DataUnits {
 
   enum class NumberSystem(val title: String, val base: BigDecimal) {
 
-    BASIC("Basic", BigDecimal.valueOf(2)),
-    BINARY("Binary", BigDecimal.valueOf(2)),
-    DECIMAL("Decimal", BigDecimal.valueOf(10)),
+    BASIC(UiToolsBundle.message("units-converter.number-system.basic"), BigDecimal.valueOf(2)),
+    BINARY(UiToolsBundle.message("units-converter.number-system.binary"), BigDecimal.valueOf(2)),
+    DECIMAL(UiToolsBundle.message("units-converter.number-system.decimal"), BigDecimal.valueOf(10)),
   }
 
   // -- Inner Type ---------------------------------------------------------- //

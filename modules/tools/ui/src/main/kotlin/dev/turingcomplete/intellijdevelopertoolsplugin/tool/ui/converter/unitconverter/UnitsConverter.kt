@@ -15,6 +15,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ScrollPaneBuilder
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import javax.swing.ScrollPaneConstants
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
@@ -127,7 +128,10 @@ class UnitsConverter(
   class Factory : DeveloperUiToolFactory<UnitsConverter> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Units Converter", contentTitle = "Units Converter")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("units-converter.menu-title"),
+        contentTitle = UiToolsBundle.message("units-converter.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

@@ -6,12 +6,13 @@ import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.util.PlatformIcons
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.PluginCommonDataKeys.SELECTED_VALUES
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.message.CommonBundle
 import java.awt.datatransfer.StringSelection
 import javax.swing.Icon
 
 class CopyValuesAction(
-  private val singleValue: String = "Copy Value",
-  private val pluralValue: (Int) -> String = { "Copy $it Values" },
+  private val singleValue: String = CommonBundle.message("copy-values.single"),
+  private val pluralValue: (Int) -> String = { CommonBundle.message("copy-values.plural", it) },
   private val valueToString: (Any) -> String? = { it.toString() },
   icon: Icon? = PlatformIcons.COPY_ICON,
 ) : DumbAwareAction(singleValue, null, icon) {

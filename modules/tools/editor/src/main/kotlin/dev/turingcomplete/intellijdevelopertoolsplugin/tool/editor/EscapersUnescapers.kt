@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.TextRange
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.executeWriteCommand
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 import org.apache.commons.text.StringEscapeUtils
 
 object EscapersUnescapers {
@@ -15,20 +16,50 @@ object EscapersUnescapers {
 
   val commonEscaper =
     listOf(
-      Escaper("Java String", { StringEscapeUtils.escapeJava(it) }),
-      Escaper("HTML Entities", { StringEscapeUtils.escapeHtml4(it) }),
-      Escaper("JSON Value", { StringEscapeUtils.escapeJson(it) }),
-      Escaper("XML Value", { StringEscapeUtils.escapeXml11(it) }),
-      Escaper("CSV Value", { StringEscapeUtils.escapeCsv(it) }),
+      Escaper(
+        EditorToolsBundle.message("escape-unescape.title.java-string"),
+        { StringEscapeUtils.escapeJava(it) },
+      ),
+      Escaper(
+        EditorToolsBundle.message("escape-unescape.title.html-entities"),
+        { StringEscapeUtils.escapeHtml4(it) },
+      ),
+      Escaper(
+        EditorToolsBundle.message("escape-unescape.title.json-value"),
+        { StringEscapeUtils.escapeJson(it) },
+      ),
+      Escaper(
+        EditorToolsBundle.message("escape-unescape.title.xml-value"),
+        { StringEscapeUtils.escapeXml11(it) },
+      ),
+      Escaper(
+        EditorToolsBundle.message("escape-unescape.title.csv-value"),
+        { StringEscapeUtils.escapeCsv(it) },
+      ),
     )
 
   val commonUnescaper =
     listOf(
-      Unescaper("Java String", { StringEscapeUtils.unescapeJava(it) }),
-      Unescaper("HTML Entities", { StringEscapeUtils.escapeHtml4(it) }),
-      Unescaper("JSON Value", { StringEscapeUtils.unescapeJson(it) }),
-      Unescaper("XML Value", { StringEscapeUtils.unescapeXml(it) }),
-      Unescaper("CSV Value", { StringEscapeUtils.unescapeCsv(it) }),
+      Unescaper(
+        EditorToolsBundle.message("escape-unescape.title.java-string"),
+        { StringEscapeUtils.unescapeJava(it) },
+      ),
+      Unescaper(
+        EditorToolsBundle.message("escape-unescape.title.html-entities"),
+        { StringEscapeUtils.escapeHtml4(it) },
+      ),
+      Unescaper(
+        EditorToolsBundle.message("escape-unescape.title.json-value"),
+        { StringEscapeUtils.unescapeJson(it) },
+      ),
+      Unescaper(
+        EditorToolsBundle.message("escape-unescape.title.xml-value"),
+        { StringEscapeUtils.unescapeXml(it) },
+      ),
+      Unescaper(
+        EditorToolsBundle.message("escape-unescape.title.csv-value"),
+        { StringEscapeUtils.unescapeCsv(it) },
+      ),
     )
 
   // -- Initialization ------------------------------------------------------ //
@@ -43,7 +74,11 @@ object EscapersUnescapers {
     } catch (e: Exception) {
       log.warn("Escape failed", e)
       ApplicationManager.getApplication().invokeLater {
-        Messages.showErrorDialog(editor.project, "Escape failed: ${e.message}", escaper.actionName)
+        Messages.showErrorDialog(
+          editor.project,
+          EditorToolsBundle.message("escape-unescape.error.escape-failed", e.message ?: ""),
+          escaper.actionName,
+        )
       }
     }
   }
@@ -64,7 +99,7 @@ object EscapersUnescapers {
       ApplicationManager.getApplication().invokeLater {
         Messages.showErrorDialog(
           editor.project,
-          "Unescape failed: ${e.message}",
+          EditorToolsBundle.message("escape-unescape.error.unescape-failed", e.message ?: ""),
           unescaper.actionName,
         )
       }
@@ -77,7 +112,7 @@ object EscapersUnescapers {
   class Escaper(
     val title: String,
     val escape: (String) -> String,
-    val actionName: String = "Escape $title",
+    val actionName: String = EditorToolsBundle.message("escape-unescape.action.escape", title),
   )
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -85,6 +120,6 @@ object EscapersUnescapers {
   class Unescaper(
     val title: String,
     val unescape: (String) -> String,
-    val actionName: String = "Unescape $title",
+    val actionName: String = EditorToolsBundle.message("escape-unescape.action.unescape", title),
   )
 }

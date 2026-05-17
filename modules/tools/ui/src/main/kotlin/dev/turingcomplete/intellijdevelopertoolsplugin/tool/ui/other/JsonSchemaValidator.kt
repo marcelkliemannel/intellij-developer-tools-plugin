@@ -29,6 +29,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEd
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.ErrorHolder
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.PropertyComponentPredicate
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 
 class JsonSchemaValidator(
   private val context: DeveloperUiToolContext,
@@ -75,9 +76,11 @@ class JsonSchemaValidator(
 
     row {
       val liveValidationCheckBox =
-        checkBox("Live validation").bindSelected(liveValidation).gap(RightGap.SMALL)
+        checkBox(UiToolsBundle.message("json-schema-validator.live-validation"))
+          .bindSelected(liveValidation)
+          .gap(RightGap.SMALL)
 
-      button("Validate") { validateSchema() }
+      button(UiToolsBundle.message("json-schema-validator.validate")) { validateSchema() }
         .enabledIf(liveValidationCheckBox.selected.not())
         .gap(RightGap.SMALL)
     }
@@ -92,7 +95,7 @@ class JsonSchemaValidator(
 
     row {
         icon(AllIcons.General.InspectionsOK).gap(RightGap.SMALL)
-        label("Data matches schema")
+        label(UiToolsBundle.message("json-schema-validator.data-matches-schema"))
       }
       .visibleIf(PropertyComponentPredicate(validationState, ValidationState.VALIDATED))
 
@@ -104,7 +107,7 @@ class JsonSchemaValidator(
 
     row {
         icon(AllIcons.General.Warning).gap(RightGap.SMALL)
-        label("Invalid input")
+        label(UiToolsBundle.message("json-schema-validator.invalid-input"))
       }
       .visibleIf(PropertyComponentPredicate(validationState, ValidationState.INVALID_INPUT))
   }
@@ -156,7 +159,7 @@ class JsonSchemaValidator(
         validationError.set(
           """
             <html>
-            Data does not match schema:<br />
+            ${UiToolsBundle.message("json-schema-validator.data-does-not-match-schema")}<br />
               ${errors.joinToString(separator = "<br />") { "- $it" }}
             </html>
           """
@@ -172,7 +175,7 @@ class JsonSchemaValidator(
         context = context,
         configuration = configuration,
         project = project,
-        title = "JSON schema",
+        title = UiToolsBundle.message("json-schema-validator.schema-title"),
         editorMode = INPUT,
         parentDisposable = parentDisposable,
         initialLanguage = JsonLanguage.INSTANCE,
@@ -192,7 +195,7 @@ class JsonSchemaValidator(
         context = context,
         configuration = configuration,
         project = project,
-        title = "JSON data",
+        title = UiToolsBundle.message("json-schema-validator.data-title"),
         editorMode = INPUT,
         parentDisposable = parentDisposable,
         initialLanguage = JsonLanguage.INSTANCE,
@@ -220,7 +223,10 @@ class JsonSchemaValidator(
   class Factory : DeveloperUiToolFactory<JsonSchemaValidator> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "JSON Schema", contentTitle = "JSON Schema Validator")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("json-schema-validator.menu-title"),
+        contentTitle = UiToolsBundle.message("json-schema-validator.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

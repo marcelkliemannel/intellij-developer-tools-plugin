@@ -18,6 +18,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindIntTextImproved
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateLongValue
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.math.BigDecimal
 import java.math.MathContext
 import java.text.DecimalFormat
@@ -108,11 +109,11 @@ abstract class MathContextUnitConverter(
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildSettingsUi() {
-    collapsibleGroup("Settings") {
+    collapsibleGroup(UiToolsBundle.message("units-converter.settings")) {
         buildAdditionalSettingsUi()
         row {
             comboBox(ALL_AVAILABLE_LOCALES)
-              .label("Locale for parsing:")
+              .label(UiToolsBundle.message("units-converter.locale-for-parsing"))
               .bindItem(parsingLocale)
               .columns(COLUMNS_MEDIUM)
               .whenItemSelectedFromUi { sync() }
@@ -127,7 +128,7 @@ abstract class MathContextUnitConverter(
           .topGap(TopGap.NONE)
         row {
             textField()
-              .label("Decimal places:")
+              .label(UiToolsBundle.message("units-converter.decimal-places"))
               .bindIntTextImproved(decimalPlaces)
               .validateLongValue(LongRange(1, 50))
               .columns(COLUMNS_TINY)
@@ -136,14 +137,14 @@ abstract class MathContextUnitConverter(
           .layout(RowLayout.PARENT_GRID)
         row {
             comboBox(RoundingMode.entries)
-              .label("Rounding mode:")
+              .label(UiToolsBundle.message("units-converter.rounding-mode"))
               .bindItem(roundingMode)
               .whenItemSelectedFromUi { sync() }
           }
           .layout(RowLayout.PARENT_GRID)
         row {
             textField()
-              .label("Precision:")
+              .label(UiToolsBundle.message("units-converter.precision"))
               .bindIntTextImproved(precision)
               .validateLongValue(LongRange(1, 100))
               .columns(COLUMNS_TINY)
@@ -164,13 +165,28 @@ abstract class MathContextUnitConverter(
     val javaMathRoundingMode: java.math.RoundingMode,
   ) {
 
-    DOWN("Down", java.math.RoundingMode.DOWN),
-    UP("Up", java.math.RoundingMode.UP),
-    CEILING("Ceiling", java.math.RoundingMode.CEILING),
-    FLOOR("Floor", java.math.RoundingMode.FLOOR),
-    HALF_UP("Half up", java.math.RoundingMode.HALF_UP),
-    HALF_DOWN("Half down", java.math.RoundingMode.HALF_DOWN),
-    HALF_EVEN("Half even", java.math.RoundingMode.HALF_EVEN);
+    DOWN(UiToolsBundle.message("units-converter.rounding-mode.down"), java.math.RoundingMode.DOWN),
+    UP(UiToolsBundle.message("units-converter.rounding-mode.up"), java.math.RoundingMode.UP),
+    CEILING(
+      UiToolsBundle.message("units-converter.rounding-mode.ceiling"),
+      java.math.RoundingMode.CEILING,
+    ),
+    FLOOR(
+      UiToolsBundle.message("units-converter.rounding-mode.floor"),
+      java.math.RoundingMode.FLOOR,
+    ),
+    HALF_UP(
+      UiToolsBundle.message("units-converter.rounding-mode.half-up"),
+      java.math.RoundingMode.HALF_UP,
+    ),
+    HALF_DOWN(
+      UiToolsBundle.message("units-converter.rounding-mode.half-down"),
+      java.math.RoundingMode.HALF_DOWN,
+    ),
+    HALF_EVEN(
+      UiToolsBundle.message("units-converter.rounding-mode.half-even"),
+      java.math.RoundingMode.HALF_EVEN,
+    );
 
     override fun toString(): String = title
   }

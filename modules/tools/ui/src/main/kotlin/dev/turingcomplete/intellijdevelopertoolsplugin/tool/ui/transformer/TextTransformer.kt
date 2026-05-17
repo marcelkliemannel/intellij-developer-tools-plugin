@@ -31,6 +31,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor.EditorMode.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor.EditorMode.OUTPUT
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.GeneralBundle
 import java.awt.Dimension
 import javax.swing.JComponent
 
@@ -120,9 +121,18 @@ abstract class TextTransformer(
   private fun Panel.buildActionsUi() {
     row {
       val liveTransformationCheckBox =
-        checkBox("Live transformation").bindSelected(liveTransformation).gap(RightGap.SMALL)
+        checkBox(GeneralBundle.message("text-transformer.live-transformation"))
+          .bindSelected(liveTransformation)
+          .gap(RightGap.SMALL)
 
-      button("▼ ${textTransformerContext.transformActionTitle}") { transform() }
+      button(
+          GeneralBundle.message(
+            "text-transformer.transform-action",
+            textTransformerContext.transformActionTitle,
+          )
+        ) {
+          transform()
+        }
         .enabledIf(liveTransformationCheckBox.selected.not())
         .component
 
@@ -138,7 +148,12 @@ abstract class TextTransformer(
   }
 
   private fun createDebugAction(debugButton: () -> JComponent): AnAction {
-    return object : DumbAwareAction("Debug", null, AllIcons.Toolwindows.ToolWindowDebugger) {
+    return object :
+      DumbAwareAction(
+        GeneralBundle.message("text-transformer.debug"),
+        null,
+        AllIcons.Toolwindows.ToolWindowDebugger,
+      ) {
 
       override fun actionPerformed(e: AnActionEvent) {
         val debugComponent =

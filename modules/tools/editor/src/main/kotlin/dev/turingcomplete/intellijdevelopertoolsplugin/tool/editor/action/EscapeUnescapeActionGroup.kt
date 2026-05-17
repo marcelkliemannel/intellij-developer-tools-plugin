@@ -13,13 +13,15 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnesc
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnescapers.Unescaper
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnescapers.executeEscapeInEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnescapers.executeUnescapeInEditor
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 
-open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", false) {
+open class EscapeUnescapeActionGroup :
+  DefaultActionGroup(EditorToolsBundle.message("escape-unescape-action-group.title"), false) {
   // -- Properties ---------------------------------------------------------- //
 
   private val escapeActionGroup by lazy {
     createActionGroup(
-      title = "Escape",
+      title = EditorToolsBundle.message("escape-unescape-action-group.escape"),
       actions =
         EscapersUnescapers.commonEscaper.map { escaper ->
           EscapeAction(escaper) { getSourceText(it) }
@@ -28,7 +30,7 @@ open class EscapeUnescapeActionGroup : DefaultActionGroup("Escape/Unescape", fal
   }
   private val unescapeActionGroup by lazy {
     createActionGroup(
-      title = "Unescape",
+      title = EditorToolsBundle.message("escape-unescape-action-group.unescape"),
       actions =
         EscapersUnescapers.commonUnescaper.map { unescaper ->
           UnescapeAction(unescaper) { getSourceText(it) }

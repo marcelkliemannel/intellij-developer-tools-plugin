@@ -23,6 +23,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateMi
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.LoremIpsumGenerator.TextMode.BULLETS
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.LoremIpsumGenerator.TextMode.PARAGRAPHS
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.LoremIpsumGenerator.TextMode.WORDS
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.security.SecureRandom
 import kotlin.math.max
 import kotlin.math.min
@@ -34,7 +35,7 @@ class LoremIpsumGenerator(
   parentDisposable: Disposable,
 ) :
   MultiLineTextGenerator(
-    generatedTextTitle = "Generated lorem ipsum",
+    generatedTextTitle = UiToolsBundle.message("lorem-ipsum-generator.generated-text-title"),
     configuration = configuration,
     parentDisposable = parentDisposable,
     context = context,
@@ -77,14 +78,14 @@ class LoremIpsumGenerator(
 
     row {
         textField()
-          .label("Minimum words in paragraph:")
+          .label(UiToolsBundle.message("lorem-ipsum-generator.minimum-words-in-paragraph"))
           .bindIntTextImproved(minWordsInParagraph)
           .validateLongValue(LongRange(1, 999))
           .columns(COLUMNS_TINY)
           .validateMinMaxValueRelation(MIN) { maxWordsInParagraph.get() }
           .gap(RightGap.SMALL)
         textField()
-          .label("Maximum:")
+          .label(UiToolsBundle.message("lorem-ipsum-generator.maximum"))
           .bindIntTextImproved(maxWordsInParagraph)
           .validateLongValue(LongRange(1, 999))
           .columns(COLUMNS_TINY)
@@ -94,14 +95,14 @@ class LoremIpsumGenerator(
 
     row {
         textField()
-          .label("Minimum words in bullet:")
+          .label(UiToolsBundle.message("lorem-ipsum-generator.minimum-words-in-bullet"))
           .bindIntTextImproved(minWordsInBullet)
           .validateLongValue(LongRange(1, 999))
           .columns(COLUMNS_TINY)
           .validateMinMaxValueRelation(MIN) { maxWordsInBullet.get() }
           .gap(RightGap.SMALL)
         textField()
-          .label("Maximum:")
+          .label(UiToolsBundle.message("lorem-ipsum-generator.maximum"))
           .bindIntTextImproved(maxWordsInBullet)
           .validateLongValue(LongRange(1, 999))
           .columns(COLUMNS_TINY)
@@ -110,7 +111,7 @@ class LoremIpsumGenerator(
       .visibleIf(ComboBoxPredicate<TextMode>(textModeComboBox) { it == BULLETS })
 
     row {
-      checkBox("<html>Start with iconic <i>Lorem ipsum dolor sit amet…</i></html>")
+      checkBox(UiToolsBundle.message("lorem-ipsum-generator.start-with-iconic-lorem-ipsum"))
         .bindSelected(startWithLoremIpsum)
     }
   }
@@ -243,9 +244,9 @@ class LoremIpsumGenerator(
 
   private enum class TextMode(val title: String) {
 
-    PARAGRAPHS("Paragraphs"),
-    WORDS("Words"),
-    BULLETS("Bullets");
+    PARAGRAPHS(UiToolsBundle.message("lorem-ipsum-generator.text-mode.paragraphs")),
+    WORDS(UiToolsBundle.message("lorem-ipsum-generator.text-mode.words")),
+    BULLETS(UiToolsBundle.message("lorem-ipsum-generator.text-mode.bullets"));
 
     override fun toString(): String = title
   }
@@ -255,7 +256,10 @@ class LoremIpsumGenerator(
   class Factory : DeveloperUiToolFactory<LoremIpsumGenerator> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Lorem Ipsum", contentTitle = "Lorem Ipsum Generator")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("lorem-ipsum-generator.menu-title"),
+        contentTitle = UiToolsBundle.message("lorem-ipsum-generator.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

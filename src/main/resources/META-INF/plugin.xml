@@ -1,61 +1,12 @@
 <idea-plugin>
-    <name>Developer Tools</name>
+    <name>%plugin.name</name>
     <vendor email="dev@marcelkliemannel.com"
             url="https://marcelkliemannel.com/projects/intellij-developer-tools-plugin">
         Marcel Kliemannel
     </vendor>
+    <resource-bundle>messages.PluginBundle</resource-bundle>
 
-    <description><![CDATA[
-<p>Developer Tools brings a practical toolbox of everyday development utilities directly into IntelliJ-based IDEs. It keeps common tasks such as encoding data, transforming text, validating JSON, generating identifiers, inspecting archives, formatting code and SQL, and checking certificates inside the IDE, so you do not need to switch to separate web tools or command-line snippets.</p>
-
-<p>Plugin icon by <a href="https://www.svgrepo.com/svg/489187/toolbox">Gabriele Malaspina</a>.</p>
-
-<h2>Key Features</h2>
-<ul>
-    <li>JWT Encoder/Decoder</li>
-    <li>Base32, Base64, URL Base64, MIME Base64, URL, and ASCII Encoder/Decoder</li>
-    <li>Text escaping and unescaping for HTML entities, Java strings, JSON, CSV, XML, and escape sequences</li>
-    <li>Regular Expression Matcher</li>
-    <li>UUID, ULID, Nano ID, password, QR code/barcode, Lorem Ipsum, and ASCII art generators</li>
-    <li>Text Sorting</li>
-    <li>Text Case Transformation</li>
-    <li>Text Diff Viewer</li>
-    <li>Text Format Conversion</li>
-    <li>Text Statistic</li>
-    <li>Text Filter</li>
-    <li>JSON Path Parser</li>
-    <li>JSON Schema Validator</li>
-    <li>Hashing and HMAC</li>
-    <li>HTTP Server (WireMock)</li>
-    <li>Archive viewer and extractor for ZIP, TAR, JAR, 7z, and other formats</li>
-    <li>Date and time tools for Unix timestamps, formatting, and parsing</li>
-    <li>Unit converters for time, data size, and transfer rate</li>
-    <li>Code Style Formatting</li>
-    <li>SQL Formatting</li>
-    <li>CLI Command Conversion</li>
-    <li>Color Picker</li>
-    <li>Fetching, analyzing, and exporting server certificates</li>
-    <li>Notes</li>
-</ul>
-
-<h2>Integration</h2>
-
-<p>The full toolbox is available in both a persistent tool window and a standalone dialog. Tools can have multiple named workbenches, so you can keep separate inputs and configurations for different tasks. Frequently used text operations are also available from the editor popup menu and as intentions; depending on the action, they work on selected text or on the Java/Kotlin string or identifier at the caret.</p>
-
-<p>Plugin settings are available in IntelliJ IDEA's settings/preferences under <b>Tools | Developer Tools</b>.</p>
-
-<h3>Tool Window</h3>
-
-<p>The tool window is available under <b>View | Tool Windows | Developer Tools</b>. Inputs, selected tools, expanded menu groups, and tool configuration are stored per project.</p>
-
-<h3>Dialog</h3>
-
-<p>The dialog is available from IntelliJ IDEA's main menu under <b>Tools | Developer Tools</b>.</p>
-
-<p>To add the "Open Dialog" action to the main toolbar, enable it in IntelliJ IDEA's settings/preferences under <b>Tools | Developer Tools</b>, or add it manually via <b>Customize Toolbar... | Add Actions... | Developer Tools</b>.</p>
-
-<p>Dialog inputs, selected tools, expanded menu groups, and tool configuration are stored at the application level.</p>
-    ]]></description>
+    <description>%plugin.description</description>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
@@ -74,7 +25,7 @@
                 parentId="tools"
                 instance="dev.turingcomplete.intellijdevelopertoolsplugin.settings.GeneralSettingsConfigurable"
                 id="dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsConfigurable"
-                displayName="Developer Tools">
+                displayName="%plugin.name">
             <configurable
                     id="dev.turingcomplete.intellijdevelopertoolsplugin.settings.JsonHandlingSettingsConfigurable"
                     instance="dev.turingcomplete.intellijdevelopertoolsplugin.settings.JsonHandlingSettingsConfigurable"/>
@@ -84,6 +35,8 @@
                     anchor="right" secondary="true" canCloseContents="false" doNotActivateOnStart="true"
                     icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/toolwindow.svg"/>
         <notificationGroup id="Developer Tools Plugin Notifications" displayType="TOOL_WINDOW"
+                           bundle="messages.PluginBundle"
+                           key="notification.group.developer-tools"
                            toolWindowId="Developer Tools"/>
         <!--suppress PluginXmlExtensionRegistration (not depending on any language) -->
         <intentionAction>
@@ -458,8 +411,8 @@
     <actions>
         <action id="dev.turingcomplete.intellijdevelopertoolsplugin.ui.instance.dialog.OpenMainDialogAction"
                 class="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.dialog.OpenMainDialogAction"
-                text="Developer Tools"
-                description="Provides various developer tools"
+                text="%action.open-main-dialog.text"
+                description="%action.open-main-dialog.description"
                 icon="/dev/turingcomplete/intellijdevelopertoolsplugin/icons/action.svg">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>

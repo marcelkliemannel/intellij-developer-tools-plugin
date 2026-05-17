@@ -63,6 +63,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateMi
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.LEVEL_BITS
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.LEVEL_ENUM_NAME
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.BarcodeGenerator.ErrorCorrectionSupport.UNSUPPORTED
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.awt.Container
 import java.awt.Graphics
 import java.lang.Integer.toHexString
@@ -104,7 +105,7 @@ private constructor(
     row {
       formatComboBox =
         comboBox(Format.entries)
-          .label("Format:")
+          .label(UiToolsBundle.message("barcode-generator.format"))
           .bindItem(format)
           .whenItemSelectedFromUi { generate() }
           .component
@@ -125,16 +126,16 @@ private constructor(
     }
 
     row {
-      label("Background color:").gap(RightGap.SMALL)
+      label(UiToolsBundle.message("barcode-generator.background-color")).gap(RightGap.SMALL)
       cell(ColorPanel(drawPanel.backgroundColor)).gap(RightGap.SMALL)
       lateinit var backgroundColorButton: JButton
       backgroundColorButton =
-        button("Change") {
+        button(UiToolsBundle.message("barcode-generator.change")) {
             ColorChooserService.getInstance()
               .showDialog(
                 project,
                 backgroundColorButton,
-                "Select Background Color",
+                UiToolsBundle.message("barcode-generator.select-background-color"),
                 drawPanel.backgroundColor.get(),
               )
               ?.let {
@@ -144,16 +145,16 @@ private constructor(
           }
           .component
 
-      label("Foreground color:").gap(RightGap.SMALL)
+      label(UiToolsBundle.message("barcode-generator.foreground-color")).gap(RightGap.SMALL)
       cell(ColorPanel(drawPanel.foregroundColor)).gap(RightGap.SMALL)
       lateinit var foregroundColorButton: JButton
       foregroundColorButton =
-        button("Change") {
+        button(UiToolsBundle.message("barcode-generator.change")) {
             ColorChooserService.getInstance()
               .showDialog(
                 project,
                 foregroundColorButton,
-                "Select Foreground Color",
+                UiToolsBundle.message("barcode-generator.select-foreground-color"),
                 drawPanel.foregroundColor.get(),
               )
               ?.let {
@@ -166,7 +167,7 @@ private constructor(
 
     row {
       val liveGenerationCheckBox =
-        checkBox("Live generation")
+        checkBox(UiToolsBundle.message("barcode-generator.live-generation"))
           .bindSelected(liveGeneration)
           .whenStateChangedFromUi {
             if (it) {
@@ -175,12 +176,17 @@ private constructor(
           }
           .gap(RightGap.SMALL)
 
-      button("▼ Generate") { generate(false) }.enabledIf(liveGenerationCheckBox.selected.not())
+      button(UiToolsBundle.message("barcode-generator.generate")) { generate(false) }
+        .enabledIf(liveGenerationCheckBox.selected.not())
 
       val exportToFileActions =
         ImageIO.getWriterFileSuffixes()
           .map { fileFormat ->
-            DumbAwareAction.create("Export as $fileFormat") { exportToFile(fileFormat) }
+            DumbAwareAction.create(
+              UiToolsBundle.message("barcode-generator.export-as", fileFormat)
+            ) {
+              exportToFile(fileFormat)
+            }
           }
           .toTypedArray()
       actionsButton(
@@ -188,13 +194,13 @@ private constructor(
           actionPlace = BarcodeGenerator::class.java.name,
           icon = AllIcons.Actions.MenuSaveall,
         )
-        .label("Export:")
+        .label(UiToolsBundle.message("barcode-generator.export"))
         .visibleIf(contentErrorHolder.asComponentPredicate().not())
     }
 
     row {
         cell(ScrollPaneFactory.createScrollPane(drawPanel, true))
-          .label("Generated image:", LabelPosition.TOP)
+          .label(UiToolsBundle.message("barcode-generator.generated-image"), LabelPosition.TOP)
           .align(AlignY.TOP)
       }
       .visibleIf(contentErrorHolder.asComponentPredicate().not())
@@ -239,7 +245,7 @@ private constructor(
         )
       drawPanel.matrix.set(newMatrix)
     } catch (_: NumberFormatException) {
-      contentErrorHolder.add("Input must be a number")
+      contentErrorHolder.add(UiToolsBundle.message("barcode-generator.input-must-be-a-number"))
     } catch (e: Exception) {
       contentErrorHolder.add(e)
     }
@@ -253,7 +259,7 @@ private constructor(
         context,
         configuration,
         project,
-        "Content",
+        UiToolsBundle.message("barcode-generator.content"),
         AdvancedEditor.EditorMode.INPUT,
         parentDisposable,
         contentText,
@@ -261,7 +267,11 @@ private constructor(
       .onTextChangeFromUi { generate() }
 
   private fun exportToFile(fileFormat: String) {
-    val fileSaverDescriptor = FileSaverDescriptor("Export As $fileFormat", "")
+    val fileSaverDescriptor =
+      FileSaverDescriptor(
+        UiToolsBundle.message("barcode-generator.export-as-title", fileFormat),
+        "",
+      )
     val timeStamp = LocalDateTime.now().format(timestampFormat)
     val defaultFilename = "${format.get().name.lowercase()}_$timeStamp.$fileFormat"
     FileChooserFactory.getInstance()
@@ -281,12 +291,24 @@ private constructor(
     val createConfiguration: (DeveloperToolConfiguration) -> FormatConfiguration,
   ) {
 
-    AZTEC("Aztec 2D", { configuration -> AztecCodeConfiguration(configuration) }),
-    QR_CODE("QR Code 2D", { configuration -> QrCodeConfiguration(configuration) }),
-    DATA_MATRIX("Data Matrix 2D", { configuration -> DataMatrixConfiguration(configuration) }),
-    PDF_417("PDF417", { configuration -> Pdf417FormatConfiguration(configuration) }),
+    AZTEC(
+      UiToolsBundle.message("barcode-generator.format.aztec"),
+      { configuration -> AztecCodeConfiguration(configuration) },
+    ),
+    QR_CODE(
+      UiToolsBundle.message("barcode-generator.format.qr-code"),
+      { configuration -> QrCodeConfiguration(configuration) },
+    ),
+    DATA_MATRIX(
+      UiToolsBundle.message("barcode-generator.format.data-matrix"),
+      { configuration -> DataMatrixConfiguration(configuration) },
+    ),
+    PDF_417(
+      UiToolsBundle.message("barcode-generator.format.pdf-417"),
+      { configuration -> Pdf417FormatConfiguration(configuration) },
+    ),
     CODE_39(
-      "Code 39 1D",
+      UiToolsBundle.message("barcode-generator.format.code-39"),
       { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODE_39,
@@ -299,7 +321,7 @@ private constructor(
       },
     ),
     CODE_93(
-      "Code 93 1D",
+      UiToolsBundle.message("barcode-generator.format.code-93"),
       { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODE_93,
@@ -312,7 +334,7 @@ private constructor(
       },
     ),
     CODE_128(
-      "Code 128 1D",
+      UiToolsBundle.message("barcode-generator.format.code-128"),
       { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODE_128,
@@ -325,7 +347,7 @@ private constructor(
       },
     ),
     EAN_8(
-      "EAN-8 1D",
+      UiToolsBundle.message("barcode-generator.format.ean-8"),
       { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.EAN_8,
@@ -338,7 +360,7 @@ private constructor(
       },
     ),
     EAN_13(
-      "EAN-13 1D",
+      UiToolsBundle.message("barcode-generator.format.ean-13"),
       { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.EAN_13,
@@ -351,7 +373,7 @@ private constructor(
       },
     ),
     ITF(
-      "ITF (Interleaved Two of Five) 1D",
+      UiToolsBundle.message("barcode-generator.format.itf"),
       { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.ITF,
@@ -364,7 +386,7 @@ private constructor(
       },
     ),
     CODABAR(
-      "CODABAR 1D",
+      UiToolsBundle.message("barcode-generator.format.codabar"),
       { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.CODABAR,
@@ -377,7 +399,7 @@ private constructor(
       },
     ),
     UPC_A(
-      "UPC-A 1D",
+      UiToolsBundle.message("barcode-generator.format.upc-a"),
       { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.UPC_A,
@@ -388,7 +410,7 @@ private constructor(
       },
     ),
     UPC_E(
-      "UPC-E 1D",
+      UiToolsBundle.message("barcode-generator.format.upc-e"),
       { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.UPC_E,
@@ -399,7 +421,7 @@ private constructor(
       },
     ),
     UPC_EAN_EXTENSION(
-      "UPC/EAN extension",
+      UiToolsBundle.message("barcode-generator.format.upc-ean-extension"),
       { configuration ->
         FormatConfiguration(
           barcodeFormat = BarcodeFormat.UPC_EAN_EXTENSION,
@@ -444,7 +466,7 @@ private constructor(
       row {
           if (supportsWidth) {
             textField()
-              .label("Width:")
+              .label(UiToolsBundle.message("barcode-generator.width"))
               .bindIntTextImproved(width)
               .validateLongValue(LongRange(10, 1000))
               .columns(COLUMNS_TINY)
@@ -453,7 +475,7 @@ private constructor(
 
           if (supportsHeight) {
             textField()
-              .label("Height:")
+              .label(UiToolsBundle.message("barcode-generator.height"))
               .bindIntTextImproved(height)
               .validateLongValue(LongRange(1, 1000))
               .columns(COLUMNS_TINY)
@@ -462,7 +484,7 @@ private constructor(
 
           if (supportsMargin) {
             textField()
-              .label("Margin:")
+              .label(UiToolsBundle.message("barcode-generator.margin"))
               .bindIntTextImproved(margin)
               .validateLongValue(LongRange(0, 100))
               .columns(COLUMNS_TINY)
@@ -471,7 +493,7 @@ private constructor(
 
           if (supportsErrorCorrection != UNSUPPORTED) {
             comboBox(ErrorCorrection.entries)
-              .label("Error correction:")
+              .label(UiToolsBundle.message("barcode-generator.error-correction"))
               .bindItem(errorCorrection)
               .onChanged { onConfigurationChange() }
           }
@@ -529,8 +551,7 @@ private constructor(
       supportsMargin = true,
       defaultMargin = 5,
       supportsErrorCorrection = LEVEL_BITS,
-      comment =
-        "The actual size will be calculated on a scale factor which is based on the relationship between the width and height value. Use a larger height than width value to rotate the barcode.",
+      comment = UiToolsBundle.message("barcode-generator.pdf-417.size-comment"),
     ) {
 
     private val useCompactMode =
@@ -552,7 +573,7 @@ private constructor(
     ) {
       row {
           val useCompactModeCheckBox =
-            checkBox("PDF417 compact mode:")
+            checkBox(UiToolsBundle.message("barcode-generator.pdf-417-compact-mode"))
               .bindSelected(useCompactMode)
               .onChanged { onConfigurationChange() }
               .gap(RightGap.SMALL)
@@ -567,23 +588,23 @@ private constructor(
             .whenItemSelectedFromUi { onConfigurationChange() }
             .enabledIf(useCompactModeCheckBox.selected)
 
-          checkBox("Automatically insert ECIs").bindSelected(insertEcis).whenStateChangedFromUi {
-            onConfigurationChange()
-          }
+          checkBox(UiToolsBundle.message("barcode-generator.pdf-417-insert-ecis"))
+            .bindSelected(insertEcis)
+            .whenStateChangedFromUi { onConfigurationChange() }
         }
         .visibleIf(visible)
 
       lateinit var limitDimensionsCheckbox: Cell<JBCheckBox>
       row {
           limitDimensionsCheckbox =
-            checkBox("Limit dimensions:").bindSelected(setDimensions).whenStateChangedFromUi {
-              onConfigurationChange()
-            }
+            checkBox(UiToolsBundle.message("barcode-generator.pdf-417-limit-dimensions"))
+              .bindSelected(setDimensions)
+              .whenStateChangedFromUi { onConfigurationChange() }
         }
         .visibleIf(visible)
       row {
           textField()
-            .label("Min. col.:")
+            .label(UiToolsBundle.message("barcode-generator.pdf-417-min-columns"))
             .bindIntTextImproved(minColumns)
             .validateLongValue(LongRange(1, 1000))
             .validateMinMaxValueRelation(ValidateMinIntValueSide.MIN) { maxColumns.get() }
@@ -591,7 +612,7 @@ private constructor(
             .gap(RightGap.SMALL)
             .whenTextChangedFromUi { onConfigurationChange() }
           textField()
-            .label("Max. col.:")
+            .label(UiToolsBundle.message("barcode-generator.pdf-417-max-columns"))
             .bindIntTextImproved(maxColumns)
             .validateLongValue(LongRange(1, 1000))
             .validateMinMaxValueRelation(ValidateMinIntValueSide.MAX) { minColumns.get() }
@@ -599,7 +620,7 @@ private constructor(
             .whenTextChangedFromUi { onConfigurationChange() }
 
           textField()
-            .label("Min. rows:")
+            .label(UiToolsBundle.message("barcode-generator.pdf-417-min-rows"))
             .bindIntTextImproved(minRows)
             .validateLongValue(LongRange(1, 1000))
             .validateMinMaxValueRelation(ValidateMinIntValueSide.MIN) { maxRows.get() }
@@ -607,7 +628,7 @@ private constructor(
             .gap(RightGap.SMALL)
             .whenTextChangedFromUi { onConfigurationChange() }
           textField()
-            .label("Max. rows:")
+            .label(UiToolsBundle.message("barcode-generator.pdf-417-max-rows"))
             .bindIntTextImproved(maxRows)
             .validateLongValue(LongRange(1, 1000))
             .validateMinMaxValueRelation(ValidateMinIntValueSide.MAX) { minRows.get() }
@@ -659,13 +680,13 @@ private constructor(
             textListCellRenderer<Int?> {
               when {
                 it == null -> throw IllegalArgumentException()
-                it < 0 -> "$it (compact)"
-                it == 0 -> "Minimum"
+                it < 0 -> UiToolsBundle.message("barcode-generator.compact-suffix", it)
+                it == 0 -> UiToolsBundle.message("barcode-generator.minimum")
                 else -> it.toString()
               }
             }
           comboBox(IntRange(-4, 32).toList(), renderer)
-            .label("Layers:")
+            .label(UiToolsBundle.message("barcode-generator.layers"))
             .bindItem(layers)
             .whenItemSelectedFromUi { onConfigurationChange() }
         }
@@ -703,31 +724,35 @@ private constructor(
     ) {
       row {
           val compactModeCheckBox =
-            checkBox("Compact mode")
+            checkBox(UiToolsBundle.message("barcode-generator.compact-mode"))
               .bindSelected(compactMode)
               .whenStateChangedFromUi { onConfigurationChange() }
               .gap(RightGap.SMALL)
 
-          checkBox("Use GS1")
+          checkBox(UiToolsBundle.message("barcode-generator.use-gs1"))
             .bindSelected(gs1)
             .whenStateChangedFromUi { onConfigurationChange() }
             .enabledIf(compactModeCheckBox.selected)
 
           val versionRenderer =
             textListCellRenderer<Int?> {
-              if (it == 0) "Minimum" else it?.toString() ?: throw IllegalArgumentException()
+              if (it == 0) {
+                UiToolsBundle.message("barcode-generator.minimum")
+              } else it?.toString() ?: throw IllegalArgumentException()
             }
           comboBox(IntRange(0, 40).toList(), versionRenderer)
-            .label("Version:")
+            .label(UiToolsBundle.message("barcode-generator.version"))
             .bindItem(version)
             .whenItemSelectedFromUi { onConfigurationChange() }
 
           val maskPatternRenderer =
             textListCellRenderer<Int?> {
-              if (it == -1) "Best" else it?.toString() ?: throw IllegalArgumentException()
+              if (it == -1) {
+                UiToolsBundle.message("barcode-generator.best")
+              } else it?.toString() ?: throw IllegalArgumentException()
             }
           comboBox(IntRange(-1, QRCode.NUM_MASK_PATTERNS - 1).toList(), maskPatternRenderer)
-            .label("Mask pattern:")
+            .label(UiToolsBundle.message("barcode-generator.mask-pattern"))
             .bindItem(maskPattern)
             .whenItemSelectedFromUi { onConfigurationChange() }
         }
@@ -778,18 +803,18 @@ private constructor(
     ) {
       row {
           val compactModeCheckBox =
-            checkBox("Compact mode")
+            checkBox(UiToolsBundle.message("barcode-generator.compact-mode"))
               .bindSelected(compactMode)
               .whenStateChangedFromUi { onConfigurationChange() }
               .gap(RightGap.SMALL)
 
-          checkBox("Use GS1")
+          checkBox(UiToolsBundle.message("barcode-generator.use-gs1"))
             .bindSelected(gs1)
             .whenStateChangedFromUi { onConfigurationChange() }
             .enabledIf(compactModeCheckBox.selected)
             .gap(RightGap.SMALL)
 
-          checkBox("Force C40")
+          checkBox(UiToolsBundle.message("barcode-generator.force-c40"))
             .bindSelected(forceC40)
             .whenStateChangedFromUi { onConfigurationChange() }
             .enabledIf(compactModeCheckBox.selected.not())
@@ -797,15 +822,17 @@ private constructor(
           val symbolShapeRenderer =
             textListCellRenderer<SymbolShapeHint?> {
               when (it) {
-                SymbolShapeHint.FORCE_NONE -> "Automatically"
-                SymbolShapeHint.FORCE_SQUARE -> "Square"
-                SymbolShapeHint.FORCE_RECTANGLE -> "Rectangle"
+                SymbolShapeHint.FORCE_NONE ->
+                  UiToolsBundle.message("barcode-generator.automatically")
+                SymbolShapeHint.FORCE_SQUARE -> UiToolsBundle.message("barcode-generator.square")
+                SymbolShapeHint.FORCE_RECTANGLE ->
+                  UiToolsBundle.message("barcode-generator.rectangle")
                 else -> throw IllegalArgumentException()
               }
             }
           comboBox(SymbolShapeHint.entries, symbolShapeRenderer)
             .bindItem(symbolShape)
-            .label("Symbol shape:")
+            .label(UiToolsBundle.message("barcode-generator.symbol-shape"))
             .whenItemSelectedFromUi { onConfigurationChange() }
         }
         .visibleIf(visible)
@@ -928,8 +955,8 @@ private constructor(
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "QR Code/Barcode",
-        contentTitle = "QR Code/Barcode Generator",
+        menuTitle = UiToolsBundle.message("barcode-generator.menu-title"),
+        contentTitle = UiToolsBundle.message("barcode-generator.content-title"),
       )
 
     override fun getDeveloperUiToolCreator(

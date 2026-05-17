@@ -17,6 +17,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.LOCAL_INTERFACE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.MacAddressBasedUuidGenerator.MacAddressGenerationMode.RANDOM
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.net.NetworkInterface
 import java.net.SocketException
 
@@ -37,15 +38,15 @@ abstract class MacAddressBasedUuidGenerator(
 
   @Suppress("UnstableApiUsage")
   override fun Panel.buildConfigurationUi(visible: ComponentPredicate) {
-    buttonsGroup("MAC address:") {
+    buttonsGroup(UiToolsBundle.message("uuid-generator.mac-address")) {
         row {
-          radioButton("Generate random multicast MAC address")
+          radioButton(UiToolsBundle.message("uuid-generator.mac-address.generate-random-multicast"))
             .bind(macAddressGenerationMode, RANDOM)
         }
 
         row {
           val individualRadioButton =
-            radioButton("Individual:")
+            radioButton(UiToolsBundle.message("uuid-generator.mac-address.individual"))
               .bind(macAddressGenerationMode, INDIVIDUAL)
               .gap(RightGap.SMALL)
           expandableTextField()
@@ -59,7 +60,7 @@ abstract class MacAddressBasedUuidGenerator(
           val localMacAddresses = collectLocalMacAddresses()
           visible(localMacAddresses.isNotEmpty())
           val useLocalInterface =
-            radioButton("Local interface:")
+            radioButton(UiToolsBundle.message("uuid-generator.mac-address.local-interface"))
               .bind(macAddressGenerationMode, LOCAL_INTERFACE)
               .gap(RightGap.SMALL)
           comboBox(localMacAddresses)
@@ -154,6 +155,7 @@ abstract class MacAddressBasedUuidGenerator(
   companion object {
 
     private val MAC_ADDRESS_REGEX = Regex("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
-    private val INVALID_MAC_ADDRESS_VALIDATION_INFO = ValidationInfo("Must be a valid MAC address")
+    private val INVALID_MAC_ADDRESS_VALIDATION_INFO =
+      ValidationInfo(UiToolsBundle.message("uuid-generator.mac-address.invalid"))
   }
 }

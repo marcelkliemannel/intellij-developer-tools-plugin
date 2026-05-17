@@ -7,10 +7,12 @@ import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAwareAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedText
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolService
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.TextStatistic
 
-class EditorTextStatisticAction : DumbAwareAction("Show Text Statistic of Document...") {
+class EditorTextStatisticAction :
+  DumbAwareAction(EditorToolsBundle.message("editor-text-statistic-action.title")) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //

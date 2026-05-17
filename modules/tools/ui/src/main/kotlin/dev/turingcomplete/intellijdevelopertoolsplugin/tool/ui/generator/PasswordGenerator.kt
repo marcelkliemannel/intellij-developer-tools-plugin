@@ -21,6 +21,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.Passwor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_LOWERCASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.ASCII_ALPHABET_ONLY_UPPERCASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator.LettersMode.NONE
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.security.SecureRandom
 import javax.swing.JComponent
 import org.apache.commons.text.RandomStringGenerator
@@ -53,7 +54,7 @@ class PasswordGenerator(
     rowsRange {
       row {
           textField()
-            .label("Length:")
+            .label(UiToolsBundle.message("password-generator.length"))
             .validateLongValue(LongRange(1, 100))
             .bindIntTextImproved(length)
         }
@@ -61,7 +62,7 @@ class PasswordGenerator(
 
       row {
           comboBox(LettersMode.entries)
-            .label("Letters:")
+            .label(UiToolsBundle.message("password-generator.letters"))
             .bindItem(lettersMode)
             .validationInfo(validateAtLeastOneCharacter())
             .component
@@ -69,7 +70,7 @@ class PasswordGenerator(
         .layout(RowLayout.PARENT_GRID)
 
       row {
-          checkBox("Add digits")
+          checkBox(UiToolsBundle.message("password-generator.add-digits"))
             .bindSelected(addDigits)
             .validationInfo(validateAtLeastOneCharacter())
             .align(Align.FILL)
@@ -78,7 +79,7 @@ class PasswordGenerator(
 
       row {
           val addSymbolsCheckBox =
-            checkBox("Add symbols:")
+            checkBox(UiToolsBundle.message("password-generator.add-symbols"))
               .bindSelected(addSymbols)
               .validationInfo(validateAtLeastOneCharacter())
               .component
@@ -104,7 +105,9 @@ class PasswordGenerator(
   private fun validateAtLeastOneCharacter(): ValidationInfoBuilder.(JComponent) -> ValidationInfo? =
     {
       if (collectCharacters().isEmpty()) {
-        ValidationInfo("At least one character must be provided")
+        ValidationInfo(
+          UiToolsBundle.message("password-generator.validation.at-least-one-character")
+        )
       } else {
         null
       }
@@ -135,10 +138,14 @@ class PasswordGenerator(
 
   private enum class LettersMode(val title: String) {
 
-    NONE("None"),
-    ASCII_ALPHABET("ASCII alphabet"),
-    ASCII_ALPHABET_ONLY_LOWERCASE("ASCII alphabet - only lowercase"),
-    ASCII_ALPHABET_ONLY_UPPERCASE("ASCII alphabet - only uppercase");
+    NONE(UiToolsBundle.message("password-generator.character-set.none")),
+    ASCII_ALPHABET(UiToolsBundle.message("password-generator.character-set.ascii-alphabet")),
+    ASCII_ALPHABET_ONLY_LOWERCASE(
+      UiToolsBundle.message("password-generator.character-set.ascii-alphabet-only-lowercase")
+    ),
+    ASCII_ALPHABET_ONLY_UPPERCASE(
+      UiToolsBundle.message("password-generator.character-set.ascii-alphabet-only-uppercase")
+    );
 
     override fun toString(): String = title
   }
@@ -149,8 +156,8 @@ class PasswordGenerator(
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "Password Generator",
-        contentTitle = "Password Generator",
+        menuTitle = UiToolsBundle.message("password-generator.menu-title"),
+        contentTitle = UiToolsBundle.message("password-generator.content-title"),
       )
 
     override fun getDeveloperUiToolCreator(

@@ -10,6 +10,7 @@ import com.intellij.util.ui.JBEmptyBorder
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings.Companion.generalSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsDialogSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.content.ContentPanelHandler
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import javax.swing.Action
 import javax.swing.JComponent
 
@@ -28,7 +29,7 @@ class MainDialog(project: Project?) :
   // -- Initialization ------------------------------------------------------ //
 
   init {
-    title = "Developer Tools"
+    title = UiToolsBundle.message("main-frame.title")
     setSize(950, 705)
     isModal = generalSettings.dialogIsModal.get()
     init()

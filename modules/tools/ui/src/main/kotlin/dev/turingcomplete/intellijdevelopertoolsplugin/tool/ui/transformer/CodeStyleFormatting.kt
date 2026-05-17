@@ -14,6 +14,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 
 class CodeStyleFormatting(
   val codeStyles: List<CodeStyle>,
@@ -25,10 +26,10 @@ class CodeStyleFormatting(
   TextTransformer(
     textTransformerContext =
       TextTransformerContext(
-        transformActionTitle = "Format",
-        sourceTitle = "Original",
-        resultTitle = "Formatted",
-        diffSupport = DiffSupport(title = "Code Style Formatting"),
+        transformActionTitle = UiToolsBundle.message("code-style-formatting.format"),
+        sourceTitle = UiToolsBundle.message("code-style-formatting.source-title"),
+        resultTitle = UiToolsBundle.message("code-style-formatting.result-title"),
+        diffSupport = DiffSupport(title = UiToolsBundle.message("code-style-formatting.title")),
       ),
     context = context,
     configuration = configuration,
@@ -63,7 +64,7 @@ class CodeStyleFormatting(
 
     row {
       comboBox(codeStyles.toList())
-        .label("Language:")
+        .label(UiToolsBundle.message("code-style-formatting.language"))
         .applyToComponent { selectedItem = selectedCodeStyle }
         .whenItemSelectedFromUi {
           selectedCodeStyleLanguageId.set(it.language.id)
@@ -107,8 +108,8 @@ class CodeStyleFormatting(
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
-        menuTitle = "Code Style Formatting",
-        contentTitle = "Code Style Formatting",
+        menuTitle = UiToolsBundle.message("code-style-formatting.menu-title"),
+        contentTitle = UiToolsBundle.message("code-style-formatting.content-title"),
       )
 
     override fun getDeveloperUiToolCreator(

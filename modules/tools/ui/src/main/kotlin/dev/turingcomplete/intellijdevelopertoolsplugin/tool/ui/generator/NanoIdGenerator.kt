@@ -7,6 +7,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 
 class NanoIdGenerator(
   project: Project?,
@@ -32,7 +33,10 @@ class NanoIdGenerator(
   class Factory : DeveloperUiToolFactory<NanoIdGenerator> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Nano ID", contentTitle = "Nano ID Generator")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("nano-id-generator.menu-title"),
+        contentTitle = UiToolsBundle.message("nano-id-generator.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

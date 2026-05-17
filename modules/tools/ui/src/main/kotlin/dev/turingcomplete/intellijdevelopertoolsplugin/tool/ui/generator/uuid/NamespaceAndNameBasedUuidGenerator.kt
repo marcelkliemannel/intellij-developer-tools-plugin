@@ -17,6 +17,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolCon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.NamespaceAndNameBasedUuidGenerator.NamespaceMode.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.uuid.NamespaceAndNameBasedUuidGenerator.NamespaceMode.PREDEFINED
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.security.MessageDigest
 import java.util.UUID
 
@@ -41,10 +42,12 @@ abstract class NamespaceAndNameBasedUuidGenerator(
   @Suppress("UnstableApiUsage")
   override fun Panel.buildConfigurationUi(visible: ComponentPredicate) {
     rowsRange {
-        buttonsGroup("Namespace:") {
+        buttonsGroup(UiToolsBundle.message("uuid-generator.namespace")) {
           row {
             val usePredefined =
-              radioButton("Predefined:").bind(namespaceMode, PREDEFINED).gap(RightGap.SMALL)
+              radioButton(UiToolsBundle.message("uuid-generator.namespace.predefined"))
+                .bind(namespaceMode, PREDEFINED)
+                .gap(RightGap.SMALL)
             comboBox(PredefinedNamespace.entries)
               .bindItem(predefinedNamespace)
               .enabledIf(usePredefined.selected)
@@ -53,7 +56,9 @@ abstract class NamespaceAndNameBasedUuidGenerator(
 
           row {
             val individualRadioButton =
-              radioButton("Individual:").bind(namespaceMode, INDIVIDUAL).gap(RightGap.SMALL)
+              radioButton(UiToolsBundle.message("uuid-generator.namespace.individual"))
+                .bind(namespaceMode, INDIVIDUAL)
+                .gap(RightGap.SMALL)
             textField()
               .text(individualNamespace.get())
               .validationInfo(validateIndividualNamespace())
@@ -63,7 +68,11 @@ abstract class NamespaceAndNameBasedUuidGenerator(
           }
         }
 
-        row { expandableTextField().label("Name:").bindText(name) }
+        row {
+          expandableTextField()
+            .label(UiToolsBundle.message("uuid-generator.namespace.name"))
+            .bindText(name)
+        }
       }
       .visibleIf(visible)
   }
@@ -71,7 +80,7 @@ abstract class NamespaceAndNameBasedUuidGenerator(
   private fun validateIndividualNamespace():
     ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
     if (namespaceMode.get() == INDIVIDUAL && !UUID_REGEX.matches(it.text)) {
-      ValidationInfo("Must be a valid UUID")
+      ValidationInfo(UiToolsBundle.message("uuid-generator.namespace.invalid"))
     } else {
       null
     }
@@ -100,10 +109,22 @@ abstract class NamespaceAndNameBasedUuidGenerator(
 
   private enum class PredefinedNamespace(private val title: String, val value: UUID) {
 
-    DNS("DNS", UUID.fromString("6ba7b810-9dad-11d1-80b4-00c04fd430c8")),
-    URL("URL", UUID.fromString("6ba7b811-9dad-11d1-80b4-00c04fd430c8")),
-    OID("OID", UUID.fromString("6ba7b812-9dad-11d1-80b4-00c04fd430c8")),
-    X500DN("X.500 DN", UUID.fromString("6ba7b814-9dad-11d1-80b4-00c04fd430c8"));
+    DNS(
+      UiToolsBundle.message("uuid-generator.namespace.dns"),
+      UUID.fromString("6ba7b810-9dad-11d1-80b4-00c04fd430c8"),
+    ),
+    URL(
+      UiToolsBundle.message("uuid-generator.namespace.url"),
+      UUID.fromString("6ba7b811-9dad-11d1-80b4-00c04fd430c8"),
+    ),
+    OID(
+      UiToolsBundle.message("uuid-generator.namespace.oid"),
+      UUID.fromString("6ba7b812-9dad-11d1-80b4-00c04fd430c8"),
+    ),
+    X500DN(
+      UiToolsBundle.message("uuid-generator.namespace.x500dn"),
+      UUID.fromString("6ba7b814-9dad-11d1-80b4-00c04fd430c8"),
+    );
 
     override fun toString(): String = "$title ($value)"
   }

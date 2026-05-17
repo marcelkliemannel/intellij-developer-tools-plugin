@@ -18,6 +18,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bindIntTex
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.validateLongValue
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 
 class SqlFormattingTransformer(
   context: DeveloperUiToolContext,
@@ -30,10 +31,10 @@ class SqlFormattingTransformer(
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
-    title = "SQL Formatting",
-    sourceTitle = "Plain SQL",
-    targetTitle = "Formatted SQL",
-    toTargetTitle = "Format",
+    title = UiToolsBundle.message("sql-formatting-transformer.title"),
+    sourceTitle = UiToolsBundle.message("sql-formatting-transformer.source-title"),
+    targetTitle = UiToolsBundle.message("sql-formatting-transformer.target-title"),
+    toTargetTitle = UiToolsBundle.message("sql-formatting-transformer.format"),
   ),
   DeveloperToolConfiguration.ChangeListener {
   // -- Properties ---------------------------------------------------------- //
@@ -58,12 +59,16 @@ class SqlFormattingTransformer(
   }
 
   override fun Panel.buildSourceTopConfigurationUi() {
-    row { comboBox(Dialect.entries).label("Dialect:").bindItem(dialect) }
+    row {
+        comboBox(Dialect.entries)
+          .label(UiToolsBundle.message("sql-formatting-transformer.dialect"))
+          .bindItem(dialect)
+      }
       .layout(RowLayout.PARENT_GRID)
 
     row {
         textField()
-          .label("Indent spaces:")
+          .label(UiToolsBundle.message("sql-formatting-transformer.indent-spaces"))
           .bindIntTextImproved(indentSpaces)
           .validateLongValue(LongRange(0, 99))
       }
@@ -71,7 +76,7 @@ class SqlFormattingTransformer(
 
     row {
         textField()
-          .label("Lines between queries:")
+          .label(UiToolsBundle.message("sql-formatting-transformer.lines-between-queries"))
           .bindIntTextImproved(linesBetweenQueries)
           .validateLongValue(LongRange(0, 99))
       }
@@ -79,13 +84,16 @@ class SqlFormattingTransformer(
 
     row {
         textField()
-          .label("Maximum column length:")
+          .label(UiToolsBundle.message("sql-formatting-transformer.maximum-column-length"))
           .bindIntTextImproved(maxColumnLength)
           .validateLongValue(LongRange(0, 99))
       }
       .layout(RowLayout.PARENT_GRID)
 
-    row { checkBox("Convert keywords to uppercase").bindSelected(uppercase) }
+    row {
+        checkBox(UiToolsBundle.message("sql-formatting-transformer.convert-keywords-to-uppercase"))
+          .bindSelected(uppercase)
+      }
       .layout(RowLayout.PARENT_GRID)
   }
 
@@ -119,7 +127,10 @@ class SqlFormattingTransformer(
   class Factory : DeveloperUiToolFactory<SqlFormattingTransformer> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "SQL Formatting", contentTitle = "SQL Formatting")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("sql-formatting-transformer.menu-title"),
+        contentTitle = UiToolsBundle.message("sql-formatting-transformer.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

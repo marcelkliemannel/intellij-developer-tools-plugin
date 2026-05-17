@@ -14,6 +14,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.DataGenerator
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.DataGenerators.DataGeneratorBase
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.DataGenerators.DataGeneratorsGroup
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.DataGenerators.dataGenerators
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 
 class DataGeneratorIntentionAction : IntentionAction, LowPriorityAction {
   // -- Properties ---------------------------------------------------------- //
@@ -22,7 +23,8 @@ class DataGeneratorIntentionAction : IntentionAction, LowPriorityAction {
 
   override fun startInWriteAction(): Boolean = false
 
-  override fun getFamilyName(): String = "Insert generated data"
+  override fun getFamilyName(): String =
+    EditorToolsBundle.message("intention.data-generator.family-name")
 
   override fun getText(): String = familyName
 

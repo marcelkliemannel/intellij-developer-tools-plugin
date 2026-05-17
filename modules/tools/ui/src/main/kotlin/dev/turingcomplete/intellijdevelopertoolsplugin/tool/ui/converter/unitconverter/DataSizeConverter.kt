@@ -21,6 +21,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitcon
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.NumberSystem
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.bitDataUnit
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.unitconverter.DataUnits.dataUnits
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
 
@@ -116,9 +117,9 @@ class DataSizeConverter(configuration: DeveloperToolConfiguration, parentDisposa
   @Suppress("UnstableApiUsage")
   override fun Panel.buildAdditionalSettingsUi() {
     row {
-      checkBox("Show large data units").bindSelected(showLargeDataUnits).whenStateChangedFromUi {
-        sync()
-      }
+      checkBox(UiToolsBundle.message("units-converter.show-large-data-units"))
+        .bindSelected(showLargeDataUnits)
+        .whenStateChangedFromUi { sync() }
     }
   }
 

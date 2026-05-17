@@ -16,6 +16,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecod
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecoders.commonEncoders
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecoders.executeDecodingInEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecoders.executeEncodingInEditor
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 
 abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction {
   // -- Properties ---------------------------------------------------------- //
@@ -86,7 +87,8 @@ abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction 
     private val editor: Editor,
   ) : BaseListPopupStep<Encoder>(null, commonEncoders), EncoderDecoderListPopupStep<Encoder> {
 
-    override val actionName: String = "Encode To"
+    override val actionName: String =
+      EditorToolsBundle.message("encode-decode-action-group.encode-to")
 
     override fun getTextFor(encoder: Encoder): String = encoder.title
 
@@ -104,7 +106,8 @@ abstract class EncodeDecodeIntentionAction : IntentionAction, LowPriorityAction 
     private val editor: Editor,
   ) : BaseListPopupStep<Decoder>(null, commonDecoders), EncoderDecoderListPopupStep<Decoder> {
 
-    override val actionName: String = "Decode From"
+    override val actionName: String =
+      EditorToolsBundle.message("encode-decode-action-group.decode-from")
 
     override fun getTextFor(decoder: Decoder): String = decoder.title
 

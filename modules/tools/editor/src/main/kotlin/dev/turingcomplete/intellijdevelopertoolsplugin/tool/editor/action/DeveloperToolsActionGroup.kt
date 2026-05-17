@@ -2,8 +2,10 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.action
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.ui.IconManager
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 
-class DeveloperToolsActionGroup : DefaultActionGroup("Developer Tools", true) {
+class DeveloperToolsActionGroup :
+  DefaultActionGroup(EditorToolsBundle.message("developer-tools-action-group.title"), true) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //
 

@@ -17,6 +17,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextSortingTransformer.WordsDelimiter.INDIVIDUAL
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextSortingTransformer.WordsDelimiter.LINE_BREAK
 
@@ -31,10 +32,10 @@ class TextSortingTransformer(
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
-    title = "Text Sorting",
-    sourceTitle = "Unsorted",
-    targetTitle = "Sorted",
-    toTargetTitle = "Sort",
+    title = UiToolsBundle.message("text-sorting-transformer.title"),
+    sourceTitle = UiToolsBundle.message("text-sorting-transformer.source-title"),
+    targetTitle = UiToolsBundle.message("text-sorting-transformer.target-title"),
+    toTargetTitle = UiToolsBundle.message("text-sorting-transformer.sort"),
   ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -99,7 +100,7 @@ class TextSortingTransformer(
   override fun Panel.buildSourceBottomConfigurationUi() {
     row {
       buildSplitConfigurationUi(
-        "Split unsorted words by:",
+        UiToolsBundle.message("text-sorting-transformer.split-unsorted-words"),
         unsortedSplitWordsDelimiter,
         unsortedIndividualSplitWordsDelimiter,
       )
@@ -107,22 +108,27 @@ class TextSortingTransformer(
 
     row {
       buildSplitConfigurationUi(
-        "Join sorted words by:",
+        UiToolsBundle.message("text-sorting-transformer.join-sorted-words"),
         sortedJoinWordsDelimiter,
         sortedIndividualJoinWordsDelimiter,
       )
     }
 
     row {
-      comboBox(SortingOrder.entries).label("Order:").bindItem(sortingOrder)
-      checkBox("Reverse").bindSelected(reverseOrder)
-      checkBox("Case insensitive").bindSelected(caseInsensitive)
+      comboBox(SortingOrder.entries)
+        .label(UiToolsBundle.message("text-sorting-transformer.order"))
+        .bindItem(sortingOrder)
+      checkBox(UiToolsBundle.message("text-sorting-transformer.reverse")).bindSelected(reverseOrder)
+      checkBox(UiToolsBundle.message("text-sorting-transformer.case-insensitive"))
+        .bindSelected(caseInsensitive)
     }
 
     row {
-      checkBox("Remove duplicates").bindSelected(removeDuplicates)
-      checkBox("Trim words").bindSelected(trimWords)
-      checkBox("Remove blank words").bindSelected(removeBlankWords)
+      checkBox(UiToolsBundle.message("text-sorting-transformer.remove-duplicates"))
+        .bindSelected(removeDuplicates)
+      checkBox(UiToolsBundle.message("text-sorting-transformer.trim-words")).bindSelected(trimWords)
+      checkBox(UiToolsBundle.message("text-sorting-transformer.remove-blank-words"))
+        .bindSelected(removeBlankWords)
     }
   }
 
@@ -144,9 +150,18 @@ class TextSortingTransformer(
 
   private enum class SortingOrder(private val title: String, val comparator: Comparator<String>) {
 
-    NATURAL("Natural", NaturalComparator()),
-    LEXICOGRAPHIC("Lexicographic", { a, b -> a.compareTo(b) }),
-    WORD_LENGTH("Word length", Comparator { a, b -> a.length - b.length });
+    NATURAL(
+      UiToolsBundle.message("text-sorting-transformer.sorting-order.natural"),
+      NaturalComparator(),
+    ),
+    LEXICOGRAPHIC(
+      UiToolsBundle.message("text-sorting-transformer.sorting-order.lexicographic"),
+      { a, b -> a.compareTo(b) },
+    ),
+    WORD_LENGTH(
+      UiToolsBundle.message("text-sorting-transformer.sorting-order.word-length"),
+      Comparator { a, b -> a.length - b.length },
+    );
 
     override fun toString(): String = title
   }
@@ -159,13 +174,37 @@ class TextSortingTransformer(
     val joinDelimiter: String?,
   ) {
 
-    LINE_BREAK("Line break", Regex("\\R+"), System.lineSeparator()),
-    SPACE("Whitespace", Regex("\\s+"), " "),
-    COMMA("Comma", Regex(",+"), ","),
-    SEMICOLON("Semicolon", Regex(";+"), ";"),
-    DASH("Dash", Regex("-+"), "-"),
-    UNDERSCORE("Underscore", Regex("_+"), "_"),
-    INDIVIDUAL("Individual", null, null);
+    LINE_BREAK(
+      UiToolsBundle.message("text-sorting-transformer.words-delimiter.line-break"),
+      Regex("\\R+"),
+      System.lineSeparator(),
+    ),
+    SPACE(
+      UiToolsBundle.message("text-sorting-transformer.words-delimiter.whitespace"),
+      Regex("\\s+"),
+      " ",
+    ),
+    COMMA(
+      UiToolsBundle.message("text-sorting-transformer.words-delimiter.comma"),
+      Regex(",+"),
+      ",",
+    ),
+    SEMICOLON(
+      UiToolsBundle.message("text-sorting-transformer.words-delimiter.semicolon"),
+      Regex(";+"),
+      ";",
+    ),
+    DASH(UiToolsBundle.message("text-sorting-transformer.words-delimiter.dash"), Regex("-+"), "-"),
+    UNDERSCORE(
+      UiToolsBundle.message("text-sorting-transformer.words-delimiter.underscore"),
+      Regex("_+"),
+      "_",
+    ),
+    INDIVIDUAL(
+      UiToolsBundle.message("text-sorting-transformer.words-delimiter.individual"),
+      null,
+      null,
+    );
 
     override fun toString(): String = title
   }
@@ -175,7 +214,10 @@ class TextSortingTransformer(
   class Factory : DeveloperUiToolFactory<TextSortingTransformer> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Text Sorting", contentTitle = "Text Sorting")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("text-sorting-transformer.menu-title"),
+        contentTitle = UiToolsBundle.message("text-sorting-transformer.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,

@@ -10,6 +10,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.common.HashingUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.decodeFromAscii
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.encodeToAscii
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.toHexString
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -25,12 +26,27 @@ object EncodersDecoders {
 
   val commonDecoders =
     listOf(
-      Decoder("Base32", { Base32().decode(it).decodeToString() }),
-      Decoder("Base64", { Base64.getDecoder().decode(it).decodeToString() }),
-      Decoder("MIME Base64", { Base64.getMimeDecoder().decode(it).decodeToString() }),
-      Decoder("URL Base64", { Base64.getUrlDecoder().decode(it).decodeToString() }),
-      Decoder("URL", { URLDecoder.decode(it, StandardCharsets.UTF_8) }),
-      Decoder("ASCII", { it.decodeFromAscii() }),
+      Decoder(
+        EditorToolsBundle.message("encode-decode.title.base32"),
+        { Base32().decode(it).decodeToString() },
+      ),
+      Decoder(
+        EditorToolsBundle.message("encode-decode.title.base64"),
+        { Base64.getDecoder().decode(it).decodeToString() },
+      ),
+      Decoder(
+        EditorToolsBundle.message("encode-decode.title.mime-base64"),
+        { Base64.getMimeDecoder().decode(it).decodeToString() },
+      ),
+      Decoder(
+        EditorToolsBundle.message("encode-decode.title.url-base64"),
+        { Base64.getUrlDecoder().decode(it).decodeToString() },
+      ),
+      Decoder(
+        EditorToolsBundle.message("encode-decode.title.url"),
+        { URLDecoder.decode(it, StandardCharsets.UTF_8) },
+      ),
+      Decoder(EditorToolsBundle.message("encode-decode.title.ascii"), { it.decodeFromAscii() }),
     )
 
   // -- Initialization ------------------------------------------------------ //
@@ -38,12 +54,27 @@ object EncodersDecoders {
   init {
     val commonEncoders =
       mutableListOf(
-        Encoder("Base32", { Base32().encodeToString(it.encodeToByteArray()) }),
-        Encoder("Base64", { Base64.getEncoder().encodeToString(it.encodeToByteArray()) }),
-        Encoder("MIME Base64", { Base64.getMimeEncoder().encodeToString(it.encodeToByteArray()) }),
-        Encoder("URL Base64", { Base64.getUrlEncoder().encodeToString(it.encodeToByteArray()) }),
-        Encoder("URL", { URLEncoder.encode(it, StandardCharsets.UTF_8) }),
-        Encoder("ASCII", { it.encodeToAscii() }),
+        Encoder(
+          EditorToolsBundle.message("encode-decode.title.base32"),
+          { Base32().encodeToString(it.encodeToByteArray()) },
+        ),
+        Encoder(
+          EditorToolsBundle.message("encode-decode.title.base64"),
+          { Base64.getEncoder().encodeToString(it.encodeToByteArray()) },
+        ),
+        Encoder(
+          EditorToolsBundle.message("encode-decode.title.mime-base64"),
+          { Base64.getMimeEncoder().encodeToString(it.encodeToByteArray()) },
+        ),
+        Encoder(
+          EditorToolsBundle.message("encode-decode.title.url-base64"),
+          { Base64.getUrlEncoder().encodeToString(it.encodeToByteArray()) },
+        ),
+        Encoder(
+          EditorToolsBundle.message("encode-decode.title.url"),
+          { URLEncoder.encode(it, StandardCharsets.UTF_8) },
+        ),
+        Encoder(EditorToolsBundle.message("encode-decode.title.ascii"), { it.encodeToAscii() }),
       )
 
     HashingUtils.commonMessageDigests.forEach { messageDigest ->
@@ -76,7 +107,7 @@ object EncodersDecoders {
       ApplicationManager.getApplication().invokeLater {
         Messages.showErrorDialog(
           editor.project,
-          "Encoding failed: ${e.message}",
+          EditorToolsBundle.message("encode-decode.error.encoding-failed", e.message ?: ""),
           encoder.actionName,
         )
       }
@@ -99,7 +130,7 @@ object EncodersDecoders {
       ApplicationManager.getApplication().invokeLater {
         Messages.showErrorDialog(
           editor.project,
-          "Decoding failed: ${e.message}",
+          EditorToolsBundle.message("encode-decode.error.decoding-failed", e.message ?: ""),
           decoder.actionName,
         )
       }
@@ -112,7 +143,7 @@ object EncodersDecoders {
   class Encoder(
     val title: String,
     val encode: (String) -> String,
-    val actionName: String = "Encode to $title",
+    val actionName: String = EditorToolsBundle.message("encode-decode.action.encode-to", title),
   )
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -120,6 +151,6 @@ object EncodersDecoders {
   class Decoder(
     val title: String,
     val decode: (String) -> String,
-    val actionName: String = "Decode from $title",
+    val actionName: String = EditorToolsBundle.message("encode-decode.action.decode-from", title),
   )
 }

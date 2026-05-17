@@ -15,6 +15,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.bind
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.ConversionSideHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.UndirectionalConverter
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.AUTOMATIC_DETECTION
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.FIXED_TEXT_CASE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.TextCaseTransformer.OriginalParsingMode.INDIVIDUAL_DELIMITER
@@ -36,10 +37,10 @@ class TextCaseTransformer(
     configuration = configuration,
     parentDisposable = parentDisposable,
     project = project,
-    title = "Text Case",
-    sourceTitle = "Original",
-    targetTitle = "Target",
-    toTargetTitle = "Transform",
+    title = UiToolsBundle.message("text-case-transformer.title"),
+    sourceTitle = UiToolsBundle.message("text-case-transformer.source-title"),
+    targetTitle = UiToolsBundle.message("text-case-transformer.target-title"),
+    toTargetTitle = UiToolsBundle.message("text-case-transformer.transform"),
   ) {
   // -- Properties ---------------------------------------------------------- //
 
@@ -66,12 +67,15 @@ class TextCaseTransformer(
   }
 
   override fun Panel.buildSourceBottomConfigurationUi() {
-    buttonsGroup("Original:") {
-      row { radioButton("Automatic detection").bind(originalParsingMode, AUTOMATIC_DETECTION) }
+    buttonsGroup(UiToolsBundle.message("text-case-transformer.original")) {
+      row {
+        radioButton(UiToolsBundle.message("text-case-transformer.automatic-detection"))
+          .bind(originalParsingMode, AUTOMATIC_DETECTION)
+      }
 
       row {
         val fixedTextCaseRadioButton =
-          radioButton("Fixed text case:")
+          radioButton(UiToolsBundle.message("text-case-transformer.fixed-text-case"))
             .bind(originalParsingMode, FIXED_TEXT_CASE)
             .gap(RightGap.SMALL)
         comboBox(TextCase.entries)
@@ -82,7 +86,7 @@ class TextCaseTransformer(
 
       row {
         val individualDelimiterRadioButton =
-          radioButton("Split words by:")
+          radioButton(UiToolsBundle.message("text-case-transformer.split-words-by"))
             .bind(originalParsingMode, INDIVIDUAL_DELIMITER)
             .gap(RightGap.SMALL)
         textField()
@@ -92,7 +96,11 @@ class TextCaseTransformer(
       }
     }
 
-    row { comboBox(TextCase.entries).label("Target:").bindItem(outputTextCase) }
+    row {
+      comboBox(TextCase.entries)
+        .label(UiToolsBundle.message("text-case-transformer.target"))
+        .bindItem(outputTextCase)
+    }
   }
 
   //  override fun Panel.buildDebugComponent() {
@@ -159,7 +167,10 @@ class TextCaseTransformer(
   class Factory : DeveloperUiToolFactory<TextCaseTransformer> {
 
     override fun getDeveloperUiToolPresentation() =
-      DeveloperUiToolPresentation(menuTitle = "Text Case", contentTitle = "Text Case Transformer")
+      DeveloperUiToolPresentation(
+        menuTitle = UiToolsBundle.message("text-case-transformer.menu-title"),
+        contentTitle = UiToolsBundle.message("text-case-transformer.content-title"),
+      )
 
     override fun getDeveloperUiToolCreator(
       project: Project?,
