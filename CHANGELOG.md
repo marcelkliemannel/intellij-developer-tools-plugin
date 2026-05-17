@@ -13,6 +13,10 @@
 
 ### Fixed
 
+- Improved archive extraction safety in the "Unarchiver" tool by blocking archive entries that
+  escape the selected target directory and by correctly handling duplicate archive entry names
+  during extraction.
+
 ## 8.0.0 - 2026-05-01
 
 ### Added
