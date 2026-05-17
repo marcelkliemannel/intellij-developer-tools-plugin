@@ -1061,7 +1061,7 @@ class HttpServer(
     private const val WIREMOCK_STANDALONE_DOWNLOAD_URL =
       "https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/$WIREMOCK_STANDALONE_VERSION/wiremock-standalone-$WIREMOCK_STANDALONE_VERSION.jar"
     private const val DEFAULT_WIREMOCK_PORT = 8089
-    private const val STARTUP_TIMEOUT_MILLISECONDS = 1_500L
+    private const val STARTUP_TIMEOUT_MILLISECONDS = 10_000L
     private const val STOP_TIMEOUT_MILLISECONDS = 5_000L
     private const val MAX_STARTUP_PROCESS_OUTPUT_LENGTH = 8_000
     private const val DEFAULT_ADVANCED_COMMAND_LINE_OPTIONS = "--disable-banner"
