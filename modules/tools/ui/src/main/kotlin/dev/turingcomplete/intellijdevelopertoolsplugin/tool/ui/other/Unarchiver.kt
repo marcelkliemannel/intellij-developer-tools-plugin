@@ -88,6 +88,17 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.ha
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolService
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.Unarchiver.OpenUnarchiverContext
+import org.apache.commons.compress.archivers.ArchiveEntry
+import org.apache.commons.compress.archivers.ArchiveInputStream
+import org.apache.commons.compress.archivers.ArchiveStreamFactory
+import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry
+import org.apache.commons.compress.archivers.sevenz.SevenZFile
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
+import org.apache.commons.compress.archivers.zip.ZipMethod
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.compress.compressors.gzip.GzipUtils
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
 import java.awt.datatransfer.StringSelection
 import java.awt.dnd.DropTarget
 import java.awt.event.MouseEvent
@@ -115,17 +126,6 @@ import javax.swing.table.DefaultTableModel
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreePath
-import org.apache.commons.compress.archivers.ArchiveEntry
-import org.apache.commons.compress.archivers.ArchiveInputStream
-import org.apache.commons.compress.archivers.ArchiveStreamFactory
-import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry
-import org.apache.commons.compress.archivers.sevenz.SevenZFile
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
-import org.apache.commons.compress.archivers.zip.ZipMethod
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
-import org.apache.commons.compress.compressors.gzip.GzipUtils
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.IOUtils
 
 class Unarchiver(
   private val project: Project?,
@@ -1819,14 +1819,14 @@ class Unarchiver(
       }
 
       // Prepare directories...
-      val preparedFileNodeExtractions = mutableMapOf<String, Path>()
+      val preparedFileNodeExtractions = mutableListOf<Pair<String, Path>>()
       extractionContext.archiveNodes.forEach { archiveNode ->
         progressIndicator.checkCanceled()
         progressIndicator.text2 = archiveNode.relativePath
 
         when (archiveNode) {
           is DirectoryNode ->
-            preparedFileNodeExtractions.putAll(
+            preparedFileNodeExtractions.addAll(
               prepareDirectoryNode(
                 archiveNode,
                 extractionContext.targetDirectoryPath,
@@ -1837,7 +1837,7 @@ class Unarchiver(
           is FileNode ->
             prepareStandaloneFileNodeExtraction(archiveNode, extractionContext).let {
               (archiveEntry, path) ->
-              preparedFileNodeExtractions[archiveEntry.name] = path
+              preparedFileNodeExtractions.add(archiveEntry.name to path)
             }
 
           else ->
@@ -1848,28 +1848,37 @@ class Unarchiver(
       }
 
       // Copy files...
-      val numOfFileNodesToExtract = preparedFileNodeExtractions.size
-      val archiveEntryToTargetFilePathToCopy = preparedFileNodeExtractions.toMutableMap()
+      val archiveEntryToTargetFilePathToCopy = mutableMapOf<String, ArrayDeque<Path>>()
+      preparedFileNodeExtractions.forEach { (archiveEntryName, targetPath) ->
+        archiveEntryToTargetFilePathToCopy
+          .getOrPut(archiveEntryName) { ArrayDeque() }
+          .addLast(targetPath)
+      }
+      val numOfFileNodesToExtract = archiveEntryToTargetFilePathToCopy.values.sumOf { it.size }
       extractionContext.rootNode.iterateEntries { archiveEntry, archiveInputStream ->
-        if (archiveEntryToTargetFilePathToCopy.containsKey(archiveEntry.name)) {
+        val targetPathsForEntry = archiveEntryToTargetFilePathToCopy[archiveEntry.name]
+        val targetPath = targetPathsForEntry?.removeFirstOrNull()
+        if (targetPath != null) {
           progressIndicator.checkCanceled()
           progressIndicator.text =
             UiToolsBundle.message(
               "unarchiver.extracting-files",
               numOfFileNodesToExtract,
-              archiveEntryToTargetFilePathToCopy.size,
+              archiveEntryToTargetFilePathToCopy.values.sumOf { it.size },
             )
           progressIndicator.text2 = archiveEntry.name
           progressIndicator.fraction =
-            (numOfFileNodesToExtract - archiveEntryToTargetFilePathToCopy.size.toDouble()) /
+            (numOfFileNodesToExtract -
+              archiveEntryToTargetFilePathToCopy.values.sumOf { it.size }.toDouble()) /
               numOfFileNodesToExtract
 
-          val targetPath = archiveEntryToTargetFilePathToCopy[archiveEntry.name]!!
           Files.newOutputStream(targetPath, WRITE, CREATE_NEW, TRUNCATE_EXISTING).use { outputStream
             ->
             IOUtils.copy(archiveInputStream(), outputStream)
           }
-          archiveEntryToTargetFilePathToCopy.remove(archiveEntry.name)
+          if (targetPathsForEntry.isEmpty()) {
+            archiveEntryToTargetFilePathToCopy.remove(archiveEntry.name)
+          }
           if (extractionContext.preserveFileAttributes) {
             restoreFileAttributes(archiveEntry, targetPath)
           }
@@ -1909,7 +1918,7 @@ class Unarchiver(
       directoryNode: DirectoryNode,
       baseDirectoryPath: Path,
       extractionContext: ExtractionContext,
-    ): Map<String, Path> {
+    ): List<Pair<String, Path>> {
       val directoryPath =
         if (extractionContext.preserveDirectoryStructure) {
           val relativeDirectoryPath =
@@ -1919,7 +1928,9 @@ class Unarchiver(
               Path.of(directoryNode.fileName)
             }
           val directoryPath =
-            Files.createDirectories(baseDirectoryPath.resolve(relativeDirectoryPath))
+            Files.createDirectories(
+              resolveSafeExtractionPath(baseDirectoryPath, relativeDirectoryPath, directoryNode)
+            )
           if (extractionContext.preserveFileAttributes && directoryNode.archiveEntry != null) {
             restoreFileAttributes(directoryNode.archiveEntry!!, directoryPath)
           }
@@ -1928,17 +1939,18 @@ class Unarchiver(
           baseDirectoryPath
         }
 
-      val preparedFileNodeExtractions = mutableMapOf<String, Path>()
+      val preparedFileNodeExtractions = mutableListOf<Pair<String, Path>>()
       directoryNode.children.forEach { archiveNode ->
         when (archiveNode) {
           is DirectoryNode ->
-            preparedFileNodeExtractions.putAll(
+            preparedFileNodeExtractions.addAll(
               prepareDirectoryNode(archiveNode, directoryPath, extractionContext)
             )
 
           is FileNode -> {
-            val filePath = directoryPath.resolve(archiveNode.fileName)
-            preparedFileNodeExtractions[archiveNode.archiveEntry!!.name] = filePath
+            val filePath =
+              resolveSafeExtractionPath(directoryPath, Path.of(archiveNode.fileName), archiveNode)
+            preparedFileNodeExtractions.add(archiveNode.archiveEntry!!.name to filePath)
           }
 
           else ->
@@ -1963,14 +1975,35 @@ class Unarchiver(
           extractionContext.preserveDirectoryStructure && extractionContext.createParentDirectories
         ) {
           val targetPath =
-            extractionContext.targetDirectoryPath.resolve(Paths.get(fileNode.relativePath))
+            resolveSafeExtractionPath(
+              extractionContext.targetDirectoryPath,
+              Paths.get(fileNode.relativePath),
+              fileNode,
+            )
           Files.createDirectories(targetPath.parent)
           targetPath
         } else {
-          extractionContext.targetDirectoryPath.resolve(Paths.get(fileNode.fileName))
+          resolveSafeExtractionPath(
+            extractionContext.targetDirectoryPath,
+            Path.of(fileNode.fileName),
+            fileNode,
+          )
         }
 
       return fileNode.archiveEntry!! to filePath
+    }
+
+    private fun resolveSafeExtractionPath(
+      baseDirectoryPath: Path,
+      relativePath: Path,
+      archiveNode: ArchiveNode,
+    ): Path {
+      val normalizedBasePath = baseDirectoryPath.toAbsolutePath().normalize()
+      val resolvedPath = normalizedBasePath.resolve(relativePath).normalize()
+      check(resolvedPath.startsWith(normalizedBasePath)) {
+        "Archive entry path escapes target directory: ${archiveNode.relativePath}"
+      }
+      return resolvedPath
     }
 
     private fun notifyAboutExtractionResult(extractionContext: ExtractionContext) {
