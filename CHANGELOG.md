@@ -13,6 +13,7 @@
 
 ### Fixed
 
+- Fixed live conversions in converter tools blocking the UI while processing text input.
 - Fixed large editor encode/decode and escape/unescape actions blocking the UI while processing
   selected text.
 - Fixed closed tool workbenches being restored as disposed tabs after the tool UI was rebuilt.
