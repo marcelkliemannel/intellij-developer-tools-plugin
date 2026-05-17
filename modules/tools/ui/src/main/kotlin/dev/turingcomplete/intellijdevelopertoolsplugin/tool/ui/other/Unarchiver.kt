@@ -88,17 +88,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.ha
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.instance.handling.OpenDeveloperToolService
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.Unarchiver.OpenUnarchiverContext
-import org.apache.commons.compress.archivers.ArchiveEntry
-import org.apache.commons.compress.archivers.ArchiveInputStream
-import org.apache.commons.compress.archivers.ArchiveStreamFactory
-import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry
-import org.apache.commons.compress.archivers.sevenz.SevenZFile
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
-import org.apache.commons.compress.archivers.zip.ZipMethod
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
-import org.apache.commons.compress.compressors.gzip.GzipUtils
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.IOUtils
 import java.awt.datatransfer.StringSelection
 import java.awt.dnd.DropTarget
 import java.awt.event.MouseEvent
@@ -126,6 +115,17 @@ import javax.swing.table.DefaultTableModel
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreePath
+import org.apache.commons.compress.archivers.ArchiveEntry
+import org.apache.commons.compress.archivers.ArchiveInputStream
+import org.apache.commons.compress.archivers.ArchiveStreamFactory
+import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry
+import org.apache.commons.compress.archivers.sevenz.SevenZFile
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
+import org.apache.commons.compress.archivers.zip.ZipMethod
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.compress.compressors.gzip.GzipUtils
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
 
 class Unarchiver(
   private val project: Project?,
