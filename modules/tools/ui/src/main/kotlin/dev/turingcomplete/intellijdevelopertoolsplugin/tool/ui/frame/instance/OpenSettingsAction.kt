@@ -45,7 +45,7 @@ class OpenSettingsAction :
           ActionUiKind.NONE,
           null,
         )
-      ActionUtil.invokeAction(openSettingsAction, event, null)
+      ActionUtil.performAction(openSettingsAction, event)
     }
   }
 }

@@ -36,7 +36,7 @@ class AnActionOptionButton(mainAction: AnAction, vararg additionalActions: AnAct
       val context: DataContext = DataManager.getInstance().getDataContext(component)
       val event =
         AnActionEvent.createEvent(action, context, null, "jvmaction", ActionUiKind.NONE, null)
-      ActionUtil.performActionDumbAwareWithCallbacks(action, event)
+      ActionUtil.performAction(action, event)
     }
   }
 

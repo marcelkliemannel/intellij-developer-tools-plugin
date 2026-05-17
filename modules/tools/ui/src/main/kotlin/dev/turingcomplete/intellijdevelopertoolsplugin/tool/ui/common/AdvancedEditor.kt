@@ -13,8 +13,8 @@ import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.Separator
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.ex.ClipboardUtil
-import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
@@ -349,7 +349,8 @@ class AdvancedEditor(
         AllIcons.Actions.DiffWithClipboard,
       ) { e ->
         val editor = e.getEditor()
-        val firstText = runReadAction { editor.document.text }
+        val firstText =
+          ReadAction.computeBlocking<String, RuntimeException> { editor.document.text }
         UiUtils.showDiffDialog(
           title = GeneralBundle.message("advanced-editor.show-diff-with-clipboard"),
           firstTitle = firstTitle,
@@ -369,7 +370,8 @@ class AdvancedEditor(
           isEnabledAndVisible = diffSupport.enabled?.let { { it.get() } } ?: { true },
         ) { e ->
           val editor = e.getEditor()
-          val firstText = runReadAction { editor.document.text }
+          val firstText =
+            ReadAction.computeBlocking<String, RuntimeException> { editor.document.text }
           UiUtils.showDiffDialog(
             title =
               GeneralBundle.message(
@@ -524,7 +526,7 @@ class AdvancedEditor(
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getEditor()
-      val content = runReadAction { editor.document.text }
+      val content = ReadAction.computeBlocking<String, RuntimeException> { editor.document.text }
       CopyPasteManager.getInstance().setContents(StringSelection(content))
     }
 
@@ -552,7 +554,8 @@ class AdvancedEditor(
         ?.file
         ?.toPath()
         ?.let {
-          val content = runReadAction { editor.document.text }
+          val content =
+            ReadAction.computeBlocking<String, RuntimeException> { editor.document.text }
           Files.writeString(
             it,
             content,

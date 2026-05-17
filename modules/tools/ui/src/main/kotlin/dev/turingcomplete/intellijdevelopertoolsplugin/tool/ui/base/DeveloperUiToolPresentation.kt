@@ -11,10 +11,10 @@ import javax.swing.JComponent
 import org.jetbrains.annotations.Nls
 
 data class DeveloperUiToolPresentation(
-  @Nls(capitalization = Nls.Capitalization.Title) val menuTitle: String,
-  @Nls(capitalization = Nls.Capitalization.Title) val groupedMenuTitle: String = menuTitle,
-  @Nls(capitalization = Nls.Capitalization.Title) val contentTitle: String,
-  @Nls(capitalization = Nls.Capitalization.Sentence) val description: Description? = null,
+  @param:Nls(capitalization = Nls.Capitalization.Title) val menuTitle: String,
+  @param:Nls(capitalization = Nls.Capitalization.Title) val groupedMenuTitle: String = menuTitle,
+  @param:Nls(capitalization = Nls.Capitalization.Title) val contentTitle: String,
+  @param:Nls(capitalization = Nls.Capitalization.Sentence) val description: Description? = null,
 ) {
   // -- Properties ---------------------------------------------------------- //
   // -- Initialization ------------------------------------------------------ //

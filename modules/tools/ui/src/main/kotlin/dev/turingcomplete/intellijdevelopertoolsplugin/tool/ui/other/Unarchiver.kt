@@ -1579,7 +1579,7 @@ class Unarchiver(
 
         ApplicationManager.getApplication().invokeLater {
           val descriptor =
-            FileChooserDescriptorFactory.createSingleFileDescriptor()
+            FileChooserDescriptorFactory.singleFile()
               .withTitle("Open Archive File")
               .withExtensionFilter("Archive files", *supportedArchiveExtensions)
           val fileToOpen = FileChooser.chooseFile(descriptor, project, startPath)

@@ -118,9 +118,9 @@ object DataGenerators {
   // -- Inner Type ---------------------------------------------------------- //
 
   abstract class DataGenerator(
-    @Nls(capitalization = Nls.Capitalization.Title) override val title: String,
+    @param:Nls(capitalization = Nls.Capitalization.Title) override val title: String,
     val actionName: String = "Insert generated $title",
-    @Nls(capitalization = Nls.Capitalization.Sentence) override val toolText: String? = null,
+    @param:Nls(capitalization = Nls.Capitalization.Sentence) override val toolText: String? = null,
   ) : DataGeneratorBase {
 
     abstract fun generate(): String
@@ -129,8 +129,8 @@ object DataGenerators {
   // -- Inner Type ---------------------------------------------------------- //
 
   class DataGeneratorsGroup(
-    @Nls(capitalization = Nls.Capitalization.Title) override val title: String,
+    @param:Nls(capitalization = Nls.Capitalization.Title) override val title: String,
     val children: List<DataGeneratorBase>,
-    @Nls(capitalization = Nls.Capitalization.Sentence) override val toolText: String? = null,
+    @param:Nls(capitalization = Nls.Capitalization.Sentence) override val toolText: String? = null,
   ) : DataGeneratorBase
 }

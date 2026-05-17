@@ -46,7 +46,7 @@ object GitHubUtils {
 
         var index = 1
         var errors = 0
-        fileNamesToDownloadUrls.forEach { fileName, downloadUrl ->
+        fileNamesToDownloadUrls.forEach { (fileName, downloadUrl) ->
           if (indicator.isCanceled) {
             return@forEach
           }
@@ -98,13 +98,12 @@ object GitHubUtils {
 
     val response = httpClient.newCall(request).execute()
     if (response.code == 200) {
-      response.body.byteStream()?.use { inputStream ->
+      return response.body.byteStream().use { inputStream ->
         val rootNode: JsonNode = ObjectMapper().readTree(inputStream)
-        return rootNode
+        rootNode
           .filter { it["type"].asText() == "file" }
           .associate { it["name"].asText() to it["download_url"].asText() }
       }
-      throw Exception("No HTTP body received from $apiUrl")
     } else {
       throw Exception("Failed to fetch file list from $apiUrl: HTTP ${response.code}")
     }
@@ -121,11 +120,11 @@ object GitHubUtils {
 
     val response = httpClient.newCall(request).execute()
     return if (response.code == 200) {
-      response.body?.byteStream()?.use { inputStream ->
+      response.body.byteStream().use { inputStream ->
         Files.createDirectories(targetPath.parent)
         Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING)
         true
-      } == true
+      }
     } else {
       log.warn("Failed to download $downloadUrl to $targetPath: HTTP ${response.code}")
       false

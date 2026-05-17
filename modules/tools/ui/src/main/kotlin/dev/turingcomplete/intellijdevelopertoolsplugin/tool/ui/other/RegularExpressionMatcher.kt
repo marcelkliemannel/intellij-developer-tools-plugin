@@ -397,7 +397,7 @@ class RegularExpressionMatcher(
       setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
       rowSelectionAllowed = true
       columnSelectionAllowed = false
-      setDefaultRenderer(Object::class.java, MatchResultsTableCellRenderer(model))
+      setDefaultRenderer(Any::class.java, MatchResultsTableCellRenderer(model))
       selectionModel.addListSelectionListener(createSelectionListener())
       setContextMenu(this::class.java.name, DefaultActionGroup(CopyValuesAction()))
       setEmptyState(UiToolsBundle.message("regular-expression-matcher.matches-no-matches"))
