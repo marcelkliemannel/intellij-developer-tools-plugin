@@ -35,10 +35,13 @@ import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.ide.CopyPasteManager
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
@@ -550,18 +553,41 @@ class AdvancedEditor(
       val defaultFilename = "$timeStamp.txt"
       FileChooserFactory.getInstance()
         .createSaveFileDialog(fileSaverDescriptor, e.project)
-        .save(defaultFilename)
-        ?.file
-        ?.toPath()
-        ?.let {
-          val content =
-            ReadAction.computeBlocking<String, RuntimeException> { editor.document.text }
-          Files.writeString(
-            it,
-            content,
-            StandardOpenOption.CREATE,
-            StandardOpenOption.TRUNCATE_EXISTING,
-          )
+          .save(defaultFilename)
+          ?.file
+          ?.toPath()
+          ?.let {
+          val targetFile = it
+          object :
+              Task.Backgroundable(
+                e.project,
+                GeneralBundle.message("advanced-editor.save-to-file-action-title"),
+              ) {
+
+              override fun run(indicator: ProgressIndicator) {
+                indicator.text = GeneralBundle.message("advanced-editor.save-to-file-action-title")
+                val content =
+                  ReadAction.computeBlocking<String, RuntimeException> { editor.document.text }
+                Files.writeString(
+                  targetFile,
+                  content,
+                  StandardOpenOption.CREATE,
+                  StandardOpenOption.TRUNCATE_EXISTING,
+                )
+              }
+
+              override fun onThrowable(error: Throwable) {
+                Messages.showErrorDialog(
+                  e.project,
+                  GeneralBundle.message(
+                    "advanced-editor.save-to-file-failed-message",
+                    error.message ?: error::class.simpleName ?: "unknown",
+                  ),
+                  GeneralBundle.message("advanced-editor.save-to-file-failed-title"),
+                )
+              }
+            }
+            .queue()
         }
     }
 
@@ -585,11 +611,40 @@ class AdvancedEditor(
         .choose(e.project)
         .firstOrNull()
         ?.let {
-          runWriteAction {
-            editor.putUserData(editorActiveKey, true)
-            editor.document.setText(Files.readString(it.toNioPath()))
-          }
-          editor.contentComponent.grabFocus()
+          val sourceFile = it.toNioPath()
+          object :
+              Task.Backgroundable(
+                e.project,
+                GeneralBundle.message("advanced-editor.open-file-action-title"),
+              ) {
+
+              private lateinit var content: String
+
+              override fun run(indicator: ProgressIndicator) {
+                indicator.text = GeneralBundle.message("advanced-editor.open-file-action-title")
+                content = Files.readString(sourceFile)
+              }
+
+              override fun onSuccess() {
+                runWriteAction {
+                  editor.putUserData(editorActiveKey, true)
+                  editor.document.setText(content)
+                }
+                editor.contentComponent.grabFocus()
+              }
+
+              override fun onThrowable(error: Throwable) {
+                Messages.showErrorDialog(
+                  e.project,
+                  GeneralBundle.message(
+                    "advanced-editor.open-file-failed-message",
+                    error.message ?: error::class.simpleName ?: "unknown",
+                  ),
+                  GeneralBundle.message("advanced-editor.open-file-failed-title"),
+                )
+              }
+            }
+            .queue()
         }
     }
 
