@@ -13,6 +13,8 @@
 
 ### Fixed
 
+- Fixed HTML entity unescaping in editor actions and intentions so escaped values are decoded
+  instead of escaped again.
 - Improved archive extraction safety in the "Unarchiver" tool by blocking archive entries that
   escape the selected target directory and by correctly handling duplicate archive entry names
   during extraction.
