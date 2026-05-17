@@ -13,6 +13,7 @@
 
 ### Fixed
 
+- Fixed closed tool workbenches being restored as disposed tabs after the tool UI was rebuilt.
 - Fixed HTML entity unescaping in editor actions and intentions so escaped values are decoded
   instead of escaped again.
 - Improved archive extraction safety in the "Unarchiver" tool by blocking archive entries that
