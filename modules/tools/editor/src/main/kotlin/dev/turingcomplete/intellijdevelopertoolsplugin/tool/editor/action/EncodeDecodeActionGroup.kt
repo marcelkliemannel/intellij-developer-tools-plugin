@@ -7,7 +7,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.TextRange
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EditorSourceText.getSelectedTextOrTextAtCaret
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EditorSourceText.getSelectedTextsOrTextAtCaret
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecoders
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecoders.Encoder
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EncodersDecoders.executeDecodingInEditor
@@ -23,7 +23,7 @@ open class EncodeDecodeActionGroup :
       title = EditorToolsBundle.message("encode-decode-action-group.encode-to"),
       actions =
         EncodersDecoders.commonEncoders.map { encoder ->
-          EncoderAction(encoder) { getSourceText(it) }
+          EncoderAction(encoder) { getSourceTexts(it) }
         },
     )
   }
@@ -32,7 +32,7 @@ open class EncodeDecodeActionGroup :
       title = EditorToolsBundle.message("encode-decode-action-group.decode-from"),
       actions =
         EncodersDecoders.commonDecoders.map { decoder ->
-          DecoderAction(decoder) { getSourceText(it) }
+          DecoderAction(decoder) { getSourceTexts(it) }
         },
     )
   }
@@ -46,16 +46,16 @@ open class EncodeDecodeActionGroup :
   final override fun update(e: AnActionEvent) {
     val editor = e.getData(EDITOR)
     e.presentation.isVisible =
-      editor != null && editor.document.isWritable && getSourceText(e) != null
+      editor != null && editor.document.isWritable && getSourceTexts(e).isNotEmpty()
   }
 
   final override fun getChildren(e: AnActionEvent?): Array<AnAction> = encoderDecoderActions
 
   final override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
-  open fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? {
-    val editor = e.getData(EDITOR) ?: return null
-    return editor.getSelectedTextOrTextAtCaret()
+  open fun getSourceTexts(e: AnActionEvent): List<Pair<String, TextRange>> {
+    val editor = e.getData(EDITOR) ?: return emptyList()
+    return editor.getSelectedTextsOrTextAtCaret()
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -72,13 +72,15 @@ open class EncodeDecodeActionGroup :
 
   private class EncoderAction(
     val encoder: Encoder,
-    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?,
+    val getSourceTexts: (AnActionEvent) -> List<Pair<String, TextRange>>,
   ) : DumbAwareAction(encoder.title, encoder.actionName, null) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(EDITOR) ?: return
-      val (text, textRange) = getSourceText(e) ?: return
-      executeEncodingInEditor(text, textRange, encoder, editor)
+      val sourceTexts = getSourceTexts(e)
+      if (sourceTexts.isNotEmpty()) {
+        executeEncodingInEditor(sourceTexts, encoder, editor)
+      }
     }
   }
 
@@ -86,13 +88,15 @@ open class EncodeDecodeActionGroup :
 
   private class DecoderAction(
     val decoder: EncodersDecoders.Decoder,
-    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?,
+    val getSourceTexts: (AnActionEvent) -> List<Pair<String, TextRange>>,
   ) : DumbAwareAction(decoder.title, decoder.actionName, null) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(EDITOR) ?: return
-      val (text, textRange) = getSourceText(e) ?: return
-      executeDecodingInEditor(text, textRange, decoder, editor)
+      val sourceTexts = getSourceTexts(e)
+      if (sourceTexts.isNotEmpty()) {
+        executeDecodingInEditor(sourceTexts, decoder, editor)
+      }
     }
   }
 

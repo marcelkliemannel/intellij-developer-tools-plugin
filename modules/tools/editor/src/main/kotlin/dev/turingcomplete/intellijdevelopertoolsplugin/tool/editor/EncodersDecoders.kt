@@ -96,14 +96,24 @@ object EncodersDecoders {
     textRange: TextRange,
     encoder: Encoder,
     editor: Editor,
+  ) = executeEncodingInEditor(listOf(text to textRange), encoder, editor)
+
+  fun executeEncodingInEditor(
+    sourceTexts: List<Pair<String, TextRange>>,
+    encoder: Encoder,
+    editor: Editor,
   ) {
     ApplicationManager.getApplication().executeOnPooledThread {
       try {
-        val result = encoder.encode(text)
+        val results = sourceTexts.map { (text, textRange) -> encoder.encode(text) to textRange }
         ApplicationManager.getApplication().invokeLater {
           if (!editor.isDisposed && editor.document.isWritable) {
             editor.executeWriteCommand(encoder.actionName) {
-              it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+              results
+                .sortedByDescending { (_, textRange) -> textRange.startOffset }
+                .forEach { (result, textRange) ->
+                  it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+                }
             }
           }
         }
@@ -125,14 +135,24 @@ object EncodersDecoders {
     textRange: TextRange,
     decoder: Decoder,
     editor: Editor,
+  ) = executeDecodingInEditor(listOf(text to textRange), decoder, editor)
+
+  fun executeDecodingInEditor(
+    sourceTexts: List<Pair<String, TextRange>>,
+    decoder: Decoder,
+    editor: Editor,
   ) {
     ApplicationManager.getApplication().executeOnPooledThread {
       try {
-        val result = decoder.decode(text)
+        val results = sourceTexts.map { (text, textRange) -> decoder.decode(text) to textRange }
         ApplicationManager.getApplication().invokeLater {
           if (!editor.isDisposed && editor.document.isWritable) {
             editor.executeWriteCommand(decoder.actionName) {
-              it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+              results
+                .sortedByDescending { (_, textRange) -> textRange.startOffset }
+                .forEach { (result, textRange) ->
+                  it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+                }
             }
           }
         }

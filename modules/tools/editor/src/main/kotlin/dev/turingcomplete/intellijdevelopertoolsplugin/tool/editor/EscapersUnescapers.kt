@@ -66,13 +66,25 @@ object EscapersUnescapers {
   // -- Exported Methods ---------------------------------------------------- //
 
   fun executeEscapeInEditor(text: String, textRange: TextRange, escaper: Escaper, editor: Editor) {
+    executeEscapeInEditor(listOf(text to textRange), escaper, editor)
+  }
+
+  fun executeEscapeInEditor(
+    sourceTexts: List<Pair<String, TextRange>>,
+    escaper: Escaper,
+    editor: Editor,
+  ) {
     ApplicationManager.getApplication().executeOnPooledThread {
       try {
-        val result = escaper.escape(text)
+        val results = sourceTexts.map { (text, textRange) -> escaper.escape(text) to textRange }
         ApplicationManager.getApplication().invokeLater {
           if (!editor.isDisposed && editor.document.isWritable) {
             editor.executeWriteCommand(escaper.actionName) {
-              it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+              results
+                .sortedByDescending { (_, textRange) -> textRange.startOffset }
+                .forEach { (result, textRange) ->
+                  it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+                }
             }
           }
         }
@@ -94,14 +106,24 @@ object EscapersUnescapers {
     textRange: TextRange,
     unescaper: Unescaper,
     editor: Editor,
+  ) = executeUnescapeInEditor(listOf(text to textRange), unescaper, editor)
+
+  fun executeUnescapeInEditor(
+    sourceTexts: List<Pair<String, TextRange>>,
+    unescaper: Unescaper,
+    editor: Editor,
   ) {
     ApplicationManager.getApplication().executeOnPooledThread {
       try {
-        val result = unescaper.unescape(text)
+        val results = sourceTexts.map { (text, textRange) -> unescaper.unescape(text) to textRange }
         ApplicationManager.getApplication().invokeLater {
           if (!editor.isDisposed && editor.document.isWritable) {
             editor.executeWriteCommand(unescaper.actionName) {
-              it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+              results
+                .sortedByDescending { (_, textRange) -> textRange.startOffset }
+                .forEach { (result, textRange) ->
+                  it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+                }
             }
           }
         }
