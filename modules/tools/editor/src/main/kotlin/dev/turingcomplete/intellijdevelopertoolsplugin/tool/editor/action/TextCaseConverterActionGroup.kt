@@ -11,7 +11,7 @@ import com.intellij.openapi.util.TextRange
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.executeWriteCommand
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils.allTextCases
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.TextCaseUtils.determineWordsSplitter
-import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EditorSourceText.getSelectedTextOrTextAtCaret
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EditorSourceText.getSelectedTextsOrTextAtCaret
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.message.EditorToolsBundle
 import dev.turingcomplete.textcaseconverter.TextCase
 
@@ -20,7 +20,7 @@ open class TextCaseConverterActionGroup :
   // -- Properties ---------------------------------------------------------- //
 
   private val textCasesAction: Array<AnAction> =
-    allTextCases.map { ConvertTextCaseAction(it) { getSourceText(it) } }.toTypedArray()
+    allTextCases.map { ConvertTextCaseAction(it) { getSourceTexts(it) } }.toTypedArray()
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
@@ -28,16 +28,16 @@ open class TextCaseConverterActionGroup :
   final override fun update(e: AnActionEvent) {
     val editor = e.getData(CommonDataKeys.EDITOR)
     e.presentation.isVisible =
-      editor != null && editor.document.isWritable && getSourceText(e) != null
+      editor != null && editor.document.isWritable && getSourceTexts(e).isNotEmpty()
   }
 
   final override fun getChildren(e: AnActionEvent?): Array<AnAction> = textCasesAction
 
   override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
-  open fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? {
-    val editor = e.getData(CommonDataKeys.EDITOR) ?: return null
-    return editor.getSelectedTextOrTextAtCaret()
+  open fun getSourceTexts(e: AnActionEvent): List<Pair<String, TextRange>> {
+    val editor = e.getData(CommonDataKeys.EDITOR) ?: return emptyList()
+    return editor.getSelectedTextsOrTextAtCaret()
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -45,30 +45,38 @@ open class TextCaseConverterActionGroup :
 
   private class ConvertTextCaseAction(
     val textCase: TextCase,
-    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?,
+    val getSourceTexts: (AnActionEvent) -> List<Pair<String, TextRange>>,
   ) : DumbAwareAction(textCase.example(), null, null) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(CommonDataKeys.EDITOR) ?: return
-      val (text, textRange) = getSourceText(e) ?: return
-      executeConversionInEditor(text, textRange, textCase, editor)
+      val sourceTexts = getSourceTexts(e)
+      if (sourceTexts.isNotEmpty()) {
+        executeConversionInEditor(sourceTexts, textCase, editor)
+      }
     }
 
     private fun executeConversionInEditor(
-      text: String,
-      textRange: TextRange,
+      sourceTexts: List<Pair<String, TextRange>>,
       textCase: TextCase,
       editor: Editor,
     ) {
-      val wordsSplitter = determineWordsSplitter(text, textCase)
-      val result = textCase.convert(text, wordsSplitter)
+      val results =
+        sourceTexts.map { (text, textRange) ->
+          val wordsSplitter = determineWordsSplitter(text, textCase)
+          textCase.convert(text, wordsSplitter) to textRange
+        }
       editor.executeWriteCommand(
         EditorToolsBundle.message(
           "text-case-converter.action.convert-to",
           textCase.title().lowercase(),
         )
       ) {
-        it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+        results
+          .sortedByDescending { (_, textRange) -> textRange.startOffset }
+          .forEach { (result, textRange) ->
+            it.document.replaceString(textRange.startOffset, textRange.endOffset, result)
+          }
       }
     }
   }

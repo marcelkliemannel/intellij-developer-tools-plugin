@@ -10,8 +10,8 @@ class EscapeUnescapeKotlinCodeActionGroup : EscapeUnescapeActionGroup() {
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
-  override fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? =
-    PsiKotlinUtils.getTextFromStringValue(e)
+  override fun getSourceTexts(e: AnActionEvent): List<Pair<String, TextRange>> =
+    listOfNotNull(PsiKotlinUtils.getTextFromStringValue(e))
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //

@@ -7,7 +7,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.TextRange
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedText
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.EditorUtils.getSelectedTexts
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnescapers
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnescapers.Escaper
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.editor.EscapersUnescapers.Unescaper
@@ -24,7 +24,7 @@ open class EscapeUnescapeActionGroup :
       title = EditorToolsBundle.message("escape-unescape-action-group.escape"),
       actions =
         EscapersUnescapers.commonEscaper.map { escaper ->
-          EscapeAction(escaper) { getSourceText(it) }
+          EscapeAction(escaper) { getSourceTexts(it) }
         },
     )
   }
@@ -33,7 +33,7 @@ open class EscapeUnescapeActionGroup :
       title = EditorToolsBundle.message("escape-unescape-action-group.unescape"),
       actions =
         EscapersUnescapers.commonUnescaper.map { unescaper ->
-          UnescapeAction(unescaper) { getSourceText(it) }
+          UnescapeAction(unescaper) { getSourceTexts(it) }
         },
     )
   }
@@ -47,16 +47,16 @@ open class EscapeUnescapeActionGroup :
   final override fun update(e: AnActionEvent) {
     val editor = e.getData(EDITOR)
     e.presentation.isVisible =
-      editor != null && editor.document.isWritable && getSourceText(e) != null
+      editor != null && editor.document.isWritable && getSourceTexts(e).isNotEmpty()
   }
 
   final override fun getChildren(e: AnActionEvent?): Array<AnAction> = encoderDecoderActions
 
   final override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
-  open fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? {
-    val editor = e.getData(EDITOR) ?: return null
-    return editor.getSelectedText()
+  open fun getSourceTexts(e: AnActionEvent): List<Pair<String, TextRange>> {
+    val editor = e.getData(EDITOR) ?: return emptyList()
+    return editor.getSelectedTexts()
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -73,13 +73,15 @@ open class EscapeUnescapeActionGroup :
 
   private class EscapeAction(
     val escaper: Escaper,
-    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?,
+    val getSourceTexts: (AnActionEvent) -> List<Pair<String, TextRange>>,
   ) : DumbAwareAction(escaper.title, escaper.actionName, null) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(EDITOR) ?: return
-      val (text, textRange) = getSourceText(e) ?: return
-      executeEscapeInEditor(text, textRange, escaper, editor)
+      val sourceTexts = getSourceTexts(e)
+      if (sourceTexts.isNotEmpty()) {
+        executeEscapeInEditor(sourceTexts, escaper, editor)
+      }
     }
   }
 
@@ -87,13 +89,15 @@ open class EscapeUnescapeActionGroup :
 
   private class UnescapeAction(
     val unescaper: Unescaper,
-    val getSourceText: (AnActionEvent) -> Pair<String, TextRange>?,
+    val getSourceTexts: (AnActionEvent) -> List<Pair<String, TextRange>>,
   ) : DumbAwareAction(unescaper.title, unescaper.actionName, null) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(EDITOR) ?: return
-      val (text, textRange) = getSourceText(e) ?: return
-      executeUnescapeInEditor(text, textRange, unescaper, editor)
+      val sourceTexts = getSourceTexts(e)
+      if (sourceTexts.isNotEmpty()) {
+        executeUnescapeInEditor(sourceTexts, unescaper, editor)
+      }
     }
   }
 

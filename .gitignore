@@ -1,10 +1,28 @@
-# Compiled class file
+# macOS
+.DS_Store
+
+# IntelliJ IDEA
+/.idea/
+*.iml
+*.ipr
+*.iws
+/out/
+
+# Gradle
+/.gradle/
+build/
+gradle-app.setting
+.gradletasknamecache
+
+# Kotlin
+/.kotlin/
+
+# IntelliJ Platform Gradle Plugin
+/.intellijPlatform/
+
+# JVM and packaged artifacts
 *.class
-
-# Log file
 *.log
-
-# Package Files #
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
 *.war
@@ -12,27 +30,7 @@
 *.zip
 *.tar.gz
 *.rar
-
-# Virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# Intellij
-.idea
-out/
-.intellijPlatform
-
-# Gradle
-.gradle
-build/
-gradle-app.setting
-!gradle-wrapper.jar
-.gradletasknamecache
-
-# Mac
-.DS_Store
-
-# Kotlin
-.kotlin/
-
-# Java
+# Local Java version overrides
 .java-version

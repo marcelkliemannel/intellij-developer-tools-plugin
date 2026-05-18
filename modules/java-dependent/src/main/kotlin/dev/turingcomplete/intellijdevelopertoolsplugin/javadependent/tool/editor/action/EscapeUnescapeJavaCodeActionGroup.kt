@@ -10,8 +10,10 @@ class EscapeUnescapeJavaCodeActionGroup : EscapeUnescapeActionGroup() {
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
-  override fun getSourceText(e: AnActionEvent): Pair<String, TextRange>? =
-    PsiJavaUtils.getPsiElementAtCaret(e)?.let { PsiJavaUtils.getTextIfStringValue(it) }
+  override fun getSourceTexts(e: AnActionEvent): List<Pair<String, TextRange>> =
+    listOfNotNull(
+      PsiJavaUtils.getPsiElementAtCaret(e)?.let { PsiJavaUtils.getTextIfStringValue(it) }
+    )
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //

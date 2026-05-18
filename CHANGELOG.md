@@ -7,6 +7,7 @@
 - Added editor actions for text case conversion and encoding/decoding, now available across all
   programming languages as well as plain text.
 - Prepared UI display text for localization and added Simplified Chinese and German translations.
+- Editor actions are now also available for multi-line selection
 
 ### Changed
 

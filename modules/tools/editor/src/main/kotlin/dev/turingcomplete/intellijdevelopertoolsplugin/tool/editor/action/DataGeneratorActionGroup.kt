@@ -53,19 +53,41 @@ class DataGeneratorActionGroup :
     override fun actionPerformed(e: AnActionEvent) {
       val editor = e.getData(CommonDataKeys.EDITOR) ?: return
       editor.executeWriteCommand(dataGenerator.actionName) {
-        val result = dataGenerator.generate()
-        val selectionStart = editor.selectionModel.selectionStart
-        val selectionEnd = editor.selectionModel.selectionEnd
-        if (selectionEnd > selectionStart) {
-          it.document.replaceString(selectionStart, selectionEnd, result)
-        } else {
-          val currentOffset = editor.caretModel.offset
-          it.document.insertString(currentOffset, result)
-          editor.caretModel.moveToOffset(currentOffset + result.length)
+        val replacements =
+          editor.caretModel.allCarets.map { caret ->
+            val result = dataGenerator.generate()
+            if (caret.hasSelection()) {
+              Replacement(caret.selectionStart, caret.selectionEnd, result)
+            } else {
+              Replacement(caret.offset, caret.offset, result)
+            }
+          }
+
+        replacements
+          .sortedByDescending { it.startOffset }
+          .forEach { replacement ->
+            if (replacement.startOffset < replacement.endOffset) {
+              it.document.replaceString(
+                replacement.startOffset,
+                replacement.endOffset,
+                replacement.result,
+              )
+            } else {
+              it.document.insertString(replacement.startOffset, replacement.result)
+            }
+          }
+
+        if (replacements.size == 1) {
+          val replacement = replacements.single()
+          editor.caretModel.moveToOffset(replacement.startOffset + replacement.result.length)
         }
       }
     }
   }
+
+  // -- Inner Type ---------------------------------------------------------- //
+
+  private data class Replacement(val startOffset: Int, val endOffset: Int, val result: String)
 
   // -- Companion Object ---------------------------------------------------- //
 }
