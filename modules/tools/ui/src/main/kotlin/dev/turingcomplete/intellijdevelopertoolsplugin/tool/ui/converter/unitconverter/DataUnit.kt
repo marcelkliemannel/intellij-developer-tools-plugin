@@ -136,7 +136,7 @@ object DataUnits {
       ),
       DataUnit(
         "${binaryPrefix}bit",
-        "${decimalAbbreviationFirstLetter}ib",
+        "${binaryAbbreviationFirstLetter}ib",
         isLarge,
         BIT,
         BINARY,

@@ -25,6 +25,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBu
 import java.math.BigDecimal
 import java.math.BigDecimal.ONE
 import java.math.BigDecimal.ZERO
+import java.math.MathContext
 import java.util.concurrent.TimeUnit
 
 class TransferRateConverter(
@@ -227,7 +228,15 @@ class TransferRateConverter(
       UiToolsBundle.message("units-converter.time-dimension.days.short"),
       "d",
       TimeUnit.DAYS.toSeconds(1).toBigDecimal(),
-    ),
+    );
+
+    internal fun convertBitsTo(
+      bits: BigDecimal,
+      targetTimeDimension: TransferRateTimeDimension,
+      mathContext: MathContext,
+    ): BigDecimal {
+      return bits.multiply(targetTimeDimension.seconds, mathContext).divide(seconds, mathContext)
+    }
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -259,8 +268,10 @@ class TransferRateConverter(
       unitConverter: MathContextUnitConverter,
     ) {
       val mathContext = unitConverter.mathContext
-      val timeFactor = originTimeDimension.seconds.divide(targetTimeDimension.seconds, mathContext)
-      setFromBits(bits.multiply(timeFactor, mathContext), unitConverter)
+      setFromBits(
+        originTimeDimension.convertBitsTo(bits, targetTimeDimension, mathContext),
+        unitConverter,
+      )
     }
 
     override fun toString(): String = dataUnit.name
