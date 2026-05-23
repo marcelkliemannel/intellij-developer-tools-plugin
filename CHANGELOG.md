@@ -33,6 +33,12 @@
   correctly tokenized before starting WireMock.
 - Increased the HTTP Server startup grace period to reduce false startup failures on slower
   environments.
+- Fixed transfer rate conversions in the Units Converter so changing the time unit keeps the same
+  rate. For example, `60 b/s` is now shown as `3600 b/min` instead of `1 b/min`.
+- Fixed the Units Converter showing kibibits with the abbreviation `kib` instead of the correct
+  `Kib`.
+- Fixed the Units Converter's default data size example so it starts from an exact binary value
+  instead of a rounded bit count.
 
 ## 8.0.0 - 2026-05-01
 

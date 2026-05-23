@@ -160,7 +160,7 @@ class DataSizeConverter(configuration: DeveloperToolConfiguration, parentDisposa
   companion object {
 
     private const val CONFIGURATION_KEY_PREFIX = "dataSizeConverter_"
-    private val DEFAULT_BIT_DATA_SIZE_VALUE = BigDecimal(1073740000)
+    private val DEFAULT_BIT_DATA_SIZE_VALUE = BigDecimal.valueOf(1073741824)
     private const val DEFAULT_SHOW_LARGE_DATA_UNITS = false
   }
 }
