@@ -11,6 +11,9 @@
 
 ### Changed
 
+- Changed DER export for certificate chains in the "Server Certificates" tool to write one `.der`
+  file per certificate instead of a single concatenated binary file.
+
 ### Removed
 
 ### Fixed

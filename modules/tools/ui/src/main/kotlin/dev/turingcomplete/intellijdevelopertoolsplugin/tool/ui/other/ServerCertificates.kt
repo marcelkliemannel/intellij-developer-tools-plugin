@@ -8,7 +8,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserFactory
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.fileChooser.FileSaverDialog
 import com.intellij.openapi.ide.CopyPasteManager
@@ -56,6 +58,7 @@ import java.math.BigInteger
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.security.KeyStore
 import java.security.SecureRandom
@@ -415,9 +418,11 @@ class ServerCertificates(
     private val formatName: String,
     private val certificates: List<Certificate>,
     private val url: String,
+    actionTitle: String =
+      UiToolsBundle.message("server-certificates.export-action-title", formatName),
   ) :
     AnAction(
-      UiToolsBundle.message("server-certificates.export-action-title", formatName),
+      actionTitle,
       null,
       AllIcons.Actions.MenuSaveall,
     ) {
@@ -472,7 +477,8 @@ class ServerCertificates(
       return "$fileName.${formatName.lowercase()}"
     }
 
-    private fun String.makeSafeForFilename(): String = this.replace(Regex("[^a-zA-Z0-9]+"), "_")
+    protected fun String.makeSafeForFilename(): String =
+      this.replace(Regex("[^a-zA-Z0-9]+"), "_")
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -496,10 +502,62 @@ class ServerCertificates(
   // -- Inner Type ---------------------------------------------------------- //
 
   private class ExportAsDerAction(private val certificates: List<Certificate>, url: String) :
-    ExportCertificateAction("DER", certificates, url) {
+    ExportCertificateAction(
+      "DER",
+      certificates,
+      url,
+      if (certificates.size > 1) {
+        UiToolsBundle.message("server-certificates.export-der-files-action-title")
+      } else {
+        UiToolsBundle.message("server-certificates.export-action-title", "DER")
+      },
+    ) {
+
+    override fun actionPerformed(e: AnActionEvent) {
+      if (certificates.size == 1) {
+        super.actionPerformed(e)
+        return
+      }
+
+      try {
+        val targetDirectory =
+          FileChooser.chooseFile(
+              FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                .withTitle(
+                  UiToolsBundle.message("server-certificates.export-der-files-directory-title")
+                ),
+              e.project,
+              null,
+            )
+            ?.toNioPath() ?: return
+
+        certificates.forEachIndexed { index, certificate ->
+          Files.write(
+            targetDirectory.resolve(createDerFileName(index, certificate)),
+            certificate.encoded,
+            StandardOpenOption.TRUNCATE_EXISTING,
+            StandardOpenOption.CREATE,
+          )
+        }
+      } catch (exception: Exception) {
+        val errorMessage = exception.message ?: ""
+        Messages.showErrorDialog(
+          e.project,
+          UiToolsBundle.message("server-certificates.export-failed", errorMessage),
+          e.presentation.text,
+        )
+      }
+    }
 
     override fun createFileContent(): ByteArray =
       certificates.flatMap { it.encoded.asList() }.toByteArray()
+
+    private fun createDerFileName(index: Int, certificate: Certificate): Path {
+      val certificateName =
+        certificate.safeCastTo<X509Certificate>()?.getCn()?.makeSafeForFilename()
+          ?: "server_certificate"
+      return Path.of("${(index + 1).toString().padStart(2, '0')}_$certificateName.der")
+    }
   }
 
   // -- Inner Type ---------------------------------------------------------- //
