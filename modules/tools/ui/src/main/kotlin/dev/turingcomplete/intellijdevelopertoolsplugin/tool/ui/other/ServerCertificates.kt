@@ -36,6 +36,7 @@ import com.intellij.util.text.DateFormatUtil
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.OkHttpClientUtils
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.OkHttpClientUtils.applyIntelliJProxySettings
+import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.capitalize
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.safeCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
@@ -48,7 +49,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor.EditorMode.OUTPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AnActionOptionButton
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.PropertyComponentPredicate
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.Popup.createPopup
+import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.UiUtils.createWrappingTextArea
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.awt.datatransfer.StringSelection
@@ -61,6 +64,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.security.KeyStore
+import java.security.MessageDigest
 import java.security.SecureRandom
 import java.security.cert.Certificate
 import java.security.cert.CertificateExpiredException
@@ -79,6 +83,8 @@ import javax.swing.event.HyperlinkEvent
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.awt.Dimension
+import javax.swing.SwingUtilities
 
 class ServerCertificates(
   private val project: Project?,
@@ -94,49 +100,71 @@ class ServerCertificates(
   private val followRedirects = configuration.register("followRedirects", true, CONFIGURATION)
   private val allowInsecureConnection =
     configuration.register("allowInsecureConnection", false, CONFIGURATION)
+  private val fetchingServerCertificates = ValueProperty(false)
   private val certificatesPanel = BorderLayoutPanel()
+
+  @Volatile
+  private var lastSuccessfulHttpResponse: HttpResponse? = null
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
   override fun Panel.buildUi() {
     row {
-        expandableTextField()
-          .label(UiToolsBundle.message("server-certificates.url"))
-          .bindText(url)
-          .resizableColumn()
-          .align(Align.FILL)
-      }
+      expandableTextField()
+        .label(UiToolsBundle.message("server-certificates.url"))
+        .bindText(url)
+        .resizableColumn()
+        .align(Align.FILL)
+    }
       .bottomGap(BottomGap.NONE)
     row {
-        checkBox(UiToolsBundle.message("server-certificates.follow-redirects"))
-          .bindSelected(followRedirects)
-      }
+      checkBox(UiToolsBundle.message("server-certificates.follow-redirects"))
+        .bindSelected(followRedirects)
+    }
       .topGap(TopGap.NONE)
     row {
-        checkBox(UiToolsBundle.message("server-certificates.allow-insecure-connection"))
-          .bindSelected(allowInsecureConnection)
-          .gap(RightGap.SMALL)
-        contextHelp(UiToolsBundle.message("server-certificates.allow-insecure-connection-help"))
-      }
+      checkBox(UiToolsBundle.message("server-certificates.allow-insecure-connection"))
+        .bindSelected(allowInsecureConnection)
+        .gap(RightGap.SMALL)
+      contextHelp(UiToolsBundle.message("server-certificates.allow-insecure-connection-help"))
+    }
       .topGap(TopGap.NONE)
 
     row {
       button(UiToolsBundle.message("server-certificates.fetch-server-certificates")) {
-        val url = url.get()
+        val normalizedUrl = normalizeUrl(url.get())
+        url.set(normalizedUrl)
         fetchCertificates(
           project = project,
-          url = url,
+          url = normalizedUrl,
           allowInsecureConnection = allowInsecureConnection.get(),
-          onStarted = { setCertificatesResultUi(createFetchingUi()) },
-          onSuccess = { setCertificatesResultUi(createCertificatesUi(it)) },
-          onCancel = { setCertificatesResultUi(null) },
+          onStarted = {
+            setFetchingServerCertificates(true)
+            setCertificatesResultUi {
+              createResultUi(createFetchingUi(), lastSuccessfulHttpResponse)
+            }
+          },
+          onSuccess = {
+            lastSuccessfulHttpResponse = it
+            setFetchingServerCertificates(false)
+            setCertificatesResultUi { createCertificatesUi(it) }
+          },
+          onCancel = {
+            setFetchingServerCertificates(false)
+            setCertificatesResultUi {
+              lastSuccessfulHttpResponse?.let { createCertificatesUi(it) }
+            }
+          },
           onThrowable = { e ->
-            log.warn("Failed to retrieve server certificates from: $url", e)
-            setCertificatesResultUi(createFetchingFailedUi(e))
+            log.warn("Failed to retrieve server certificates from: $normalizedUrl", e)
+            setFetchingServerCertificates(false)
+            setCertificatesResultUi {
+              createResultUi(createFetchingFailedUi(e), lastSuccessfulHttpResponse)
+            }
           },
         )
-      }
+      }.enabledIf(PropertyComponentPredicate(fetchingServerCertificates, false))
     }
 
     row { cell(certificatesPanel).resizableColumn().align(Align.FILL) }
@@ -144,18 +172,49 @@ class ServerCertificates(
       .topGap(TopGap.MEDIUM)
   }
 
-  private fun setCertificatesResultUi(component: JComponent?) {
+  private fun setCertificatesResultUi(componentFactory: () -> JComponent?) {
     ApplicationManager.getApplication().invokeLater {
+      val component = componentFactory()
       certificatesPanel.removeAll()
       if (component != null) {
         certificatesPanel.addToCenter(component)
       }
       certificatesPanel.revalidate()
       certificatesPanel.repaint()
+
+      scrollToTop()
     }
   }
 
   // -- Private Methods ----------------------------------------------------- //
+
+  private fun setFetchingServerCertificates(fetching: Boolean) {
+    ApplicationManager.getApplication().invokeLater { fetchingServerCertificates.set(fetching) }
+  }
+
+  private fun normalizeUrl(input: String): String {
+    val trimmedInput = input.trim()
+    return if ("://" in trimmedInput) trimmedInput else "https://$trimmedInput"
+  }
+
+  private fun createResultUi(
+    statusComponent: JComponent?,
+    previousResponse: HttpResponse?,
+  ): JComponent? =
+    when {
+      statusComponent == null && previousResponse == null -> null
+      previousResponse == null -> statusComponent
+      else ->
+        panel {
+          if (statusComponent != null) {
+            row { cell(statusComponent).resizableColumn().align(Align.FILL) }
+          }
+          row {
+            cell(createCertificatesUi(previousResponse)).resizableColumn().align(Align.FILL)
+          }
+            .resizableRow()
+        }
+    }
 
   private fun createFetchingUi(): JComponent = panel {
     row {
@@ -169,47 +228,100 @@ class ServerCertificates(
     row {
       icon(AllIcons.General.BalloonError).gap(RightGap.SMALL)
       label(
-          UiToolsBundle.message(
-            "server-certificates.fetch-server-certificates-failed",
-            "${e::class.simpleName}: ${e.message}",
-          )
-        )
+        UiToolsBundle.message(
+          "server-certificates.fetch-server-certificates-failed",
+          "${e::class.simpleName}: ${e.message}",
+        ),
+      )
         .align(Align.FILL)
         .resizableColumn()
     }
   }
 
   private fun createCertificatesUi(httpResponse: HttpResponse): JComponent = panel {
-    group(UiToolsBundle.message("server-certificates.result"), false) {
-      row {
+    buildResponseSummaryUi(httpResponse)
+
+    if (httpResponse.certificates?.isNotEmpty() == true) {
+      buildCertificatesExportUi(httpResponse.certificates)
+
+      httpResponse.certificates.forEachIndexed { index, certificate ->
+        val certificateRole = getCertificateRole(index, httpResponse.certificates)
+        group(
+          UiToolsBundle.message(
+            "server-certificates.certificate-title-with-role",
+            index + 1,
+            certificateRole,
+          ),
+          false,
+        ) {
+          if (certificate is X509Certificate) {
+            buildCertificatePropertiesUi(certificate)
+            buildCertificateValidityUi(certificate)
+          }
+          buildCertificatesExportUi(listOf(certificate))
+        }
+      }
+    } else {
+      row { label("<html>${UiToolsBundle.message("server-certificates.no-result")}</html>") }
+    }
+  }
+
+  private fun Panel.buildResponseSummaryUi(httpResponse: HttpResponse) {
+    group(UiToolsBundle.message("server-certificates.summary"), false) {
+      row(
+        UiToolsBundle.message(
+          "server-certificates.response.title",
+        ),
+      ) {
         cell(
           HyperlinkLabel(
-              UiToolsBundle.message(
-                "server-certificates.response",
-                httpResponse.statusCode,
-                httpResponse.statusMessage,
-              )
-            )
-            .apply {
-              addHyperlinkListener(createShowHttpResponseHyperlinkHandler(httpResponse, this))
-            }
+            UiToolsBundle.message(
+              "server-certificates.response.status",
+              httpResponse.statusCode,
+              httpResponse.statusMessage,
+            ),
+          ).apply {
+            addHyperlinkListener(createShowHttpResponseHyperlinkHandler(httpResponse, this))
+          },
         )
       }
-
-      if (httpResponse.certificates?.isNotEmpty() == true) {
-        buildCertificatesExportUi(httpResponse.certificates)
-
-        httpResponse.certificates.forEachIndexed { index, certificate ->
-          group(UiToolsBundle.message("server-certificates.certificate-title", index + 1), false) {
-            if (certificate is X509Certificate) {
-              buildCertificatePropertiesUi(certificate)
-              buildCertificateValidityUi(certificate)
-            }
-            buildCertificatesExportUi(listOf(certificate))
-          }
-        }
-      } else {
-        row { label("<html>${UiToolsBundle.message("server-certificates.no-result")}</html>") }
+      buildCopyablePropertyRow(
+        UiToolsBundle.message("server-certificates.summary-requested-url"),
+        httpResponse.requestedUrl,
+      )
+      if (httpResponse.finalUrl != httpResponse.requestedUrl) {
+        buildCopyablePropertyRow(
+          UiToolsBundle.message("server-certificates.summary-final-url"),
+          httpResponse.finalUrl,
+        )
+      }
+      buildCopyablePropertyRow(
+        UiToolsBundle.message("server-certificates.summary-certificates-count"),
+        (httpResponse.certificates?.size ?: 0).toString(),
+      )
+      buildCopyablePropertyRow(
+        UiToolsBundle.message("server-certificates.summary-tls-version"),
+        httpResponse.tlsVersion ?: UiToolsBundle.message("server-certificates.not-available"),
+      )
+      buildCopyablePropertyRow(
+        UiToolsBundle.message("server-certificates.summary-cipher-suite"),
+        httpResponse.cipherSuite ?: UiToolsBundle.message("server-certificates.not-available"),
+      )
+      buildCopyablePropertyRow(
+        UiToolsBundle.message("server-certificates.summary-trust-status"),
+        httpResponse.trustStatus.toDisplayText(),
+      )
+      val hostname = URI.create(httpResponse.finalUrl).host
+      val leafCertificate = httpResponse.certificates?.firstOrNull() as? X509Certificate
+      if (hostname != null && leafCertificate != null) {
+        buildCopyablePropertyRow(
+          UiToolsBundle.message("server-certificates.summary-hostname-status"),
+          if (leafCertificate.matchesHostname(hostname)) {
+            UiToolsBundle.message("server-certificates.hostname-status-matches", hostname)
+          } else {
+            UiToolsBundle.message("server-certificates.hostname-status-does-not-match", hostname)
+          },
+        )
       }
     }
   }
@@ -222,37 +334,38 @@ class ServerCertificates(
       override fun hyperlinkActivated(e: HyperlinkEvent) {
         val content = panel {
           row {
-              cell(
-                  AdvancedEditor(
-                      id = "server-certificates-http-response",
-                      context = context,
-                      configuration = configuration,
-                      project = project,
-                      title = null,
-                      editorMode = OUTPUT,
-                      parentDisposable = parentDisposable,
-                    )
-                    .apply {
-                      text =
-                        with(StringJoiner(System.lineSeparator())) {
-                          add(
-                            "${httpResponse.protocol} ${httpResponse.statusCode} ${httpResponse.statusMessage}"
-                          )
-                          httpResponse.headers.forEach {
-                            add("${it.key}: ${it.value.joinToString(", ") { it ?: "" }}")
-                          }
-                          httpResponse.body?.let {
-                            add("")
-                            add(it)
-                          }
-                          toString()
-                        }
+            cell(
+              AdvancedEditor(
+                id = "server-certificates-http-response",
+                context = context,
+                configuration = configuration,
+                project = project,
+                title = null,
+                editorMode = OUTPUT,
+                parentDisposable = parentDisposable,
+              )
+                .apply {
+                  text =
+                    with(StringJoiner(System.lineSeparator())) {
+                      add(
+                        "${httpResponse.protocol} ${httpResponse.statusCode} " +
+                          httpResponse.statusMessage,
+                      )
+                      httpResponse.headers.forEach {
+                        add("${it.key}: ${it.value.joinToString(", ") { it ?: "" }}")
+                      }
+                      httpResponse.body?.let {
+                        add("")
+                        add(it)
+                      }
+                      toString()
                     }
-                    .component
-                )
-                .resizableColumn()
-                .align(Align.FILL)
-            }
+                }
+                .component,
+            )
+              .resizableColumn()
+              .align(Align.FILL)
+          }
             .resizableRow()
         }
         createPopup(content).showInCenterOf(parentComponent)
@@ -287,48 +400,166 @@ class ServerCertificates(
 
   private fun Panel.buildCertificatePropertiesUi(certificate: X509Certificate) {
     listOf<Pair<String, Any>>(
-        UiToolsBundle.message("server-certificates.certificate-subject") to
-          certificate.subjectX500Principal,
-        UiToolsBundle.message("server-certificates.certificate-issuer") to
-          certificate.issuerX500Principal,
-        UiToolsBundle.message("server-certificates.certificate-serial-number") to
-          certificate.serialNumber,
-        UiToolsBundle.message("server-certificates.certificate-valid-from") to
-          certificate.notBefore,
-        UiToolsBundle.message("server-certificates.certificate-valid-to") to certificate.notAfter,
-        UiToolsBundle.message("server-certificates.certificate-signature-algorithm") to
-          certificate.sigAlgName,
-      )
+      UiToolsBundle.message("server-certificates.certificate-subject") to
+        certificate.subjectX500Principal,
+      UiToolsBundle.message("server-certificates.certificate-issuer") to
+        certificate.issuerX500Principal,
+      UiToolsBundle.message("server-certificates.certificate-serial-number") to
+        certificate.serialNumber,
+      UiToolsBundle.message("server-certificates.certificate-valid-from") to
+        certificate.notBefore,
+      UiToolsBundle.message("server-certificates.certificate-valid-to") to certificate.notAfter,
+      UiToolsBundle.message("server-certificates.certificate-signature-algorithm") to
+        certificate.sigAlgName,
+      UiToolsBundle.message("server-certificates.certificate-fingerprint-sha256") to
+        certificate.getSha256Fingerprint(),
+    )
       .forEach { (title, value) ->
-        row("$title:") {
-          val stringValue =
-            when (value) {
-              is String -> value
-              is BigInteger -> value.toString(16).uppercase()
-              is X500Principal -> value.toString()
-              is Date -> {
-                val diff = DateFormatUtil.formatBetweenDates(value.time, System.currentTimeMillis())
-                "${DateFormatUtil.formatDateTime(value)} (${diff.capitalize()})"
-              }
-
-              else -> throw IllegalStateException("Unknown property type: ${value::class}")
-            }
-          cell(JBLabel(stringValue).copyable()).gap(RightGap.SMALL)
-        }
+        buildCopyablePropertyRow(title, value.toCertificatePropertyString())
       }
+
+    val subjectAlternativeNames = certificate.getDisplayableSubjectAlternativeNames()
+    if (subjectAlternativeNames.isNotEmpty()) {
+      buildCopyablePropertyRow(
+        UiToolsBundle.message("server-certificates.certificate-subject-alternative-names"),
+        subjectAlternativeNames.joinToString(", "),
+      )
+    }
   }
 
   private fun Panel.buildCertificateValidityUi(certificate: X509Certificate) {
-    row {
+    val validityStatus =
       try {
         certificate.checkValidity()
+        val millisUntilExpiry = certificate.notAfter.time - System.currentTimeMillis()
+        val timeUntilExpiry =
+          DateFormatUtil.formatBetweenDates(certificate.notAfter.time, System.currentTimeMillis())
+            .capitalize()
+        if (millisUntilExpiry <= CERTIFICATE_EXPIRING_SOON_THRESHOLD_MILLIS) {
+          UiToolsBundle.message("server-certificates.certificate-expires-soon", timeUntilExpiry)
+        } else {
+          UiToolsBundle.message("server-certificates.certificate-valid", timeUntilExpiry)
+        }
       } catch (_: CertificateExpiredException) {
-        icon(AllIcons.General.Warning).gap(RightGap.SMALL)
-        label(UiToolsBundle.message("server-certificates.certificate-expired"))
+        UiToolsBundle.message("server-certificates.certificate-expired")
       } catch (_: CertificateNotYetValidException) {
-        icon(AllIcons.General.Warning).gap(RightGap.SMALL)
-        label(UiToolsBundle.message("server-certificates.certificate-not-valid-yet"))
+        UiToolsBundle.message("server-certificates.certificate-not-valid-yet")
       }
+
+    buildCopyablePropertyRow(
+      UiToolsBundle.message("server-certificates.certificate-validity"),
+      validityStatus,
+    )
+  }
+
+  private fun Panel.buildCopyablePropertyRow(title: String, value: String) {
+    row("$title:") {
+      cell(createWrappingTextArea(value))
+        .resizableColumn()   // keep this
+        .align(Align.FILL)
+        .gap(RightGap.SMALL)
+        .applyToComponent {
+          // ensures it reflows when shrinking
+          maximumSize = Dimension(Int.MAX_VALUE, preferredSize.height)
+        }
+    }
+  }
+
+  private fun Any.toCertificatePropertyString(): String =
+    when (this) {
+      is String -> this
+      is BigInteger -> toString(16).uppercase()
+      is X500Principal -> toString()
+      is Date -> {
+        val diff = DateFormatUtil.formatBetweenDates(time, System.currentTimeMillis())
+        "${DateFormatUtil.formatDateTime(this)} (${diff.capitalize()})"
+      }
+
+      else -> throw IllegalStateException("Unknown property type: ${this::class}")
+    }
+
+  private fun X509Certificate.getDisplayableSubjectAlternativeNames(): List<String> =
+    getSubjectAlternativeNamesWithTypes()
+      .mapNotNull { (type, value) ->
+        when (type) {
+          SUBJECT_ALTERNATIVE_NAME_DNS ->
+            "${UiToolsBundle.message("server-certificates.certificate-san-dns")}: $value"
+
+          SUBJECT_ALTERNATIVE_NAME_IP ->
+            "${UiToolsBundle.message("server-certificates.certificate-san-ip")}: $value"
+
+          else -> null
+        }
+      }
+
+  private fun X509Certificate.getSubjectAlternativeNamesWithTypes(): List<Pair<Int, String>> =
+    try {
+      subjectAlternativeNames
+        ?.mapNotNull { subjectAlternativeName ->
+          val type = subjectAlternativeName.getOrNull(0) as? Int ?: return@mapNotNull null
+          val value = subjectAlternativeName.getOrNull(1)?.toString() ?: return@mapNotNull null
+          type to value
+        }
+        .orEmpty()
+    } catch (_: Exception) {
+      emptyList()
+    }
+
+  private fun X509Certificate.matchesHostname(hostname: String): Boolean {
+    val normalizedHostname = hostname.lowercase()
+    val subjectAlternativeNames = getSubjectAlternativeNamesWithTypes()
+    val ipSubjectAlternativeNames =
+      subjectAlternativeNames
+        .filter { it.first == SUBJECT_ALTERNATIVE_NAME_IP }
+        .map { it.second.lowercase() }
+    val dnsSubjectAlternativeNames =
+      subjectAlternativeNames
+        .filter { it.first == SUBJECT_ALTERNATIVE_NAME_DNS }
+        .map { it.second.lowercase() }
+
+    return when {
+      ipSubjectAlternativeNames.isNotEmpty() ->
+        ipSubjectAlternativeNames.any { it == normalizedHostname }
+
+      dnsSubjectAlternativeNames.isNotEmpty() ->
+        dnsSubjectAlternativeNames.any { it.matchesDnsName(normalizedHostname) }
+
+      else -> getCommonName()?.lowercase()?.matchesDnsName(normalizedHostname) == true
+    }
+  }
+
+  private fun X509Certificate.getCommonName(): String? =
+    subjectX500Principal?.name?.let {
+      Regex("CN=(?<cn>[^,]+)").find(it)?.groups?.get("cn")?.value
+    }
+
+  private fun String.matchesDnsName(hostname: String): Boolean =
+    if (startsWith("*.")) {
+      val suffix = substring(1)
+      val prefix = hostname.removeSuffix(suffix)
+      hostname.endsWith(suffix) && prefix.isNotEmpty() && "." !in prefix
+    } else {
+      this == hostname
+    }
+
+  private fun X509Certificate.getSha256Fingerprint(): String =
+    MessageDigest.getInstance("SHA-256")
+      .digest(encoded)
+      .joinToString(":") { "%02X".format(it.toInt() and 0xff) }
+
+  private fun getCertificateRole(index: Int, certificates: List<Certificate>): String {
+    if (index == 0) {
+      return UiToolsBundle.message("server-certificates.certificate-role-leaf")
+    }
+
+    val x509Certificate = certificates[index].safeCastTo<X509Certificate>()
+    return if (
+      index == certificates.lastIndex &&
+      x509Certificate?.subjectX500Principal == x509Certificate?.issuerX500Principal
+    ) {
+      UiToolsBundle.message("server-certificates.certificate-role-root")
+    } else {
+      UiToolsBundle.message("server-certificates.certificate-role-intermediate")
     }
   }
 
@@ -342,73 +573,79 @@ class ServerCertificates(
     onThrowable: (Throwable) -> Unit,
   ) {
     object :
-        Task.Backgroundable(
-          project,
-          UiToolsBundle.message("server-certificates.fetch-server-certificates-in-progress-title"),
-          true,
-        ) {
-        @Volatile private var call: Call? = null
+      Task.Backgroundable(
+        project,
+        UiToolsBundle.message("server-certificates.fetch-server-certificates-in-progress-title"),
+        true,
+      ) {
+      @Volatile
+      private var call: Call? = null
 
-        override fun run(indicator: ProgressIndicator) {
-          indicator.text =
-            UiToolsBundle.message("server-certificates.fetch-server-certificates-in-progress")
-          onStarted()
+      override fun run(indicator: ProgressIndicator) {
+        indicator.text =
+          UiToolsBundle.message("server-certificates.fetch-server-certificates-in-progress")
+        onStarted()
 
-          val httpClientBuilder =
-            OkHttpClient.Builder()
-              .followRedirects(followRedirects.get())
-              .followSslRedirects(followRedirects.get())
-              .applyIntelliJProxySettings(url)
+        val httpClientBuilder =
+          OkHttpClient.Builder()
+            .followRedirects(followRedirects.get())
+            .followSslRedirects(followRedirects.get())
+            .applyIntelliJProxySettings(url)
 
-          val certificateCapturingTrustManager =
-            CertificateCapturingTrustManager(allowInsecureConnection)
-          httpClientBuilder.sslSocketFactory(
-            certificateCapturingTrustManager.createSslContext().socketFactory,
-            certificateCapturingTrustManager,
-          )
-          if (allowInsecureConnection) {
-            httpClientBuilder.hostnameVerifier { _, _ -> true }
-          }
-
-          val httpClient = httpClientBuilder.build()
-          val request = Request.Builder().url(url).build()
-          val call = httpClient.newCall(request)
-          this.call = call
-          try {
-            call.execute().use { response ->
-              val httpResponse =
-                HttpResponse(
-                  certificates = certificateCapturingTrustManager.serverCertificates,
-                  protocol = OkHttpClientUtils.toDisplayableString(response.protocol),
-                  statusCode = response.code,
-                  statusMessage =
-                    response.message.ifBlank {
-                      OkHttpClientUtils.toStatusMessage(response.code) ?: ""
-                    },
-                  headers = response.headers.toMultimap(),
-                  body = response.peekBody(MAX_RESPONSE_BODY_BYTES).string(),
-                )
-              onSuccess(httpResponse)
-            }
-          } catch (e: IOException) {
-            if (call.isCanceled()) {
-              throw ProcessCanceledException(e)
-            }
-            throw e
-          } finally {
-            this.call = null
-          }
+        val certificateCapturingTrustManager =
+          CertificateCapturingTrustManager(allowInsecureConnection)
+        httpClientBuilder.sslSocketFactory(
+          certificateCapturingTrustManager.createSslContext().socketFactory,
+          certificateCapturingTrustManager,
+        )
+        if (allowInsecureConnection) {
+          httpClientBuilder.hostnameVerifier { _, _ -> true }
         }
 
-        override fun onCancel() {
-          call?.cancel()
-          onCancel()
-        }
-
-        override fun onThrowable(error: Throwable) {
-          onThrowable(error)
+        val httpClient = httpClientBuilder.build()
+        val request = Request.Builder().url(url).build()
+        val call = httpClient.newCall(request)
+        this.call = call
+        try {
+          call.execute().use { response ->
+            val httpResponse =
+              HttpResponse(
+                certificates = certificateCapturingTrustManager.serverCertificates,
+                requestedUrl = url,
+                finalUrl = response.request.url.toString(),
+                protocol = OkHttpClientUtils.toDisplayableString(response.protocol),
+                statusCode = response.code,
+                statusMessage =
+                  response.message.ifBlank {
+                    OkHttpClientUtils.toStatusMessage(response.code) ?: ""
+                  },
+                tlsVersion = response.handshake?.tlsVersion?.javaName,
+                cipherSuite = response.handshake?.cipherSuite?.javaName,
+                trustStatus = certificateCapturingTrustManager.getCertificateTrustStatus(),
+                headers = response.headers.toMultimap(),
+                body = response.peekBody(MAX_RESPONSE_BODY_BYTES).string(),
+              )
+            onSuccess(httpResponse)
+          }
+        } catch (e: IOException) {
+          if (call.isCanceled()) {
+            throw ProcessCanceledException(e)
+          }
+          throw e
+        } finally {
+          this.call = null
         }
       }
+
+      override fun onCancel() {
+        call?.cancel()
+        onCancel()
+      }
+
+      override fun onThrowable(error: Throwable) {
+        onThrowable(error)
+      }
+    }
       .queue()
   }
 
@@ -484,7 +721,16 @@ class ServerCertificates(
   // -- Inner Type ---------------------------------------------------------- //
 
   private class ExportAsPemAction(private val certificates: List<Certificate>, url: String) :
-    ExportCertificateAction("PEM", certificates, url) {
+    ExportCertificateAction(
+      "PEM",
+      certificates,
+      url,
+      if (certificates.size > 1) {
+        UiToolsBundle.message("server-certificates.export-chain-as-pem-action-title")
+      } else {
+        UiToolsBundle.message("server-certificates.export-certificate-as-pem-action-title")
+      },
+    ) {
 
     override fun createFileContent(): ByteArray =
       certificates
@@ -509,7 +755,7 @@ class ServerCertificates(
       if (certificates.size > 1) {
         UiToolsBundle.message("server-certificates.export-der-files-action-title")
       } else {
-        UiToolsBundle.message("server-certificates.export-action-title", "DER")
+        UiToolsBundle.message("server-certificates.export-certificate-as-der-action-title")
       },
     ) {
 
@@ -522,13 +768,13 @@ class ServerCertificates(
       try {
         val targetDirectory =
           FileChooser.chooseFile(
-              FileChooserDescriptorFactory.createSingleFolderDescriptor()
-                .withTitle(
-                  UiToolsBundle.message("server-certificates.export-der-files-directory-title")
-                ),
-              e.project,
-              null,
-            )
+            FileChooserDescriptorFactory.createSingleFolderDescriptor()
+              .withTitle(
+                UiToolsBundle.message("server-certificates.export-der-files-directory-title"),
+              ),
+            e.project,
+            null,
+          )
             ?.toNioPath() ?: return
 
         certificates.forEachIndexed { index, certificate ->
@@ -563,7 +809,16 @@ class ServerCertificates(
   // -- Inner Type ---------------------------------------------------------- //
 
   private class ExportAsJksAction(private val certificates: List<Certificate>, url: String) :
-    ExportCertificateAction("JKS", certificates, url) {
+    ExportCertificateAction(
+      "JKS",
+      certificates,
+      url,
+      if (certificates.size > 1) {
+        UiToolsBundle.message("server-certificates.export-chain-as-jks-action-title")
+      } else {
+        UiToolsBundle.message("server-certificates.export-certificate-as-jks-action-title")
+      },
+    ) {
 
     private val password = "changeit"
 
@@ -595,7 +850,13 @@ class ServerCertificates(
 
   private class CopyAsPemToClipboardAction(private val certificates: List<Certificate>) :
     AnAction(
-      UiToolsBundle.message("server-certificates.copy-pem-to-clipboard-action-title"),
+      if (certificates.size > 1) {
+        UiToolsBundle.message("server-certificates.copy-chain-pem-to-clipboard-action-title")
+      } else {
+        UiToolsBundle.message(
+          "server-certificates.copy-certificate-pem-to-clipboard-action-title",
+        )
+      },
       null,
       AllIcons.Actions.Copy,
     ) {
@@ -615,30 +876,40 @@ class ServerCertificates(
     private val project: Project?,
     private val parentDisposable: Disposable,
     private val parentComponent: () -> JComponent,
-  ) : AnAction(UiToolsBundle.message("server-certificates.show-as-pem-action-title"), null, null) {
+  ) :
+    AnAction(
+      if (certificates.size > 1) {
+        UiToolsBundle.message("server-certificates.show-chain-as-pem-action-title")
+      } else {
+        UiToolsBundle.message("server-certificates.show-certificate-as-pem-action-title")
+      },
+      null,
+      null,
+    ) {
 
     override fun actionPerformed(e: AnActionEvent) {
       val content = panel {
         row {
-            cell(
-                AdvancedEditor(
-                    id = "server-certificates-show-certificates-as-pem",
-                    context = context,
-                    configuration = configuration,
-                    project = project,
-                    title = null,
-                    editorMode = OUTPUT,
-                    parentDisposable = parentDisposable,
-                  )
-                  .apply { text = toPemFile(certificates) }
-                  .component
-              )
-              .resizableColumn()
-              .align(Align.FILL)
-          }
+          cell(
+            AdvancedEditor(
+              id = "server-certificates-show-certificates-as-pem",
+              context = context,
+              configuration = configuration,
+              project = project,
+              title = null,
+              editorMode = OUTPUT,
+              parentDisposable = parentDisposable,
+            )
+              .apply { text = toPemFile(certificates) }
+              .component,
+          )
+            .resizableColumn()
+            .align(Align.FILL)
+        }
           .resizableRow()
       }
-      createPopup(content).show(RelativePoint.getSouthOf(parentComponent()), Balloon.Position.below)
+      createPopup(content)
+        .show(RelativePoint.getSouthOf(parentComponent()), Balloon.Position.below)
     }
   }
 
@@ -667,22 +938,22 @@ class ServerCertificates(
     override fun actionPerformed(e: AnActionEvent) {
       val content = panel {
         row {
-            cell(
-                AdvancedEditor(
-                    id = "server-certificates-show-details",
-                    context = context,
-                    configuration = configuration,
-                    project = project,
-                    title = null,
-                    editorMode = OUTPUT,
-                    parentDisposable = parentDisposable,
-                  )
-                  .apply { text = certificates[0].toString() }
-                  .component
-              )
-              .resizableColumn()
-              .align(Align.FILL)
-          }
+          cell(
+            AdvancedEditor(
+              id = "server-certificates-show-details",
+              context = context,
+              configuration = configuration,
+              project = project,
+              title = null,
+              editorMode = OUTPUT,
+              parentDisposable = parentDisposable,
+            )
+              .apply { text = certificates[0].toString() }
+              .component,
+          )
+            .resizableColumn()
+            .align(Align.FILL)
+        }
           .resizableRow()
       }
       createPopup(content).showInCenterOf(parentComponent())
@@ -693,18 +964,47 @@ class ServerCertificates(
 
   private data class HttpResponse(
     val certificates: List<Certificate>?,
+    val requestedUrl: String,
+    val finalUrl: String,
     val protocol: String,
     val statusCode: Int,
     val statusMessage: String,
+    val tlsVersion: String?,
+    val cipherSuite: String?,
+    val trustStatus: CertificateTrustStatus,
     val headers: Map<String, List<String?>>,
     val body: String?,
   )
 
   // -- Inner Type ---------------------------------------------------------- //
 
+  private sealed class CertificateTrustStatus {
+
+    data object Trusted : CertificateTrustStatus()
+
+    data class NotTrusted(val errorMessage: String?) : CertificateTrustStatus()
+
+    data object NotValidated : CertificateTrustStatus()
+
+    fun toDisplayText(): String =
+      when (this) {
+        Trusted -> UiToolsBundle.message("server-certificates.trust-status-trusted")
+        is NotTrusted ->
+          errorMessage?.let {
+            UiToolsBundle.message("server-certificates.trust-status-not-trusted-with-reason", it)
+          } ?: UiToolsBundle.message("server-certificates.trust-status-not-trusted")
+
+        NotValidated -> UiToolsBundle.message("server-certificates.trust-status-not-validated")
+      }
+  }
+
+  // -- Inner Type ---------------------------------------------------------- //
+
   private class CertificateCapturingTrustManager(private val allowInsecureConnection: Boolean) :
     X509TrustManager {
     val serverCertificates = mutableListOf<Certificate>()
+    private var certificateTrustStatus: CertificateTrustStatus =
+      CertificateTrustStatus.NotValidated
 
     override fun checkClientTrusted(chain: Array<X509Certificate>?, authType: String?) {
       // Nothing to do
@@ -714,16 +1014,18 @@ class ServerCertificates(
       serverCertificates.clear()
       chain?.forEach { serverCertificates.add(it) }
 
-      if (!allowInsecureConnection) {
-        try {
-          val defaultTrustManager =
-            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-          defaultTrustManager.init(null as KeyStore?)
-          val defaultX509TrustManager =
-            defaultTrustManager.trustManagers.firstOrNull() as? X509TrustManager
-              ?: throw IllegalStateException("Default trust manager not available")
-          defaultX509TrustManager.checkServerTrusted(chain, authType)
-        } catch (e: Exception) {
+      try {
+        val defaultTrustManager =
+          TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        defaultTrustManager.init(null as KeyStore?)
+        val defaultX509TrustManager =
+          defaultTrustManager.trustManagers.firstOrNull() as? X509TrustManager
+            ?: throw IllegalStateException("Default trust manager not available")
+        defaultX509TrustManager.checkServerTrusted(chain, authType)
+        certificateTrustStatus = CertificateTrustStatus.Trusted
+      } catch (e: Exception) {
+        certificateTrustStatus = CertificateTrustStatus.NotTrusted(e.message)
+        if (!allowInsecureConnection) {
           throw IllegalStateException("Failed to validate server certificate: ${e.message}", e)
         }
       }
@@ -736,6 +1038,8 @@ class ServerCertificates(
         init(null, arrayOf<TrustManager>(this@CertificateCapturingTrustManager), SecureRandom())
         this
       }
+
+    fun getCertificateTrustStatus(): CertificateTrustStatus = certificateTrustStatus
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -762,6 +1066,9 @@ class ServerCertificates(
   companion object {
 
     private const val MAX_RESPONSE_BODY_BYTES = 64L * 1024L
+    private const val CERTIFICATE_EXPIRING_SOON_THRESHOLD_MILLIS = 30L * 24L * 60L * 60L * 1000L
+    private const val SUBJECT_ALTERNATIVE_NAME_DNS = 2
+    private const val SUBJECT_ALTERNATIVE_NAME_IP = 7
 
     fun toPemFile(certificates: List<Certificate>) =
       certificates
