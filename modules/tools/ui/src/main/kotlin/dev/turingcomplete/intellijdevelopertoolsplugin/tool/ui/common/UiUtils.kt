@@ -22,6 +22,7 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.popup.PopupState
 import com.intellij.util.ui.ColumnInfo
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import java.awt.Dimension
 import java.awt.event.InputEvent
@@ -29,6 +30,8 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.Icon
 import javax.swing.JComponent
+import javax.swing.JTextArea
+import javax.swing.UIManager
 
 object UiUtils {
   // -- Properties ---------------------------------------------------------- //
@@ -149,6 +152,23 @@ object UiUtils {
 
       override fun getComparator(): Comparator<T> = compareBy { sortValue(it) }
     }
+
+  /**
+   * Capable of wrapping long lines that do not have whitespaces.
+   */
+  fun createWrappingTextArea(text: String): JTextArea {
+    return JTextArea(text).apply {
+      lineWrap = true
+      wrapStyleWord = false
+      isEditable = false
+      isOpaque = false
+
+      // IMPORTANT: allow proper shrinking
+      minimumSize = Dimension(0, preferredSize.height)
+
+      font = UIManager.getFont("Label.font")
+    }
+  }
 
   // -- Private Methods ----------------------------------------------------- //
   // -- Inner Type ---------------------------------------------------------- //

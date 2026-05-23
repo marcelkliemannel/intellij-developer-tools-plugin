@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.validation.DialogValidationRequestor
 import com.intellij.ui.ComponentUtil.findComponentsOfType
 import com.intellij.ui.ScrollPaneFactory.createScrollPane
+import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBEmptyBorder
@@ -14,7 +15,10 @@ import com.intellij.util.ui.JBInsets
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.Dimension
+import java.awt.Point
+import java.awt.Rectangle
 import javax.swing.JComponent
+import javax.swing.SwingUtilities
 
 abstract class DeveloperUiTool(protected val parentDisposable: Disposable) :
   DataProvider, Disposable {
@@ -110,6 +114,17 @@ abstract class DeveloperUiTool(protected val parentDisposable: Disposable) :
 
   fun registerValidationListeners(listener: (List<ValidationInfo>) -> Unit) {
     validationListeners.add(listener)
+  }
+
+  fun scrollToTop() {
+    SwingUtilities.invokeLater {
+      val parent = component.parent
+      if (parent is JBScrollPane) {
+        parent.viewport.viewPosition = Point(0, 0)
+      } else {
+        component.scrollRectToVisible(Rectangle(0, 0, 1, 1))
+      }
+    }
   }
 
   // -- Private Methods ----------------------------------------------------- //

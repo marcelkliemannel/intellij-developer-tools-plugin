@@ -13,6 +13,9 @@
 
 - Changed DER export for certificate chains in the "Server Certificates" tool to write one `.der`
   file per certificate instead of a single concatenated binary file.
+- Improved the "Server Certificates" tool with a compact TLS summary, certificate chain roles,
+  hostname matching, subject alternative names, SHA-256 fingerprints, expiry warnings, clearer
+  export actions, URL normalization, and preserved results while fetching or after failed fetches.
 
 ### Removed
 
