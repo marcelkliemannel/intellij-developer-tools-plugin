@@ -12,6 +12,7 @@ import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.fileChooser.FileSaverDialog
 import com.intellij.openapi.ide.CopyPasteManager
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
@@ -50,6 +51,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.copyable
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.awt.datatransfer.StringSelection
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.math.BigInteger
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -64,7 +66,6 @@ import java.security.cert.X509Certificate
 import java.util.Base64
 import java.util.Date
 import java.util.StringJoiner
-import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.TrustManagerFactory
@@ -72,6 +73,7 @@ import javax.net.ssl.X509TrustManager
 import javax.security.auth.x500.X500Principal
 import javax.swing.JComponent
 import javax.swing.event.HyperlinkEvent
+import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
@@ -342,6 +344,8 @@ class ServerCertificates(
           UiToolsBundle.message("server-certificates.fetch-server-certificates-in-progress-title"),
           true,
         ) {
+        @Volatile private var call: Call? = null
+
         override fun run(indicator: ProgressIndicator) {
           indicator.text =
             UiToolsBundle.message("server-certificates.fetch-server-certificates-in-progress")
@@ -360,25 +364,41 @@ class ServerCertificates(
             certificateCapturingTrustManager,
           )
           if (allowInsecureConnection) {
-            httpClientBuilder.hostnameVerifier(HostnameVerifier { _, _ -> true })
+            httpClientBuilder.hostnameVerifier { _, _ -> true }
           }
 
           val httpClient = httpClientBuilder.build()
           val request = Request.Builder().url(url).build()
-          val response = httpClient.newCall(request).execute()
-          val httpResponse =
-            HttpResponse(
-              certificates = certificateCapturingTrustManager.serverCertificates,
-              protocol = OkHttpClientUtils.toDisplayableString(response.protocol),
-              statusCode = response.code,
-              statusMessage = OkHttpClientUtils.toStatusMessage(response.code) ?: "",
-              headers = response.headers.toMultimap(),
-              body = response.body.string(),
-            )
-          onSuccess(httpResponse)
+          val call = httpClient.newCall(request)
+          this.call = call
+          try {
+            call.execute().use { response ->
+              val httpResponse =
+                HttpResponse(
+                  certificates = certificateCapturingTrustManager.serverCertificates,
+                  protocol = OkHttpClientUtils.toDisplayableString(response.protocol),
+                  statusCode = response.code,
+                  statusMessage =
+                    response.message.ifBlank {
+                      OkHttpClientUtils.toStatusMessage(response.code) ?: ""
+                    },
+                  headers = response.headers.toMultimap(),
+                  body = response.peekBody(MAX_RESPONSE_BODY_BYTES).string(),
+                )
+              onSuccess(httpResponse)
+            }
+          } catch (e: IOException) {
+            if (call.isCanceled()) {
+              throw ProcessCanceledException(e)
+            }
+            throw e
+          } finally {
+            this.call = null
+          }
         }
 
         override fun onCancel() {
+          call?.cancel()
           onCancel()
         }
 
@@ -408,14 +428,13 @@ class ServerCertificates(
         val saveFileDialog: FileSaverDialog =
           FileChooserFactory.getInstance().createSaveFileDialog(fileSaverDescriptor, e.project)
         val defaultFileName = createDefaultCertificateFileName()
-        saveFileDialog.save(defaultFileName)?.file?.toPath()?.let { targetPath ->
-          Files.write(
-            targetPath,
-            createFileContent(),
-            StandardOpenOption.TRUNCATE_EXISTING,
-            StandardOpenOption.CREATE,
-          )
-        }
+        val targetPath = saveFileDialog.save(defaultFileName)?.file?.toPath() ?: return
+        Files.write(
+          targetPath,
+          createFileContent(),
+          StandardOpenOption.TRUNCATE_EXISTING,
+          StandardOpenOption.CREATE,
+        )
         onSuccess(e)
       } catch (exception: Exception) {
         val errorMessage = exception.message ?: ""
@@ -683,6 +702,8 @@ class ServerCertificates(
   // -- Companion Object ---------------------------------------------------- //
 
   companion object {
+
+    private const val MAX_RESPONSE_BODY_BYTES = 64L * 1024L
 
     fun toPemFile(certificates: List<Certificate>) =
       certificates
