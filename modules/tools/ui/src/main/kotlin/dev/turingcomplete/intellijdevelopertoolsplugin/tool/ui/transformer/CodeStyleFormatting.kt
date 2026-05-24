@@ -5,6 +5,7 @@ import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.application.ReadAction
 import com.intellij.psi.PsiManager
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
 import com.intellij.testFramework.LightVirtualFile
@@ -82,12 +83,24 @@ class CodeStyleFormatting(
         getSelectedCodeStyle().language,
         sourceText.get(),
       )
-    PsiManager.getInstance(project!!).findFile(workingVirtualFile)?.let { workingPsiFile ->
+
+    val workingPsiFile =
+      ReadAction.computeBlocking<com.intellij.psi.PsiFile?, RuntimeException> {
+        PsiManager.getInstance(project!!).findFile(workingVirtualFile)
+      }
+
+    if (workingPsiFile != null) {
       val processor =
         RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))
-      processor.setPostRunnable { resultText.set(workingPsiFile.text) }
+      processor.setPostRunnable {
+        val text =
+          ReadAction.computeBlocking<String, RuntimeException> { workingPsiFile.text }
+        resultText.set(text)
+      }
       processor.run()
-    } ?: error("snh: Can't get PSI file for `LightVirtualFile`")
+    } else {
+      error("snh: Can't get PSI file for `LightVirtualFile`")
+    }
   }
 
   // -- Private Methods ----------------------------------------------------- //
