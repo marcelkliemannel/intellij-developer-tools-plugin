@@ -164,6 +164,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
         Double::class to Pair(1234567.0, "1234567.0"),
         Float::class to Pair(1.2345f, "1.2345"),
         String::class to Pair("foo", "foo"),
+        // JBColor test is flickering
         JBColor::class to Pair(JBColor.MAGENTA, "-65281"),
         LocaleContainer::class to Pair(LocaleContainer(Locale.forLanguageTag("de-DE")), "de-DE"),
         BigDecimal::class to

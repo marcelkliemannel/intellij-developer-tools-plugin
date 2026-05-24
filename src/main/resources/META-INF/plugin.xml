@@ -378,9 +378,9 @@
                 type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.Unarchiver$SortingMode"
                 legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.Unarchiver$SortingMode"/>
         <developerToolConfigurationEnumPropertyType
-                id="ConfigFormatConverter-Format"
+                id="CodeFormattingConverter-Language"
                 type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.ConfigFormatConverter$Format"
-                legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.ConfigFormatConverter$Format"/>
+                legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CodeFormattingConverter$Language"/>
         <developerToolConfigurationEnumPropertyType
                 id="QrCode-SymbolShapeHint"
                 type="com.google.zxing.datamatrix.encoder.SymbolShapeHint"
