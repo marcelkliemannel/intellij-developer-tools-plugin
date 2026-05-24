@@ -18,7 +18,7 @@
     <li>Text Sorting</li>
     <li>Text Case Transformation</li>
     <li>Text Diff Viewer</li>
-    <li>Text Format Conversion</li>
+    <li>Config Format Conversion</li>
     <li>Text Statistic</li>
     <li>Text Filter</li>
     <li>JSON Path Parser</li>
@@ -254,7 +254,7 @@
         <developerUiTool
                 id="text-format-converter"
                 groupId="text"
-                implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.TextFormattingConverter$Factory"/>
+                implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.ConfigFormatConverter$Factory"/>
         <developerUiTool
                 id="text-sorting-transformer"
                 groupId="text"
@@ -378,9 +378,9 @@
                 type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other.Unarchiver$SortingMode"
                 legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.other.Unarchiver$SortingMode"/>
         <developerToolConfigurationEnumPropertyType
-                id="CodeFormattingConverter-Language"
-                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.TextFormattingConverter$Language"
-                legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.CodeFormattingConverter$Language"/>
+                id="ConfigFormatConverter-Format"
+                type="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.ConfigFormatConverter$Format"
+                legacyId="dev.turingcomplete.intellijdevelopertoolsplugin._internal.tool.ui.converter.ConfigFormatConverter$Format"/>
         <developerToolConfigurationEnumPropertyType
                 id="QrCode-SymbolShapeHint"
                 type="com.google.zxing.datamatrix.encoder.SymbolShapeHint"

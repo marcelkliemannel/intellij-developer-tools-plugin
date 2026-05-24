@@ -20,7 +20,7 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.Co
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.converter.base.TextInputOutputHandler
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 
-class TextFormattingConverter(
+class ConfigFormatConverter(
   configuration: DeveloperToolConfiguration,
   parentDisposable: Disposable,
   context: DeveloperUiToolContext,
@@ -40,8 +40,8 @@ class TextFormattingConverter(
   DeveloperToolConfiguration.ChangeListener {
   // -- Properties ---------------------------------------------------------- //
 
-  private var sourceLanguage = configuration.register("firstLanguage", Language.JSON)
-  private var targetLanguage = configuration.register("secondLanguage", Language.YAML)
+  private var sourceFormat = configuration.register("firstLanguage", Format.JSON)
+  private var targetFormat = configuration.register("secondLanguage", Format.YAML)
 
   private lateinit var sourceTextInputOutputHandler: TextInputOutputHandler
   private lateinit var targetTextInputOutputHandler: TextInputOutputHandler
@@ -75,17 +75,17 @@ class TextFormattingConverter(
 
   override fun Panel.buildSourceTopConfigurationUi() {
     row {
-      comboBox(Language.entries)
+      comboBox(Format.entries)
         .label(UiToolsBundle.message("code-formatting.first-language"))
-        .bindItem(sourceLanguage)
+        .bindItem(sourceFormat)
     }
   }
 
   override fun Panel.buildTargetTopConfigurationUi() {
     row {
-      comboBox(Language.entries)
+      comboBox(Format.entries)
         .label(UiToolsBundle.message("code-formatting.second-language"))
-        .bindItem(targetLanguage)
+        .bindItem(targetFormat)
     }
   }
 
@@ -93,29 +93,29 @@ class TextFormattingConverter(
     if (source.isEmpty()) {
       emptyByteArray
     } else {
-      targetLanguage.get().writeAsBytes(sourceLanguage.get().parse(source))
+      targetFormat.get().writeAsBytes(sourceFormat.get().parse(source))
     }
 
   override fun doConvertToSource(target: ByteArray): ByteArray =
     if (target.isEmpty()) {
       emptyByteArray
     } else {
-      sourceLanguage.get().writeAsBytes(targetLanguage.get().parse(target))
+      sourceFormat.get().writeAsBytes(targetFormat.get().parse(target))
     }
 
   // -- Private Methods ----------------------------------------------------- //
 
   private fun syncLanguages() {
-    val sourceCodeStyle = codeStyles[sourceLanguage.get().languageId]
+    val sourceCodeStyle = codeStyles[sourceFormat.get().languageId]
     sourceTextInputOutputHandler.setLanguage(sourceCodeStyle ?: PlainTextLanguage.INSTANCE)
 
-    val targetCodeStyle = codeStyles[targetLanguage.get().languageId]
+    val targetCodeStyle = codeStyles[targetFormat.get().languageId]
     targetTextInputOutputHandler.setLanguage(targetCodeStyle ?: PlainTextLanguage.INSTANCE)
   }
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private enum class Language(
+  private enum class Format(
     val title: String,
     val languageId: String,
     val objectMapper: (ObjectMapperService) -> ObjectMapper,
@@ -141,7 +141,7 @@ class TextFormattingConverter(
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  class Factory : DeveloperUiToolFactory<TextFormattingConverter> {
+  class Factory : DeveloperUiToolFactory<ConfigFormatConverter> {
 
     override fun getDeveloperUiToolPresentation() =
       DeveloperUiToolPresentation(
@@ -153,8 +153,8 @@ class TextFormattingConverter(
       project: Project?,
       parentDisposable: Disposable,
       context: DeveloperUiToolContext,
-    ): ((DeveloperToolConfiguration) -> TextFormattingConverter) = { configuration ->
-      TextFormattingConverter(configuration, parentDisposable, context, project)
+    ): ((DeveloperToolConfiguration) -> ConfigFormatConverter) = { configuration ->
+      ConfigFormatConverter(configuration, parentDisposable, context, project)
     }
   }
 
