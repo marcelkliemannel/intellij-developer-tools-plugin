@@ -11,6 +11,7 @@
 
 ### Changed
 
+- Renamed "Text Format" tool to "Config Format".
 - Changed DER export for certificate chains in the "Server Certificates" tool to write one `.der`
   file per certificate instead of a single concatenated binary file.
 - Improved the "Server Certificates" tool with a compact TLS summary, certificate chain roles,
