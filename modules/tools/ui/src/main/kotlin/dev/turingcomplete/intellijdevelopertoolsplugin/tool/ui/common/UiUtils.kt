@@ -22,7 +22,6 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.popup.PopupState
 import com.intellij.util.ui.ColumnInfo
-import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import java.awt.Dimension
 import java.awt.event.InputEvent
@@ -153,9 +152,7 @@ object UiUtils {
       override fun getComparator(): Comparator<T> = compareBy { sortValue(it) }
     }
 
-  /**
-   * Capable of wrapping long lines that do not have whitespaces.
-   */
+  /** Capable of wrapping long lines that do not have whitespaces. */
   fun createWrappingTextArea(text: String): JTextArea {
     return JTextArea(text).apply {
       lineWrap = true
