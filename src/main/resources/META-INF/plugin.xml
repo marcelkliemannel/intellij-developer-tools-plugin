@@ -66,7 +66,7 @@
                 parentId="tools"
                 instance="dev.turingcomplete.intellijdevelopertoolsplugin.settings.GeneralSettingsConfigurable"
                 id="dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsConfigurable"
-                displayName="%plugin.name">
+                displayName="Developer Tools">
             <configurable
                     id="dev.turingcomplete.intellijdevelopertoolsplugin.settings.JsonHandlingSettingsConfigurable"
                     instance="dev.turingcomplete.intellijdevelopertoolsplugin.settings.JsonHandlingSettingsConfigurable"/>

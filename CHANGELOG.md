@@ -46,6 +46,7 @@
   `Kib`.
 - Fixed the Units Converter's default data size example so it starts from an exact binary value
   instead of a rounded bit count.
+- Fixed menu name of the plugin settings page
 
 ## 8.0.0 - 2026-05-01
 
