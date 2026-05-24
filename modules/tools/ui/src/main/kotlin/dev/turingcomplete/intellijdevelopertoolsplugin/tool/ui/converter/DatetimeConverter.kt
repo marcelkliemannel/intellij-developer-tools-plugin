@@ -164,212 +164,212 @@ class DatetimeConverter(
     val initialLocalDateTime = LocalDateTime.ofInstant(initialInstant, selectedTimeZoneId())
 
     group(UiToolsBundle.message("datetime-converter.unix-timestamp")) {
-      if (context.prioritizeVerticalLayout) {
-        row { buildUnixTimeStampSecondsTextFieldUi(initialInstant) }
-          .topGap(TopGap.NONE)
-          .bottomGap(BottomGap.NONE)
-          .layout(RowLayout.PARENT_GRID)
-        row { buildUnixTimeStampMillisTextFieldUi(initialInstant) }
-          .topGap(TopGap.NONE)
-          .bottomGap(BottomGap.NONE)
-          .layout(RowLayout.PARENT_GRID)
-        row { buildSetToNowButtonUi() }
-      } else {
-        row {
-          buildUnixTimeStampSecondsTextFieldUi(initialInstant)
-          buildUnixTimeStampMillisTextFieldUi(initialInstant)
-          buildSetToNowButtonUi()
+        if (context.prioritizeVerticalLayout) {
+          row { buildUnixTimeStampSecondsTextFieldUi(initialInstant) }
+            .topGap(TopGap.NONE)
+            .bottomGap(BottomGap.NONE)
+            .layout(RowLayout.PARENT_GRID)
+          row { buildUnixTimeStampMillisTextFieldUi(initialInstant) }
+            .topGap(TopGap.NONE)
+            .bottomGap(BottomGap.NONE)
+            .layout(RowLayout.PARENT_GRID)
+          row { buildSetToNowButtonUi() }
+        } else {
+          row {
+            buildUnixTimeStampSecondsTextFieldUi(initialInstant)
+            buildUnixTimeStampMillisTextFieldUi(initialInstant)
+            buildSetToNowButtonUi()
+          }
         }
       }
-    }
       .topGap(TopGap.NONE)
       .bottomGap(BottomGap.NONE)
 
     group(UiToolsBundle.message("datetime-converter.date-and-time")) {
-      row {
-        comboBox(ZoneId.getAvailableZoneIds().sorted())
-          .label(UiToolsBundle.message("datetime-converter.time-zone"))
-          .bindItem(selectedTimeZoneId)
-          .whenItemSelectedFromUi { convert(TIME_ZONE) }
-          .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, TIME_ZONE) }
-      }
-      data class DateField(
-        val title: String,
-        val initialValue: Int,
-        val valueProperty: ValueProperty<Int>,
-        val range: LongRange,
-        val changeOrigin: ConversionOrigin,
-      )
-      row {
-        listOf(
-          DateField(
-            UiToolsBundle.message("datetime-converter.year"),
-            initialLocalDateTime.year,
-            convertYear,
-            LongRange(1970, 9999),
-            YEAR,
-          ),
-          DateField(
-            UiToolsBundle.message("datetime-converter.month"),
-            initialLocalDateTime.monthValue,
-            convertMonth,
-            LongRange(1, 12),
-            MONTH,
-          ),
-          DateField(
-            UiToolsBundle.message("datetime-converter.day"),
-            initialLocalDateTime.dayOfMonth,
-            convertDay,
-            LongRange(1, 31),
-            DAY,
-          ),
+        row {
+          comboBox(ZoneId.getAvailableZoneIds().sorted())
+            .label(UiToolsBundle.message("datetime-converter.time-zone"))
+            .bindItem(selectedTimeZoneId)
+            .whenItemSelectedFromUi { convert(TIME_ZONE) }
+            .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, TIME_ZONE) }
+        }
+        data class DateField(
+          val title: String,
+          val initialValue: Int,
+          val valueProperty: ValueProperty<Int>,
+          val range: LongRange,
+          val changeOrigin: ConversionOrigin,
         )
-          .forEach { (title, initialValue, valueProperty, range, changeOrigin) ->
-            textField()
-              .label(UiToolsBundle.message("datetime-converter.label", title))
-              .text(initialValue.toString())
-              .bindIntTextImproved(valueProperty)
-              .columns(5)
-              .validateLongValue(range)
-              .whenTextChangedFromUi { convert(changeOrigin) }
-              .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, changeOrigin) }
+        row {
+            listOf(
+                DateField(
+                  UiToolsBundle.message("datetime-converter.year"),
+                  initialLocalDateTime.year,
+                  convertYear,
+                  LongRange(1970, 9999),
+                  YEAR,
+                ),
+                DateField(
+                  UiToolsBundle.message("datetime-converter.month"),
+                  initialLocalDateTime.monthValue,
+                  convertMonth,
+                  LongRange(1, 12),
+                  MONTH,
+                ),
+                DateField(
+                  UiToolsBundle.message("datetime-converter.day"),
+                  initialLocalDateTime.dayOfMonth,
+                  convertDay,
+                  LongRange(1, 31),
+                  DAY,
+                ),
+              )
+              .forEach { (title, initialValue, valueProperty, range, changeOrigin) ->
+                textField()
+                  .label(UiToolsBundle.message("datetime-converter.label", title))
+                  .text(initialValue.toString())
+                  .bindIntTextImproved(valueProperty)
+                  .columns(5)
+                  .validateLongValue(range)
+                  .whenTextChangedFromUi { convert(changeOrigin) }
+                  .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, changeOrigin) }
+              }
           }
-      }
-        .layout(RowLayout.PARENT_GRID)
-      row {
-        listOf(
-          DateField(
-            UiToolsBundle.message("datetime-converter.hour"),
-            initialLocalDateTime.hour,
-            convertHour,
-            LongRange(0, 23),
-            HOUR,
-          ),
-          DateField(
-            UiToolsBundle.message("datetime-converter.minute"),
-            initialLocalDateTime.minute,
-            convertMinute,
-            LongRange(0, 59),
-            MINUTE,
-          ),
-          DateField(
-            UiToolsBundle.message("datetime-converter.second"),
-            initialLocalDateTime.second,
-            convertSecond,
-            LongRange(0, 59),
-            SECOND,
-          ),
-        )
-          .forEach { (title, initialValue, valueProperty, range, changeOrigin) ->
-            textField()
-              .label(UiToolsBundle.message("datetime-converter.label", title))
-              .text(initialValue.toString())
-              .bindIntTextImproved(valueProperty)
-              .columns(5)
-              .validateLongValue(range)
-              .whenTextChangedFromUi { convert(changeOrigin) }
-              .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, changeOrigin) }
+          .layout(RowLayout.PARENT_GRID)
+        row {
+            listOf(
+                DateField(
+                  UiToolsBundle.message("datetime-converter.hour"),
+                  initialLocalDateTime.hour,
+                  convertHour,
+                  LongRange(0, 23),
+                  HOUR,
+                ),
+                DateField(
+                  UiToolsBundle.message("datetime-converter.minute"),
+                  initialLocalDateTime.minute,
+                  convertMinute,
+                  LongRange(0, 59),
+                  MINUTE,
+                ),
+                DateField(
+                  UiToolsBundle.message("datetime-converter.second"),
+                  initialLocalDateTime.second,
+                  convertSecond,
+                  LongRange(0, 59),
+                  SECOND,
+                ),
+              )
+              .forEach { (title, initialValue, valueProperty, range, changeOrigin) ->
+                textField()
+                  .label(UiToolsBundle.message("datetime-converter.label", title))
+                  .text(initialValue.toString())
+                  .bindIntTextImproved(valueProperty)
+                  .columns(5)
+                  .validateLongValue(range)
+                  .whenTextChangedFromUi { convert(changeOrigin) }
+                  .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, changeOrigin) }
+              }
           }
+          .layout(RowLayout.PARENT_GRID)
+        row { comment("").bindText(dateDetails) }
       }
-        .layout(RowLayout.PARENT_GRID)
-      row { comment("").bindText(dateDetails) }
-    }
       .layout(RowLayout.PARENT_GRID)
       .topGap(TopGap.NONE)
       .bottomGap(BottomGap.NONE)
 
     group(UiToolsBundle.message("datetime-converter.formatted")) {
-      buttonsGroup {
-        lateinit var formattedStandardFormatComboBox: ComboBox<StandardFormat>
-        row {
-          radioButton(UiToolsBundle.message("datetime-converter.standard-format"))
-            .bindSelected(formattedIndividual.not())
-            .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
-            .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
-            .gap(RightGap.SMALL)
-          formattedStandardFormatComboBox =
-            comboBox(StandardFormat.entries)
-              .bindItem(formattedStandardFormat)
-              .columns(COLUMNS_MEDIUM)
-              .whenItemSelectedFromUi {
-                syncFormattedStandardFormatPattern()
-                convert(UNIX_TIMESTAMP_MILLIS)
-              }
-              .enabledIf(formattedIndividual.not())
-              .gap(RightGap.SMALL)
-              .component
-              .apply { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
-          if (!context.prioritizeVerticalLayout) {
-            buildStandardFormatConfigurationUi(formattedStandardFormatComboBox)
-          }
-        }
-          .layout(RowLayout.PARENT_GRID)
-          .bottomGap(BottomGap.NONE)
-        if (context.prioritizeVerticalLayout) {
+        buttonsGroup {
+          lateinit var formattedStandardFormatComboBox: ComboBox<StandardFormat>
           row {
-            cell()
-            buildStandardFormatConfigurationUi(formattedStandardFormatComboBox)
-          }
-            .topGap(TopGap.NONE)
-            .layout(RowLayout.PARENT_GRID)
-        }
-        row {
-          cell()
-          comment("")
-            .bindText(formattedStandardFormatPattern)
-            .enabledIf(formattedIndividual.not())
-        }
-          .topGap(TopGap.NONE)
-          .layout(RowLayout.PARENT_GRID)
-
-        row {
-          radioButton(UiToolsBundle.message("datetime-converter.individual-format"))
-            .bindSelected(formattedIndividual)
-            .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
-            .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
-            .gap(RightGap.SMALL)
-          expandableTextField()
-            .bindText(formattedIndividualFormat)
-            .columns(COLUMNS_MEDIUM)
-            .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
-            .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
-            .validationInfo {
-              try {
-                if (formattedIndividual.get()) {
-                  DateTimeFormatter.ofPattern(it.text)
-                }
-                return@validationInfo null
-              } catch (_: Exception) {
-                return@validationInfo ValidationInfo(
-                  UiToolsBundle.message("datetime-converter.invalid-individual-format"),
-                  it,
-                )
+              radioButton(UiToolsBundle.message("datetime-converter.standard-format"))
+                .bindSelected(formattedIndividual.not())
+                .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
+                .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
+                .gap(RightGap.SMALL)
+              formattedStandardFormatComboBox =
+                comboBox(StandardFormat.entries)
+                  .bindItem(formattedStandardFormat)
+                  .columns(COLUMNS_MEDIUM)
+                  .whenItemSelectedFromUi {
+                    syncFormattedStandardFormatPattern()
+                    convert(UNIX_TIMESTAMP_MILLIS)
+                  }
+                  .enabledIf(formattedIndividual.not())
+                  .gap(RightGap.SMALL)
+                  .component
+                  .apply { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
+              if (!context.prioritizeVerticalLayout) {
+                buildStandardFormatConfigurationUi(formattedStandardFormatComboBox)
               }
             }
-            .enabledIf(formattedIndividual)
+            .layout(RowLayout.PARENT_GRID)
+            .bottomGap(BottomGap.NONE)
+          if (context.prioritizeVerticalLayout) {
+            row {
+                cell()
+                buildStandardFormatConfigurationUi(formattedStandardFormatComboBox)
+              }
+              .topGap(TopGap.NONE)
+              .layout(RowLayout.PARENT_GRID)
+          }
+          row {
+              cell()
+              comment("")
+                .bindText(formattedStandardFormatPattern)
+                .enabledIf(formattedIndividual.not())
+            }
+            .topGap(TopGap.NONE)
+            .layout(RowLayout.PARENT_GRID)
+
+          row {
+              radioButton(UiToolsBundle.message("datetime-converter.individual-format"))
+                .bindSelected(formattedIndividual)
+                .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
+                .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
+                .gap(RightGap.SMALL)
+              expandableTextField()
+                .bindText(formattedIndividualFormat)
+                .columns(COLUMNS_MEDIUM)
+                .whenTextChangedFromUi { convert(UNIX_TIMESTAMP_MILLIS) }
+                .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
+                .validationInfo {
+                  try {
+                    if (formattedIndividual.get()) {
+                      DateTimeFormatter.ofPattern(it.text)
+                    }
+                    return@validationInfo null
+                  } catch (_: Exception) {
+                    return@validationInfo ValidationInfo(
+                      UiToolsBundle.message("datetime-converter.invalid-individual-format"),
+                      it,
+                    )
+                  }
+                }
+                .enabledIf(formattedIndividual)
+            }
+            .layout(RowLayout.PARENT_GRID)
         }
+
+        row {
+            comboBox(ALL_AVAILABLE_LOCALES)
+              .label(UiToolsBundle.message("datetime-converter.locale"))
+              .bindItem(formattedLocale)
+              .columns(COLUMNS_MEDIUM)
+              .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
+              .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
+          }
           .layout(RowLayout.PARENT_GRID)
-      }
 
-      row {
-        comboBox(ALL_AVAILABLE_LOCALES)
-          .label(UiToolsBundle.message("datetime-converter.locale"))
-          .bindItem(formattedLocale)
-          .columns(COLUMNS_MEDIUM)
-          .onChanged { convert(UNIX_TIMESTAMP_MILLIS) }
-          .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_MILLIS) }
+        row {
+            label("")
+              .bindText(formattedText)
+              .changeFont(scale = 1.1f, style = Font.BOLD)
+              .gap(RightGap.SMALL)
+            actionButton(CopyAction(FORMATTED_TEXT_DATA_KEY), DatetimeConverter::class.java.name)
+          }
+          .topGap(TopGap.SMALL)
       }
-        .layout(RowLayout.PARENT_GRID)
-
-      row {
-        label("")
-          .bindText(formattedText)
-          .changeFont(scale = 1.1f, style = Font.BOLD)
-          .gap(RightGap.SMALL)
-        actionButton(CopyAction(FORMATTED_TEXT_DATA_KEY), DatetimeConverter::class.java.name)
-      }
-        .topGap(TopGap.SMALL)
-    }
       .topGap(TopGap.NONE)
   }
 
@@ -454,7 +454,7 @@ class DatetimeConverter(
       .applyToComponent { putUserData(CONVERSION_ORIGIN_KEY, UNIX_TIMESTAMP_SECONDS) }
       .enabledIf(formattedIndividual.not())
       .visibleIf(
-        ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsTimeZone == true },
+        ComboBoxPredicate(formattedStandardFormatComboBox) { it?.supportsTimeZone == true }
       )
   }
 
@@ -478,7 +478,7 @@ class DatetimeConverter(
 
   private fun createCurrentUnixTimestampUpdate(): Runnable = Runnable {
     currentUnixTimestampSeconds.set(
-      "<html><code>${System.currentTimeMillis().div(1000)}</code></html>",
+      "<html><code>${System.currentTimeMillis().div(1000)}</code></html>"
     )
     currentUnixTimestampMillis.set("<html><code>${System.currentTimeMillis()}</code></html>")
     scheduleCurrentUnixTimestampUpdate()
@@ -582,26 +582,26 @@ class DatetimeConverter(
       dateDetails.set(
         "$dayName; ${formatEnglish(dayOfYear)} day of the year; ${formatEnglish(weekNumber)} week; ${
           formatEnglish(
-            quarterOfYear,
+            quarterOfYear
           )
-        } quarter",
+        } quarter"
       )
     } else {
       dateDetails.set(
         "A $dayName, the ${formatEnglish(dayOfYear)} day of the year, in the ${
           formatEnglish(
-            weekNumber,
+            weekNumber
           )
         } week, within the ${
           formatEnglish(
-            quarterOfYear,
+            quarterOfYear
           )
-        } quarter.",
+        } quarter."
       )
     }
 
     formattedText.set(
-      "<html><code>${formatDateTime(localDateTime).ifBlank { "No result" }}</code></html>",
+      "<html><code>${formatDateTime(localDateTime).ifBlank { "No result" }}</code></html>"
     )
   }
 
@@ -631,13 +631,13 @@ class DatetimeConverter(
   ) {
     panel {
       row {
-        label(title).gap(RightGap.SMALL)
-        label("")
-          .changeFont(scale = 1.5f, style = Font.BOLD)
-          .bindText(timestampProperty)
-          .gap(RightGap.SMALL)
-        actionButton(CopyAction(contentDataKey))
-      }
+          label(title).gap(RightGap.SMALL)
+          label("")
+            .changeFont(scale = 1.5f, style = Font.BOLD)
+            .bindText(timestampProperty)
+            .gap(RightGap.SMALL)
+          actionButton(CopyAction(contentDataKey))
+        }
         .topGap(TopGap.NONE)
     }
   }

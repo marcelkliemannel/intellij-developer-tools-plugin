@@ -4,8 +4,8 @@ import com.intellij.codeInsight.actions.RearrangeCodeProcessor
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.lang.Language
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiManager
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
 import com.intellij.testFramework.LightVirtualFile
@@ -93,8 +93,7 @@ class CodeStyleFormatting(
       val processor =
         RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))
       processor.setPostRunnable {
-        val text =
-          ReadAction.computeBlocking<String, RuntimeException> { workingPsiFile.text }
+        val text = ReadAction.computeBlocking<String, RuntimeException> { workingPsiFile.text }
         resultText.set(text)
       }
       processor.run()
