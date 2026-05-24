@@ -4,6 +4,16 @@
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## 9.0.0 - 2026-05-24
+
+### Added
+
 - Added editor actions for text case conversion and encoding/decoding, now available across all
   programming languages as well as plain text.
 - Prepared UI display text for localization and added Simplified Chinese and German translations.
@@ -17,8 +27,6 @@
 - Improved the "Server Certificates" tool with a compact TLS summary, certificate chain roles,
   hostname matching, subject alternative names, SHA-256 fingerprints, expiry warnings, clearer
   export actions, URL normalization, and preserved results while fetching or after failed fetches.
-
-### Removed
 
 ### Fixed
 
