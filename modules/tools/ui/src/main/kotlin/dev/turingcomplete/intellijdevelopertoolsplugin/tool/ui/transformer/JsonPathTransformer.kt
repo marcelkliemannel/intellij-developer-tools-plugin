@@ -14,7 +14,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiFile
 import com.intellij.testFramework.LightVirtualFile
+import com.intellij.openapi.application.ReadAction
 import com.intellij.ui.JBColor
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.awt.RelativePoint
@@ -121,7 +123,12 @@ class JsonPathTransformer(
       if (formatResult.get()) {
         val workingVirtualFile =
           LightVirtualFile(this.javaClass.canonicalName, JsonLanguage.INSTANCE, resultJsonText)
-        PsiManager.getInstance(project!!).findFile(workingVirtualFile)?.let { workingPsiFile ->
+
+        val workingPsiFile = ReadAction.compute<PsiFile?, RuntimeException> {
+          PsiManager.getInstance(project!!).findFile(workingVirtualFile)
+        }
+
+        workingPsiFile?.let { workingPsiFile ->
           val processor =
             RearrangeCodeProcessor(ReformatCodeProcessor(project, workingPsiFile, null, false))
           processor.setPostRunnable { resultText.set(workingPsiFile.text) }

@@ -743,8 +743,10 @@ class HttpServer(
   }
 
   private fun appendProcessOutput(outputChunk: String) {
-    synchronized(outputEditor) {
-      outputEditor.text = (outputEditor.text + outputChunk).takeLast(MAX_PROCESS_OUTPUT_LENGTH)
+    ApplicationManager.getApplication().invokeLater {
+      synchronized(outputEditor) {
+        outputEditor.text = (outputEditor.text + outputChunk).takeLast(MAX_PROCESS_OUTPUT_LENGTH)
+      }
     }
   }
 
