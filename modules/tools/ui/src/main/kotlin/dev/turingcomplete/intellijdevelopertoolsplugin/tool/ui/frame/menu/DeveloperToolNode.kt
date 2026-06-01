@@ -34,6 +34,15 @@ class DeveloperToolNode(
   val developerTools: List<DeveloperToolContainer>
     get() = _developerTools
 
+  var isFavorite: Boolean
+    get() = settings.getDeveloperToolConfigurations(developerToolId).firstOrNull()?.isFavorite ?: false
+    set(value) {
+        settings.getDeveloperToolConfigurations(developerToolId).firstOrNull()?.let {
+          it.isFavorite = value
+        }
+    }
+
+
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 

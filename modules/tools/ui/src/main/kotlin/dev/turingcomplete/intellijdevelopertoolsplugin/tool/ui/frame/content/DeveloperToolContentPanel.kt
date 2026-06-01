@@ -1,9 +1,12 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.content
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.ToggleAction
+import com.intellij.openapi.actionSystem.impl.ActionButton
 import com.intellij.openapi.observable.properties.AtomicProperty
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.project.DumbAwareAction
@@ -20,6 +23,7 @@ import com.intellij.ui.tabs.TabInfo
 import com.intellij.ui.tabs.TabsListener
 import com.intellij.util.ui.JBEmptyBorder
 import com.intellij.util.ui.components.BorderLayoutPanel
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolsApplicationSettings.Companion.generalSettings
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.NotBlankInputValidator
@@ -91,7 +95,18 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
         row {
             val titleComponent = buildTitle()
 
-            val actions =
+            val favoriteButton = ActionButton(
+                ToggleFavoriteAction(developerToolNode),
+                null,  // presentation
+                ToggleFavoriteAction.PLACE,
+                DEFAULT_MINIMUM_BUTTON_SIZE
+            )
+            cell(favoriteButton)
+                .gap(RightGap.SMALL)
+
+
+
+          val actions =
               mutableListOf(
                 dumbAwareAction(GeneralBundle.message("developer-tool-content-panel.reset")) {
                   selectedDeveloperToolInstance.get().apply {
@@ -130,6 +145,37 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
 
     return tabs.component
   }
+
+  private class ToggleFavoriteAction(private val toolNode: DeveloperToolNode) :
+    ToggleAction("Toggle Favorite", null, AllIcons.Nodes.NotFavoriteOnHover) {
+
+    override fun isSelected(e: AnActionEvent): Boolean {
+      return toolNode.isFavorite
+    }
+
+    override fun setSelected(e: AnActionEvent, state: Boolean) {
+      toolNode.isFavorite = state
+      e.presentation.icon = if (state) AllIcons.Nodes.Favorite else AllIcons.Nodes.NotFavoriteOnHover
+
+      DeveloperToolsApplicationSettings.instance.generalSettings.apply {
+        val current = toolsMenuTreeShowGroupNodes.get()
+        toolsMenuTreeShowGroupNodes.set(!current)
+        toolsMenuTreeShowGroupNodes.set(current)
+      }
+    }
+
+    override fun update(e: AnActionEvent) {
+      super.update(e)
+      e.presentation.icon = if (isSelected(e)) AllIcons.Nodes.Favorite else AllIcons.Nodes.NotFavoriteOnHover
+    }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+
+    companion object {
+      const val PLACE = "DeveloperTools.Favorite"
+    }
+  }
+
 
   private fun syncTabsSelectionVisibility() {
     tabs.presentation.isHideTabs =

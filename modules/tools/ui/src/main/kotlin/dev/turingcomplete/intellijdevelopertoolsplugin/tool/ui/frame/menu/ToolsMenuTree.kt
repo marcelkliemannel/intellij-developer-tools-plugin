@@ -305,6 +305,15 @@ class ToolsMenuTree(
 
     val defaultGroupNodesToExpand = mutableListOf<GroupNode>()
     val groupNodes = mutableMapOf<String, GroupNode>()
+
+    val favoritesGroupNode = GroupNode(DeveloperUiToolGroup().apply {
+      id = "favorites"
+      menuTitle = "⭐ Favorites"
+      detailTitle = "Favorites"
+      initiallyExpanded = true
+    })
+
+
     if (toolsMenuTreeShowGroupNodes) {
       DeveloperUiToolGroup.EP_NAME.extensions.forEach { developerToolGroup ->
         val groupNode = GroupNode(developerToolGroup)
@@ -346,6 +355,21 @@ class ToolsMenuTree(
           )
         parentNode.add(developerToolNode)
 
+        if (developerToolNode.isFavorite) {
+          val cloneNode =
+            DeveloperToolNode(
+              developerToolId = developerToolFactoryEp.id,
+              project = project,
+              settings = settings,
+              parentDisposable = parentDisposable,
+              developerUiToolPresentation = developerUiToolFactory.getDeveloperUiToolPresentation(),
+              showGrouped = true,
+              developerUiToolCreator = developerToolCreator,
+            )
+          favoritesGroupNode.add(cloneNode)
+        }
+
+
         if (developerToolFactoryEp.preferredSelected) {
           check(preferredSelectedDeveloperToolNode == null) {
             "Multiple initial selected developer tools"
@@ -355,8 +379,31 @@ class ToolsMenuTree(
       }
     }
 
+    if( favoritesGroupNode.childCount > 0 ) {
+      rootNode.add(favoritesGroupNode)
+      defaultGroupNodesToExpand.add(favoritesGroupNode)
+    }
+
+
     if (generalSettings.toolsMenuTreeOrderAlphabetically.get()) {
-      TreeUtil.sortChildren<ContentNode>(rootNode) { o1, o2 -> o1.title.compareTo(o2.title) }
+      fun sortNodeRecursively(node: ContentNode) {
+        TreeUtil.sortChildren<ContentNode>(node) { o1, o2 ->
+          when {
+            o1.id == "favorites" -> -1
+            o2.id == "favorites" -> 1
+            else -> o1.title.compareTo(o2.title)
+          }
+        }
+
+        for (i in 0 until node.childCount) {
+          val child = node.getChildAt(i)
+          if (child is ContentNode) {
+            sortNodeRecursively(child)
+          }
+        }
+      }
+
+      sortNodeRecursively(rootNode)
     }
 
     return Triple(rootNode, defaultGroupNodesToExpand, preferredSelectedDeveloperToolNode)
@@ -400,7 +447,9 @@ class ToolsMenuTree(
 
       val isTopLevelNode = contentNode.parent is RootNode
       val textAttributes =
-        if (toolsMenuTreeShowGroupNodes && isTopLevelNode && !contentNode.isSecondaryNode) {
+        if (contentNode.id == "favorites") {
+          REGULAR_BOLD_ATTRIBUTES
+        } else if (toolsMenuTreeShowGroupNodes && isTopLevelNode && !contentNode.isSecondaryNode) {
           REGULAR_BOLD_ATTRIBUTES
         } else {
           REGULAR_ATTRIBUTES

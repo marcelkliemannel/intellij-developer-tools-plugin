@@ -30,6 +30,20 @@ class DeveloperToolConfiguration(
   var isResetting = false
     private set
 
+  private val favoriteProperty = register(
+        "isFavorite",
+        false,
+        PropertyType.CONFIGURATION
+    )
+
+    var isFavorite: Boolean
+        get() = favoriteProperty.get()
+        set(value) {
+            favoriteProperty.set(value)
+        }
+
+
+
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
