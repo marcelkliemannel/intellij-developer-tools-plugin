@@ -123,6 +123,9 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
     tabs = JBTabsFactory.createTabs(developerToolNode.project, developerToolNode.parentDisposable)
 
     developerToolNode.developerTools.forEach { addWorkbench(it) }
+
+    restoreTabOrder()
+
     selectedDeveloperToolInstance = AtomicProperty(tabs.selectedInfo!!.castedObject())
 
     tabs.addListener(createTabsChangedListener(), developerToolNode.parentDisposable)
@@ -147,6 +150,10 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
           newDeveloperToolInstance.instance.activated()
         }
       }
+
+      override fun tabsMoved() {
+        saveTabOrder()
+      }
     }
 
   private fun addWorkbench(developerToolContainer: DeveloperToolContainer) {
@@ -168,7 +175,11 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
     tabs.addTab(tabInfo)
     tabs.select(tabInfo, false)
     tabs.setPopupGroup(
-      DefaultActionGroup(createRenameWorkbenchAction()),
+      DefaultActionGroup(
+        createRenameWorkbenchAction(),
+        createMoveTabAction(direction = -1),
+        createMoveTabAction(direction = 1),
+      ),
       DeveloperToolContentPanel::class.java.name,
       true,
     )
@@ -204,6 +215,37 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
       override fun getActionUpdateThread() = ActionUpdateThread.BGT
     }
 
+  private fun createMoveTabAction(direction: Int) =
+    object : DumbAwareAction(
+      if (direction < 0) "Move Left" else "Move Right",
+      null,
+      if (direction < 0) AllIcons.General.ArrowLeft else AllIcons.General.ArrowRight
+    ) {
+
+      override fun update(e: AnActionEvent) {
+        val selectedInfo = tabs.selectedInfo
+        val currentIndex = tabs.tabs.indexOf(selectedInfo)
+        val targetIndex = currentIndex + direction
+        e.presentation.isEnabled = selectedInfo != null && targetIndex in 0 until tabs.tabCount
+      }
+
+      override fun actionPerformed(e: AnActionEvent) {
+        val selectedInfo = tabs.selectedInfo ?: return
+        val currentIndex = tabs.tabs.indexOf(selectedInfo)
+        val targetIndex = currentIndex + direction
+
+        if (targetIndex in 0 until tabs.tabCount) {
+          tabs.removeTab(selectedInfo)
+          tabs.addTab(selectedInfo, targetIndex)
+          tabs.select(selectedInfo, true)
+          saveTabOrder()
+        }
+      }
+
+      override fun getActionUpdateThread() = ActionUpdateThread.BGT
+    }
+
+
   private fun createDestroyWorkbenchAction(developerUiTool: DeveloperUiTool, tabInfo: TabInfo) =
     DestroyWorkbenchAction(
       {
@@ -229,6 +271,43 @@ open class DeveloperToolContentPanel(protected val developerToolNode: DeveloperT
 
       override fun getActionUpdateThread() = ActionUpdateThread.BGT
     }
+
+  private fun restoreTabOrder() {
+    val savedOrder = developerToolNode.settings.getToolTabOrder(developerToolNode.id)
+    if (savedOrder.isEmpty()) {
+      return
+    }
+
+    val existingTabs = mutableMapOf<String, TabInfo>()
+    tabs.tabs.forEach { tab ->
+      val container = tab.`object` as DeveloperToolContainer
+      existingTabs[container.configuration.id.toString()] = tab
+    }
+
+    val orderedTabs = ArrayList<TabInfo>()
+
+    savedOrder.forEach { id ->
+      existingTabs[id]?.let { tab ->
+        orderedTabs.add(tab)
+        existingTabs.remove(id)
+      }
+    }
+
+    orderedTabs.addAll(existingTabs.values)
+
+    tabs.removeAllTabs()
+    orderedTabs.forEach { tab ->
+      tabs.addTab(tab)
+    }
+  }
+
+  private fun saveTabOrder() {
+    val order = tabs.tabs.map {
+      (it.`object` as DeveloperToolContainer).configuration.id.toString()
+    }
+    developerToolNode.settings.setToolTabOrder(developerToolNode.id, order)
+  }
+
 
   // -- Inner Type ---------------------------------------------------------- //
 

@@ -38,6 +38,9 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
   var expandedGroupNodeIds: MutableSet<String>? = null
     private set
 
+  private val tabOrders =
+    ConcurrentHashMap<String, MutableList<String>>()
+
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
@@ -70,6 +73,13 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
     developerToolsConfigurations[developerToolId]?.remove(developerToolConfiguration)
   }
 
+  fun getToolTabOrder(toolId: String): List<String> =
+    tabOrders[toolId]?.toList() ?: emptyList()
+
+  fun setToolTabOrder(toolId: String, order: List<String>) {
+    tabOrders[toolId] = order.toMutableList()
+  }
+
   override fun getState(): InstanceState {
     val stateDeveloperToolsConfigurations =
       developerToolsConfigurations
@@ -86,6 +96,7 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
       developerToolsConfigurations = stateDeveloperToolsConfigurations,
       lastSelectedContentNodeId = lastSelectedContentNodeId.get(),
       expandedGroupNodeIds = expandedGroupNodeIds?.toList(),
+      tabOrders = tabOrders.mapValues { it.value.toList() },
     )
   }
 
@@ -132,6 +143,11 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
           }
         }
       }
+
+    tabOrders.clear()
+    state.tabOrders?.forEach { (toolId, order) ->
+      tabOrders[toolId] = order.toMutableList()
+    }
   }
 
   // -- Private Methods ----------------------------------------------------- //
@@ -181,6 +197,8 @@ abstract class DeveloperToolsInstanceSettings : PersistentStateComponent<Instanc
     @get:Attribute("lastSelectedContentNodeId") var lastSelectedContentNodeId: String? = null,
     @get:XCollection(style = v2, elementName = "expandedGroupNodeId")
     var expandedGroupNodeIds: List<String>? = null,
+    @get:XCollection(style = v2, elementName = "tabOrder")
+    var tabOrders: Map<String, List<String>>? = null,
   )
 
   // -- Inner Type ---------------------------------------------------------- //
