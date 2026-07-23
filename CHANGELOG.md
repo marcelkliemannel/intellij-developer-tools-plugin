@@ -10,6 +10,8 @@
 
 ### Fixed
 
+- Fixed a crash in IntelliJ 2026.2 when refreshing UI labels during Look and Feel changes.
+
 ## 9.0.0 - 2026-05-24
 
 ### Added
