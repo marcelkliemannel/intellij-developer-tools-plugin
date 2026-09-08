@@ -232,6 +232,10 @@
                 groupId="cryptography"
                 implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.HmacTransformer$Factory"/>
         <developerUiTool
+                id="bcrypt-transformer"
+                groupId="cryptography"
+                implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.transformer.BCryptTransformer$Factory"/>
+        <developerUiTool
                 id="password-generator"
                 groupId="cryptography"
                 implementationClass="dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.generator.PasswordGenerator$Factory"/>

@@ -34,6 +34,7 @@ dependencies {
   implementation(libs.jnanoid)
   implementation(libs.uuid.generator)
   implementation(libs.cronutils)
+  implementation(libs.bcrypt)
 
   testImplementation(libs.assertj.core)
   testImplementation(libs.bundles.junit.implementation)
