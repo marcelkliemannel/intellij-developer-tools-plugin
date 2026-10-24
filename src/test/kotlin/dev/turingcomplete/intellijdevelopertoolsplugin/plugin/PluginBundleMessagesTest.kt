@@ -96,8 +96,32 @@ class PluginBundleMessagesTest {
     assertThat(defaultPluginBundleNames).contains(PLUGIN_BUNDLE_NAME)
 
     return collectDefaultPluginXmlMessageBundleUsages(defaultPluginBundleNames) +
+      collectImplicitActionMessageBundleUsages(defaultPluginBundleNames) +
       collectExplicitPluginXmlMessageBundleUsages()
   }
+
+  private fun collectImplicitActionMessageBundleUsages(
+    defaultPluginBundleNames: List<String>
+  ): List<PluginBundleUsage> =
+    pluginXml
+      .collectElementsRecursively()
+      .filter { it.name == "action" }
+      .flatMap { action ->
+        val actionId = action.getAttributeValue("id") ?: return@flatMap emptyList()
+        defaultPluginBundleNames.flatMap { bundleName ->
+          listOf("text", "description")
+            .filter { action.getAttributeValue(it) == null }
+            .map { "action.$actionId.$it" }
+            .filter { getPluginBundle(bundleName).referenceLanguageMessages().containsKey(it) }
+            .map { messageKey ->
+              PluginBundleUsage(
+                bundleName = bundleName,
+                messageKey = messageKey,
+                displayableText = "action $actionId: $messageKey",
+              )
+            }
+        }
+      }
 
   private fun collectDefaultPluginXmlMessageBundleUsages(
     defaultPluginBundleNames: List<String>

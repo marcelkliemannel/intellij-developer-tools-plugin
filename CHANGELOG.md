@@ -13,6 +13,7 @@
 ### Fixed
 
 - Prevented a tool loading error from stopping the main tool panel from opening.
+- Placeholder was shown in the _Tools_ menu, instead of the actual tool title.
 
 ## 9.0.0 - 2026-05-24
 
