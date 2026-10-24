@@ -10,6 +10,7 @@ import com.intellij.ui.dsl.builder.Panel
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.toHexString
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool.Companion.DUMMY_DIALOG_VALIDATION_REQUESTOR
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
@@ -29,6 +30,7 @@ class TextInputOutputHandler(
   private val diffSupport: AdvancedEditor.DiffSupport? = null,
   defaultText: String = "",
   exampleText: String? = null,
+  propertyType: PropertyType = INPUT,
   inputOutputDirection: InputOutputDirection,
   private val initialLanguage: Language = PlainTextLanguage.INSTANCE,
   private val bytesToTextMode: BytesToTextMode = BytesToTextMode.BYTES_TO_CHARACTERS,
@@ -51,7 +53,7 @@ class TextInputOutputHandler(
 
   private var inputOutputText =
     if (inputOutputDirection.supportsRead)
-      configuration.register("${id}Text", defaultText, INPUT, exampleText)
+      configuration.register("${id}Text", defaultText, propertyType, exampleText)
     else ValueProperty("")
 
   private lateinit var advancedEditor: AdvancedEditor

@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RowLayout
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.SENSITIVE
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolFactory
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolPresentation
@@ -38,10 +39,12 @@ class BCryptTransformer(
   /**
    * BCrypt is a deliberately slow key derivation function. Even the default cost takes a noticeable
    * amount of time and the maximum cost takes minutes, which makes it unsuitable to be executed on
-   * every keystroke. Therefore, the hash is only calculated on demand, as a cancelable background
-   * task.
+   * every keystroke. Therefore, the hash is only calculated on demand in a non-cancelable
+   * background task because the BCrypt library does not support interrupting an active hash.
    */
   override val liveConversionPossible: Boolean = false
+
+  override val backgroundConversionCancellable: Boolean = false
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
@@ -50,6 +53,7 @@ class BCryptTransformer(
     addTextInputOutputHandler(
       id = defaultSourceInputOutputHandlerId,
       exampleText = EXAMPLE_PASSWORD,
+      propertyType = SENSITIVE,
     )
   }
 

@@ -58,6 +58,9 @@ abstract class Converter(
    */
   protected open val liveConversionPossible: Boolean = true
 
+  /** Whether a background conversion can be canceled while it is running. */
+  protected open val backgroundConversionCancellable: Boolean = true
+
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
@@ -339,7 +342,7 @@ abstract class Converter(
     }
 
     conversionEnabled.set(false)
-    object : Task.Backgroundable(project, heavyConversionTitle) {
+    object : Task.Backgroundable(project, heavyConversionTitle, backgroundConversionCancellable) {
 
         override fun run(indicator: ProgressIndicator) {
           indicator.text = heavyConversionTitle
