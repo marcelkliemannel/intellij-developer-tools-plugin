@@ -73,9 +73,9 @@ class ErrorHolder(
   /**
    * Creates a [ObservableMutableProperty] that will return an empty string if there is no error.
    *
-   * The `set()` operation is not supported, but a [com.intellij.ui.dsl.builder.Row.text] requires
-   * [ObservableMutableProperty] and not only a
-   * [com.intellij.openapi.observable.properties.ObservableProperty].
+   * The [com.intellij.ui.dsl.builder.Row.text] binding requires [ObservableMutableProperty] and not
+   * only [com.intellij.openapi.observable.properties.ObservableProperty]. Writes from the bound
+   * text component are ignored because the error holder is the source of truth.
    */
   fun asPropertyForTextCell(): ObservableMutableProperty<String> =
     object : ObservableMutableProperty<String> {
@@ -86,9 +86,7 @@ class ErrorHolder(
 
       override fun get(): String = formatErrors() ?: ""
 
-      override fun set(value: String) {
-        throw UnsupportedOperationException()
-      }
+      override fun set(value: String) = Unit
     }
 
   fun catchException(task: () -> Unit) {

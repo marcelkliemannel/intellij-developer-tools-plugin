@@ -165,7 +165,7 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
         Float::class to Pair(1.2345f, "1.2345"),
         String::class to Pair("foo", "foo"),
         // JBColor test is flickering
-        JBColor::class to Pair(JBColor.MAGENTA, "-65281"),
+        JBColor::class to Pair(JBColor(-65281, -65281), "-65281"),
         LocaleContainer::class to Pair(LocaleContainer(Locale.forLanguageTag("de-DE")), "de-DE"),
         BigDecimal::class to
           Pair(BigDecimal(1.234), "1.2339999999999999857891452847979962825775146484375"),
@@ -205,7 +205,12 @@ class DeveloperToolsInstanceSettingsTest : IdeaTest() {
     val settings = createDeveloperToolsInstanceSettings()
 
     val developerUiToolsUnderTest: List<DeveloperUiToolUnderTest<*>> =
-      createDeveloperUiToolsUnderTest(fixture.project, disposable, settings)
+      createDeveloperUiToolsUnderTest(
+        fixture.project,
+        disposable,
+        settings,
+        runAfterBuildUi = false,
+      )
 
     developerUiToolsUnderTest.forEach { it.randomiseConfiguration() }
 

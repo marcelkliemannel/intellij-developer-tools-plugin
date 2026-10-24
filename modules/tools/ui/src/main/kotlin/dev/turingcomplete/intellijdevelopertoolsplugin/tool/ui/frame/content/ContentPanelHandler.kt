@@ -1,6 +1,7 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.content
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.ui.components.BorderLayoutPanel
 import com.intellij.util.ui.tree.TreeUtil
@@ -13,6 +14,8 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.Conten
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.DeveloperToolNode
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.GroupNode
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.ToolsMenuTree
+import java.awt.BorderLayout
+import javax.swing.JLabel
 import javax.swing.JPanel
 
 open class ContentPanelHandler(
@@ -101,11 +104,19 @@ open class ContentPanelHandler(
         }
 
         is DeveloperToolNode -> {
-          setContentPanel(
-            cachedDeveloperToolsPanels
-              .getOrPut(new) { createDeveloperToolContentPanel(new) }
-              .also { it.selected() }
-          )
+          try {
+            val developerToolContentPanel =
+              cachedDeveloperToolsPanels[new] ?: createDeveloperToolContentPanel(new)
+            developerToolContentPanel.selected()
+            cachedDeveloperToolsPanels[new] = developerToolContentPanel
+            setContentPanel(developerToolContentPanel)
+          } catch (exception: Exception) {
+            LOG.error(
+              "Failed to load developer tool '${new.developerUiToolPresentation.contentTitle}'",
+              exception,
+            )
+            setContentPanel(createErrorPanel(new, exception))
+          }
           selectedContentNode.set(new)
         }
 
@@ -125,6 +136,21 @@ open class ContentPanelHandler(
     }
   }
 
+  private fun createErrorPanel(developerToolNode: DeveloperToolNode, exception: Exception) =
+    JPanel(BorderLayout()).apply {
+      add(
+        JLabel(
+          "Failed to load ${developerToolNode.developerUiToolPresentation.contentTitle}: " +
+            (exception.message ?: exception::class.simpleName)
+        ),
+        BorderLayout.NORTH,
+      )
+    }
+
   // -- Inner Type ---------------------------------------------------------- //
   // -- Companion Object ---------------------------------------------------- //
+
+  companion object {
+    private val LOG = Logger.getInstance(ContentPanelHandler::class.java)
+  }
 }

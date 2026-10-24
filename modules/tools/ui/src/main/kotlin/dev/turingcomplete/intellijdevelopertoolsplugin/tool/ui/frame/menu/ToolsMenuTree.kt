@@ -5,6 +5,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.ide.util.treeView.NodeRenderer
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.ui.ColoredSideBorder
 import com.intellij.ui.HyperlinkAdapter
@@ -320,38 +321,43 @@ class ToolsMenuTree(
     val application = ApplicationManager.getApplication()
     val showInternalTools = generalSettings.showInternalTools.get()
     DeveloperUiToolFactoryEp.EP_NAME.forEachExtensionSafe { developerToolFactoryEp ->
-      if (developerToolFactoryEp.internalTool && !showInternalTools) {
-        return@forEachExtensionSafe
-      }
-
-      val developerUiToolFactory: DeveloperUiToolFactory<*> =
-        developerToolFactoryEp.createInstance(application)
-      val context = DeveloperUiToolContext(developerToolFactoryEp.id, prioritizeVerticalLayout)
-      developerUiToolFactory.getDeveloperUiToolCreator(project, parentDisposable, context)?.let {
-        developerToolCreator ->
-        val groupId: String? =
-          if (toolsMenuTreeShowGroupNodes) developerToolFactoryEp.groupId else null
-        val parentNode =
-          if (groupId != null) (groupNodes[groupId] ?: error("Unknown group: $groupId"))
-          else rootNode
-        val developerToolNode =
-          DeveloperToolNode(
-            developerToolId = developerToolFactoryEp.id,
-            project = project,
-            settings = settings,
-            parentDisposable = parentDisposable,
-            developerUiToolPresentation = developerUiToolFactory.getDeveloperUiToolPresentation(),
-            showGrouped = toolsMenuTreeShowGroupNodes,
-            developerUiToolCreator = developerToolCreator,
-          )
-        parentNode.add(developerToolNode)
-
-        if (developerToolFactoryEp.preferredSelected) {
-          check(preferredSelectedDeveloperToolNode == null) {
-            "Multiple initial selected developer tools"
-          }
-          preferredSelectedDeveloperToolNode = developerToolNode
+      try {
+        if (developerToolFactoryEp.internalTool && !showInternalTools) {
+          return@forEachExtensionSafe
         }
+
+        val developerUiToolFactory: DeveloperUiToolFactory<*> =
+          developerToolFactoryEp.createInstance(application)
+        val context = DeveloperUiToolContext(developerToolFactoryEp.id, prioritizeVerticalLayout)
+        developerUiToolFactory.getDeveloperUiToolCreator(project, parentDisposable, context)?.let {
+          developerToolCreator ->
+          val groupId: String? =
+            if (toolsMenuTreeShowGroupNodes) developerToolFactoryEp.groupId else null
+          val parentNode =
+            if (groupId != null) (groupNodes[groupId] ?: error("Unknown group: $groupId"))
+            else rootNode
+          val developerToolNode =
+            DeveloperToolNode(
+              developerToolId = developerToolFactoryEp.id,
+              project = project,
+              settings = settings,
+              parentDisposable = parentDisposable,
+              developerUiToolPresentation = developerUiToolFactory.getDeveloperUiToolPresentation(),
+              showGrouped = toolsMenuTreeShowGroupNodes,
+              developerUiToolCreator = developerToolCreator,
+            )
+          parentNode.add(developerToolNode)
+
+          if (developerToolFactoryEp.preferredSelected) {
+            check(preferredSelectedDeveloperToolNode == null) {
+              "Multiple initial selected developer tools"
+            }
+            preferredSelectedDeveloperToolNode = developerToolNode
+          }
+        }
+      } catch (exception: Exception) {
+        Logger.getInstance(ToolsMenuTree::class.java)
+          .error("Failed to register developer tool '${developerToolFactoryEp.id}'", exception)
       }
     }
 

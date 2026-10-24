@@ -3,6 +3,7 @@ package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.content
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.components.ActionLink
+import com.intellij.ui.components.panels.VerticalLayout
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.panel
@@ -14,7 +15,6 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.Develo
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.frame.menu.GroupNode
 import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants
-import org.jdesktop.swingx.VerticalLayout
 
 class GroupContentPanel(
   groupNode: GroupNode,

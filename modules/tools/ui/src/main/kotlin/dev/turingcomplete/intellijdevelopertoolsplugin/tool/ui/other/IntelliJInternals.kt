@@ -1,26 +1,14 @@
 package dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.other
 
-import com.intellij.ide.BrowserUtil
-import com.intellij.ide.plugins.IdeaPluginDescriptor
+import com.intellij.ide.plugins.PluginDetailsService
 import com.intellij.ide.plugins.PluginManager
-import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.extensions.PluginDescriptor
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.OpenFileDescriptor
-import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.setEmptyState
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.TableSpeedSearch
 import com.intellij.ui.dsl.builder.Align
@@ -34,7 +22,6 @@ import com.intellij.util.ui.ColumnInfo
 import com.intellij.util.ui.ListTableModel
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.CopyValuesAction
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.PluginCommonDataKeys
-import dev.turingcomplete.intellijdevelopertoolsplugin.common.extension
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.uncheckedCastTo
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiTool
@@ -46,11 +33,9 @@ import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.setContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.message.UiToolsBundle
 import java.awt.Dimension
 import java.net.URLClassLoader
-import java.nio.file.Files
 import java.nio.file.Paths
 import javax.swing.ListSelectionModel
 import javax.swing.tree.DefaultMutableTreeNode
-import kotlin.streams.asSequence
 
 class IntelliJInternals(parentDisposable: Disposable, private val project: Project?) :
   DeveloperUiTool(parentDisposable = parentDisposable), DataProvider {
@@ -65,7 +50,7 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
     group(UiToolsBundle.message("intellij-internals.plugins")) {
       row {
           val pluginOverviewTableModel =
-            ListTableModel<IdeaPluginDescriptor>(*pluginOverviewTableColumns).apply {
+            ListTableModel<PluginDetailsService.PluginDetails>(*pluginOverviewTableColumns).apply {
               isSortable = true
             }
           pluginOverviewTable =
@@ -78,12 +63,10 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
                 DefaultActionGroup(
                   CopyValuesAction(
                     valueToString = {
-                      val ideaPluginDescriptor = it as IdeaPluginDescriptor
-                      "${ideaPluginDescriptor.name} (${ideaPluginDescriptor.pluginId.idString})"
+                      val pluginDetails = it as PluginDetailsService.PluginDetails
+                      "${pluginDetails.name} (${pluginDetails.id.idString})"
                     }
-                  ),
-                  OpenPluginDirectory(),
-                  OpenPluginDescriptor(),
+                  )
                 ),
               )
               setEmptyState(UiToolsBundle.message("intellij-internals.no-plugins"))
@@ -154,7 +137,9 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
     when {
       PluginCommonDataKeys.SELECTED_VALUES.`is`(dataId) -> {
         val tableModel =
-          pluginOverviewTable.model.uncheckedCastTo<ListTableModel<IdeaPluginDescriptor>>()
+          pluginOverviewTable.model.uncheckedCastTo<
+            ListTableModel<PluginDetailsService.PluginDetails>
+          >()
         val rowSorter = pluginOverviewTable.rowSorter
         pluginOverviewTable.selectedRows
           .map { tableModel.getRowValue(rowSorter.convertRowIndexToModel(it)) }
@@ -167,8 +152,9 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
   // -- Private Methods ----------------------------------------------------- //
 
   private fun populatePluginOverviewTableModel() {
-    pluginOverviewTable.model.uncheckedCastTo<ListTableModel<IdeaPluginDescriptor>>().items =
-      PluginManager.getPlugins().sortedBy { it.name }
+    pluginOverviewTable.model
+      .uncheckedCastTo<ListTableModel<PluginDetailsService.PluginDetails>>()
+      .items = PluginDetailsService.getInstance().getActivePlugins().sortedBy { it.name }.toList()
   }
 
   private fun findPluginByClassName(className: String) {
@@ -265,97 +251,6 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
 
   // -- Inner Type ---------------------------------------------------------- //
 
-  private class OpenPluginDirectory :
-    DumbAwareAction(UiToolsBundle.message("intellij-internals.open-plugin-directory")) {
-
-    override fun actionPerformed(e: AnActionEvent) {
-      val values: List<Any> =
-        PluginCommonDataKeys.SELECTED_VALUES.getData(e.dataContext)
-          ?: throw IllegalStateException("snh: Data missing")
-      if (values.isEmpty()) {
-        return
-      }
-
-      values.map { it as PluginDescriptor }.forEach { BrowserUtil.browse(it.pluginPath) }
-    }
-  }
-
-  // -- Inner Type ---------------------------------------------------------- //
-
-  private class OpenPluginDescriptor :
-    DumbAwareAction(UiToolsBundle.message("intellij-internals.open-plugin-descriptor")) {
-
-    override fun actionPerformed(e: AnActionEvent) {
-      val project =
-        e.dataContext.getData(CommonDataKeys.PROJECT)
-          ?: throw IllegalStateException("snh: Data missing")
-      val values: List<Any> =
-        PluginCommonDataKeys.SELECTED_VALUES.getData(e.dataContext)
-          ?: throw IllegalStateException("snh: Data missing")
-      if (values.isEmpty()) {
-        return
-      }
-
-      findPluginDescriptorFiles(values.map { it as IdeaPluginDescriptor }) { pluginDescriptorFiles
-        ->
-        openProgramDescriptorFile(pluginDescriptorFiles, project)
-      }
-    }
-
-    private fun findPluginDescriptorFiles(
-      pluginDescriptors: List<IdeaPluginDescriptor>,
-      callback: (List<VirtualFile>) -> Unit,
-    ) {
-      ApplicationManager.getApplication().executeOnPooledThread {
-        val virtualFileManager = VirtualFileManager.getInstance()
-        val pluginDescriptorFiles =
-          pluginDescriptors.flatMap { pluginDescriptor ->
-            Files.list(pluginDescriptor.pluginPath.resolve("lib")).use { files ->
-              files
-                .asSequence()
-                .filter { Files.isRegularFile(it) && it.extension() == "jar" }
-                .mapNotNull {
-                  virtualFileManager.findFileByUrl(
-                    "jar://${it.toAbsolutePath()}!/${PluginManagerCore.PLUGIN_XML_PATH}"
-                  )
-                }
-                .toList()
-            }
-          }
-        callback(pluginDescriptorFiles)
-      }
-    }
-
-    private fun openProgramDescriptorFile(
-      pluginDescriptorFiles: List<VirtualFile>,
-      project: Project,
-    ) {
-      invokeLater {
-        if (pluginDescriptorFiles.isEmpty()) {
-          Messages.showErrorDialog(
-            project,
-            UiToolsBundle.message("intellij-internals.unable-to-find-plugin-descriptor"),
-            UiToolsBundle.message("intellij-internals.open-plugin-descriptor"),
-          )
-        }
-
-        val fileEditorManager = FileEditorManager.getInstance(project)
-        pluginDescriptorFiles.forEach {
-          val openEditor = fileEditorManager.openEditor(OpenFileDescriptor(project, it), true)
-          if (openEditor.isEmpty()) {
-            Messages.showErrorDialog(
-              project,
-              UiToolsBundle.message("intellij-internals.unable-to-open-file-in-editor", it.name),
-              UiToolsBundle.message("intellij-internals.open-plugin-descriptor"),
-            )
-          }
-        }
-      }
-    }
-  }
-
-  // -- Inner Type ---------------------------------------------------------- //
-
   class Factory : DeveloperUiToolFactory<IntelliJInternals> {
 
     override fun getDeveloperUiToolPresentation() =
@@ -379,10 +274,11 @@ class IntelliJInternals(parentDisposable: Disposable, private val project: Proje
 
     private val log = logger<IntelliJInternals>()
 
-    private val pluginOverviewTableColumns: Array<ColumnInfo<IdeaPluginDescriptor, String>> =
+    private val pluginOverviewTableColumns:
+      Array<ColumnInfo<PluginDetailsService.PluginDetails, String>> =
       arrayOf(
         simpleColumnInfo("Name", { it.name }, { it.name }),
-        simpleColumnInfo("ID", { it.pluginId.idString }, { it.pluginId.idString }),
+        simpleColumnInfo("ID", { it.id.idString }, { it.id.idString }),
       )
   }
 }

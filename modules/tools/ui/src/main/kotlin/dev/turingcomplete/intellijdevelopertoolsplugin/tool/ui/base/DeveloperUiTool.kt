@@ -34,7 +34,7 @@ abstract class DeveloperUiTool(protected val parentDisposable: Disposable) :
   // -- Initialization ------------------------------------------------------ //
   // -- Exposed Methods ----------------------------------------------------- //
 
-  fun createComponent(): JComponent {
+  fun createComponent(runAfterBuildUi: Boolean = true): JComponent {
     component = panel { buildUi() }
     // This prevents the `Editor` from increasing the size of the dialog if the
     // to display all the text on the screen instead of using scrollbars. The
@@ -63,7 +63,9 @@ abstract class DeveloperUiTool(protected val parentDisposable: Disposable) :
       wrapper = createScrollPane(wrapper, true)
     }
 
-    afterBuildUi()
+    if (runAfterBuildUi) {
+      afterBuildUi()
+    }
 
     return wrapper
   }

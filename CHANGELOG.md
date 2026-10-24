@@ -10,6 +10,21 @@
 
 ### Fixed
 
+## 9.1.0 - 2026-10-24
+
+### Added
+
+- Added a "BCrypt" tool to hash passwords with a configurable cost factor.
+
+### Changed
+
+- Minimum version increased to 2026.2.
+
+### Fixed
+
+- Prevented a tool loading error from stopping the main tool panel from opening.
+- Placeholder was shown in the _Tools_ menu, instead of the actual tool title.
+
 ## 9.0.0 - 2026-05-24
 
 ### Added

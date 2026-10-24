@@ -50,6 +50,23 @@ abstract class Converter(
   protected open val defaultSourceInputOutputHandlerId: String = "source"
   protected open val defaultTargetInputOutputHandlerId: String = "target"
 
+  /**
+   * If a conversion is too expensive to be executed on every input change (e.g., a deliberately
+   * slow key derivation function), a subclass can set this to `false`. The live conversion checkbox
+   * will then be hidden, the conversion button stays always enabled and the conversion will be
+   * executed as a background task instead of on the live conversion executor.
+   */
+  protected open val liveConversionPossible: Boolean = true
+
+  /** Whether a background conversion can be canceled while it is running. */
+  protected open val backgroundConversionCancellable: Boolean = true
+
+  /** Title and description shown for an on-demand background conversion. */
+  protected open val toTargetProgressTitle: String
+    get() = toTargetTitle
+
+  protected open val toTargetProgressDescription: String? = null
+
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
@@ -67,11 +84,12 @@ abstract class Converter(
 
   fun convertToTarget() {
     convert(
-      heavyConversionTitle = toTargetTitle,
+      heavyConversionTitle = toTargetProgressTitle,
+      heavyConversionDescription = toTargetProgressDescription,
       doConvert = { source, target ->
         // Only check visible/enabled components, because there might be
         // validation errors in non-active `InputOutputHandler`s.
-        if (validateOnEdt(onlyVisibleAndEnabled = true).isNotEmpty()) {
+        if (validateOnEdt(onlyVisibleAndEnabled = true).any { !it.warning }) {
           return@convert
         }
 
@@ -293,7 +311,8 @@ abstract class Converter(
 
   private fun syncLiveConversionSupported() {
     liveConversionSupported.set(
-      sourceConversionSideHandler.activeInputOutputHandler.get().liveConversionSupported &&
+      liveConversionPossible &&
+        sourceConversionSideHandler.activeInputOutputHandler.get().liveConversionSupported &&
         targetConversionSideHandler.activeInputOutputHandler.get().liveConversionSupported
     )
   }
@@ -307,6 +326,7 @@ abstract class Converter(
 
   protected fun convert(
     heavyConversionTitle: String,
+    heavyConversionDescription: String? = null,
     doConvert: (InputOutputHandler, InputOutputHandler) -> Unit,
   ) {
     val sourceInputOutputHandler: InputOutputHandler =
@@ -318,7 +338,8 @@ abstract class Converter(
     targetInputOutputHandler.errorHolder.clear()
 
     if (
-      sourceInputOutputHandler.liveConversionSupported &&
+      liveConversionPossible &&
+        sourceInputOutputHandler.liveConversionSupported &&
         targetInputOutputHandler.liveConversionSupported
     ) {
       liveConversionExecutor.replaceTasks(defaultUiInputDelay) {
@@ -329,10 +350,10 @@ abstract class Converter(
     }
 
     conversionEnabled.set(false)
-    object : Task.Backgroundable(project, heavyConversionTitle) {
+    object : Task.Backgroundable(project, heavyConversionTitle, backgroundConversionCancellable) {
 
         override fun run(indicator: ProgressIndicator) {
-          indicator.text = heavyConversionTitle
+          indicator.text = heavyConversionDescription ?: heavyConversionTitle
           doConvert(sourceInputOutputHandler, targetInputOutputHandler)
         }
 

@@ -20,6 +20,7 @@ object DeveloperUiToolsInstances {
     project: Project,
     parentDisposable: Disposable,
     settings: DeveloperToolsInstanceSettings,
+    runAfterBuildUi: Boolean = true,
   ): List<DeveloperUiToolUnderTest<*>> {
     val developerUiToolsUnderTest = mutableListOf<DeveloperUiToolUnderTest<*>>()
 
@@ -37,7 +38,7 @@ object DeveloperUiToolsInstances {
           ?: error("No instance of tool `${factoryEp.id}` was be created by its factory")
       configuration.wasConsumedByDeveloperTool = true
       runInEdtAndWait {
-        instance.createComponent()
+        instance.createComponent(runAfterBuildUi)
         instance.activated()
       }
 

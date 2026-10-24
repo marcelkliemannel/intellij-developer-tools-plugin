@@ -11,6 +11,7 @@ import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.components.BorderLayoutPanel
 import dev.turingcomplete.intellijdevelopertoolsplugin.common.ValueProperty
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
+import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType.INPUT
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.base.DeveloperUiToolContext
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.AdvancedEditor
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.common.TitledTabbedPane
@@ -70,6 +71,7 @@ class ConversionSideHandler(
     id: String,
     defaultText: String = "",
     exampleText: String? = null,
+    propertyType: DeveloperToolConfiguration.PropertyType = INPUT,
     bytesToTextMode: BytesToTextMode = BytesToTextMode.BYTES_TO_CHARACTERS,
     initialLanguage: Language = PlainTextLanguage.INSTANCE,
   ): TextInputOutputHandler {
@@ -88,6 +90,7 @@ class ConversionSideHandler(
         diffSupport = diffSupport,
         defaultText = defaultText,
         exampleText = exampleText,
+        propertyType = propertyType,
         inputOutputDirection = inputOutputDirection,
         bytesToTextMode = bytesToTextMode,
         initialLanguage = initialLanguage,
