@@ -61,6 +61,12 @@ abstract class Converter(
   /** Whether a background conversion can be canceled while it is running. */
   protected open val backgroundConversionCancellable: Boolean = true
 
+  /** Title and description shown for an on-demand background conversion. */
+  protected open val toTargetProgressTitle: String
+    get() = toTargetTitle
+
+  protected open val toTargetProgressDescription: String? = null
+
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
 
@@ -78,11 +84,12 @@ abstract class Converter(
 
   fun convertToTarget() {
     convert(
-      heavyConversionTitle = toTargetTitle,
+      heavyConversionTitle = toTargetProgressTitle,
+      heavyConversionDescription = toTargetProgressDescription,
       doConvert = { source, target ->
         // Only check visible/enabled components, because there might be
         // validation errors in non-active `InputOutputHandler`s.
-        if (validateOnEdt(onlyVisibleAndEnabled = true).isNotEmpty()) {
+        if (validateOnEdt(onlyVisibleAndEnabled = true).any { !it.warning }) {
           return@convert
         }
 
@@ -319,6 +326,7 @@ abstract class Converter(
 
   protected fun convert(
     heavyConversionTitle: String,
+    heavyConversionDescription: String? = null,
     doConvert: (InputOutputHandler, InputOutputHandler) -> Unit,
   ) {
     val sourceInputOutputHandler: InputOutputHandler =
@@ -345,7 +353,7 @@ abstract class Converter(
     object : Task.Backgroundable(project, heavyConversionTitle, backgroundConversionCancellable) {
 
         override fun run(indicator: ProgressIndicator) {
-          indicator.text = heavyConversionTitle
+          indicator.text = heavyConversionDescription ?: heavyConversionTitle
           doConvert(sourceInputOutputHandler, targetInputOutputHandler)
         }
 
