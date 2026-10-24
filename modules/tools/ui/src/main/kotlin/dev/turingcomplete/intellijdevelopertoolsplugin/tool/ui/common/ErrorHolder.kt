@@ -73,9 +73,9 @@ class ErrorHolder(
   /**
    * Creates a [ObservableMutableProperty] that will return an empty string if there is no error.
    *
-   * The [com.intellij.ui.dsl.builder.Row.text] binding requires [ObservableMutableProperty] and
-   * not only [com.intellij.openapi.observable.properties.ObservableProperty]. Writes from the
-   * bound text component are ignored because the error holder is the source of truth.
+   * The [com.intellij.ui.dsl.builder.Row.text] binding requires [ObservableMutableProperty] and not
+   * only [com.intellij.openapi.observable.properties.ObservableProperty]. Writes from the bound
+   * text component are ignored because the error holder is the source of truth.
    */
   fun asPropertyForTextCell(): ObservableMutableProperty<String> =
     object : ObservableMutableProperty<String> {

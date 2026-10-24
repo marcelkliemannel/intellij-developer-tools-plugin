@@ -342,8 +342,7 @@ class ToolsMenuTree(
               project = project,
               settings = settings,
               parentDisposable = parentDisposable,
-              developerUiToolPresentation =
-                developerUiToolFactory.getDeveloperUiToolPresentation(),
+              developerUiToolPresentation = developerUiToolFactory.getDeveloperUiToolPresentation(),
               showGrouped = toolsMenuTreeShowGroupNodes,
               developerUiToolCreator = developerToolCreator,
             )
