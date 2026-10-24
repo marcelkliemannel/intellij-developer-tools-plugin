@@ -6,6 +6,18 @@ plugins {
 }
 
 dependencies {
+  intellijPlatform {
+    testBundledPlugins(
+      "org.jetbrains.kotlin",
+      "com.intellij.java",
+      "intellij.structureView.plugin",
+      "intellij.testRunner.plugin",
+      "intellij.todo.plugin",
+      "intellij.libraries.misc.plugin",
+      "intellij.structuralSearch.plugin",
+    )
+  }
+
   implementation(project(":common"))
 
   testImplementation(libs.assertj.core)

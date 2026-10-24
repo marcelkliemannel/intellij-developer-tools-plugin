@@ -17,7 +17,17 @@ dependencies {
   testRuntimeOnly(libs.bundles.junit.runtime)
 
   if (project.property("platform") == "idea") {
-    intellijPlatform { testBundledPlugins("org.jetbrains.kotlin") }
+    intellijPlatform {
+      testBundledPlugins(
+        "org.jetbrains.kotlin",
+        "com.intellij.java",
+        "intellij.structureView.plugin",
+        "intellij.testRunner.plugin",
+        "intellij.todo.plugin",
+        "intellij.libraries.misc.plugin",
+        "intellij.structuralSearch.plugin",
+      )
+    }
     configurations.testFixturesApi.extendsFrom(configurations.intellijPlatformTestBundledPlugins)
   }
 

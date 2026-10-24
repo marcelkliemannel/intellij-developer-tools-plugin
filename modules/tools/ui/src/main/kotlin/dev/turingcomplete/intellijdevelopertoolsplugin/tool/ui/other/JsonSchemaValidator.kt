@@ -14,10 +14,10 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.layout.not
-import com.networknt.schema.JsonSchema
-import com.networknt.schema.JsonSchemaFactory
-import com.networknt.schema.SpecVersion
-import com.networknt.schema.SpecVersionDetector
+import dev.turingcomplete.intellijdevelopertoolsplugin.internal.networknt.schema.JsonSchema
+import dev.turingcomplete.intellijdevelopertoolsplugin.internal.networknt.schema.JsonSchemaFactory
+import dev.turingcomplete.intellijdevelopertoolsplugin.internal.networknt.schema.SpecVersion
+import dev.turingcomplete.intellijdevelopertoolsplugin.internal.networknt.schema.SpecVersionDetector
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration
 import dev.turingcomplete.intellijdevelopertoolsplugin.settings.DeveloperToolConfiguration.PropertyType
 import dev.turingcomplete.intellijdevelopertoolsplugin.tool.ui.ObjectMapperService

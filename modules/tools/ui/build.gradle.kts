@@ -8,6 +8,16 @@ plugins {
   alias(libs.plugins.spotless)
   `java-test-fixtures`
   alias(libs.plugins.changelog)
+  id("com.gradleup.shadow") version "9.6.1"
+}
+
+val jsonSchemaValidatorLibraries = configurations.create("jsonSchemaValidatorLibraries")
+
+tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJsonSchemaValidator") {
+  configurations = listOf(jsonSchemaValidatorLibraries)
+  archiveClassifier.set("relocated")
+  // IntelliJ bundles an incompatible NetworkNT version in the JSON plugin under the same package.
+  relocate("com.networknt", "dev.turingcomplete.intellijdevelopertoolsplugin.internal.networknt")
 }
 
 dependencies {
@@ -26,9 +36,12 @@ dependencies {
   implementation(libs.csscolor4j)
   implementation(libs.jfiglet)
   implementation(libs.jsonpath)
-  implementation(libs.json.schema.validator) {
+  jsonSchemaValidatorLibraries(libs.json.schema.validator) {
+    isTransitive = false
     exclude("org.apache.commons", "commons-lang3")
   }
+  jsonSchemaValidatorLibraries("com.ethlo.time:itu:1.10.3")
+  implementation(files(tasks.named("shadowJsonSchemaValidator")))
   implementation(libs.bundles.text.case.converter)
   implementation(libs.ulid.creator)
   implementation(libs.jnanoid)

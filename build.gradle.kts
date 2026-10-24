@@ -81,6 +81,12 @@ allprojects {
     withType<Test> {
       useJUnitPlatform()
       systemProperty("java.awt.headless", "false")
+      doFirst {
+        systemProperty(
+          "idea.home.path",
+          configurations.getByName("intellijPlatformDependency").singleFile.absolutePath,
+        )
+      }
     }
   }
 }

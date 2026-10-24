@@ -79,6 +79,8 @@ open class DeveloperUiToolUnderTest<T : DeveloperUiTool>(
       id == "hmac-transformer" && property.key == "algorithm" ->
         HmacTransformer.hmacAlgorithms.random { it.algorithm == property.defaultValue }.algorithm
 
+      id == "bcrypt-transformer" && property.key == "version" -> "\$2b\$"
+
       id == "units-converter" && property.key == "baseConverter_baseTwoInput" ->
         randomBaseTwoString()
 
