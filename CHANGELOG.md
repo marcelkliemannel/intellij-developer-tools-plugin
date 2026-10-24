@@ -6,11 +6,13 @@
 
 ### Changed
 
-- Minimum version increased to 2026.2
+- Minimum version increased to 2026.2.
 
 ### Removed
 
 ### Fixed
+
+- Prevented a tool loading error from stopping the main tool panel from opening.
 
 ## 9.0.0 - 2026-05-24
 
