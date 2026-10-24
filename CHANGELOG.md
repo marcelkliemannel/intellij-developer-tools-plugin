@@ -4,13 +4,21 @@
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## 9.1.0 - 2026-10-24
+
+### Added
+
 - Added a "BCrypt" tool to hash passwords with a configurable cost factor.
 
 ### Changed
 
 - Minimum version increased to 2026.2.
-
-### Removed
 
 ### Fixed
 
