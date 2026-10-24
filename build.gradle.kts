@@ -6,8 +6,7 @@ import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLeve
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.INVALID_PLUGIN
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.NON_EXTENDABLE_API_USAGES
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel.OVERRIDE_ONLY_API_USAGES
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 fun properties(key: String) = project.findProperty(key).toString()
 
@@ -21,6 +20,7 @@ plugins {
 }
 
 val platform = properties("platform")
+val javaVersion = properties("javaVersion").toInt()
 
 allprojects {
   group = properties("pluginGroup")
@@ -58,8 +58,16 @@ allprojects {
   }
 
   pluginManager.withPlugin("java") {
-    java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
     tasks.named("check") { dependsOn("spotlessCheck") }
+  }
+
+  pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+    extensions.configure<KotlinJvmProjectExtension> {
+      jvmToolchain { languageVersion.set(JavaLanguageVersion.of(javaVersion)) }
+      compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict", "-opt-in=kotlin.ExperimentalStdlibApi")
+      }
+    }
   }
 
   configurations.all {
@@ -70,13 +78,6 @@ allprojects {
   }
 
   tasks {
-    withType<KotlinCompile> {
-      compilerOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict", "-opt-in=kotlin.ExperimentalStdlibApi")
-        jvmTarget.set(JvmTarget.JVM_21)
-      }
-    }
-
     withType<Test> {
       useJUnitPlatform()
       systemProperty("java.awt.headless", "false")
