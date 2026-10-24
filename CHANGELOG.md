@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added a "BCrypt" tool to hash passwords with a configurable cost factor.
+
 ### Changed
 
 - Minimum version increased to 2026.2.

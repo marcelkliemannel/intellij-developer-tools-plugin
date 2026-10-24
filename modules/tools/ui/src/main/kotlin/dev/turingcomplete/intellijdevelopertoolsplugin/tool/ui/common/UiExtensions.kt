@@ -50,7 +50,10 @@ import javax.swing.border.CompoundBorder
 
 /** The UI DSL only verifies the range of an `intTextField` on a user input. */
 @Suppress("UnstableApiUsage")
-fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) =
+fun Cell<JBTextField>.validateLongValue(
+  range: LongRange? = null,
+  warning: ((Long) -> String?)? = null,
+) =
   this.apply {
     validationInfo {
       if (this@validateLongValue.component.isEnabled) {
@@ -59,7 +62,10 @@ fun Cell<JBTextField>.validateLongValue(range: LongRange? = null) =
           value == null -> error(UIBundle.message("please.enter.a.number"))
           range != null && value !in range ->
             error(UIBundle.message("please.enter.a.number.from.0.to.1", range.first, range.last))
-          else -> null
+          else ->
+            warning?.invoke(value)?.let {
+              ValidationInfo(it, this@validateLongValue.component).asWarning()
+            }
         }
       } else {
         null
