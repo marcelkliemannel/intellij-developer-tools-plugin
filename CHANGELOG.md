@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Minimum version increased to 2026.2
+
 ### Removed
 
 ### Fixed
