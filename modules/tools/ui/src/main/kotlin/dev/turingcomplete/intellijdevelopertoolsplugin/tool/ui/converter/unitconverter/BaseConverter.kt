@@ -33,7 +33,7 @@ class BaseConverter(configuration: DeveloperToolConfiguration, parentDisposable:
   private val showOnlyCommonBases =
     configuration.register("${CONFIGURATION_KEY_PREFIX}showOnlyCommonBases", true, CONFIGURATION)
 
-  private lateinit var baseProperties: Map<Int, ValueProperty<String>>
+  private lateinit var baseProperties: Map<String, ValueProperty<String>>
 
   // -- Initialization ------------------------------------------------------ //
   // -- Exported Methods ---------------------------------------------------- //
@@ -43,7 +43,7 @@ class BaseConverter(configuration: DeveloperToolConfiguration, parentDisposable:
     baseProperties =
       bases
         .map { (base, title) ->
-          val property = if (base == 2) baseTwoInput else ValueProperty("0")
+          val property = if (base == "2") baseTwoInput else ValueProperty("0")
           row {
               lateinit var textField: JBTextField
               val textFieldCell =
@@ -78,12 +78,12 @@ class BaseConverter(configuration: DeveloperToolConfiguration, parentDisposable:
   }
 
   override fun sync() {
-    convertFromCommonBase(2, null)
+    convertFromCommonBase("2", null)
   }
 
   // -- Private Methods ----------------------------------------------------- //
 
-  private fun convertFromCommonBase(inputBase: Int, textField: JBTextField?) {
+  private fun convertFromCommonBase(inputBase: String, textField: JBTextField?) {
     if (textField != null && validate().any { it.component == textField }) {
       return
     }
@@ -94,11 +94,11 @@ class BaseConverter(configuration: DeveloperToolConfiguration, parentDisposable:
 
     baseProperties
       .filter { it.value != inputProperty }
-      .forEach { (base, property) -> property.set(input.toString(base).uppercase()) }
+      .forEach { (base, property) -> property.set(input.toString(base)) }
   }
 
   @Suppress("UnstableApiUsage")
-  private fun Cell<JBTextField>.validate(base: Int) =
+  private fun Cell<JBTextField>.validate(base: String) =
     this.apply {
       validationInfo {
         if (!this@validate.component.isEnabled) {
@@ -114,18 +114,27 @@ class BaseConverter(configuration: DeveloperToolConfiguration, parentDisposable:
       }
     }
 
-  private fun String.parse(base: Int): BigInteger? {
+  private fun String.parse(base: String): BigInteger? {
     if (this.isBlank()) {
       return null
     }
 
-    val maxAllowedChar = validChars[base - 1]
-    val isValid = this.uppercase().all { it in '0'..maxAllowedChar }
-    if (!isValid) {
-      throw IllegalArgumentException("Invalid input for base $base")
+    return when (base) {
+      FLOAT32 -> BigInteger.valueOf(toFloat().toRawBits().toLong())
+      FLOAT64 -> BigInteger.valueOf(toDouble().toRawBits())
+      else -> BigInteger(this, base.toInt())
     }
+  }
 
-    return BigInteger(this, base)
+  private fun BigInteger.toString(base: String): String {
+    return when {
+      base == FLOAT32 && bitLength() > 32 || base == FLOAT64 && bitLength() > 64 ->
+        Float.NaN.toString()
+
+      base == FLOAT32 -> Float.fromBits(toInt()).toString()
+      base == FLOAT64 -> Double.fromBits(toLong()).toString()
+      else -> toString(base.toInt()).uppercase()
+    }
   }
 
   // -- Inner Type ---------------------------------------------------------- //
@@ -136,46 +145,49 @@ class BaseConverter(configuration: DeveloperToolConfiguration, parentDisposable:
     private const val CONFIGURATION_KEY_PREFIX = "baseConverter_"
     private const val EXAMPLE_BASE_TWO_INPUT = "10101010"
 
-    private val validChars = ('0'..'9') + ('A'..'Z')
+    private const val FLOAT32 = "float32"
+    private const val FLOAT64 = "float64"
 
-    private val commonBases = setOf(2, 8, 10, 16)
+    private val commonBases = setOf("2", "8", "10", "16", FLOAT32, FLOAT64)
     private val bases =
       linkedMapOf(
-        2 to "Binary",
-        3 to "Ternary",
-        4 to "Quaternary",
-        5 to "Quinary",
-        6 to "Senary",
-        7 to "Septenary",
-        8 to "Octal",
-        9 to "Nonary",
-        10 to "Decimal",
-        11 to "Undecimal",
-        12 to "Duodecimal",
-        13 to "Tridecimal",
-        14 to "Tetradecimal",
-        15 to "Pentadecimal",
-        16 to "Hexadecimal",
-        17 to "Heptadecimal",
-        18 to "Octodecimal",
-        19 to "Enneadecimal",
-        20 to "Vigesimal",
-        21 to "Unvigesimal",
-        22 to "Duovigesimal",
-        23 to "Trivigesimal",
-        24 to "Tetravigesimal",
-        25 to "Pentavigesimal",
-        26 to "Hexavigesimal",
-        27 to "Septemvigesimal",
-        28 to "Octovigesimal",
-        29 to "Ennevigesimal",
-        30 to "Trigesimal",
-        31 to "Untrigesimal",
-        32 to "Duotrigesimal",
-        33 to "Tretrigesimal",
-        34 to "Tetratrigesimal",
-        35 to "Pentatrigesimal",
-        36 to "Hexatrigesimal",
+        "2" to "Binary",
+        "3" to "Ternary",
+        "4" to "Quaternary",
+        "5" to "Quinary",
+        "6" to "Senary",
+        "7" to "Septenary",
+        "8" to "Octal",
+        "9" to "Nonary",
+        "10" to "Decimal",
+        "11" to "Undecimal",
+        "12" to "Duodecimal",
+        "13" to "Tridecimal",
+        "14" to "Tetradecimal",
+        "15" to "Pentadecimal",
+        "16" to "Hexadecimal",
+        "17" to "Heptadecimal",
+        "18" to "Octodecimal",
+        "19" to "Enneadecimal",
+        "20" to "Vigesimal",
+        "21" to "Unvigesimal",
+        "22" to "Duovigesimal",
+        "23" to "Trivigesimal",
+        "24" to "Tetravigesimal",
+        "25" to "Pentavigesimal",
+        "26" to "Hexavigesimal",
+        "27" to "Septemvigesimal",
+        "28" to "Octovigesimal",
+        "29" to "Ennevigesimal",
+        "30" to "Trigesimal",
+        "31" to "Untrigesimal",
+        "32" to "Duotrigesimal",
+        "33" to "Tretrigesimal",
+        "34" to "Tetratrigesimal",
+        "35" to "Pentatrigesimal",
+        "36" to "Hexatrigesimal",
+        FLOAT32 to "Float32",
+        FLOAT64 to "Float64",
       )
   }
 }
